@@ -1,0 +1,22 @@
+{
+    "name": "andriy-svirin/ebics-php",
+    "type": "package",
+    "description": "PHP library to communicate with bank through EBICS protocol.",
+    "version": "dev",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/andriy-svirin/mt942-php"
+        }
+    ],
+    "require": {
+        "comodojo/httprequest": "~1.0",
+        "phpseclib/phpseclib": "~2.0",
+        "andriy-svirin/mt942-php": "dev-dev",
+        "ext-openssl": "*",
+        "ext-dom": "*"
+    },
+    "autoload": {
+        "classmap": ["src/"]
+    }
+}
