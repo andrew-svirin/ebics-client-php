@@ -1,13 +1,13 @@
 <?php
 
-namespace Ukrinsoft\Ebics;
+namespace AndrewSvirin\Ebics;
 
 use DOMDocument;
 use DOMXPath;
 use Exception;
 use phpseclib\Crypt\RSA;
-use Ukrinsoft\Ebics\Request;
-use Ukrinsoft\MT942;
+use AndrewSvirin\Ebics\Request;
+use AndrewSvirin\MT942;
 
 /**
  * Response model.
