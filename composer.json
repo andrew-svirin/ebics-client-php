@@ -1,0 +1,30 @@
+{
+    "name": "andrew-svirin/ebics-client-php",
+    "version": "0.0.1",
+    "type": "library",
+    "description": "PHP library to communicate with bank through EBICS protocol.",
+    "keywords": [
+        "ebics",
+        "PHP",
+        "client"
+    ],
+    "authors": [
+        {
+            "name": "Andrew Svirin"
+        }
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^7.0",
+        "ext-dom": "*",
+        "ext-openssl": "*",
+        "andrew-svirin/mt942-php": "1.0.0",
+        "comodojo/httprequest": "~1.0",
+        "phpseclib/phpseclib": "~2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "AndrewSvirin\\Ebics\\": "src"
+        }
+    }
+}
