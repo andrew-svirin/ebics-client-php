@@ -1,8 +1,8 @@
 <?php
 
-namespace Ukrinsoft\Ebics;
+namespace AndrewSvirin\Ebics;
 
-use Ukrinsoft\Ebics\EbicsKeyRing;
+use AndrewSvirin\Ebics\EbicsKeyRing;
 
 /**
  * EBICS user representation.

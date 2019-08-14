@@ -1,10 +1,10 @@
 <?php
 
-namespace Ukrinsoft\Ebics;
+namespace AndrewSvirin\Ebics;
 
-use Ukrinsoft\Ebics\EbicsBank;
-use Ukrinsoft\Ebics\EbicsUser;
-use Ukrinsoft\Ebics\Request;
+use AndrewSvirin\Ebics\EbicsBank;
+use AndrewSvirin\Ebics\EbicsUser;
+use AndrewSvirin\Ebics\Request;
 use DOMDocument;
 
 /**
