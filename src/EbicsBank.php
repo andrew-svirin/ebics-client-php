@@ -1,6 +1,6 @@
 <?php
 
-namespace Ukrinsoft\Ebics;
+namespace AndrewSvirin\Ebics;
 
 use Ukrinsoft\Ebics\EbicsKeyRing;
 use phpseclib\Crypt\RSA;

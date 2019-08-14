@@ -1,14 +1,14 @@
 <?php
 
-namespace Ukrinsoft\Ebics;
+namespace AndrewSvirin\Ebics;
 
 use DateTime;
 use DateTimeZone;
 use DOMDocument;
 use DOMNode;
 use Comodojo\Httprequest\Httprequest;
-use Ukrinsoft\Ebics\EbicsClient;
-use Ukrinsoft\Ebics\Response;
+use AndrewSvirin\Ebics\EbicsClient;
+use AndrewSvirin\Ebics\Response;
 use Exception;
 
 /**
