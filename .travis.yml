@@ -1,0 +1,14 @@
+sudo: false
+
+language: php
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+    - vendor
+
+before_script:
+  - composer update --dev --no-interaction
