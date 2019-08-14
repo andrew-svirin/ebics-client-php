@@ -1,30 +1,20 @@
-#EBICS-PHP
+# EBICS-CLIENT-PHP
 PHP library to communicate with bank through EBICS protocol.
 
-###Instalation:
-2. Include current library into vendors
-```
-    "repositories": [
-        {
-            "type": "git",
-            "url": "git@bitbucket.org:ukrinsoft/ebics-php.git"
-        },
-        {
-            "type": "git",
-            "url": "git@bitbucket.org:ukrinsoft/mt942-php.git"
-        }
-    ],
-    "require": {
-        "ukrinsoft/ebics-php": "dev-master"
-    },
+### Installation
+```bash
+$ composer require andrew-swirin/ebics-client-php
 ```
 
-###Example:
+### License
+andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+
+### Example
 ```
-use Ukrinsoft\Ebics\EbicsKeyRing;
-use Ukrinsoft\Ebics\EbicsBank;
-use Ukrinsoft\Ebics\EbicsUser;
-use Ukrinsoft\Ebics\EbicsClient;
+use AndrewSvirin\Ebics\EbicsKeyRing;
+use AndrewSvirin\Ebics\EbicsBank;
+use AndrewSvirin\Ebics\EbicsUser;
+use AndrewSvirin\Ebics\EbicsClient;
 
 $keysRealPath = realpath('files/mykeys.json');
 $keyring = new EbicsKeyRing($keysRealPath, 'mysecret');
@@ -33,3 +23,6 @@ $user = new EbicsUser($keyring, 'PartnerID', 'UserID');
 $client = new EbicsClient($bank, $user);
 $vmkData = $client->VMK('2016-10-02', '2016-10-27');
 ```
+
+### Statistic
+[![Build Status](https://travis-ci.com/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
