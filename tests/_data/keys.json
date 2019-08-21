@@ -1,0 +1,24 @@
+{
+  "@DZTEST": {
+    "X" : {
+      "key" : "CFFB3E609EF3AB5B1471B1C0C3C9570AE79ACCF8",
+      "version": "X001"
+    },
+    "E" : {
+      "key" : "0F2CF2121D15A4D71059BBF4BFC75570B721BBA3",
+      "version": "E001"
+    }
+  },
+  "#USER" : {
+    "X" : {
+      "pk" : "953A8251DAAACD4A6D6969B45BAB858AF835EE13BFADD0704F7DD1C46D73E3E0",
+      "pk_iv" : "",
+      "version": "X002"
+    },
+    "E" : {
+      "pk" : "A560646AF31E6BC2A7B20DB4B09BCB13D78BB4ECC067EC8EC98D1DD4EFAEED87",
+      "pk_iv" : "",
+      "version": "E002"
+    }
+  }
+}

@@ -2,6 +2,11 @@
 
 namespace AndrewSvirin\tests\Unit;
 
+use AndrewSvirin\Ebics\Bank;
+use AndrewSvirin\Ebics\Client;
+use AndrewSvirin\Ebics\handlers\ResponseHandler;
+use AndrewSvirin\Ebics\KeyRing;
+use AndrewSvirin\Ebics\User;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,9 +18,21 @@ use PHPUnit\Framework\TestCase;
 final class EbicsTest extends TestCase
 {
 
-   public function testTrue()
+   var $data = __DIR__ . '/../_data';
+   var $fixtures = __DIR__ . '/../_fixtures';
+
+   public function testINI()
    {
-      $this->assertTrue(true);
+      $credentials = json_decode(file_get_contents($this->data . '/credentials.json'));
+      $keyRingRealPath = realpath($this->data . '/workspace/keyring.json');
+      $keyring = new KeyRing($keyRingRealPath, 'test123', base64_decode($credentials->A006CertB64));
+      $bank = new Bank($keyring, $credentials->hostId, $credentials->hostURL);
+      $user = new User($keyring,  $credentials->partnerId, $credentials->userId);
+      $client = new Client($bank, $user, $keyring);
+      $ini = $client->INI();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($ini);
+      $this->assertEquals($code, '000000');
    }
 
 }

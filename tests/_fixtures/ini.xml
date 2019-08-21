@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004">
+    <header authenticate="true">
+        <static>
+            <HostID>EBIXQUAL</HostID>
+            <PartnerID>PETROV00</PartnerID>
+            <UserID>MV024523</UserID>
+            <Product Language="de">EBICS - a PHP ebics kernel</Product>
+            <OrderDetails>
+                <OrderType>INI</OrderType>
+                <OrderAttribute>DZNNN</OrderAttribute>
+            </OrderDetails>
+            <SecurityMedium>0000</SecurityMedium>
+        </static>
+        <mutable/>
+    </header>
+    <body>
+        <DataTransfer>
+            <OrderData>{order_data}</OrderData>
+        </DataTransfer>
+    </body>
+</ebicsUnsecuredRequest>
