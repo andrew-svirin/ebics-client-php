@@ -26,6 +26,3 @@ $vmkData = $client->VMK('2016-10-02', '2016-10-27');
 
 ### Statistic
 [![Build Status](https://travis-ci.com/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
-
-// Docs:
-https://support.axway.com/doc/015d426feda8dfb53f55c2a2321f33bc/Transfer_CFT_3.1.3_UsersGuide_allOS_en/content/prots/french/ebics/ebics_gui/c_ebics_overview.htm

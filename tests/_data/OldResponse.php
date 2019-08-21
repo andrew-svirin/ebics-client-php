@@ -1,25 +1,23 @@
 <?php
 
-namespace AndrewSvirin\Ebics;
+namespace AndrewSvirin\Ebics\models;
 
+use AndrewSvirin\Ebics\exceptions\EbicsException;
 use DOMDocument;
 use DOMXPath;
-use Exception;
 use phpseclib\Crypt\RSA;
-use AndrewSvirin\Ebics\Request;
-use AndrewSvirin\MT942;
 
 /**
  * Response model.
  */
-class Response
+class OldResponse
 {
 
     /**
      * A Request instance.
      * @var Request 
      */
-    private $_request;
+    private $request;
 
     /**
      * Constructor.
@@ -27,7 +25,7 @@ class Response
      */
     public function __construct(Request $request = NULL)
     {
-        $this->_request = $request;
+        $this->request = $request;
     }
 
     /**
@@ -42,10 +40,11 @@ class Response
      */
     private $_mt942Data;
 
-    /**
-     * Set response.
-     * @param string $source XML raw data.
-     */
+   /**
+    * Set response.
+    * @param string $source XML raw data.
+    * @throws EbicsException
+    */
     public function setResponse($source)
     {
         $domTree = new DOMDocument();
@@ -56,12 +55,12 @@ class Response
         $returnCode = $xpath->query('/H004:ebicsResponse/H004:body/H004:ReturnCode');
         $returnCodeValue = $returnCode->item(0)->nodeValue;
         if ($returnCodeValue !== '000000') {
-            throw new Exception('EBICS response code: ' . $returnCode->item(0)->nodeValue);
+            throw new EbicsException('EBICS response code: ' . $returnCode->item(0)->nodeValue);
         }
 
         $orderData = $xpath->query('/H004:ebicsResponse/H004:body/H004:DataTransfer/H004:OrderData');
         if ($orderData->length == 0) {
-            throw new Exception('EBICS response empty result.');
+            throw new EbicsException('EBICS response empty result.');
         }
         $orderDataValue = $orderData->item(0)->nodeValue;
 
@@ -73,8 +72,8 @@ class Response
         $this->encryptionPubKeyDigest = $encryptionPubKeyDigest->item(0)->nodeValue;
 
         $rsa = new RSA();
-        $rsa->setPassword($this->_request->getClient()->getUser()->getKeyring()->getPassphrase());
-        $rsa->loadKey($this->_request->getClient()->getUser()->getEncriptionKey());
+        $rsa->setPassword($this->request->getClient()->getUser()->getKeyring()->getPassphrase());
+        $rsa->loadKey($this->request->getClient()->getUser()->getEncriptionKey());
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionIdDecoded = $rsa->decrypt($transactionIdBin);
 
