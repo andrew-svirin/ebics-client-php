@@ -8,3 +8,6 @@ Test 3: https://www.business-logics.de/english/download_ok.html
 
 // Docs:
 https://support.axway.com/doc/015d426feda8dfb53f55c2a2321f33bc/Transfer_CFT_3.1.3_UsersGuide_allOS_en/content/prots/french/ebics/ebics_gui/c_ebics_overview.htm
+
+
+https://github.com/cyrill62/ebics-java/blob/master/src/main/java/org/kopi/ebics/certificate/X509Generator.java
