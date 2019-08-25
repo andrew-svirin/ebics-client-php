@@ -7,6 +7,8 @@ use AndrewSvirin\Ebics\User;
 use DateTime;
 use DOMDocument;
 use phpseclib\Crypt\RSA;
+use phpseclib\File\X509;
+use phpseclib\Math\BigInteger;
 
 /**
  * Class OrderDataHandler manages OrderData DOM elements.
@@ -42,21 +44,26 @@ class OrderDataHandler
    /**
     * Adds OrderData DOM elements to XML DOM.
     * @param DOMDocument $xml
-    * @param RSA $rsa
+    * @param string $certificateContent
     * @param DateTime|null $dateTime
     */
-   public function handle(DOMDocument $xml, RSA $rsa, DateTime $dateTime = null)
+   public function handle(DOMDocument $xml, $certificateContent, DateTime $dateTime = null)
    {
+      $x509 = new X509();
+      $x509->loadX509($certificateContent);
       if (null === $dateTime)
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $exponent = $rsa->exponent->toHex();
-      $modulus = $rsa->modulus->toHex();
-      $certificateContent = $this->keyRing->getCertificateContent();
-      $certificateData = $this->keyRing->getCertificateData();
-      $insurerName = $certificateData['tbsCertificate']['issuer']['rdnSequence'][2][0]['value']['printableString'];
-      $serialNumber = $certificateData['tbsCertificate']['serialNumber']->value[0];
+      /* @var $publicKey RSA */
+      $publicKey = $x509->getPublicKey();
+      $exponent = $publicKey->exponent->toHex();
+      $modulus = $publicKey->modulus->toHex();
+      /* @var $serialNumber BigInteger */
+      $serialNumber = $x509->currentCert["tbsCertificate"]["serialNumber"];
+      $serialNumberValue = $serialNumber->toString();
+      $insurerName = $x509->getIssuerDNProp('id-at-commonName');
+      $insurerNameValue = array_shift($insurerName);
       $timeStamp = $dateTime->format('c');
 
       // Add SignaturePubKeyOrderData to root.
@@ -78,12 +85,12 @@ class OrderDataHandler
 
       // Add ds:X509IssuerName to ds:X509IssuerSerial.
       $xmlX509IssuerName = $xml->createElement('ds:X509IssuerName');
-      $xmlX509IssuerName->nodeValue = $insurerName;
+      $xmlX509IssuerName->nodeValue = $insurerNameValue;
       $xmlX509IssuerSerial->appendChild($xmlX509IssuerName);
 
       // Add ds:X509SerialNumber to ds:X509IssuerSerial.
       $xmlX509SerialNumber = $xml->createElement('ds:X509SerialNumber');
-      $xmlX509SerialNumber->nodeValue = $serialNumber;
+      $xmlX509SerialNumber->nodeValue = $serialNumberValue;
       $xmlX509IssuerSerial->appendChild($xmlX509SerialNumber);
 
       // Add ds:X509Certificate to ds:X509Data.
