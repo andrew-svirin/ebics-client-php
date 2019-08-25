@@ -157,7 +157,7 @@ class KeyRing
       $rsa1->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
       $rsa1->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
       $rsa1->setHash('sha256');
-      $keys = $rsa1->createKey(1536);
+      $keys = $rsa1->createKey(2048);
       return $keys;
    }
 

@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='utf-8'?>
+<HIARequestOrderData xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns="urn:org:ebics:H004">
+    <AuthenticationPubKeyInfo>
+        <ds:X509Data>
+            <ds:X509IssuerSerial>
+                <ds:X509IssuerName>{XX509IssuerName}</ds:X509IssuerName>
+                <ds:X509SerialNumber>{XX509SerialNumber}</ds:X509SerialNumber>
+            </ds:X509IssuerSerial>
+            <ds:X509Certificate>{XX509Certificate}</ds:X509Certificate>
+        </ds:X509Data>
+        <PubKeyValue>
+            <ds:RSAKeyValue>
+                <ds:Modulus>{X002_Modulus}</ds:Modulus>
+                <ds:Exponent>{X002_Exponent}</ds:Exponent>
+            </ds:RSAKeyValue>
+        </PubKeyValue>
+        <AuthenticationVersion>X002</AuthenticationVersion>
+    </AuthenticationPubKeyInfo>
+    <EncryptionPubKeyInfo>
+        <ds:X509Data>
+            <ds:X509IssuerSerial>
+                <ds:X509IssuerName>{EX509IssuerName}</ds:X509IssuerName>
+                <ds:X509SerialNumber>{EX509SerialNumber}</ds:X509SerialNumber>
+            </ds:X509IssuerSerial>
+            <ds:X509Certificate>{EX509Certificate}</ds:X509Certificate>
+        </ds:X509Data>
+        <PubKeyValue>
+            <ds:RSAKeyValue>
+                <ds:Modulus>{E002_Modulus}</ds:Modulus>
+                <ds:Exponent>{E002_Exponent}</ds:Exponent>
+            </ds:RSAKeyValue>
+        </PubKeyValue>
+        <EncryptionVersion>E002</EncryptionVersion>
+    </EncryptionPubKeyInfo>
+    <PartnerID>{PartnerID}</PartnerID>
+    <UserID>{UserID}</UserID>
+</HIARequestOrderData>
