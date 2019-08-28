@@ -3,11 +3,10 @@
 namespace AndrewSvirin\Ebics\handlers;
 
 use AndrewSvirin\Ebics\KeyRing;
+use AndrewSvirin\Ebics\models\Certificate;
 use AndrewSvirin\Ebics\User;
 use DateTime;
 use DOMDocument;
-use phpseclib\Crypt\RSA;
-use phpseclib\File\X509;
 use phpseclib\Math\BigInteger;
 
 /**
@@ -44,21 +43,18 @@ class OrderDataHandler
    /**
     * Adds OrderData DOM elements to XML DOM.
     * @param DOMDocument $xml
-    * @param string $certificateContent
+    * @param Certificate $certificateA
     * @param DateTime|null $dateTime
     */
-   public function handle(DOMDocument $xml, $certificateContent, DateTime $dateTime = null)
+   public function handle(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime = null)
    {
-      $x509 = new X509();
-      $x509->loadX509($certificateContent);
+      $x509 = $certificateA->toX509();
       if (null === $dateTime)
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      /* @var $publicKey RSA */
-      $publicKey = $x509->getPublicKey();
-      $exponent = $publicKey->exponent->toHex();
-      $modulus = $publicKey->modulus->toHex();
+      $exponent = $x509->getPublicKey()->exponent->toHex();
+      $modulus = $x509->getPublicKey()->modulus->toHex();
       /* @var $serialNumber BigInteger */
       $serialNumber = $x509->currentCert["tbsCertificate"]["serialNumber"];
       $serialNumberValue = $serialNumber->toString();
@@ -95,7 +91,7 @@ class OrderDataHandler
 
       // Add ds:X509Certificate to ds:X509Data.
       $xmlX509Certificate = $xml->createElement('ds:X509Certificate');
-      $xmlX509Certificate->nodeValue = base64_encode($certificateContent);
+      $xmlX509Certificate->nodeValue = base64_encode($certificateA->getContent());
       $xmlX509Data->appendChild($xmlX509Certificate);
 
       // Add PubKeyValue to SignaturePubKeyInfo.
