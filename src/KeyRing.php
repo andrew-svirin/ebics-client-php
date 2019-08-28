@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\exceptions\EbicsException;
-use phpseclib\Crypt\RSA;
+use AndrewSvirin\Ebics\models\Certificate;
 use phpseclib\File\X509;
 
 /**
@@ -145,23 +145,6 @@ class KeyRing
    }
 
    /**
-    * Generate public and private keys.
-    * @return array [
-    *    'publickey' => '<string>',
-    *    'privatekey' => '<string>',
-    * ]
-    */
-   public function generateKeys()
-   {
-      $rsa1 = new RSA();
-      $rsa1->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
-      $rsa1->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
-      $rsa1->setHash('sha256');
-      $keys = $rsa1->createKey(2048);
-      return $keys;
-   }
-
-   /**
     * @return array Certificate.
     */
    public function getCertificateData()
@@ -179,6 +162,36 @@ class KeyRing
    {
       $content = $this->certificateContent;
       return $content;
+   }
+
+   private function saveCertificateA(Certificate $certificate): bool
+   {
+
+   }
+
+   private function saveCertificateE(Certificate $certificate): bool
+   {
+
+   }
+
+   private function saveCertificateX(Certificate $certificate): bool
+   {
+
+   }
+
+   public function getCertificateA(): Certificate
+   {
+
+   }
+
+   public function getCertificateE(): Certificate
+   {
+
+   }
+
+   public function getCertificateX(): Certificate
+   {
+
    }
 
 }
