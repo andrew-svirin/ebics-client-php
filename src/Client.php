@@ -131,7 +131,7 @@ class Client
       $certificateA = CertificateFactory::buildCertificateA();
       // Order data.
       $orderData = new OrderData();
-      $this->orderDataHandler->handle($orderData, $certificateA);
+      $this->orderDataHandler->handleINI($orderData, $certificateA);
       $orderDataContent = $orderData->getContent();
       // Wrapper for request Order data.
       $request = new Request();
@@ -148,73 +148,27 @@ class Client
 
    /**
     * Make HIA request.
-    * @param $data
-    * @return string
+    * @return Response
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
     */
-   public function HIA($data)
+   public function HIA(): Response
    {
       $certificateE = CertificateFactory::buildCertificateE();
-      $certificateEX509 = $certificateE->toX509();
       $certificateX = CertificateFactory::buildCertificateX();
-      $certificateXX509 = $certificateX->toX509();
-      $exponent1 = $certificateEX509->getPublicKey()->exponent->toHex();
-      $modulus1 = $certificateEX509->getPublicKey()->modulus->toHex();
-      $exponent2 = $certificateXX509->getPublicKey()->exponent->toHex();
-      $modulus2 = $certificateXX509->getPublicKey()->modulus->toHex();
-      $data = str_replace([
-         '{X002_Modulus}',
-         '{X002_Exponent}',
-         '{E002_Modulus}',
-         '{E002_Exponent}',
-         '{XX509IssuerName}',
-         '{XX509SerialNumber}',
-         '{XX509Certificate}',
-         '{EX509IssuerName}',
-         '{EX509SerialNumber}',
-         '{EX509Certificate}',
-         '{PartnerID}',
-         '{UserID}',
-      ], [
-         base64_encode($modulus1),
-         base64_encode($exponent1),
-         base64_encode($modulus2),
-         base64_encode($exponent2),
-         $certificateEX509->getInsurerName(),
-         $certificateEX509->getSerialNumber(),
-         base64_encode($certificateE->getContent()),
-         $certificateXX509->getInsurerName(),
-         $certificateXX509->getSerialNumber(),
-         base64_encode($certificateX->getContent()),
-         $this->user->getPartnerId(),
-         $this->user->getUserId(),
-
-      ], $data);
-      $xml = '<?xml version="1.0"?>
-        <ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004">
-          <header authenticate="true">
-            <static>
-              <HostID>' . $this->bank->getHostId() . '</HostID>
-              <PartnerID>' . $this->user->getPartnerId() . '</PartnerID>
-              <UserID>' . $this->user->getUserId() . '</UserID>
-              <OrderDetails>
-                <OrderType>HIA</OrderType>
-                <OrderAttribute>DZNNN</OrderAttribute>
-              </OrderDetails>
-              <SecurityMedium>0000</SecurityMedium>
-            </static>
-            <mutable/>
-          </header>
-          <body>
-            <DataTransfer>
-              <OrderData>' . base64_encode(gzcompress($data)) . '</OrderData>
-            </DataTransfer>
-          </body>
-        </ebicsUnsecuredRequest>';
-      $hostResponse = $this->post($xml);
+      // Order data.
+      $orderData = new OrderData();
+      $this->orderDataHandler->handleHIA($orderData, $certificateX, $certificateE);
+      $orderDataContent = $orderData->getContent();
+      // Wrapper for request Order data.
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleUnsecured($request);
+      $this->headerHandler->handleHIA($request, $xmlRequest);
+      $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
