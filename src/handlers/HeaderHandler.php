@@ -17,6 +17,7 @@ class HeaderHandler
 {
 
    const ORDER_TYPE_INI = 'INI';
+   const ORDER_TYPE_HIA = 'HIA';
    const ORDER_TYPE_VMK = 'VMK';
 
    const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
@@ -64,6 +65,16 @@ class HeaderHandler
    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest)
    {
       $this->handle($xml, $xmlRequest, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN);
+   }
+
+   /**
+    * Add header for HIA request.
+    * @param DOMDocument $xml
+    * @param DOMElement $xmlRequest
+    */
+   public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest)
+   {
+      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN);
    }
 
    /**

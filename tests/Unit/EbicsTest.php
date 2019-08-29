@@ -35,8 +35,8 @@ final class EbicsTest extends TestCase
       $ini = $client->INI();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveKeyManagementResponseReturnCode($ini);
-      $this->assertEquals($code, '000000');
       $reportText = $responseHandler->retrieveKeyManagementResponseReportText($ini);
+      $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
@@ -51,12 +51,11 @@ final class EbicsTest extends TestCase
       $bank = new Bank($keyring, $credentials->hostId, $credentials->hostURL);
       $user = new User($keyring, $credentials->partnerId, $credentials->userId);
       $client = new Client($bank, $user, $keyring);
-      $data = file_get_contents($this->fixtures . '/hia.xml');
-      $hia = $client->HIA($data);
+      $hia = $client->HIA();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveKeyManagementResponseReturnCode($hia);
-      $this->assertEquals($code, '000000');
       $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hia);
+      $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
