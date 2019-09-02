@@ -2,9 +2,8 @@
 
 namespace AndrewSvirin\Ebics\handlers;
 
-use AndrewSvirin\Ebics\KeyRing;
 use AndrewSvirin\Ebics\models\Certificate;
-use AndrewSvirin\Ebics\User;
+use AndrewSvirin\Ebics\models\User;
 use DateTime;
 use DOMDocument;
 use DOMNode;
@@ -24,11 +23,6 @@ class OrderDataHandler
    private $user;
 
    /**
-    * @var KeyRing
-    */
-   private $keyRing;
-
-   /**
     * @var string
     */
    private $signatureVersion;
@@ -43,10 +37,9 @@ class OrderDataHandler
     */
    private $encryptionVersion;
 
-   public function __construct(User $user, KeyRing $keyRing)
+   public function __construct(User $user)
    {
       $this->user = $user;
-      $this->keyRing = $keyRing;
       $this->signatureVersion = 'A006';
       $this->authenticationVersion = 'X002';
       $this->encryptionVersion = 'E002';
@@ -92,11 +85,11 @@ class OrderDataHandler
    /**
     * Adds OrderData DOM elements to XML DOM for HIA request.
     * @param DOMDocument $xml
-    * @param Certificate $certificateX
     * @param Certificate $certificateE
+    * @param Certificate $certificateX
     * @param DateTime|null $dateTime
     */
-   public function handleHIA(DOMDocument $xml, Certificate $certificateX, Certificate $certificateE, DateTime $dateTime = null)
+   public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime = null)
    {
       if (null === $dateTime)
       {

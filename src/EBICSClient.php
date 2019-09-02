@@ -7,9 +7,12 @@ use AndrewSvirin\Ebics\handlers\BodyHandler;
 use AndrewSvirin\Ebics\handlers\HeaderHandler;
 use AndrewSvirin\Ebics\handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\handlers\RequestHandler;
+use AndrewSvirin\Ebics\models\Bank;
+use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\OrderData;
 use AndrewSvirin\Ebics\models\Request;
 use AndrewSvirin\Ebics\models\Response;
+use AndrewSvirin\Ebics\models\User;
 use DOMDocument;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -24,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Client
+class EBICSClient
 {
 
    /**
@@ -78,7 +81,7 @@ class Client
       $this->requestHandler = new RequestHandler();
       $this->headerHandler = new HeaderHandler($bank, $user);
       $this->bodyHandler = new BodyHandler();
-      $this->orderDataHandler = new OrderDataHandler($user, $keyRing);
+      $this->orderDataHandler = new OrderDataHandler($user);
    }
 
    /**
@@ -91,12 +94,21 @@ class Client
    }
 
    /**
-    * Getter for user.
+    * Getter for user
     * @return User
     */
    public function getUser()
    {
       return $this->user;
+   }
+
+   /**
+    * Getter for keyRing
+    * @return KeyRing
+    */
+   public function getKeyRing()
+   {
+      return $this->keyRing;
    }
 
    /**
@@ -120,6 +132,7 @@ class Client
 
    /**
     * Make INI request.
+    * Setup A006 certificates to key ring.
     * @return Response
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -128,7 +141,7 @@ class Client
     */
    public function INI(): Response
    {
-      $certificateA = CertificateFactory::buildCertificateA();
+      $certificateA = CertificateFactory::generateCertificateA();
       // Order data.
       $orderData = new OrderData();
       $this->orderDataHandler->handleINI($orderData, $certificateA);
@@ -143,11 +156,13 @@ class Client
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
+      $this->keyRing->setCertificateA($certificateA);
       return $response;
    }
 
    /**
     * Make HIA request.
+    * Setup E002 and X002 certificates to key ring.
     * @return Response
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -156,11 +171,11 @@ class Client
     */
    public function HIA(): Response
    {
-      $certificateE = CertificateFactory::buildCertificateE();
-      $certificateX = CertificateFactory::buildCertificateX();
+      $certificateE = CertificateFactory::generateCertificateE();
+      $certificateX = CertificateFactory::generateCertificateX();
       // Order data.
       $orderData = new OrderData();
-      $this->orderDataHandler->handleHIA($orderData, $certificateX, $certificateE);
+      $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX);
       $orderDataContent = $orderData->getContent();
       // Wrapper for request Order data.
       $request = new Request();
@@ -172,6 +187,8 @@ class Client
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
+      $this->keyRing->setCertificateE($certificateE);
+      $this->keyRing->setCertificateX($certificateX);
       return $response;
    }
 

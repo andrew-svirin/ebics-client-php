@@ -25,4 +25,4 @@ $vmkData = $client->VMK('2016-10-02', '2016-10-27');
 ```
 
 ### Statistic
-[![Build Status](https://travis-ci.com/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
+[![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
