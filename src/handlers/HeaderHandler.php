@@ -2,8 +2,8 @@
 
 namespace AndrewSvirin\Ebics\handlers;
 
-use AndrewSvirin\Ebics\Bank;
-use AndrewSvirin\Ebics\User;
+use AndrewSvirin\Ebics\models\Bank;
+use AndrewSvirin\Ebics\models\User;
 use DOMDocument;
 use DOMElement;
 

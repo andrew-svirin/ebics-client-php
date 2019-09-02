@@ -16,22 +16,37 @@ use phpseclib\File\X509;
 class CertificateFactory
 {
 
-   public static function buildCertificateA(): Certificate
+   public static function buildCertificateA(string $content): Certificate
    {
-      return self::buildCertificate();
+      return new Certificate($content, Certificate::TYPE_A);
    }
 
-   public static function buildCertificateE(): Certificate
+   public static function buildCertificateE(string $content): Certificate
    {
-      return self::buildCertificate();
+      return new Certificate($content, Certificate::TYPE_E);
    }
 
-   public static function buildCertificateX(): Certificate
+   public static function buildCertificateX(string $content): Certificate
    {
-      return self::buildCertificate();
+      return new Certificate($content, Certificate::TYPE_X);
    }
 
-   private static function buildCertificate(): Certificate
+   public static function generateCertificateA(): Certificate
+   {
+      return self::generateCertificate(Certificate::TYPE_A);
+   }
+
+   public static function generateCertificateE(): Certificate
+   {
+      return self::generateCertificate(Certificate::TYPE_E);
+   }
+
+   public static function generateCertificateX(): Certificate
+   {
+      return self::generateCertificate(Certificate::TYPE_X);
+   }
+
+   private static function generateCertificate(string $type): Certificate
    {
       $keys = self::generateKeys();
 
@@ -141,7 +156,7 @@ class CertificateFactory
       );
       $result = $x509->sign($issuer, $x509, 'sha256WithRSAEncryption');
       $certificateContent = $x509->saveX509($result);
-      $certificate = new Certificate($certificateContent);
+      $certificate = new Certificate($certificateContent, $type);
       return $certificate;
    }
 

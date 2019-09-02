@@ -11,11 +11,18 @@ namespace AndrewSvirin\Ebics\models;
 class Certificate
 {
 
+   const TYPE_A = 'A';
+   const TYPE_X = 'X';
+   const TYPE_E = 'E';
+
    private $content;
 
-   public function __construct(string $content)
+   private $type;
+
+   public function __construct(string $content, string $type)
    {
       $this->content = $content;
+      $this->type = $type;
    }
 
    /**
@@ -24,6 +31,14 @@ class Certificate
    public function getContent(): string
    {
       return $this->content;
+   }
+
+   /**
+    * @return string
+    */
+   public function getType(): string
+   {
+      return $this->type;
    }
 
    /**
