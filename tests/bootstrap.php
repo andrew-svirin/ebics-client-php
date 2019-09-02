@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstrapping File for MT942 Test Suite
+ * Bootstrapping File for Test Suite
  */
 
 $loader_path = __DIR__ . '/../vendor/autoload.php';
