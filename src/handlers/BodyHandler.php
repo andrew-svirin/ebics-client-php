@@ -60,4 +60,16 @@ class BodyHandler
       $xmlDataTransfer->appendChild($xmlOrderData);
    }
 
+   /**
+    * Add empty body element to request.
+    * @param DOMDocument $xml
+    * @param DOMElement $xmlRequest
+    */
+   public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest)
+   {
+      // Add body to request.
+      $xmlBody = $xml->createElement('body');
+      $xmlRequest->appendChild($xmlBody);
+   }
+
 }

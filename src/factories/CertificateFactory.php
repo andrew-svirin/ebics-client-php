@@ -16,39 +16,39 @@ use phpseclib\File\X509;
 class CertificateFactory
 {
 
-   public static function buildCertificateA(string $content): Certificate
+   public static function buildCertificateA(string $content, array $keys): Certificate
    {
-      return new Certificate($content, Certificate::TYPE_A);
+      return new Certificate($content, Certificate::TYPE_A, $keys);
    }
 
-   public static function buildCertificateE(string $content): Certificate
+   public static function buildCertificateE(string $content, array $keys): Certificate
    {
-      return new Certificate($content, Certificate::TYPE_E);
+      return new Certificate($content, Certificate::TYPE_E, $keys);
    }
 
-   public static function buildCertificateX(string $content): Certificate
+   public static function buildCertificateX(string $content, array $keys): Certificate
    {
-      return new Certificate($content, Certificate::TYPE_X);
+      return new Certificate($content, Certificate::TYPE_X, $keys);
    }
 
-   public static function generateCertificateA(): Certificate
+   public static function generateCertificateA(string $password): Certificate
    {
-      return self::generateCertificate(Certificate::TYPE_A);
+      return self::generateCertificate($password, Certificate::TYPE_A);
    }
 
-   public static function generateCertificateE(): Certificate
+   public static function generateCertificateE(string $password): Certificate
    {
-      return self::generateCertificate(Certificate::TYPE_E);
+      return self::generateCertificate($password, Certificate::TYPE_E);
    }
 
-   public static function generateCertificateX(): Certificate
+   public static function generateCertificateX(string $password): Certificate
    {
-      return self::generateCertificate(Certificate::TYPE_X);
+      return self::generateCertificate($password, Certificate::TYPE_X);
    }
 
-   private static function generateCertificate(string $type): Certificate
+   private static function generateCertificate(string $password, string $type): Certificate
    {
-      $keys = self::generateKeys();
+      $keys = self::generateKeys($password);
 
       $privateKey = new RSA();
       $privateKey->loadKey($keys['privatekey']);
@@ -77,7 +77,7 @@ class CertificateFactory
       ]);
       $issuer->setKeyIdentifier($subject->computeKeyIdentifier($publicKey)); // id-ce-authorityKeyIdentifier
 
-      $today = new DateTime();
+      $today = DateTime::createFromFormat('U', time());
       $x509 = new X509();
 
       $x509->startDate = $today->modify('-1 day')->format('YmdHis');
@@ -156,23 +156,25 @@ class CertificateFactory
       );
       $result = $x509->sign($issuer, $x509, 'sha256WithRSAEncryption');
       $certificateContent = $x509->saveX509($result);
-      $certificate = new Certificate($certificateContent, $type);
+      $certificate = new Certificate($certificateContent, $type, $keys);
       return $certificate;
    }
 
    /**
     * Generate public and private keys.
+    * @param string $password
     * @return array [
     *    'publickey' => '<string>',
     *    'privatekey' => '<string>',
     * ]
     */
-   private static function generateKeys()
+   private static function generateKeys(string $password)
    {
       $rsa1 = new RSA();
       $rsa1->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
       $rsa1->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
       $rsa1->setHash('sha256');
+      $rsa1->setPassword($password);
       $keys = $rsa1->createKey(2048);
       return $keys;
    }

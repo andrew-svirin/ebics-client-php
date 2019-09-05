@@ -97,4 +97,17 @@ final class EbicsTest extends TestCase
       $this->keyRingManager->saveKeyRing($this->client->getKeyRing());
    }
 
+   /**
+    * @group HPB
+    * @throws ClientExceptionInterface
+    * @throws EbicsException
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testHPB()
+   {
+      $hpb = $this->client->HPB();
+   }
+
 }

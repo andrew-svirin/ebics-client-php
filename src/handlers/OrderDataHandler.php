@@ -51,13 +51,8 @@ class OrderDataHandler
     * @param Certificate $certificateA Certificate A.
     * @param DateTime|null $dateTime
     */
-   public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime = null)
+   public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime)
    {
-      if (null === $dateTime)
-      {
-         $dateTime = DateTime::createFromFormat('U', time());
-      }
-
       // Add SignaturePubKeyOrderData to root.
       $xmlSignaturePubKeyOrderData = $xml->createElementNS('http://www.ebics.org/S001', 'SignaturePubKeyOrderData');
       $xmlSignaturePubKeyOrderData->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
@@ -89,13 +84,8 @@ class OrderDataHandler
     * @param Certificate $certificateX
     * @param DateTime|null $dateTime
     */
-   public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime = null)
+   public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime)
    {
-      if (null === $dateTime)
-      {
-         $dateTime = DateTime::createFromFormat('U', time());
-      }
-
       // Add HIARequestOrderData to root.
       $xmlHIARequestOrderData = $xml->createElementNS('urn:org:ebics:H004', 'HIARequestOrderData');
       $xmlHIARequestOrderData->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');

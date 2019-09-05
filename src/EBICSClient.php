@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\factories\CertificateFactory;
+use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\handlers\BodyHandler;
 use AndrewSvirin\Ebics\handlers\HeaderHandler;
 use AndrewSvirin\Ebics\handlers\OrderDataHandler;
@@ -13,6 +14,7 @@ use AndrewSvirin\Ebics\models\OrderData;
 use AndrewSvirin\Ebics\models\Request;
 use AndrewSvirin\Ebics\models\Response;
 use AndrewSvirin\Ebics\models\User;
+use DateTime;
 use DOMDocument;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -68,6 +70,11 @@ class EBICSClient
    private $orderDataHandler;
 
    /**
+    * @var AuthSignatureHandler
+    */
+   private $authSignatureHandler;
+
+   /**
     * Constructor.
     * @param Bank $bank
     * @param User $user
@@ -82,6 +89,7 @@ class EBICSClient
       $this->headerHandler = new HeaderHandler($bank, $user);
       $this->bodyHandler = new BodyHandler();
       $this->orderDataHandler = new OrderDataHandler($user);
+      $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
    }
 
    /**
@@ -132,19 +140,25 @@ class EBICSClient
 
    /**
     * Make INI request.
+    * Send to the bank public certificate of signature A006.
     * Setup A006 certificates to key ring.
+    * @param DateTime $dateTime
     * @return Response
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
     */
-   public function INI(): Response
+   public function INI(DateTime $dateTime = null): Response
    {
-      $certificateA = CertificateFactory::generateCertificateA();
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $certificateA = CertificateFactory::generateCertificateA($this->keyRing->getPassword());
       // Order data.
       $orderData = new OrderData();
-      $this->orderDataHandler->handleINI($orderData, $certificateA);
+      $this->orderDataHandler->handleINI($orderData, $certificateA, $dateTime);
       $orderDataContent = $orderData->getContent();
       // Wrapper for request Order data.
       $request = new Request();
@@ -162,20 +176,26 @@ class EBICSClient
 
    /**
     * Make HIA request.
+    * Send to the bank public certificates of authentication (X002) and encryption (E002).
     * Setup E002 and X002 certificates to key ring.
+    * @param DateTime $dateTime
     * @return Response
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
     */
-   public function HIA(): Response
+   public function HIA(DateTime $dateTime = null): Response
    {
-      $certificateE = CertificateFactory::generateCertificateE();
-      $certificateX = CertificateFactory::generateCertificateX();
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $certificateE = CertificateFactory::generateCertificateE($this->keyRing->getPassword());
+      $certificateX = CertificateFactory::generateCertificateX($this->keyRing->getPassword());
       // Order data.
       $orderData = new OrderData();
-      $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX);
+      $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);
       $orderDataContent = $orderData->getContent();
       // Wrapper for request Order data.
       $request = new Request();
@@ -192,9 +212,41 @@ class EBICSClient
       return $response;
    }
 
-   public function SPR()
+   /**
+    * Retrieve the Bank public certificates authentication (X002) and encryption (E002).
+    * @param DateTime $dateTime
+    * @return Response
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    * @throws exceptions\EbicsException
+    */
+   public function HPB(DateTime $dateTime = null): Response
    {
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleNoPubKeyDigests($request);
+      $xmlHeader = $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest, $xmlHeader);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
+   }
 
+   /**
+    * Returns a dictionary of supported protocol versions.
+    */
+   public function HEV()
+   {
+      // TODO: Not implemented yet.
    }
 
    /**

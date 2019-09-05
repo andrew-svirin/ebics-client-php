@@ -66,26 +66,9 @@ class KeyRing
       return $this->certificateE;
    }
 
-   /**
-    * Calculate Public Digest
-    *
-    * Concat the exponent and modulus (hex representation) with a single whitespace
-    * remove leading zeros from both
-    * calculate digest (SHA256)
-    * encode as Base64
-    *
-    * @param integer $exponent
-    * @param integer $modulus
-    * @return string
-    */
-   public static function calculatePublicDigest($exponent, $modulus)
+   public function getPassword()
    {
-      $e = ltrim((string)$exponent, '0');
-      $m = ltrim((string)$modulus, '0');
-      $concat = $e . ' ' . $m;
-      $sha256 = hash('sha256', $concat, TRUE);
-      $b64en = base64_encode($sha256);
-      return $b64en;
+      return 'some_secret';
    }
 
 }
