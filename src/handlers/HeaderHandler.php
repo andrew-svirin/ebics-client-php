@@ -4,8 +4,10 @@ namespace AndrewSvirin\Ebics\handlers;
 
 use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\models\User;
+use DateTime;
 use DOMDocument;
 use DOMElement;
+use phpseclib\Crypt\Random;
 
 /**
  * Class HeaderHandler manages header DOM elements.
@@ -19,6 +21,7 @@ class HeaderHandler
    const ORDER_TYPE_INI = 'INI';
    const ORDER_TYPE_HIA = 'HIA';
    const ORDER_TYPE_VMK = 'VMK';
+   const ORDER_TYPE_HPB = 'HPB';
 
    const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
    const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
@@ -58,23 +61,37 @@ class HeaderHandler
    }
 
    /**
-    * Add header for INI request.
+    * Add header for INI Request XML.
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
+    * @return DOMElement
     */
    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest)
    {
-      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN);
+      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN);
    }
 
    /**
-    * Add header for HIA request.
+    * Add header for HIA Request XML.
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
+    * @return DOMElement
     */
    public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest)
    {
-      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN);
+      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN);
+   }
+
+   /**
+    * Add header for HPB Request XML.
+    * @param DOMDocument $xml
+    * @param DOMElement $xmlRequest
+    * @param DateTime $dateTime
+    * @return DOMElement
+    */
+   public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+   {
+      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN, $dateTime);
    }
 
    /**
@@ -83,8 +100,10 @@ class HeaderHandler
     * @param DOMElement $xmlRequest
     * @param string $orderType
     * @param string $orderAttribute
+    * @param DateTime|null $dateTime Stamped by date time and Nonce.
+    * @return DOMElement
     */
-   private function handle(DOMDocument $xml, DOMElement $xmlRequest, $orderType, $orderAttribute)
+   private function handle(DOMDocument $xml, DOMElement $xmlRequest, $orderType, $orderAttribute, DateTime $dateTime = null): DOMElement
    {
       // Add header to request.
       $xmlHeader = $xml->createElement('header');
@@ -99,6 +118,19 @@ class HeaderHandler
       $xmlHostId = $xml->createElement('HostID');
       $xmlHostId->nodeValue = $this->bank->getHostId();
       $xmlStatic->appendChild($xmlHostId);
+
+      if ($dateTime)
+      {
+         // Add Nonce to static.
+         $xmlNonce = $xml->createElement('Nonce');
+         $xmlNonce->nodeValue = $this->calculateNonce();
+         $xmlStatic->appendChild($xmlNonce);
+
+         // Add TimeStamp to static.
+         $xmlTimeStamp = $xml->createElement('Timestamp');
+         $xmlTimeStamp->nodeValue = $dateTime->format('Y-m-d\TH:i:s\Z');
+         $xmlStatic->appendChild($xmlTimeStamp);
+      }
 
       // Add PartnerID to static.
       $xmlPartnerId = $xml->createElement('PartnerID');
@@ -138,6 +170,20 @@ class HeaderHandler
       // Add mutable to header.
       $xmlMutable = $xml->createElement('mutable');
       $xmlHeader->appendChild($xmlMutable);
+
+      return $xmlHeader;
+   }
+
+   /**
+    * Calculate Nonce.
+    * @return string HEX
+    */
+   private function calculateNonce()
+   {
+      $bytes = Random::string(16);
+      $nonce = bin2hex($bytes);
+      $nonceUpper = strtoupper($nonce);
+      return $nonceUpper;
    }
 
 }

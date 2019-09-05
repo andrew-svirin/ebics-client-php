@@ -16,6 +16,7 @@ class RequestHandler
 
    const EBICS_REQUEST = 'ebicsRequest';
    const EBICS_UNSECURED_REQUEST = 'ebicsUnsecuredRequest';
+   const EBICS_NO_PUB_KEY_DIGESTS = 'ebicsNoPubKeyDigestsRequest';
 
    /**
     * Add Secured Request to DOM XML.
@@ -36,6 +37,17 @@ class RequestHandler
    public function handleUnsecured(DOMDocument $xml): DOMElement
    {
       $xmlRequest = $this->handle($xml, self::EBICS_UNSECURED_REQUEST);
+      return $xmlRequest;
+   }
+
+   /**
+    * Add NoPubKeyDigests Request to DOM XML.
+    * @param DOMDocument $xml
+    * @return DOMElement
+    */
+   public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
+   {
+      $xmlRequest = $this->handle($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
       return $xmlRequest;
    }
 

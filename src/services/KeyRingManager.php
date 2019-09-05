@@ -45,7 +45,7 @@ class KeyRingManager
    }
 
    /**
-    * Load Keyring from the saved file.
+    * Load Keyring from the saved file or create new one.
     * @return KeyRing
     * @throws EbicsException
     */

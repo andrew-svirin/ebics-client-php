@@ -15,14 +15,26 @@ class Certificate
    const TYPE_X = 'X';
    const TYPE_E = 'E';
 
+   /**
+    * @var string
+    */
    private $content;
 
+   /**
+    * @var string
+    */
    private $type;
 
-   public function __construct(string $content, string $type)
+   /**
+    * @var array
+    */
+   private $keys;
+
+   public function __construct(string $content, string $type, array $keys)
    {
       $this->content = $content;
       $this->type = $type;
+      $this->keys = $keys;
    }
 
    /**
@@ -39,6 +51,15 @@ class Certificate
    public function getType(): string
    {
       return $this->type;
+   }
+
+   /**
+    * Public and Private Keys.
+    * @return array
+    */
+   public function getKeys(): array
+   {
+      return $this->keys;
    }
 
    /**
