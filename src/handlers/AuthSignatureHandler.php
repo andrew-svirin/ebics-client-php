@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\exceptions\EbicsException;
 use AndrewSvirin\Ebics\models\KeyRing;
 use DOMDocument;
 use DOMElement;
+use phpseclib\Crypt\RSA;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -56,7 +57,7 @@ class AuthSignatureHandler
 
       // Add ds:Reference to ds:SignedInfo.
       $xmlReference = $xml->createElement('ds:Reference');
-      $xmlReference->setAttribute('URI', '#xpointer(//*[@authenticate=\'true\'])');
+      $xmlReference->setAttribute('URI', "#xpointer(//*[@authenticate='true'])");
       $xmlSignedInfo->appendChild($xmlReference);
 
       // Add ds:Transforms to ds:Reference.
@@ -76,13 +77,17 @@ class AuthSignatureHandler
       // Add ds:DigestValue to ds:Reference.
       $xmlDigestValue = $xml->createElement('ds:DigestValue');
       $canonicalizedHeader = $xmlHeader->C14N();
-      $xmlDigestValue->nodeValue = base64_encode(hash('SHA256', $canonicalizedHeader, true));
+      $canonicalizedHeaderHash = hash('SHA256', $canonicalizedHeader, true);
+      $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
       $xmlReference->appendChild($xmlDigestValue);
 
       // Add ds:SignatureValue to AuthSignature.
       $xmlSignatureValue = $xml->createElement('ds:SignatureValue');
       $canonicalizedSignedInfo = $xmlSignedInfo->C14N();
-      $xmlSignatureValue->nodeValue = base64_encode($this->calculateSignatureValue(hash('SHA256', $canonicalizedSignedInfo, true)));
+      $canonicalizedSignedInfoHash = hash('SHA256', $canonicalizedSignedInfo, true);
+      $canonicalizedSignedInfoHashSigned = $this->calculateSignatureValue($canonicalizedSignedInfoHash);
+      $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
+      $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
       $xmlAuthSignature->appendChild($xmlSignatureValue);
    }
 
@@ -117,11 +122,26 @@ class AuthSignatureHandler
    private function calculateSignatureValue(string $hash): string
    {
       $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
+      $publicKey = $this->keyRing->getCertificateX()->getKeys()['publickey'];
       $passphrase = $this->keyRing->getPassword();
+
+      $rsa = new RSA();
+      $rsa->setPassword($passphrase);
+      $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
+//      $rsa->setPrivateKey();
+//      $rsa = new RSA();
+//      $rsa->loadKey($pk);
+      $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
+      $signed = $rsa->sign($hash);
+
+      $rsa->loadKey($publicKey); // public key
+      $v =  $rsa->verify($hash, $signed) ? 'verified' : 'unverified';
+      return $signed;
+
       $resX = openssl_get_privatekey($privateKey, $passphrase);
-      openssl_sign($hash,$signature,$resX,'sha256WithRSAEncryption');
-      return $signature;
-     // $signature = base64_encode($signature);
+//      openssl_sign($hash,$signature,$resX,'sha256WithRSAEncryption');
+//      return $signature;
+      // $signature = base64_encode($signature);
 
       $RSA_SHA256prefix = [
          0x30, 0x31, 0x30, 0x0D, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20,
@@ -135,9 +155,9 @@ class AuthSignatureHandler
 //      $passphrase = $this->_client->getUser()->getKeyring()->getPassphrase();
 //      $resX = openssl_get_privatekey($privateKey, $passphrase);
 //      $certA = $this->keyRing->getCertificateA()->toX509();
-      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
-      $passphrase = $this->keyRing->getPassword();
-      $resX = openssl_get_privatekey($privateKey, $passphrase);
+//      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
+//      $passphrase = $this->keyRing->getPassword();
+//      $resX = openssl_get_privatekey($privateKey, $passphrase);
 //      $resX = $privateKey;
       if ($resX == FALSE)
       {

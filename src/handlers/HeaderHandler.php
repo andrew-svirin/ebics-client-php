@@ -157,6 +157,27 @@ class HeaderHandler
       $xmlOrderType->nodeValue = $orderType;
       $xmlOrderDetails->appendChild($xmlOrderType);
 
+      if (false)
+      {
+         // Add BankPubKeyDigests.
+         $xmlBankPubKeyDigests = $xml->createElement('BankPubKeyDigests');
+         $xmlStatic->appendChild($xmlBankPubKeyDigests);
+
+         // Add Authentication.
+         $xmlAuthentication = $xml->createElement('Authentication');
+         $xmlAuthentication->setAttribute('Version', 'X001');
+         $xmlAuthentication->setAttribute('Algorithm', 'http://www.w3.org/2001/04/xmlenc#sha256');
+         $xmlAuthentication->nodeValue = '9BF804AF2B121A5B94C82BFD8E406FFB18024D3D4BF9E';
+         $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
+
+         // Add Encryption.
+         $xmlEncryption = $xml->createElement('Encryption');
+         $xmlEncryption->setAttribute('Version', 'E001');
+         $xmlEncryption->setAttribute('Algorithm', 'http://www.w3.org/2001/04/xmlenc#sha256');
+         $xmlEncryption->nodeValue = '9BF804AF2B121A5B94C82BFD8E406FFB18024D3D4BF9E';
+         $xmlBankPubKeyDigests->appendChild($xmlEncryption);
+      }
+
       // Add OrderAttribute to OrderDetails.
       $xmlOrderAttribute = $xml->createElement('OrderAttribute');
       $xmlOrderAttribute->nodeValue = $orderAttribute;
