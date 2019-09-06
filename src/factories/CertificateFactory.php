@@ -170,12 +170,13 @@ class CertificateFactory
     */
    private static function generateKeys(string $password)
    {
-      $rsa1 = new RSA();
-      $rsa1->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
-      $rsa1->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
-      $rsa1->setHash('sha256');
-      $rsa1->setPassword($password);
-      $keys = $rsa1->createKey(2048);
+      $rsa = new RSA();
+      $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
+      $rsa->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
+      $rsa->setHash('sha256');
+      $rsa->setMGFHash('sha256');
+      $rsa->setPassword($password);
+      $keys = $rsa->createKey(2048);
       return $keys;
    }
 
