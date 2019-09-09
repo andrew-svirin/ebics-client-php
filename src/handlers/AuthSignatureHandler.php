@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\exceptions\EbicsException;
 use AndrewSvirin\Ebics\models\KeyRing;
 use DOMDocument;
 use DOMElement;
+use DOMXPath;
 use phpseclib\Crypt\RSA;
 
 /**
@@ -42,7 +43,7 @@ class AuthSignatureHandler
 
       // Add ds:SignedInfo to AuthSignature.
       $xmlSignedInfo = $xml->createElement('ds:SignedInfo');
-      $xmlSignedInfo->setAttribute('xmlns', 'http://www.w3.org/2000/09/xmldsig#');
+      //$xmlSignedInfo->setAttribute('xmlns', 'http://www.w3.org/2000/09/xmldsig#');
       $xmlAuthSignature->appendChild($xmlSignedInfo);
 
       // Add ds:CanonicalizationMethod to ds:SignedInfo.
@@ -76,7 +77,8 @@ class AuthSignatureHandler
 
       // Add ds:DigestValue to ds:Reference.
       $xmlDigestValue = $xml->createElement('ds:DigestValue');
-      $canonicalizedHeader = $xmlHeader->C14N();
+//      $canonicalizedHeader = $xmlHeader->C14N();
+      $canonicalizedHeader = $this->getDigestContent($xml, "//*[@authenticate='true']");
       $canonicalizedHeaderHash = hash('SHA256', $canonicalizedHeader, true);
       $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
       $xmlReference->appendChild($xmlDigestValue);
@@ -89,6 +91,18 @@ class AuthSignatureHandler
       $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
       $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
       $xmlAuthSignature->appendChild($xmlSignatureValue);
+   }
+
+   private function getDigestContent(DOMDocument $xml, $path)
+   {
+      $xpath = new DOMXPath($xml);
+      $nodes = $xpath->query($path);
+      $result = '';
+      /* @var $node DOMElement */
+      foreach ($nodes as $node){
+         $result .= $node->C14N();
+      }
+      return $result;
    }
 
    /**
@@ -119,25 +133,29 @@ class AuthSignatureHandler
     * @return string Base64 encoded
     * @throws EbicsException
     */
-   private function calculateSignatureValue(string $hash): string
+   private function calculateSignatureValue(string $hash, $v = 1): string
    {
-      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
-      $publicKey = $this->keyRing->getCertificateX()->getKeys()['publickey'];
-      $passphrase = $this->keyRing->getPassword();
+      if($v === 2){
+         $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
+         $publicKey = $this->keyRing->getCertificateX()->getKeys()['publickey'];
+         $passphrase = $this->keyRing->getPassword();
 
-      $rsa = new RSA();
-      $rsa->setPassword($passphrase);
-      $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
+         $rsa = new RSA();
+         $rsa->setPassword($passphrase);
+         $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
 //      $rsa->setPrivateKey();
 //      $rsa = new RSA();
 //      $rsa->loadKey($pk);
-      $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
-      $signed = $rsa->sign($hash);
+         $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
+         $signed = $rsa->sign($hash);
 
-      $rsa->loadKey($publicKey); // public key
-      $v =  $rsa->verify($hash, $signed) ? 'verified' : 'unverified';
-      return $signed;
+         $rsa->loadKey($publicKey); // public key
+         $v = $rsa->verify($hash, $signed) ? 'verified' : 'unverified';
+         return $signed;
+      }
 
+      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
+      $passphrase = $this->keyRing->getPassword();
       $resX = openssl_get_privatekey($privateKey, $passphrase);
 //      openssl_sign($hash,$signature,$resX,'sha256WithRSAEncryption');
 //      return $signature;
@@ -155,9 +173,7 @@ class AuthSignatureHandler
 //      $passphrase = $this->_client->getUser()->getKeyring()->getPassphrase();
 //      $resX = openssl_get_privatekey($privateKey, $passphrase);
 //      $certA = $this->keyRing->getCertificateA()->toX509();
-//      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
-//      $passphrase = $this->keyRing->getPassword();
-//      $resX = openssl_get_privatekey($privateKey, $passphrase);
+
 //      $resX = $privateKey;
       if ($resX == FALSE)
       {

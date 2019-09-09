@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004">
+<ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" Revision="1" Version="H004">
     <header authenticate="true">
         <static>
             <HostID>EBIXQUAL</HostID>

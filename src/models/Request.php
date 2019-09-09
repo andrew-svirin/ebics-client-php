@@ -23,6 +23,11 @@ class Request extends DOMDocument
     */
    public function getContent()
    {
+      return $this->saveXML();
+   }
+
+   public function getFormattedContent()
+   {
       $this->preserveWhiteSpace = false;
       $this->formatOutput = true;
       return $this->saveXML();
