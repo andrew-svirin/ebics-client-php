@@ -14,6 +14,7 @@ use AndrewSvirin\Ebics\models\OrderData;
 use AndrewSvirin\Ebics\models\Request;
 use AndrewSvirin\Ebics\models\Response;
 use AndrewSvirin\Ebics\models\User;
+use AndrewSvirin\Ebics\services\CryptService;
 use DateTime;
 use DOMDocument;
 use Symfony\Component\HttpClient\HttpClient;
@@ -89,7 +90,7 @@ class EBICSClient
       $this->headerHandler = new HeaderHandler($bank, $user);
       $this->bodyHandler = new BodyHandler();
       $this->orderDataHandler = new OrderDataHandler($user);
-      $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
+      $this->authSignatureHandler = new AuthSignatureHandler(new CryptService($keyRing));
    }
 
    /**

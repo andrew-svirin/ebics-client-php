@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\EBICSClient;
 use AndrewSvirin\Ebics\exceptions\EbicsException;
 use AndrewSvirin\Ebics\handlers\ResponseHandler;
+use AndrewSvirin\Ebics\services\CryptService;
 use AndrewSvirin\Ebics\services\KeyRingManager;
 use AndrewSvirin\Ebics\models\User;
 use PHPUnit\Framework\TestCase;
@@ -108,6 +109,16 @@ final class EbicsTest extends TestCase
    public function testHPB()
    {
       $hpb = $this->client->HPB();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($hpb);
+      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hpb);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $cryptService = new CryptService($this->client->getKeyRing());
+      $orderDataEncrypted = $responseHandler->retrieveKeyManagementResponseOrderData($hpb);
+      $orderData = $cryptService->decryptOrderData($orderDataEncrypted);
+      $orderDataContent = $orderData->getContent();
+      $orderDataContent = $orderDataContent;
    }
 
 }
