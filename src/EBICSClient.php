@@ -170,14 +170,14 @@ class EBICSClient
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-      $this->keyRing->setCertificateA($certificateA);
+      $this->keyRing->setUserCertificateA($certificateA);
       return $response;
    }
 
    /**
     * Make HIA request.
     * Send to the bank public certificates of authentication (X002) and encryption (E002).
-    * Setup E002 and X002 certificates to key ring.
+    * Setup User E002 and X002 certificates to key ring.
     * @param DateTime $dateTime
     * @return Response
     * @throws ClientExceptionInterface
@@ -207,13 +207,14 @@ class EBICSClient
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-      $this->keyRing->setCertificateE($certificateE);
-      $this->keyRing->setCertificateX($certificateX);
+      $this->keyRing->setUserCertificateE($certificateE);
+      $this->keyRing->setUserCertificateX($certificateX);
       return $response;
    }
 
    /**
     * Retrieve the Bank public certificates authentication (X002) and encryption (E002).
+    * Setup Bank E002 and X002 certificates to key ring.
     * @param DateTime $dateTime
     * @return Response
     * @throws ClientExceptionInterface
@@ -230,8 +231,8 @@ class EBICSClient
       }
       $request = new Request();
       $xmlRequest = $this->requestHandler->handleNoPubKeyDigests($request);
-      $xmlHeader = $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest, $xmlHeader);
+      $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
       $requestContent = $request->getContent();
       $hostResponse = $this->post($requestContent);

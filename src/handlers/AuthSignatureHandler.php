@@ -32,11 +32,11 @@ class AuthSignatureHandler
     * Add body and children elements to request.
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
-    * @param DOMElement $xmlHeader
     * @throws EbicsException
     */
-   public function handle(DOMDocument $xml, DOMElement $xmlRequest, DOMElement $xmlHeader)
+   public function handle(DOMDocument $xml, DOMElement $xmlRequest)
    {
+      $signaturePath = "//*[@authenticate='true']";
       // Add AuthSignature to request.
       $xmlAuthSignature = $xml->createElement('AuthSignature');
       $xmlRequest->appendChild($xmlAuthSignature);
@@ -58,7 +58,7 @@ class AuthSignatureHandler
 
       // Add ds:Reference to ds:SignedInfo.
       $xmlReference = $xml->createElement('ds:Reference');
-      $xmlReference->setAttribute('URI', "#xpointer(//*[@authenticate='true'])");
+      $xmlReference->setAttribute('URI', sprintf('#xpointer(%s)', $signaturePath));
       $xmlSignedInfo->appendChild($xmlReference);
 
       // Add ds:Transforms to ds:Reference.
@@ -77,8 +77,7 @@ class AuthSignatureHandler
 
       // Add ds:DigestValue to ds:Reference.
       $xmlDigestValue = $xml->createElement('ds:DigestValue');
-//      $canonicalizedHeader = $xmlHeader->C14N();
-      $canonicalizedHeader = $this->getDigestContent($xml, "//*[@authenticate='true']");
+      $canonicalizedHeader = $this->calculateC14Content($xml, $signaturePath);
       $canonicalizedHeaderHash = hash('SHA256', $canonicalizedHeader, true);
       $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
       $xmlReference->appendChild($xmlDigestValue);
@@ -93,13 +92,20 @@ class AuthSignatureHandler
       $xmlAuthSignature->appendChild($xmlSignatureValue);
    }
 
-   private function getDigestContent(DOMDocument $xml, $path)
+   /**
+    * Extract C14 content by path from the XML DOM.
+    * @param DOMDocument $xml
+    * @param $path
+    * @return string
+    */
+   private function calculateC14Content(DOMDocument $xml, $path)
    {
       $xpath = new DOMXPath($xml);
       $nodes = $xpath->query($path);
       $result = '';
       /* @var $node DOMElement */
-      foreach ($nodes as $node){
+      foreach ($nodes as $node)
+      {
          $result .= $node->C14N();
       }
       return $result;
@@ -128,39 +134,36 @@ class AuthSignatureHandler
    }
 
    /**
-    * Calculate signatureValue.
+    * Calculate signatureValue by encrypting Signature value with user Private key.
     * @param string $hash
     * @return string Base64 encoded
     * @throws EbicsException
     */
-   private function calculateSignatureValue(string $hash, $v = 1): string
+   private function calculateSignatureValue(string $hash): string
    {
-      if($v === 2){
-         $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
-         $publicKey = $this->keyRing->getCertificateX()->getKeys()['publickey'];
-         $passphrase = $this->keyRing->getPassword();
-
-         $rsa = new RSA();
-         $rsa->setPassword($passphrase);
-         $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
-//      $rsa->setPrivateKey();
-//      $rsa = new RSA();
-//      $rsa->loadKey($pk);
-         $rsa->setSignatureMode(RSA::SIGNATURE_PKCS1);
-         $signed = $rsa->sign($hash);
-
-         $rsa->loadKey($publicKey); // public key
-         $v = $rsa->verify($hash, $signed) ? 'verified' : 'unverified';
-         return $signed;
-      }
-
-      $privateKey = $this->keyRing->getCertificateX()->getKeys()['privatekey'];
+      $digestToSignBin = $this->filter($hash);
+      $privateKey = $this->keyRing->getUserCertificateX()->getKeys()['privatekey'];
       $passphrase = $this->keyRing->getPassword();
-      $resX = openssl_get_privatekey($privateKey, $passphrase);
-//      openssl_sign($hash,$signature,$resX,'sha256WithRSAEncryption');
-//      return $signature;
-      // $signature = base64_encode($signature);
+      $rsa = new RSA();
+      $rsa->setPassword($passphrase);
+      $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
+      define('CRYPT_RSA_PKCS15_COMPAT', true);
+      $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
+      $encrypted = $rsa->encrypt($digestToSignBin);
+      if (empty($encrypted))
+      {
+         throw new EbicsException('Incorrect authorization.');
+      }
+      return $encrypted;
+   }
 
+   /**
+    * Filter hash of blocked characters.
+    * @param string $hash
+    * @return string
+    */
+   private function filter(string $hash)
+   {
       $RSA_SHA256prefix = [
          0x30, 0x31, 0x30, 0x0D, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20,
       ];
@@ -169,19 +172,7 @@ class AuthSignatureHandler
       $this->systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, count($RSA_SHA256prefix));
       $this->systemArrayCopy($signedInfoDigest, 0, $digestToSign, count($RSA_SHA256prefix), count($signedInfoDigest));
       $digestToSignBin = $this->arrayToBin($digestToSign);
-//      $privateKey = $this->_client->getUser()->getAuthorizationKey();
-//      $passphrase = $this->_client->getUser()->getKeyring()->getPassphrase();
-//      $resX = openssl_get_privatekey($privateKey, $passphrase);
-//      $certA = $this->keyRing->getCertificateA()->toX509();
-
-//      $resX = $privateKey;
-      if ($resX == FALSE)
-      {
-         throw new EbicsException('Incorrect private key and passphrase.');
-      }
-      $sign = NULL;
-      openssl_private_encrypt($digestToSignBin, $sign, $resX);
-      return $sign;
+      return $digestToSignBin;
    }
 
    /**

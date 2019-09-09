@@ -64,22 +64,22 @@ class HeaderHandler
     * Add header for INI Request XML.
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
-    * @return DOMElement
+    * @return void
     */
    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest)
    {
-      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN);
+      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN);
    }
 
    /**
     * Add header for HIA Request XML.
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
-    * @return DOMElement
+    * @return void
     */
    public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest)
    {
-      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN);
+      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN);
    }
 
    /**
@@ -87,11 +87,11 @@ class HeaderHandler
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
     * @param DateTime $dateTime
-    * @return DOMElement
+    * @return void
     */
    public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
    {
-      return $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN, $dateTime);
+      $this->handle($xml, $xmlRequest, self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN, $dateTime);
    }
 
    /**
@@ -101,9 +101,8 @@ class HeaderHandler
     * @param string $orderType
     * @param string $orderAttribute
     * @param DateTime|null $dateTime Stamped by date time and Nonce.
-    * @return DOMElement
     */
-   private function handle(DOMDocument $xml, DOMElement $xmlRequest, $orderType, $orderAttribute, DateTime $dateTime = null): DOMElement
+   private function handle(DOMDocument $xml, DOMElement $xmlRequest, $orderType, $orderAttribute, DateTime $dateTime = null)
    {
       // Add header to request.
       $xmlHeader = $xml->createElement('header');
@@ -191,8 +190,6 @@ class HeaderHandler
       // Add mutable to header.
       $xmlMutable = $xml->createElement('mutable');
       $xmlHeader->appendChild($xmlMutable);
-
-      return $xmlHeader;
    }
 
    /**
