@@ -19,51 +19,61 @@ class KeyRing
    /**
     * @var Certificate
     */
-   private $certificateA;
+   private $userCertificateA;
 
    /**
     * @var Certificate
     */
-   private $certificateX;
+   private $userCertificateX;
 
    /**
     * @var Certificate
     */
-   private $certificateE;
+   private $userCertificateE;
+
+   /**
+    * @var Certificate
+    */
+   private $bankCertificateX;
+
+   /**
+    * @var Certificate
+    */
+   private $bankCertificateE;
 
    public function setUserId(string $userId)
    {
       $this->userId = $userId;
    }
 
-   public function setCertificateA(Certificate $certificate)
+   public function setUserCertificateA(Certificate $certificate)
    {
-      $this->certificateA = $certificate;
+      $this->userCertificateA = $certificate;
    }
 
-   public function getCertificateA(): ?Certificate
+   public function getUserCertificateA(): ?Certificate
    {
-      return $this->certificateA;
+      return $this->userCertificateA;
    }
 
-   public function setCertificateX(Certificate $certificate)
+   public function setUserCertificateX(Certificate $certificate)
    {
-      $this->certificateX = $certificate;
+      $this->userCertificateX = $certificate;
    }
 
-   public function getCertificateX(): ?Certificate
+   public function getUserCertificateX(): ?Certificate
    {
-      return $this->certificateX;
+      return $this->userCertificateX;
    }
 
-   public function setCertificateE(Certificate $certificate)
+   public function setUserCertificateE(Certificate $certificate)
    {
-      $this->certificateE = $certificate;
+      $this->userCertificateE = $certificate;
    }
 
-   public function getCertificateE(): ?Certificate
+   public function getUserCertificateE(): ?Certificate
    {
-      return $this->certificateE;
+      return $this->userCertificateE;
    }
 
    public function getPassword()

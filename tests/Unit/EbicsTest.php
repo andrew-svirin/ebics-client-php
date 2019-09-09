@@ -61,7 +61,7 @@ final class EbicsTest extends TestCase
     */
    public function testINI()
    {
-      if ($this->client->getKeyRing()->getCertificateA())
+      if ($this->client->getKeyRing()->getUserCertificateA())
       {
          return;
       }
@@ -84,7 +84,7 @@ final class EbicsTest extends TestCase
     */
    public function testHIA()
    {
-      if ($this->client->getKeyRing()->getCertificateX() || $this->client->getKeyRing()->getCertificateE())
+      if ($this->client->getKeyRing()->getUserCertificateX() || $this->client->getKeyRing()->getUserCertificateE())
       {
          return;
       }

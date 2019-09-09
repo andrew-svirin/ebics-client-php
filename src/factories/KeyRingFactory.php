@@ -28,41 +28,41 @@ class KeyRingFactory
          $certificateAContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::CERTIFICATE_PREFIX];
          $certificateAKeys = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::KEYS_PREFIX];
          $certificateA = CertificateFactory::buildCertificateA($certificateAContent, $certificateAKeys);
-         $keyRing->setCertificateA($certificateA);
+         $keyRing->setUserCertificateA($certificateA);
       }
       if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX]))
       {
          $certificateEContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX];
          $certificateEKeys = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::KEYS_PREFIX];
          $certificateE = CertificateFactory::buildCertificateE($certificateEContent, $certificateEKeys);
-         $keyRing->setCertificateE($certificateE);
+         $keyRing->setUserCertificateE($certificateE);
       }
       if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX]))
       {
          $certificateXContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX];
          $certificateXKeys = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::KEYS_PREFIX];
          $certificateX = CertificateFactory::buildCertificateX($certificateXContent, $certificateXKeys);
-         $keyRing->setCertificateX($certificateX);
+         $keyRing->setUserCertificateX($certificateX);
       }
       return $keyRing;
    }
 
    public static function buildDataFromKeyRing(KeyRing $keyRing): array
    {
-      if (null !== $keyRing->getCertificateA())
+      if (null !== $keyRing->getUserCertificateA())
       {
-         $certificateAB64 = base64_encode($keyRing->getCertificateA()->getContent());
-         $certificateAKeys = $keyRing->getCertificateA()->getKeys();
+         $certificateAB64 = base64_encode($keyRing->getUserCertificateA()->getContent());
+         $certificateAKeys = $keyRing->getUserCertificateA()->getKeys();
       }
-      if (null !== $keyRing->getCertificateE())
+      if (null !== $keyRing->getUserCertificateE())
       {
-         $certificateEB64 = base64_encode($keyRing->getCertificateE()->getContent());
-         $certificateEKeys = $keyRing->getCertificateE()->getKeys();
+         $certificateEB64 = base64_encode($keyRing->getUserCertificateE()->getContent());
+         $certificateEKeys = $keyRing->getUserCertificateE()->getKeys();
       }
-      if (null !== $keyRing->getCertificateX())
+      if (null !== $keyRing->getUserCertificateX())
       {
-         $certificateXB64 = base64_encode($keyRing->getCertificateX()->getContent());
-         $certificateXKeys = $keyRing->getCertificateX()->getKeys();
+         $certificateXB64 = base64_encode($keyRing->getUserCertificateX()->getContent());
+         $certificateXKeys = $keyRing->getUserCertificateX()->getKeys();
       }
       return [
          self::USER_PREFIX => [
