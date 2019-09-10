@@ -2,12 +2,13 @@
 
 namespace AndrewSvirin\Ebics\services;
 
+use AndrewSvirin\Ebics\contracts\KeyRingManagerInterface;
 use AndrewSvirin\Ebics\exceptions\EbicsException;
 use AndrewSvirin\Ebics\factories\KeyRingFactory;
 use AndrewSvirin\Ebics\models\KeyRing;
 
 /**
- * EBICS key ring representation manage one key ring.
+ * EBICS KeyRing representation manage one key ring stored in the file.
  *
  * An EbicsKeyRing instance can hold sets of private user keys and/or public
  * bank keys. Private user keys are always stored AES encrypted by the
@@ -17,7 +18,7 @@ use AndrewSvirin\Ebics\models\KeyRing;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class KeyRingManager
+class KeyRingManager implements KeyRingManagerInterface
 {
 
    /**
@@ -45,8 +46,7 @@ class KeyRingManager
    }
 
    /**
-    * Load Keyring from the saved file or create new one.
-    * @return KeyRing
+    * {@inheritdoc}
     * @throws EbicsException
     */
    public function loadKeyRing(): KeyRing
@@ -67,8 +67,7 @@ class KeyRingManager
    }
 
    /**
-    * Save KeyRing to file.
-    * @param KeyRing $keyRing
+    * {@inheritdoc}
     * @throws EbicsException
     */
    public function saveKeyRing(KeyRing $keyRing)

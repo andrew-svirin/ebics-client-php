@@ -2,12 +2,14 @@
 
 namespace AndrewSvirin\Ebics;
 
+use AndrewSvirin\Ebics\contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\factories\CertificateFactory;
 use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\handlers\BodyHandler;
 use AndrewSvirin\Ebics\handlers\HeaderHandler;
 use AndrewSvirin\Ebics\handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\handlers\RequestHandler;
+use AndrewSvirin\Ebics\handlers\ResponseHandler;
 use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\OrderData;
@@ -30,7 +32,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class EBICSClient
+final class EbicsClient implements EbicsClientInterface
 {
 
    /**
@@ -76,6 +78,16 @@ class EBICSClient
    private $authSignatureHandler;
 
    /**
+    * @var ResponseHandler
+    */
+   private $responseHandler;
+
+   /**
+    * @var CryptService
+    */
+   private $cryptService;
+
+   /**
     * Constructor.
     * @param Bank $bank
     * @param User $user
@@ -90,34 +102,9 @@ class EBICSClient
       $this->headerHandler = new HeaderHandler($bank, $user);
       $this->bodyHandler = new BodyHandler();
       $this->orderDataHandler = new OrderDataHandler($user);
-      $this->authSignatureHandler = new AuthSignatureHandler(new CryptService($keyRing));
-   }
-
-   /**
-    * Getter for bank.
-    * @return Bank
-    */
-   public function getBank()
-   {
-      return $this->bank;
-   }
-
-   /**
-    * Getter for user
-    * @return User
-    */
-   public function getUser()
-   {
-      return $this->user;
-   }
-
-   /**
-    * Getter for keyRing
-    * @return KeyRing
-    */
-   public function getKeyRing()
-   {
-      return $this->keyRing;
+      $this->cryptService = new CryptService($keyRing);
+      $this->authSignatureHandler = new AuthSignatureHandler($this->cryptService);
+      $this->responseHandler = new ResponseHandler();
    }
 
    /**
@@ -140,11 +127,7 @@ class EBICSClient
    }
 
    /**
-    * Make INI request.
-    * Send to the bank public certificate of signature A006.
-    * Setup A006 certificates to key ring.
-    * @param DateTime $dateTime
-    * @return Response
+    * {@inheritdoc}
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
@@ -156,7 +139,7 @@ class EBICSClient
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $certificateA = CertificateFactory::generateCertificateA($this->keyRing->getPassword());
+      $certificateA = CertificateFactory::generateCertificateAFromKeys($this->cryptService->generateKeys());
       // Order data.
       $orderData = new OrderData();
       $this->orderDataHandler->handleINI($orderData, $certificateA, $dateTime);
@@ -176,11 +159,7 @@ class EBICSClient
    }
 
    /**
-    * Make HIA request.
-    * Send to the bank public certificates of authentication (X002) and encryption (E002).
-    * Setup User E002 and X002 certificates to key ring.
-    * @param DateTime $dateTime
-    * @return Response
+    * {@inheritdoc}
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
@@ -192,8 +171,8 @@ class EBICSClient
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $certificateE = CertificateFactory::generateCertificateE($this->keyRing->getPassword());
-      $certificateX = CertificateFactory::generateCertificateX($this->keyRing->getPassword());
+      $certificateE = CertificateFactory::generateCertificateEFromKeys($this->cryptService->generateKeys());
+      $certificateX = CertificateFactory::generateCertificateXFromKeys($this->cryptService->generateKeys());
       // Order data.
       $orderData = new OrderData();
       $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);
@@ -214,10 +193,7 @@ class EBICSClient
    }
 
    /**
-    * Retrieve the Bank public certificates authentication (X002) and encryption (E002).
-    * Setup Bank E002 and X002 certificates to key ring.
-    * @param DateTime $dateTime
-    * @return Response
+    * {@inheritdoc}
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
@@ -240,28 +216,33 @@ class EBICSClient
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
+      // Prepare decrypted OrderData.
+      $orderDataEncrypted = $this->responseHandler->retrieveKeyManagementResponseOrderData($response);
+      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
+      $response->setOrderData($orderData);
+      $certificateX = $this->orderDataHandler->retrieveHPBAuthenticationCertificate($orderData);
+      $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
+      $this->keyRing->setBankCertificateX($certificateX);
+      $this->keyRing->setBankCertificateE($certificateE);
       return $response;
    }
 
    /**
-    * Returns a dictionary of supported protocol versions.
+    * {@inheritdoc}
     */
-   public function HEV()
+   public function HEV(DateTime $dateTime = null): Response
    {
       // TODO: Not implemented yet.
+      return new Response();
    }
 
    /**
-    * Downloads the bank account statement in SWIFT format (MT940).
-    * @param int $start The start date of requested transactions.
-    * @param int $end The end date of requested transactions.
-    * @param boolean $parsed Flag whether the received MT940 message should be
-    * parsed and returned as a dictionary or not.
-    * @return
+    * {@inheritdoc}
     */
-   public function STA($start = NULL, $end = NULL, $parsed = FALSE)
+   public function STA(DateTime $dateTime = null): Response
    {
-      return '';
+      // TODO: Not implemented yet.
+      return new Response();
    }
 
    /**
