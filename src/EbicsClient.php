@@ -216,7 +216,7 @@ final class EbicsClient implements EbicsClientInterface
       $response = new Response();
       $response->loadXML($hostResponseContent);
       // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveKeyManagementResponseOrderData($response);
+      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
       $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
       $response->setOrderData($orderData);
       $certificateX = $this->orderDataHandler->retrieveHPBAuthenticationCertificate($orderData);

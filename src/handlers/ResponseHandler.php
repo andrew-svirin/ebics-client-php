@@ -23,7 +23,7 @@ class ResponseHandler
     * @param DOMDocument $xml
     * @return string
     */
-   public function retrieveKeyManagementResponseReturnCode(DOMDocument $xml): string
+   public function retrieveReturnCode(DOMDocument $xml): string
    {
       $xpath = $this->prepareHXPath($xml);
       $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
@@ -36,7 +36,7 @@ class ResponseHandler
     * @param DOMDocument $xml
     * @return string
     */
-   public function retrieveKeyManagementResponseReportText(DOMDocument $xml): string
+   public function retrieveReportText(DOMDocument $xml): string
    {
       $xpath = $this->prepareHXPath($xml);
       $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
@@ -50,7 +50,7 @@ class ResponseHandler
     * @return OrderDataEncrypted
     * @throws EbicsException
     */
-   public function retrieveKeyManagementResponseOrderData(DOMDocument $xml): OrderDataEncrypted
+   public function retrieveOrderData(DOMDocument $xml): OrderDataEncrypted
    {
       $xpath = $this->prepareHXPath($xml);
       $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
