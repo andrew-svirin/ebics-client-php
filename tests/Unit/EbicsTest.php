@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\handlers\ResponseHandler;
 use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\services\KeyRingManager;
 use AndrewSvirin\Ebics\models\User;
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -115,6 +116,10 @@ final class EbicsTest extends TestCase
     */
    public function testHPB()
    {
+      if ($this->keyRing->getBankCertificateX() || $this->keyRing->getBankCertificateE())
+      {
+         return;
+      }
       $hpb = $this->client->HPB();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveKeyManagementResponseReturnCode($hpb);
@@ -122,6 +127,69 @@ final class EbicsTest extends TestCase
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
+   }
+
+   /**
+    * Run first HPB.
+    * @group HAA
+    * @throws ClientExceptionInterface
+    * @throws EbicsException
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testHAA()
+   {
+      $haa = $this->client->HAA();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($haa);
+      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($haa);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+   }
+
+   /**
+    * Run first HPB.
+    * @group VMK
+    * @throws ClientExceptionInterface
+    * @throws EbicsException
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testVMK()
+   {
+      $vmk = $this->client->VMK(null,
+         DateTime::createFromFormat('Y-m-d', '2005-01-01'),
+         DateTime::createFromFormat('Y-m-d', '2019-09-01')
+      );
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($vmk);
+      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($vmk);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+   }
+
+   /**
+    * Run first HPB.
+    * @group STA
+    * @throws ClientExceptionInterface
+    * @throws EbicsException
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testSTA()
+   {
+      $vmk = $this->client->STA(null,
+         DateTime::createFromFormat('Y-m-d', '2005-01-01'),
+         DateTime::createFromFormat('Y-m-d', '2019-09-01')
+      );
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($vmk);
+      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($vmk);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
 }

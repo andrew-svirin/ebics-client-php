@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics\handlers;
 use AndrewSvirin\Ebics\factories\CertificateFactory;
 use AndrewSvirin\Ebics\handlers\traits\XPathTrait;
 use AndrewSvirin\Ebics\models\Certificate;
+use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\OrderData;
 use AndrewSvirin\Ebics\models\User;
 use DateTime;
@@ -28,26 +29,14 @@ class OrderDataHandler
    private $user;
 
    /**
-    * @var string
+    * @var KeyRing
     */
-   private $signatureVersion;
+   private $keyRing;
 
-   /**
-    * @var string
-    */
-   private $authenticationVersion;
-
-   /**
-    * @var string
-    */
-   private $encryptionVersion;
-
-   public function __construct(User $user)
+   public function __construct(User $user, KeyRing $keyRing)
    {
       $this->user = $user;
-      $this->signatureVersion = 'A006';
-      $this->authenticationVersion = 'X002';
-      $this->encryptionVersion = 'E002';
+      $this->keyRing = $keyRing;
    }
 
    /**
@@ -72,7 +61,7 @@ class OrderDataHandler
 
       // Add SignatureVersion to SignaturePubKeyInfo.
       $xmlSignatureVersion = $xml->createElement('SignatureVersion');
-      $xmlSignatureVersion->nodeValue = $this->signatureVersion;
+      $xmlSignatureVersion->nodeValue = $this->keyRing->getUserCertificateAVersion();
       $xmlSignaturePubKeyInfo->appendChild($xmlSignatureVersion);
 
       // Add PartnerID to SignaturePubKeyOrderData.
@@ -105,7 +94,7 @@ class OrderDataHandler
 
       // Add AuthenticationVersion to AuthenticationPubKeyInfo.
       $xmlAuthenticationVersion = $xml->createElement('AuthenticationVersion');
-      $xmlAuthenticationVersion->nodeValue = $this->authenticationVersion;
+      $xmlAuthenticationVersion->nodeValue = $this->keyRing->getUserCertificateXVersion();
       $xmlAuthenticationPubKeyInfo->appendChild($xmlAuthenticationVersion);
 
       // Add EncryptionPubKeyInfo to HIARequestOrderData.
@@ -117,7 +106,7 @@ class OrderDataHandler
 
       // Add EncryptionVersion to EncryptionPubKeyInfo.
       $xmlEncryptionVersion = $xml->createElement('EncryptionVersion');
-      $xmlEncryptionVersion->nodeValue = $this->encryptionVersion;
+      $xmlEncryptionVersion->nodeValue = $this->keyRing->getUserCertificateEVersion();
       $xmlEncryptionPubKeyInfo->appendChild($xmlEncryptionVersion);
 
       // Add PartnerID to HIARequestOrderData.
@@ -180,7 +169,7 @@ class OrderDataHandler
 
       // Add ds:Modulus to ds:RSAKeyValue.
       $xmlModulus = $xml->createElement('ds:Modulus');
-      $xmlModulus->nodeValue = base64_encode($certificateX509->getPublicKey()->exponent->toHex());
+      $xmlModulus->nodeValue = base64_encode($certificateX509->getPublicKey()->modulus->toHex());
       $xmlRSAKeyValue->appendChild($xmlModulus);
 
       // Add ds:Exponent to ds:RSAKeyValue.

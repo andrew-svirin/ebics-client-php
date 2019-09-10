@@ -56,6 +56,11 @@ class KeyRing
       return $this->userCertificateA;
    }
 
+   public function getUserCertificateAVersion(): string
+   {
+      return 'A006';
+   }
+
    public function setUserCertificateX(Certificate $certificate)
    {
       $this->userCertificateX = $certificate;
@@ -64,6 +69,11 @@ class KeyRing
    public function getUserCertificateX(): ?Certificate
    {
       return $this->userCertificateX;
+   }
+
+   public function getUserCertificateXVersion(): string
+   {
+      return 'X002';
    }
 
    public function setUserCertificateE(Certificate $certificate)
@@ -76,17 +86,14 @@ class KeyRing
       return $this->userCertificateE;
    }
 
+   public function getUserCertificateEVersion(): string
+   {
+      return 'E002';
+   }
+
    public function getPassword()
    {
       return 'some_secret';
-   }
-
-   /**
-    * @return Certificate
-    */
-   public function getBankCertificateX(): ?Certificate
-   {
-      return $this->bankCertificateX;
    }
 
    /**
@@ -100,9 +107,14 @@ class KeyRing
    /**
     * @return Certificate
     */
-   public function getBankCertificateE(): ?Certificate
+   public function getBankCertificateX(): ?Certificate
    {
-      return $this->bankCertificateE;
+      return $this->bankCertificateX;
+   }
+
+   public function getBankCertificateXVersion(): string
+   {
+      return 'X002';
    }
 
    /**
@@ -111,6 +123,19 @@ class KeyRing
    public function setBankCertificateE(Certificate $bankCertificateE): void
    {
       $this->bankCertificateE = $bankCertificateE;
+   }
+
+   /**
+    * @return Certificate
+    */
+   public function getBankCertificateE(): ?Certificate
+   {
+      return $this->bankCertificateE;
+   }
+
+   public function getBankCertificateEVersion(): string
+   {
+      return 'E002';
    }
 
 }
