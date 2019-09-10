@@ -26,7 +26,7 @@ class ResponseHandler
    public function retrieveKeyManagementResponseReturnCode(DOMDocument $xml): string
    {
       $xpath = $this->prepareHXPath($xml);
-      $returnCode = $xpath->query('/H004:ebicsKeyManagementResponse/H004:header/H004:mutable/H004:ReturnCode');
+      $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
       $returnCodeValue = $returnCode->item(0)->nodeValue;
       return $returnCodeValue;
    }
@@ -39,7 +39,7 @@ class ResponseHandler
    public function retrieveKeyManagementResponseReportText(DOMDocument $xml): string
    {
       $xpath = $this->prepareHXPath($xml);
-      $reportText = $xpath->query('/H004:ebicsKeyManagementResponse/H004:header/H004:mutable/H004:ReportText');
+      $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
       $reportTextValue = $reportText->item(0)->nodeValue;
       return $reportTextValue;
    }
@@ -53,8 +53,8 @@ class ResponseHandler
    public function retrieveKeyManagementResponseOrderData(DOMDocument $xml): OrderDataEncrypted
    {
       $xpath = $this->prepareHXPath($xml);
-      $orderData = $xpath->query('/H004:ebicsKeyManagementResponse/H004:body/H004:DataTransfer/H004:OrderData');
-      $transactionKey = $xpath->query('/H004:ebicsKeyManagementResponse/H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
+      $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
+      $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
       if (!$orderData || !$transactionKey)
       {
          throw new EbicsException('EBICS response empty result.');

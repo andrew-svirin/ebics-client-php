@@ -18,7 +18,6 @@ use AndrewSvirin\Ebics\models\Response;
 use AndrewSvirin\Ebics\models\User;
 use AndrewSvirin\Ebics\services\CryptService;
 use DateTime;
-use DOMDocument;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -98,11 +97,11 @@ final class EbicsClient implements EbicsClientInterface
       $this->bank = $bank;
       $this->user = $user;
       $this->keyRing = $keyRing;
-      $this->requestHandler = new RequestHandler();
-      $this->headerHandler = new HeaderHandler($bank, $user);
-      $this->bodyHandler = new BodyHandler();
-      $this->orderDataHandler = new OrderDataHandler($user);
       $this->cryptService = new CryptService($keyRing);
+      $this->requestHandler = new RequestHandler();
+      $this->headerHandler = new HeaderHandler($bank, $user, $keyRing, $this->cryptService);
+      $this->bodyHandler = new BodyHandler();
+      $this->orderDataHandler = new OrderDataHandler($user, $keyRing);
       $this->authSignatureHandler = new AuthSignatureHandler($this->cryptService);
       $this->responseHandler = new ResponseHandler();
    }
@@ -229,75 +228,83 @@ final class EbicsClient implements EbicsClientInterface
 
    /**
     * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    * @throws exceptions\EbicsException
     */
-   public function HEV(DateTime $dateTime = null): Response
+   public function HAA(DateTime $dateTime = null): Response
    {
-      // TODO: Not implemented yet.
-      return new Response();
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleSecured($request);
+      $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
    }
 
    /**
     * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    * @throws exceptions\EbicsException
     */
-   public function STA(DateTime $dateTime = null): Response
+   public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
    {
-      // TODO: Not implemented yet.
-      return new Response();
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleSecured($request);
+      $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
    }
 
    /**
-    * Downloads the interim transaction report in SWIFT format (MT942).
-    * @param int $start The start date of requested transactions.
-    * @param int $end The end date of requested transactions.
-    * @param boolean $parsed Flag whether the received MT940 message should be
-    * parsed and returned as a dictionary or not.
-    * @return Response
-    * @throws \Comodojo\Exception\HttpException
+    * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
     * @throws exceptions\EbicsException
-    * @throws \Exception
     */
-   public function VMK($start = NULL, $end = NULL, $parsed = FALSE)
+   public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
    {
-      $domTree = new DOMDocument();
-
-      // Add OrderDetails.
-      $xmlOrderDetails = $domTree->createElement('OrderDetails');
-      $domTree->appendChild($xmlOrderDetails);
-
-      // Add OrderType.
-      $xmlOrderType = $domTree->createElement('OrderType');
-      $xmlOrderType->nodeValue = 'VMK';
-      $xmlOrderDetails->appendChild($xmlOrderType);
-
-      // Add OrderAttribute.
-      $xmlOrderAttribute = $domTree->createElement('OrderAttribute');
-      $xmlOrderAttribute->nodeValue = 'DZHNN';
-      $xmlOrderDetails->appendChild($xmlOrderAttribute);
-
-      // Add StandardOrderParams.
-      $xmlStandardOrderParams = $domTree->createElement('StandardOrderParams');
-      $xmlOrderDetails->appendChild($xmlStandardOrderParams);
-
-      if ($start != NULL && $end != NULL)
+      if (null === $dateTime)
       {
-         // Add DateRange.
-         $xmlDateRange = $domTree->createElement('DateRange');
-         $xmlStandardOrderParams->appendChild($xmlDateRange);
-
-         // Add Start.
-         $xmlStart = $domTree->createElement('Start');
-         $xmlStart->nodeValue = $start;
-         $xmlDateRange->appendChild($xmlStart);
-         // Add End.
-         $xmlEnd = $domTree->createElement('End');
-         $xmlEnd->nodeValue = $end;
-         $xmlDateRange->appendChild($xmlEnd);
+         $dateTime = DateTime::createFromFormat('U', time());
       }
-
-      $request = new Request($this);
-      $orderDetails = $domTree->getElementsByTagName('OrderDetails')->item(0);
-
-      return $request->createRequest($orderDetails)->download();
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleSecured($request);
+      $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
    }
 
 }

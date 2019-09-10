@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\OrderData;
 use AndrewSvirin\Ebics\models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
+use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
 
 /**
@@ -35,7 +36,7 @@ class CryptService
     * @param string $algo
     * @return string
     */
-   public function calculateHash(string $text, $algo = 'SHA256'): string
+   public function calculateHash(string $text, $algo = 'sha256'): string
    {
       return hash($algo, $text, true);
    }
@@ -78,7 +79,10 @@ class CryptService
       $rsa = new RSA();
       $rsa->setPassword($passphrase);
       $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
-      define('CRYPT_RSA_PKCS15_COMPAT', true);
+      if (!defined('CRYPT_RSA_PKCS15_COMPAT'))
+      {
+         define('CRYPT_RSA_PKCS15_COMPAT', true);
+      }
       $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
       $encrypted = $rsa->encrypt($digestToSignBin);
       if (empty($encrypted))
@@ -90,18 +94,19 @@ class CryptService
 
    /**
     * Generate public and private keys.
+    * @param string $algo
     * @return array [
     *    'publickey' => '<string>',
     *    'privatekey' => '<string>',
     * ]
     */
-   public function generateKeys(): array
+   public function generateKeys($algo = 'sha256'): array
    {
       $rsa = new RSA();
       $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
       $rsa->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
-      $rsa->setHash('sha256');
-      $rsa->setMGFHash('sha256');
+      $rsa->setHash($algo);
+      $rsa->setMGFHash($algo);
       $rsa->setPassword($this->keyRing->getPassword());
       $keys = $rsa->createKey(2048);
       return $keys;
@@ -154,25 +159,34 @@ class CryptService
    /**
     * Calculate Public Digest
     *
-    * Concat the exponent and modulus (hex representation) with a single whitespace
-    * remove leading zeros from both
-    * calculate digest (SHA256)
-    * encode as Base64
+    * Concat the exponent and modulus (hex representation) with a single whitespace.
+    * Remove leading zeros from both.
+    * Calculate digest (SHA256).
     *
-    * @deprecated
-    *
-    * @param integer $exponent
-    * @param integer $modulus
+    * @param integer $exponent HEX value.
+    * @param integer $modulus HEX value.
+    * @param string $algo
     * @return string
     */
-   public function calculateDigest($exponent, $modulus)
+   public function calculateDigest($exponent, $modulus, $algo = 'sha256')
    {
       $e = ltrim((string)$exponent, '0');
       $m = ltrim((string)$modulus, '0');
       $concat = $e . ' ' . $m;
-      $sha256 = hash('sha256', $concat, TRUE);
-      $b64en = base64_encode($sha256);
-      return $b64en;
+      $sha256 = hash($algo, $concat, TRUE);
+      return $sha256;
+   }
+
+   /**
+    * generate 16 pseudo bytes.
+    * @return string
+    */
+   public function generateNonce()
+   {
+      $bytes = Random::string(16);
+      $nonce = bin2hex($bytes);
+      $nonceUpper = strtoupper($nonce);
+      return $nonceUpper;
    }
 
 }
