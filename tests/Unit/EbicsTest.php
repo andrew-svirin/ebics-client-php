@@ -3,10 +3,10 @@
 namespace AndrewSvirin\tests\Unit;
 
 use AndrewSvirin\Ebics\models\Bank;
-use AndrewSvirin\Ebics\EBICSClient;
+use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\exceptions\EbicsException;
 use AndrewSvirin\Ebics\handlers\ResponseHandler;
-use AndrewSvirin\Ebics\services\CryptService;
+use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\services\KeyRingManager;
 use AndrewSvirin\Ebics\models\User;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ final class EbicsTest extends TestCase
    var $fixtures = __DIR__ . '/../_fixtures';
 
    /**
-    * @var EBICSClient
+    * @var EbicsClient
     */
    private $client;
 
@@ -36,6 +36,11 @@ final class EbicsTest extends TestCase
     * @var KeyRingManager
     */
    private $keyRingManager;
+
+   /**
+    * @var KeyRing
+    */
+   private $keyRing;
 
    /**
     * @throws EbicsException
@@ -46,10 +51,10 @@ final class EbicsTest extends TestCase
       $credentials = json_decode(file_get_contents($this->data . '/credentials.json'));
       $keyRingRealPath = $this->data . '/workspace/keyring.json';
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
-      $keyRing = $this->keyRingManager->loadKeyRing();
+      $this->keyRing = $this->keyRingManager->loadKeyRing();
       $bank = new Bank($credentials->hostId, $credentials->hostURL);
       $user = new User($credentials->partnerId, $credentials->userId);
-      $this->client = new EBICSClient($bank, $user, $keyRing);
+      $this->client = new EbicsClient($bank, $user, $this->keyRing);
    }
 
    /**
@@ -62,7 +67,7 @@ final class EbicsTest extends TestCase
     */
    public function testINI()
    {
-      if ($this->client->getKeyRing()->getUserCertificateA())
+      if ($this->keyRing->getUserCertificateA())
       {
          return;
       }
@@ -72,10 +77,11 @@ final class EbicsTest extends TestCase
       $reportText = $responseHandler->retrieveKeyManagementResponseReportText($ini);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
-      $this->keyRingManager->saveKeyRing($this->client->getKeyRing());
+      $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
    /**
+    * Run first INI.
     * @group HIA
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -85,7 +91,7 @@ final class EbicsTest extends TestCase
     */
    public function testHIA()
    {
-      if ($this->client->getKeyRing()->getUserCertificateX() || $this->client->getKeyRing()->getUserCertificateE())
+      if ($this->keyRing->getUserCertificateX() || $this->keyRing->getUserCertificateE())
       {
          return;
       }
@@ -95,10 +101,11 @@ final class EbicsTest extends TestCase
       $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hia);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
-      $this->keyRingManager->saveKeyRing($this->client->getKeyRing());
+      $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
    /**
+    * Run first HIA.
     * @group HPB
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -114,11 +121,7 @@ final class EbicsTest extends TestCase
       $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hpb);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
-      $cryptService = new CryptService($this->client->getKeyRing());
-      $orderDataEncrypted = $responseHandler->retrieveKeyManagementResponseOrderData($hpb);
-      $orderData = $cryptService->decryptOrderData($orderDataEncrypted);
-      $orderDataContent = $orderData->getContent();
-      $orderDataContent = $orderDataContent;
+      $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
 }

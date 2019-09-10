@@ -26,15 +26,21 @@ class Certificate
    private $type;
 
    /**
-    * @var array
+    * @var string
     */
-   private $keys;
+   private $publicKey;
 
-   public function __construct(string $content, string $type, array $keys)
+   /**
+    * @var string
+    */
+   private $privateKey;
+
+   public function __construct(string $content, string $type, string $publicKey, string $privateKey)
    {
       $this->content = $content;
       $this->type = $type;
-      $this->keys = $keys;
+      $this->publicKey = $publicKey;
+      $this->privateKey = $privateKey;
    }
 
    /**
@@ -54,12 +60,19 @@ class Certificate
    }
 
    /**
-    * Public and Private Keys.
-    * @return array
+    * @return string
     */
-   public function getKeys(): array
+   public function getPublicKey(): string
    {
-      return $this->keys;
+      return $this->publicKey;
+   }
+
+   /**
+    * @return string
+    */
+   public function getPrivateKey(): string
+   {
+      return $this->privateKey;
    }
 
    /**

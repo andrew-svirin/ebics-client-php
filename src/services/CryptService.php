@@ -49,13 +49,13 @@ class CryptService
    {
       $rsa = new RSA();
       $rsa->setPassword($this->keyRing->getPassword());
-      $rsa->loadKey($this->keyRing->getUserCertificateE()->getKeys()['privatekey']);
+      $rsa->loadKey($this->keyRing->getUserCertificateE()->getPrivateKey());
       $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
-      $transactionIdDecrypted = $rsa->decrypt($orderData->getTransactionId());
+      $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
       // aes-128-cbc encrypting format.
       $aes = new AES(AES::MODE_CBC);
       $aes->setKeyLength(128);
-      $aes->setKey($transactionIdDecrypted);
+      $aes->setKey($transactionKeyDecrypted);
       // Force openssl_options.
       $aes->openssl_options = OPENSSL_ZERO_PADDING;
       $decrypted = $aes->decrypt($orderData->getOrderData());
@@ -73,7 +73,7 @@ class CryptService
    public function cryptSignatureValue(string $hash): string
    {
       $digestToSignBin = $this->filter($hash);
-      $privateKey = $this->keyRing->getUserCertificateX()->getKeys()['privatekey'];
+      $privateKey = $this->keyRing->getUserCertificateX()->getPrivateKey();
       $passphrase = $this->keyRing->getPassword();
       $rsa = new RSA();
       $rsa->setPassword($passphrase);
@@ -86,6 +86,25 @@ class CryptService
          throw new EbicsException('Incorrect authorization.');
       }
       return $encrypted;
+   }
+
+   /**
+    * Generate public and private keys.
+    * @return array [
+    *    'publickey' => '<string>',
+    *    'privatekey' => '<string>',
+    * ]
+    */
+   public function generateKeys(): array
+   {
+      $rsa = new RSA();
+      $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
+      $rsa->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
+      $rsa->setHash('sha256');
+      $rsa->setMGFHash('sha256');
+      $rsa->setPassword($this->keyRing->getPassword());
+      $keys = $rsa->createKey(2048);
+      return $keys;
    }
 
    /**
@@ -139,6 +158,8 @@ class CryptService
     * remove leading zeros from both
     * calculate digest (SHA256)
     * encode as Base64
+    *
+    * @deprecated
     *
     * @param integer $exponent
     * @param integer $modulus

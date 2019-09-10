@@ -81,4 +81,36 @@ class KeyRing
       return 'some_secret';
    }
 
+   /**
+    * @return Certificate
+    */
+   public function getBankCertificateX(): ?Certificate
+   {
+      return $this->bankCertificateX;
+   }
+
+   /**
+    * @param Certificate $bankCertificateX
+    */
+   public function setBankCertificateX(Certificate $bankCertificateX): void
+   {
+      $this->bankCertificateX = $bankCertificateX;
+   }
+
+   /**
+    * @return Certificate
+    */
+   public function getBankCertificateE(): ?Certificate
+   {
+      return $this->bankCertificateE;
+   }
+
+   /**
+    * @param Certificate $bankCertificateE
+    */
+   public function setBankCertificateE(Certificate $bankCertificateE): void
+   {
+      $this->bankCertificateE = $bankCertificateE;
+   }
+
 }

@@ -18,12 +18,12 @@ class OrderDataEncrypted
    /**
     * @var string Binary value.
     */
-   private $transactionId;
+   private $transactionKey;
 
-   public function __construct(string $orderData, string $transactionId)
+   public function __construct(string $orderData, string $transactionKey)
    {
       $this->orderData = $orderData;
-      $this->transactionId = $transactionId;
+      $this->transactionKey = $transactionKey;
    }
 
    /**
@@ -37,9 +37,9 @@ class OrderDataEncrypted
    /**
     * @return string
     */
-   public function getTransactionId(): string
+   public function getTransactionKey(): string
    {
-      return $this->transactionId;
+      return $this->transactionKey;
    }
 
 }
