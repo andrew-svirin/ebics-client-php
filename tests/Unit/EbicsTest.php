@@ -49,8 +49,8 @@ final class EbicsTest extends TestCase
    public function setUp()
    {
       parent::setUp();
-      $credentials = json_decode(file_get_contents($this->data . '/credentials.json'));
-      $keyRingRealPath = $this->data . '/workspace/keyring.json';
+      $credentials = json_decode(file_get_contents($this->data . '/credentials_2.json'));
+      $keyRingRealPath = $this->data . '/workspace/keyring_2.json';
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
       $this->keyRing = $this->keyRingManager->loadKeyRing();
       $bank = new Bank($credentials->hostId, $credentials->hostURL);
@@ -74,8 +74,8 @@ final class EbicsTest extends TestCase
       }
       $ini = $this->client->INI();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($ini);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($ini);
+      $code = $responseHandler->retrieveReturnCode($ini);
+      $reportText = $responseHandler->retrieveReportText($ini);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
@@ -98,8 +98,8 @@ final class EbicsTest extends TestCase
       }
       $hia = $this->client->HIA();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($hia);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hia);
+      $code = $responseHandler->retrieveReturnCode($hia);
+      $reportText = $responseHandler->retrieveReportText($hia);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
@@ -122,8 +122,8 @@ final class EbicsTest extends TestCase
       }
       $hpb = $this->client->HPB();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($hpb);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($hpb);
+      $code = $responseHandler->retrieveReturnCode($hpb);
+      $reportText = $responseHandler->retrieveReportText($hpb);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
@@ -142,8 +142,8 @@ final class EbicsTest extends TestCase
    {
       $haa = $this->client->HAA();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($haa);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($haa);
+      $code = $responseHandler->retrieveReturnCode($haa);
+      $reportText = $responseHandler->retrieveReportText($haa);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
@@ -164,8 +164,8 @@ final class EbicsTest extends TestCase
          DateTime::createFromFormat('Y-m-d', '2019-09-01')
       );
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($vmk);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($vmk);
+      $code = $responseHandler->retrieveReturnCode($vmk);
+      $reportText = $responseHandler->retrieveReportText($vmk);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
@@ -186,8 +186,8 @@ final class EbicsTest extends TestCase
          DateTime::createFromFormat('Y-m-d', '2019-09-01')
       );
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveKeyManagementResponseReturnCode($vmk);
-      $reportText = $responseHandler->retrieveKeyManagementResponseReportText($vmk);
+      $code = $responseHandler->retrieveReturnCode($vmk);
+      $reportText = $responseHandler->retrieveReportText($vmk);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
