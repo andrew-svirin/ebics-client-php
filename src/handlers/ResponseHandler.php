@@ -3,8 +3,10 @@
 namespace AndrewSvirin\Ebics\handlers;
 
 use AndrewSvirin\Ebics\exceptions\EbicsException;
+use AndrewSvirin\Ebics\factories\TransactionFactory;
 use AndrewSvirin\Ebics\handlers\traits\XPathTrait;
 use AndrewSvirin\Ebics\models\OrderDataEncrypted;
+use AndrewSvirin\Ebics\models\Transaction;
 use DOMDocument;
 
 /**
@@ -45,27 +47,6 @@ class ResponseHandler
    }
 
    /**
-    * Retrieve H004 encoded order data.
-    * @param DOMDocument $xml
-    * @return OrderDataEncrypted
-    * @throws EbicsException
-    */
-   public function retrieveH004OrderData(DOMDocument $xml): OrderDataEncrypted
-   {
-      $xpath = $this->prepareH004XPath($xml);
-      $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
-      $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
-      if (!$orderData || !$transactionKey)
-      {
-         throw new EbicsException('EBICS response empty result.');
-      }
-      $orderDataValue = $orderData->item(0)->nodeValue;
-      $transactionKeyValue = $transactionKey->item(0)->nodeValue;
-      $transactionKeyValueDe = base64_decode($transactionKeyValue);
-      return new OrderDataEncrypted($orderDataValue, $transactionKeyValueDe);
-   }
-
-   /**
     * Extract H000 > SystemReturnCode > ReturnCode value from the DOM XML.
     * @param DOMDocument $xml
     * @return string
@@ -91,4 +72,44 @@ class ResponseHandler
       return $reportTextValue;
    }
 
+   /**
+    * Retrieve encoded Order data.
+    * @param DOMDocument $xml
+    * @return OrderDataEncrypted
+    * @throws EbicsException
+    */
+   public function retrieveOrderData(DOMDocument $xml): OrderDataEncrypted
+   {
+      $xpath = $this->prepareH004XPath($xml);
+      $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
+      $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
+      if (!$orderData || !$transactionKey)
+      {
+         throw new EbicsException('EBICS response empty result.');
+      }
+      $orderDataValue = $orderData->item(0)->nodeValue;
+      $transactionKeyValue = $transactionKey->item(0)->nodeValue;
+      $transactionKeyValueDe = base64_decode($transactionKeyValue);
+      return new OrderDataEncrypted($orderDataValue, $transactionKeyValueDe);
+   }
+
+   /**
+    * Extract Transaction from the DOM XML.
+    * @param DOMDocument $xml
+    * @return Transaction
+    */
+   public function retrieveTransaction(DOMDocument $xml): Transaction
+   {
+      $c = $xml->C14N();
+      $xpath = $this->prepareH004XPath($xml);
+      $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
+      $transactionIdValue = $transactionId->item(0)->nodeValue;
+      $numSegments = $xpath->query('//H004:header/H004:static/H004:NumSegments');
+      $numSegmentsValue = $numSegments->item(0)->nodeValue;
+      $transactionPhase = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
+      $transactionPhaseValue = $transactionPhase->item(0)->nodeValue;
+      $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
+      $segmentNumberValue = $segmentNumber->item(0)->nodeValue;
+      return TransactionFactory::buildTransaction($transactionIdValue, $transactionPhaseValue, $numSegmentsValue, $segmentNumberValue);
+   }
 }

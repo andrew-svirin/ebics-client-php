@@ -207,32 +207,42 @@ class OrderDataHandler
       $xmlOrderData->appendChild($xmlUserID);
    }
 
-   public function retrieveHPBAuthenticationCertificate(OrderData $orderData): Certificate
+   /**
+    * Extract Authentication Certificate from the $orderData.
+    * @param OrderData $orderData
+    * @return Certificate
+    */
+   public function retrieveAuthenticationCertificate(OrderData $orderData): Certificate
    {
       $xpath = $this->prepareH004XPath($orderData);
-      $x509Certificate = $xpath->query('/H004:HPBResponseOrderData/H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
+      $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
       $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
       $x509CertificateValueDe = base64_decode($x509CertificateValue);
-      $modulus = $xpath->query('/H004:HPBResponseOrderData/H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
+      $modulus = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
       $modulusValue = $modulus->item(0)->nodeValue;
       $modulusValueDe = base64_decode($modulusValue);
-      $exponent = $xpath->query('/H004:HPBResponseOrderData/H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
+      $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
       $exponentValue = $exponent->item(0)->nodeValue;
       $exponentValueDe = base64_decode($exponentValue);
       $certificate = CertificateFactory::buildCertificateXFromExponentAndModulus($x509CertificateValueDe, $modulusValueDe, $exponentValueDe);
       return $certificate;
    }
 
+   /**
+    * Extract Encryption Certificate from the $orderData.
+    * @param OrderData $orderData
+    * @return Certificate
+    */
    public function retrieveEncryptionCertificate(OrderData $orderData): Certificate
    {
       $xpath = $this->prepareH004XPath($orderData);
-      $x509Certificate = $xpath->query('/H004:HPBResponseOrderData/H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
+      $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
       $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
       $x509CertificateValueDe = base64_decode($x509CertificateValue);
-      $modulus = $xpath->query('/H004:HPBResponseOrderData/H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
+      $modulus = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
       $modulusValue = $modulus->item(0)->nodeValue;
       $modulusValueDe = base64_decode($modulusValue);
-      $exponent = $xpath->query('/H004:HPBResponseOrderData/H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
+      $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
       $exponentValue = $exponent->item(0)->nodeValue;
       $exponentValueDe = base64_decode($exponentValue);
       $certificate = CertificateFactory::buildCertificateEFromExponentAndModulus($x509CertificateValueDe, $modulusValueDe, $exponentValueDe);

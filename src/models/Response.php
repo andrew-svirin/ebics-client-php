@@ -14,10 +14,9 @@ class Response extends DOMDocument
 {
 
    /**
-    * Uses for encrypted OrderData.
-    * @var OrderData
+    * @var Transaction[]
     */
-   private $orderData;
+   private $transactions;
 
    /**
     * Get formatted content.
@@ -30,20 +29,17 @@ class Response extends DOMDocument
       return $this->saveXML();
    }
 
-   /**
-    * @return OrderData
-    */
-   public function getOrderData(): OrderData
+   public function addTransaction(Transaction $transaction)
    {
-      return $this->orderData;
+      $this->transactions[] = $transaction;
    }
 
    /**
-    * @param OrderData $orderData
+    * @return Transaction[]
     */
-   public function setOrderData(OrderData $orderData): void
+   public function getTransactions(): array
    {
-      $this->orderData = $orderData;
+      return $this->transactions;
    }
 
 }

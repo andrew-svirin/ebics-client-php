@@ -59,6 +59,23 @@ final class EbicsTest extends TestCase
    }
 
    /**
+    * @group HEV
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testHEV()
+   {
+      $hev = $this->client->HEV();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveH000ReturnCode($hev);
+      $reportText = $responseHandler->retrieveH000ReportText($hev);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+   }
+
+   /**
     * @group INI
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -130,18 +147,20 @@ final class EbicsTest extends TestCase
    }
 
    /**
-    * @group HEV
+    * Run first HPB.
+    * @group HPD
     * @throws ClientExceptionInterface
+    * @throws EbicsException
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
     */
-   public function testHEV()
+   public function testHPD()
    {
-      $hev = $this->client->HEV();
+      $hpd = $this->client->HPD(null);
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveH000ReturnCode($hev);
-      $reportText = $responseHandler->retrieveH000ReportText($hev);
+      $code = $responseHandler->retrieveH004ReturnCode($hpd);
+      $reportText = $responseHandler->retrieveH004ReportText($hpd);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
@@ -205,25 +224,6 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($vmk);
       $reportText = $responseHandler->retrieveH004ReportText($vmk);
-      $this->assertEquals($code, '000000');
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
-   }
-
-   /**
-    * Run first HPB.
-    * @group HPD
-    * @throws ClientExceptionInterface
-    * @throws EbicsException
-    * @throws RedirectionExceptionInterface
-    * @throws ServerExceptionInterface
-    * @throws TransportExceptionInterface
-    */
-   public function testHPD()
-   {
-      $hpd = $this->client->HPD();
-      $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveH004ReturnCode($hpd);
-      $reportText = $responseHandler->retrieveH004ReportText($hpd);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }

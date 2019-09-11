@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\factories\CertificateFactory;
+use AndrewSvirin\Ebics\factories\TransactionFactory;
 use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\handlers\BodyHandler;
 use AndrewSvirin\Ebics\handlers\HeaderHandler;
@@ -139,6 +140,26 @@ final class EbicsClient implements EbicsClientInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
     */
+   public function HEV(): Response
+   {
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleHEV($request);
+      $this->hostHandler->handle($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
+   }
+
+   /**
+    * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
    public function INI(DateTime $dateTime = null): Response
    {
       if (null === $dateTime)
@@ -223,13 +244,49 @@ final class EbicsClient implements EbicsClientInterface
       $response = new Response();
       $response->loadXML($hostResponseContent);
       // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveH004OrderData($response);
+      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
       $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
-      $response->setOrderData($orderData);
-      $certificateX = $this->orderDataHandler->retrieveHPBAuthenticationCertificate($orderData);
+      $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
+      $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
       $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
       $this->keyRing->setBankCertificateX($certificateX);
       $this->keyRing->setBankCertificateE($certificateE);
+      return $response;
+   }
+
+   /**
+    * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    * @throws exceptions\EbicsException
+    */
+   public function HPD(DateTime $dateTime = null): Response
+   {
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleSecured($request);
+      $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+
+      // TODO: Send Receipt transaction.
+      $transaction = $this->responseHandler->retrieveTransaction($response);
+      $response->addTransaction($transaction);
+
+      // Prepare decrypted OrderData.
+      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
+      $transaction->setOrderData($orderData);
       return $response;
    }
 
@@ -306,57 +363,6 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
-      $hostResponseContent = $hostResponse->getContent();
-      $response = new Response();
-      $response->loadXML($hostResponseContent);
-      return $response;
-   }
-
-   /**
-    * {@inheritdoc}
-    * @throws ClientExceptionInterface
-    * @throws RedirectionExceptionInterface
-    * @throws ServerExceptionInterface
-    * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
-    */
-   public function HPD(DateTime $dateTime = null): Response
-   {
-      if (null === $dateTime)
-      {
-         $dateTime = DateTime::createFromFormat('U', time());
-      }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleSecured($request);
-      $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
-      $hostResponseContent = $hostResponse->getContent();
-      $response = new Response();
-      $response->loadXML($hostResponseContent);
-      // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveH004OrderData($response);
-      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
-      $response->setOrderData($orderData);
-      return $response;
-   }
-
-   /**
-    * {@inheritdoc}
-    * @throws ClientExceptionInterface
-    * @throws RedirectionExceptionInterface
-    * @throws ServerExceptionInterface
-    * @throws TransportExceptionInterface
-    */
-   public function HEV(): Response
-   {
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleHEV($request);
-      $this->hostHandler->handle($request, $xmlRequest);
       $requestContent = $request->getContent();
       $hostResponse = $this->post($requestContent);
       $hostResponseContent = $hostResponse->getContent();
