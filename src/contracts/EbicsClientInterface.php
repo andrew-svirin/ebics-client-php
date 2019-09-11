@@ -15,6 +15,12 @@ interface EbicsClientInterface
 {
 
    /**
+    * Supported protocol version for the Bank.
+    * @return Response
+    */
+   function HEV(): Response;
+
+   /**
     * Make INI request.
     * Send to the bank public certificate of signature A006.
     * Prepare A006 certificates for KeyRing.
@@ -42,6 +48,13 @@ interface EbicsClientInterface
    function HPB(DateTime $dateTime = null): Response;
 
    /**
+    * Retrieve the bank server parameters.
+    * @param DateTime|null $dateTime
+    * @return Response
+    */
+   public function HPD(DateTime $dateTime = null): Response;
+
+   /**
     * Retrieve  Bank available order types.
     * @param DateTime|null $dateTime Current date.
     * @return Response
@@ -65,19 +78,5 @@ interface EbicsClientInterface
     * @return Response
     */
    function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
-
-   /**
-    * Retrieve the bank server parameters.
-    * TODO: Transaction should be closed.
-    * @param DateTime|null $dateTime
-    * @return Response
-    */
-   public function HPD(DateTime $dateTime = null): Response;
-
-   /**
-    * Supported protocol version for the Bank.
-    * @return Response
-    */
-   function HEV(): Response;
 
 }

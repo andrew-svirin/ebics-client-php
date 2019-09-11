@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\handlers;
 
 use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\models\KeyRing;
+use AndrewSvirin\Ebics\models\Transaction;
 use AndrewSvirin\Ebics\models\User;
 use AndrewSvirin\Ebics\services\CryptService;
 use DateTime;
@@ -29,8 +30,6 @@ class HeaderHandler
 
    const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
    const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
-
-   const TRANSACTION_PHASE_INITIALIZATION = 'Initialisation';
 
    /**
     * @var User
@@ -144,7 +143,7 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank(),
          $this->handleOrderDetails(self::ORDER_TYPE_HAA, self::ORDER_ATTRIBUTE_DZHNN, $this->handleStandardOrderParams()),
-         $this->handleMutable($this->handleTransactionPhase(self::TRANSACTION_PHASE_INITIALIZATION))
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
    }
 
@@ -168,7 +167,7 @@ class HeaderHandler
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams($startDateTime, $endDateTime)
          ),
-         $this->handleMutable($this->handleTransactionPhase(self::TRANSACTION_PHASE_INITIALIZATION))
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
    }
 
@@ -192,7 +191,7 @@ class HeaderHandler
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams($startDateTime, $endDateTime)
          ),
-         $this->handleMutable($this->handleTransactionPhase(self::TRANSACTION_PHASE_INITIALIZATION))
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
    }
 
@@ -214,7 +213,7 @@ class HeaderHandler
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
          ),
-         $this->handleMutable($this->handleTransactionPhase(self::TRANSACTION_PHASE_INITIALIZATION))
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
    }
 

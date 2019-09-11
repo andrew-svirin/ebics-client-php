@@ -2,18 +2,16 @@
 
 namespace AndrewSvirin\Ebics\models;
 
+use AndrewSvirin\Ebics\contracts\CertificateInterface;
+
 /**
  * Class Certificate represents Certificate model.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Certificate
+class Certificate implements CertificateInterface
 {
-
-   const TYPE_A = 'A';
-   const TYPE_X = 'X';
-   const TYPE_E = 'E';
 
    /**
     * @var string
