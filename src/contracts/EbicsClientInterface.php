@@ -67,6 +67,14 @@ interface EbicsClientInterface
    function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
    /**
+    * Retrieve the bank server parameters.
+    * TODO: Transaction should be closed.
+    * @param DateTime|null $dateTime
+    * @return Response
+    */
+   public function HPD(DateTime $dateTime = null): Response;
+
+   /**
     * Supported protocol version for the Bank.
     * @return Response
     */
