@@ -26,7 +26,7 @@ class RequestHandler
     */
    public function handleSecured(DOMDocument $xml): DOMElement
    {
-      $xmlRequest = $this->handle($xml, self::EBICS_REQUEST);
+      $xmlRequest = $this->handleH004($xml, self::EBICS_REQUEST);
       return $xmlRequest;
    }
 
@@ -37,7 +37,7 @@ class RequestHandler
     */
    public function handleUnsecured(DOMDocument $xml): DOMElement
    {
-      $xmlRequest = $this->handle($xml, self::EBICS_UNSECURED_REQUEST);
+      $xmlRequest = $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
       return $xmlRequest;
    }
 
@@ -48,7 +48,7 @@ class RequestHandler
     */
    public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
    {
-      $xmlRequest = $this->handle($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
+      $xmlRequest = $this->handleH004($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
       return $xmlRequest;
    }
 
@@ -59,22 +59,36 @@ class RequestHandler
     */
    public function handleHEV(DOMDocument $xml)
    {
-      $xmlRequest = $this->handle($xml, self::EBICS_HEV);
+      $xmlRequest = $this->handleH000($xml, self::EBICS_HEV);
       return $xmlRequest;
    }
 
    /**
-    * Add Request to DOM XML.
+    * Add H004 Request to DOM XML.
     * @param DOMDocument $xml
     * @param string $request
     * @return DOMElement
     */
-   private function handle(DOMDocument $xml, $request): DOMElement
+   private function handleH004(DOMDocument $xml, $request): DOMElement
    {
       $xmlRequest = $xml->createElementNS('urn:org:ebics:H004', $request);
       $xmlRequest->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
       $xmlRequest->setAttribute('Version', 'H004');
       $xmlRequest->setAttribute('Revision', '1');
+      $xml->appendChild($xmlRequest);
+      return $xmlRequest;
+   }
+
+   /**
+    * Add H000 Request to DOM XML.
+    * @param DOMDocument $xml
+    * @param string $request
+    * @return DOMElement
+    */
+   private function handleH000(DOMDocument $xml, $request): DOMElement
+   {
+      $xmlRequest = $xml->createElementNS('http://www.ebics.org/H000', $request);
+      $xmlRequest->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'xsi:schemaLocation', 'http://www.ebics.org/H000 http://www.ebics.org/H000/ebics_hev.xsd');
       $xml->appendChild($xmlRequest);
       return $xmlRequest;
    }

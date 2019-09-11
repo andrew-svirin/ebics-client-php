@@ -68,8 +68,8 @@ class HeaderHandler
 
    public function __construct(Bank $bank, User $user, KeyRing $keyRing, CryptService $cryptService)
    {
-      $this->user = $user;
       $this->bank = $bank;
+      $this->user = $user;
       $this->keyRing = $keyRing;
       $this->cryptService = $cryptService;
       $this->language = 'de';

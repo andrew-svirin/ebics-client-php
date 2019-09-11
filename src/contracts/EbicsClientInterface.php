@@ -66,4 +66,10 @@ interface EbicsClientInterface
     */
    function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
+   /**
+    * Supported protocol version for the Bank.
+    * @return Response
+    */
+   function HEV(): Response;
+
 }
