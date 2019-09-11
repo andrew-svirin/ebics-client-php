@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\handlers;
 
 use AndrewSvirin\Ebics\factories\CertificateFactory;
 use AndrewSvirin\Ebics\handlers\traits\XPathTrait;
+use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\models\Certificate;
 use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\OrderData;
@@ -24,17 +25,22 @@ class OrderDataHandler
    use XPathTrait;
 
    /**
+    * @var Bank
+    */
+   private $bank;
+
+   /**
     * @var User
     */
    private $user;
-
    /**
     * @var KeyRing
     */
    private $keyRing;
 
-   public function __construct(User $user, KeyRing $keyRing)
+   public function __construct(Bank $bank, User $user, KeyRing $keyRing)
    {
+      $this->bank = $bank;
       $this->user = $user;
       $this->keyRing = $keyRing;
    }
@@ -56,7 +62,10 @@ class OrderDataHandler
       $xmlSignaturePubKeyInfo = $xml->createElement('SignaturePubKeyInfo');
       $xmlSignaturePubKeyOrderData->appendChild($xmlSignaturePubKeyInfo);
 
-      $this->handleX509Data($xmlSignaturePubKeyInfo, $xml, $certificateA);
+      if ($this->bank->isCertified())
+      {
+         $this->handleX509Data($xmlSignaturePubKeyInfo, $xml, $certificateA);
+      }
       $this->handlePubKeyValue($xmlSignaturePubKeyInfo, $xml, $certificateA, $dateTime);
 
       // Add SignatureVersion to SignaturePubKeyInfo.
@@ -89,7 +98,10 @@ class OrderDataHandler
       $xmlAuthenticationPubKeyInfo = $xml->createElement('AuthenticationPubKeyInfo');
       $xmlHIARequestOrderData->appendChild($xmlAuthenticationPubKeyInfo);
 
-      $this->handleX509Data($xmlAuthenticationPubKeyInfo, $xml, $certificateX);
+      if ($this->bank->isCertified())
+      {
+         $this->handleX509Data($xmlAuthenticationPubKeyInfo, $xml, $certificateX);
+      }
       $this->handlePubKeyValue($xmlAuthenticationPubKeyInfo, $xml, $certificateX, $dateTime);
 
       // Add AuthenticationVersion to AuthenticationPubKeyInfo.
@@ -101,7 +113,10 @@ class OrderDataHandler
       $xmlEncryptionPubKeyInfo = $xml->createElement('EncryptionPubKeyInfo');
       $xmlHIARequestOrderData->appendChild($xmlEncryptionPubKeyInfo);
 
-      $this->handleX509Data($xmlEncryptionPubKeyInfo, $xml, $certificateE);
+      if ($this->bank->isCertified())
+      {
+         $this->handleX509Data($xmlEncryptionPubKeyInfo, $xml, $certificateE);
+      }
       $this->handlePubKeyValue($xmlEncryptionPubKeyInfo, $xml, $certificateE, $dateTime);
 
       // Add EncryptionVersion to EncryptionPubKeyInfo.

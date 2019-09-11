@@ -383,6 +383,7 @@ class HeaderHandler
     * @param callable|null $nonce
     * @param callable|null $bank
     * @param callable|null $orderDetails
+    * @param callable|null $muttable
     */
    private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $muttable = null)
    {
