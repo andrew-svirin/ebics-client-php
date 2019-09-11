@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\factories\CertificateFactory;
 use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\handlers\BodyHandler;
 use AndrewSvirin\Ebics\handlers\HeaderHandler;
+use AndrewSvirin\Ebics\handlers\HostHandler;
 use AndrewSvirin\Ebics\handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\handlers\RequestHandler;
 use AndrewSvirin\Ebics\handlers\ResponseHandler;
@@ -82,6 +83,11 @@ final class EbicsClient implements EbicsClientInterface
    private $responseHandler;
 
    /**
+    * @var HostHandler
+    */
+   private $hostHandler;
+
+   /**
     * @var CryptService
     */
    private $cryptService;
@@ -104,6 +110,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->orderDataHandler = new OrderDataHandler($user, $keyRing);
       $this->authSignatureHandler = new AuthSignatureHandler($this->cryptService);
       $this->responseHandler = new ResponseHandler();
+      $this->hostHandler = new HostHandler($bank);
    }
 
    /**
@@ -216,7 +223,7 @@ final class EbicsClient implements EbicsClientInterface
       $response = new Response();
       $response->loadXML($hostResponseContent);
       // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+      $orderDataEncrypted = $this->responseHandler->retrieveH004OrderData($response);
       $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
       $response->setOrderData($orderData);
       $certificateX = $this->orderDataHandler->retrieveHPBAuthenticationCertificate($orderData);
@@ -299,6 +306,26 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      return $response;
+   }
+
+   /**
+    * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function HEV(): Response
+   {
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleHEV($request);
+      $this->hostHandler->handle($request, $xmlRequest);
       $requestContent = $request->getContent();
       $hostResponse = $this->post($requestContent);
       $hostResponseContent = $hostResponse->getContent();

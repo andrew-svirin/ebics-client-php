@@ -209,7 +209,7 @@ class OrderDataHandler
 
    public function retrieveHPBAuthenticationCertificate(OrderData $orderData): Certificate
    {
-      $xpath = $this->prepareHXPath($orderData);
+      $xpath = $this->prepareH004XPath($orderData);
       $x509Certificate = $xpath->query('/H004:HPBResponseOrderData/H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
       $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
       $x509CertificateValueDe = base64_decode($x509CertificateValue);
@@ -225,7 +225,7 @@ class OrderDataHandler
 
    public function retrieveEncryptionCertificate(OrderData $orderData): Certificate
    {
-      $xpath = $this->prepareHXPath($orderData);
+      $xpath = $this->prepareH004XPath($orderData);
       $x509Certificate = $xpath->query('/H004:HPBResponseOrderData/H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
       $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
       $x509CertificateValueDe = base64_decode($x509CertificateValue);

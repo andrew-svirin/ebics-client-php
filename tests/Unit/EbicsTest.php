@@ -49,8 +49,8 @@ final class EbicsTest extends TestCase
    public function setUp()
    {
       parent::setUp();
-      $credentials = json_decode(file_get_contents($this->data . '/credentials_2.json'));
-      $keyRingRealPath = $this->data . '/workspace/keyring_2.json';
+      $credentials = json_decode(file_get_contents($this->data . '/credentials.json'));
+      $keyRingRealPath = $this->data . '/workspace/keyring.json';
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
       $this->keyRing = $this->keyRingManager->loadKeyRing();
       $bank = new Bank($credentials->hostId, $credentials->hostURL);
@@ -74,8 +74,8 @@ final class EbicsTest extends TestCase
       }
       $ini = $this->client->INI();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($ini);
-      $reportText = $responseHandler->retrieveReportText($ini);
+      $code = $responseHandler->retrieveH004ReturnCode($ini);
+      $reportText = $responseHandler->retrieveH004ReportText($ini);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
@@ -98,8 +98,8 @@ final class EbicsTest extends TestCase
       }
       $hia = $this->client->HIA();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($hia);
-      $reportText = $responseHandler->retrieveReportText($hia);
+      $code = $responseHandler->retrieveH004ReturnCode($hia);
+      $reportText = $responseHandler->retrieveH004ReportText($hia);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
@@ -122,11 +122,33 @@ final class EbicsTest extends TestCase
       }
       $hpb = $this->client->HPB();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($hpb);
-      $reportText = $responseHandler->retrieveReportText($hpb);
+      $code = $responseHandler->retrieveH004ReturnCode($hpb);
+      $reportText = $responseHandler->retrieveH004ReportText($hpb);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
+   }
+
+   /**
+    * @group HEV
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testHEV()
+   {
+      $hev = $this->client->HEV();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveH000ReturnCode($hev);
+      $reportText = $responseHandler->retrieveH000ReportText($hev);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+   }
+
+   public function testHPD()
+   {
+
    }
 
    /**
@@ -142,8 +164,8 @@ final class EbicsTest extends TestCase
    {
       $haa = $this->client->HAA();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($haa);
-      $reportText = $responseHandler->retrieveReportText($haa);
+      $code = $responseHandler->retrieveH004ReturnCode($haa);
+      $reportText = $responseHandler->retrieveH004ReportText($haa);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
@@ -164,8 +186,8 @@ final class EbicsTest extends TestCase
          DateTime::createFromFormat('Y-m-d', '2019-09-01')
       );
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($vmk);
-      $reportText = $responseHandler->retrieveReportText($vmk);
+      $code = $responseHandler->retrieveH004ReturnCode($vmk);
+      $reportText = $responseHandler->retrieveH004ReportText($vmk);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
@@ -186,8 +208,8 @@ final class EbicsTest extends TestCase
          DateTime::createFromFormat('Y-m-d', '2019-09-01')
       );
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveReturnCode($vmk);
-      $reportText = $responseHandler->retrieveReportText($vmk);
+      $code = $responseHandler->retrieveH004ReturnCode($vmk);
+      $reportText = $responseHandler->retrieveH004ReportText($vmk);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
