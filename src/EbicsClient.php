@@ -320,6 +320,37 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
+    * @throws exceptions\EbicsException
+    */
+   public function HPD(DateTime $dateTime = null): Response
+   {
+      if (null === $dateTime)
+      {
+         $dateTime = DateTime::createFromFormat('U', time());
+      }
+      $request = new Request();
+      $xmlRequest = $this->requestHandler->handleSecured($request);
+      $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
+      $this->authSignatureHandler->handle($request, $xmlRequest);
+      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $requestContent = $request->getContent();
+      $hostResponse = $this->post($requestContent);
+      $hostResponseContent = $hostResponse->getContent();
+      $response = new Response();
+      $response->loadXML($hostResponseContent);
+      // Prepare decrypted OrderData.
+      $orderDataEncrypted = $this->responseHandler->retrieveH004OrderData($response);
+      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
+      $response->setOrderData($orderData);
+      return $response;
+   }
+
+   /**
+    * {@inheritdoc}
+    * @throws ClientExceptionInterface
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
     */
    public function HEV(): Response
    {

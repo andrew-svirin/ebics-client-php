@@ -146,11 +146,6 @@ final class EbicsTest extends TestCase
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
-   public function testHPD()
-   {
-
-   }
-
    /**
     * Run first HPB.
     * @group HAA
@@ -210,6 +205,25 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($vmk);
       $reportText = $responseHandler->retrieveH004ReportText($vmk);
+      $this->assertEquals($code, '000000');
+      $this->assertEquals($reportText, '[EBICS_OK] OK');
+   }
+
+   /**
+    * Run first HPB.
+    * @group HPD
+    * @throws ClientExceptionInterface
+    * @throws EbicsException
+    * @throws RedirectionExceptionInterface
+    * @throws ServerExceptionInterface
+    * @throws TransportExceptionInterface
+    */
+   public function testHPD()
+   {
+      $hpd = $this->client->HPD();
+      $responseHandler = new ResponseHandler();
+      $code = $responseHandler->retrieveH004ReturnCode($hpd);
+      $reportText = $responseHandler->retrieveH004ReportText($hpd);
       $this->assertEquals($code, '000000');
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
