@@ -49,11 +49,11 @@ final class EbicsTest extends TestCase
    public function setUp()
    {
       parent::setUp();
-      $credentials = json_decode(file_get_contents($this->data . '/credentials.json'));
-      $keyRingRealPath = $this->data . '/workspace/keyring.json';
+      $credentials = json_decode(file_get_contents($this->data . '/credentials_3.json'));
+      $keyRingRealPath = $this->data . '/workspace/keyring_3.json';
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
       $this->keyRing = $this->keyRingManager->loadKeyRing();
-      $bank = new Bank($credentials->hostId, $credentials->hostURL);
+      $bank = new Bank($credentials->hostId, $credentials->hostURL, $credentials->hostIsCertified);
       $user = new User($credentials->partnerId, $credentials->userId);
       $this->client = new EbicsClient($bank, $user, $this->keyRing);
    }
@@ -71,7 +71,7 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH000ReturnCode($hev);
       $reportText = $responseHandler->retrieveH000ReportText($hev);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
@@ -85,15 +85,11 @@ final class EbicsTest extends TestCase
     */
    public function testINI()
    {
-      if ($this->keyRing->getUserCertificateA())
-      {
-         return;
-      }
       $ini = $this->client->INI();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($ini);
       $reportText = $responseHandler->retrieveH004ReportText($ini);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
@@ -109,15 +105,11 @@ final class EbicsTest extends TestCase
     */
    public function testHIA()
    {
-      if ($this->keyRing->getUserCertificateX() || $this->keyRing->getUserCertificateE())
-      {
-         return;
-      }
       $hia = $this->client->HIA();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hia);
       $reportText = $responseHandler->retrieveH004ReportText($hia);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
@@ -133,15 +125,11 @@ final class EbicsTest extends TestCase
     */
    public function testHPB()
    {
-      if ($this->keyRing->getBankCertificateX() || $this->keyRing->getBankCertificateE())
-      {
-         return;
-      }
       $hpb = $this->client->HPB();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hpb);
       $reportText = $responseHandler->retrieveH004ReportText($hpb);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
@@ -161,7 +149,7 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hpd);
       $reportText = $responseHandler->retrieveH004ReportText($hpd);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
@@ -180,7 +168,7 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($haa);
       $reportText = $responseHandler->retrieveH004ReportText($haa);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
@@ -202,7 +190,7 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($vmk);
       $reportText = $responseHandler->retrieveH004ReportText($vmk);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 
@@ -224,7 +212,7 @@ final class EbicsTest extends TestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($vmk);
       $reportText = $responseHandler->retrieveH004ReportText($vmk);
-      $this->assertEquals($code, '000000');
+      $this->assertEquals($code, '000000', $reportText);
       $this->assertEquals($reportText, '[EBICS_OK] OK');
    }
 

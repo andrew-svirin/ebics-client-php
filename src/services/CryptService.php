@@ -95,12 +95,13 @@ class CryptService
    /**
     * Generate public and private keys.
     * @param string $algo
+    * @param int $length
     * @return array [
     *    'publickey' => '<string>',
     *    'privatekey' => '<string>',
     * ]
     */
-   public function generateKeys($algo = 'sha256'): array
+   public function generateKeys($algo = 'sha256', $length = 2048): array
    {
       $rsa = new RSA();
       $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
@@ -108,7 +109,7 @@ class CryptService
       $rsa->setHash($algo);
       $rsa->setMGFHash($algo);
       $rsa->setPassword($this->keyRing->getPassword());
-      $keys = $rsa->createKey(2048);
+      $keys = $rsa->createKey($length);
       return $keys;
    }
 

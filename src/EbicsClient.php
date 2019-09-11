@@ -108,7 +108,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->requestHandler = new RequestHandler();
       $this->headerHandler = new HeaderHandler($bank, $user, $keyRing, $this->cryptService);
       $this->bodyHandler = new BodyHandler();
-      $this->orderDataHandler = new OrderDataHandler($user, $keyRing);
+      $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
       $this->authSignatureHandler = new AuthSignatureHandler($this->cryptService);
       $this->responseHandler = new ResponseHandler();
       $this->hostHandler = new HostHandler($bank);
@@ -181,7 +181,10 @@ final class EbicsClient implements EbicsClientInterface
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-      $this->keyRing->setUserCertificateA($certificateA);
+      if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response))
+      {
+         $this->keyRing->setUserCertificateA($certificateA);
+      }
       return $response;
    }
 
@@ -214,8 +217,11 @@ final class EbicsClient implements EbicsClientInterface
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-      $this->keyRing->setUserCertificateE($certificateE);
-      $this->keyRing->setUserCertificateX($certificateX);
+      if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response))
+      {
+         $this->keyRing->setUserCertificateE($certificateE);
+         $this->keyRing->setUserCertificateX($certificateX);
+      }
       return $response;
    }
 
@@ -243,14 +249,17 @@ final class EbicsClient implements EbicsClientInterface
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-      // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
-      $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
-      $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
-      $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
-      $this->keyRing->setBankCertificateX($certificateX);
-      $this->keyRing->setBankCertificateE($certificateE);
+      if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response))
+      {
+         // Prepare decrypted OrderData.
+         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+         $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
+         $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
+         $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
+         $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
+         $this->keyRing->setBankCertificateX($certificateX);
+         $this->keyRing->setBankCertificateE($certificateE);
+      }
       return $response;
    }
 
