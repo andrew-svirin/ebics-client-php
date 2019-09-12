@@ -31,7 +31,7 @@ class KeyRingManager implements KeyRingManagerInterface
     * The passphrase by which all private keys are encrypted/decrypted.
     * @var string
     */
-   private $passphrase;
+   private $password;
 
 
    /**
@@ -42,7 +42,7 @@ class KeyRingManager implements KeyRingManagerInterface
    public function __construct($keyRingRealPath, $passphrase)
    {
       $this->keyRingRealPath = $keyRingRealPath;
-      $this->passphrase = $passphrase;
+      $this->password = $passphrase;
    }
 
    /**
@@ -63,6 +63,7 @@ class KeyRingManager implements KeyRingManagerInterface
       {
          $result = new KeyRing();
       }
+      $result->setPassword($this->password);
       return $result;
    }
 

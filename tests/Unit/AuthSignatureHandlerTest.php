@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\handlers\traits\XPathTrait;
 use AndrewSvirin\Ebics\models\Bank;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\exceptions\EbicsException;
+use AndrewSvirin\Ebics\models\Certificate;
 use AndrewSvirin\Ebics\models\KeyRing;
 use AndrewSvirin\Ebics\models\Request;
 use AndrewSvirin\Ebics\services\CryptService;
@@ -89,4 +90,48 @@ final class AuthSignatureHandlerTest extends TestCase
       $this->assertEquals($digestValue, $digestValue2);
    }
 
+   /**
+    * Generate auth signature for working example.
+    * @group SignatureValue
+    * @throws EbicsException
+    */
+   public function testSignatureValue()
+   {
+      $keys = json_decode(file_get_contents($this->fixtures . '/keys.json'));
+      $this->keyRing->setPassword('mysecret');
+      $this->keyRing->setUserCertificateX(new Certificate(
+         $this->keyRing->getUserCertificateX()->getContent(),
+         $this->keyRing->getUserCertificateX()->getType(),
+         $this->keyRing->getUserCertificateX()->getPublicKey(),
+         $keys->X002
+      ));
+
+      $authSignatureHandler = new AuthSignatureHandler(new CryptService($this->keyRing));
+
+      $hpb = file_get_contents($this->fixtures . '/hpb.xml');
+      $request = new Request();
+      $request->loadXML($hpb);
+      $requestXpath = $this->prepareH004XPath($request);
+      $digestValue = $requestXpath->query('//H004:AuthSignature/ds:SignatureValue')->item(0)->nodeValue;
+
+      $request2 = clone $request;
+      $request2XPath = $this->prepareH004XPath($request2);
+
+      $authSignature2 = $request2XPath->query('//H004:AuthSignature')->item(0);
+      $authSignature2->parentNode->removeChild($authSignature2);
+
+      $request2Request = $request2XPath->query('/H004:ebicsNoPubKeyDigestsRequest')->item(0);
+      $authSignatureHandler->handle($request2, $request2Request);
+
+      // Rewind. Because after remove and insert XML tree do not work correctly.
+      $request2->loadXML($request2->saveXML());
+      $request2XPath = $this->prepareH004XPath($request2);
+
+      $digestValue2 = $request2XPath->query('//H004:AuthSignature/ds:SignatureValue')->item(0)->nodeValue;
+
+      $c = $request2->getContent();
+
+      $this->assertEquals($digestValue, $digestValue2);
+      // TODO: Fails.
+   }
 }

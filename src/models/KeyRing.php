@@ -41,6 +41,11 @@ class KeyRing
     */
    private $bankCertificateE;
 
+   /**
+    * @var string
+    */
+   private $password;
+
    public function setUserId(string $userId)
    {
       $this->userId = $userId;
@@ -91,9 +96,14 @@ class KeyRing
       return 'E002';
    }
 
-   public function getPassword()
+   public function setPassword(string $password)
    {
-      return 'some_secret';
+      $this->password = $password;
+   }
+
+   public function getPassword(): string
+   {
+      return $this->password;
    }
 
    /**

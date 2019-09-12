@@ -348,6 +348,7 @@ class HeaderHandler
       $cryptService = $this->cryptService;
       return function (DOMDocument $xml, DOMElement $xmlStatic) use ($keyRing, $cryptService)
       {
+         $algorithm = 'sha256';
          // Add BankPubKeyDigests to static.
          $xmlBankPubKeyDigests = $xml->createElement('BankPubKeyDigests');
          $xmlStatic->appendChild($xmlBankPubKeyDigests);
@@ -355,10 +356,11 @@ class HeaderHandler
          // Add Authentication to BankPubKeyDigests.
          $xmlAuthentication = $xml->createElement('Authentication');
          $xmlAuthentication->setAttribute('Version', $keyRing->getBankCertificateXVersion());
-         $xmlAuthentication->setAttribute('Algorithm', 'http://www.w3.org/2001/04/xmlenc#sha256');
+         $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
          $certificateXDigest = $this->cryptService->calculateDigest(
             $keyRing->getBankCertificateX()->toX509()->getPublicKey()->exponent->toHex(),
-            $keyRing->getBankCertificateX()->toX509()->getPublicKey()->modulus->toHex()
+            $keyRing->getBankCertificateX()->toX509()->getPublicKey()->modulus->toHex(),
+            $algorithm
          );
          $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
          $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
@@ -366,10 +368,11 @@ class HeaderHandler
          // Add Encryption to BankPubKeyDigests.
          $xmlEncryption = $xml->createElement('Encryption');
          $xmlEncryption->setAttribute('Version', $keyRing->getBankCertificateEVersion());
-         $xmlEncryption->setAttribute('Algorithm', 'http://www.w3.org/2001/04/xmlenc#sha256');
+         $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
          $certificateEDigest = $this->cryptService->calculateDigest(
             $keyRing->getBankCertificateE()->toX509()->getPublicKey()->exponent->toHex(),
-            $keyRing->getBankCertificateE()->toX509()->getPublicKey()->modulus->toHex()
+            $keyRing->getBankCertificateE()->toX509()->getPublicKey()->modulus->toHex(),
+            $algorithm
          );
          $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
          $xmlBankPubKeyDigests->appendChild($xmlEncryption);
@@ -383,9 +386,9 @@ class HeaderHandler
     * @param callable|null $nonce
     * @param callable|null $bank
     * @param callable|null $orderDetails
-    * @param callable|null $muttable
+    * @param callable|null $mutable
     */
-   private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $muttable = null)
+   private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $mutable = null)
    {
       // Add header to request.
       $xmlHeader = $xml->createElement('header');
@@ -440,10 +443,10 @@ class HeaderHandler
       $xmlSecurityMedium->nodeValue = $this->securityMedium;
       $xmlStatic->appendChild($xmlSecurityMedium);
 
-      if (null !== $muttable)
+      if (null !== $mutable)
       {
          // Add Mutable information to header.
-         $muttable($xml, $xmlHeader);
+         $mutable($xml, $xmlHeader);
       }
    }
 
