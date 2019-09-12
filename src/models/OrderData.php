@@ -16,6 +16,7 @@ class OrderData extends DOMDocument
    public function __construct()
    {
       parent::__construct('1.0', 'UTF-8');
+      $this->preserveWhiteSpace = false;
    }
 
    /**
@@ -24,7 +25,6 @@ class OrderData extends DOMDocument
     */
    public function getContent()
    {
-      $this->preserveWhiteSpace = false;
       $this->formatOutput = true;
       return $this->saveXML();
    }

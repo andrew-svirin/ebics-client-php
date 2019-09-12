@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<ebicsNoPubKeyDigestsRequest xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns="urn:org:ebics:H004" Version="H004" Revision="1">
+<?xml version='1.0' encoding='utf-8'?>
+<ebicsNoPubKeyDigestsRequest
+        xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+        xmlns="urn:org:ebics:H004" Version="H004" Revision="1">
     <header authenticate="true">
         <static>
-            <HostID>HOST</HostID>
-            <Nonce>014a82626a51ee1cab547bbaf18a13a0</Nonce>
-            <Timestamp>2014-09-09T09:33:12Z</Timestamp>
-            <PartnerID>PARTNER</PartnerID>
-            <UserID>USER</UserID>
-            <Product Language="de">EPICS - a ruby ebics kernel</Product>
+            <HostID>CRSISOTB</HostID>
+            <Nonce>C1C0F2D318981873EBCE455D1F60AF92</Nonce>
+            <Timestamp>2019-09-12T08:35:40Z</Timestamp>
+            <PartnerID>CRS04285</PartnerID>
+            <UserID>CRS04285</UserID>
+            <Product Language="de">PyFinTech 6.0.3, joonis new media</Product>
             <OrderDetails>
                 <OrderType>HPB</OrderType>
                 <OrderAttribute>DZHNN</OrderAttribute>
@@ -25,10 +27,12 @@
                     <ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
                 </ds:Transforms>
                 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
-                <ds:DigestValue>5PL08o8acS8kewViTEeVqSiWZshzNG3QgZehRk1EJgg=</ds:DigestValue>
+                <ds:DigestValue>8R6TH/aSPUZjGXIamFWhP1YoO5UvdNHerSyW+9VYF+Q=</ds:DigestValue>
             </ds:Reference>
         </ds:SignedInfo>
-        <ds:SignatureValue>d+qgWNti7uCsB/CWreyw9AGQOJiqU+CPPrpgdcisauUvJhFszEJasBeky9TsJXgxVsT27fZaHGnV2pO1YwlBmSuJSGRg5ijHCxbG+XyisIwVAVXY7mlkaO5Ms4eznaW2GCPhiwmIJZOcvzYZwzxtrCbAQFoKA+QgBaAytBtWJiOe8nErnb5s7OEg2D0NvWG4hV+NdcXPlUEKiY5Rw4qCukGXnpZmwMw/L+TB1v47eOLpQa/Dl2oJCjZgV4og3Q2o88adpErnKtIdKic8mb5FLXa2gFK63fmpCcwvs8FPb3kR7/QLWSs4WYycKcXDmgDKnVwYYcBfANEq1yFgReRjzQ==</ds:SignatureValue>
+        <ds:SignatureValue>
+            PEblaKPzvx+PNtoKSl5Qyn5tAhZecA57HFfk7s/83751AQ+B24DB1LXg4GPvqdIbyWYAgCj136A/3L6HFDejncfa0ANrwfjxqsTI3Z77j8d8iKyPEiG8fwP1iy3OWr+0eDyD6MLXzyN44YWXL3ci33+8y/vd6z4mh9rDfWA1fDWpyBZE1VecOfDuxLm8F8jYVulzn1P+aMHylw0INaI2QFGprwFaEgnyNrTeXOPCHn0u7GAWyo3bEY7sNU/shhmE5qkyFxNsX1ZXggHqAogGw/sFV93tRAyJmFNHyxEC/xAPlPlv++Bg0mTu+fq/5yBI7RX41xcSS4inf/jKrYx+Bg==
+        </ds:SignatureValue>
     </AuthSignature>
     <body/>
 </ebicsNoPubKeyDigestsRequest>

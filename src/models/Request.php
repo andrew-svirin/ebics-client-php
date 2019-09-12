@@ -15,6 +15,7 @@ class Request extends DOMDocument
    public function __construct()
    {
       parent::__construct('1.0', 'UTF-8');
+      $this->preserveWhiteSpace = false;
    }
 
    /**
@@ -28,7 +29,6 @@ class Request extends DOMDocument
 
    public function getFormattedContent()
    {
-      $this->preserveWhiteSpace = false;
       $this->formatOutput = true;
       return $this->saveXML();
    }
