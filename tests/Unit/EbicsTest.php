@@ -49,8 +49,8 @@ final class EbicsTest extends TestCase
    public function setUp()
    {
       parent::setUp();
-      $credentials = json_decode(file_get_contents($this->data . '/credentials_3.json'));
-      $keyRingRealPath = $this->data . '/workspace/keyring_3.json';
+      $credentials = json_decode(file_get_contents($this->data . '/credentials_2.json'));
+      $keyRingRealPath = $this->data . '/workspace/keyring_2.json';
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
       $this->keyRing = $this->keyRingManager->loadKeyRing();
       $bank = new Bank($credentials->hostId, $credentials->hostURL, $credentials->hostIsCertified);
@@ -115,7 +115,7 @@ final class EbicsTest extends TestCase
    }
 
    /**
-    * Run first HIA.
+    * Run first HIA and Activate account in bank panel.
     * @group HPB
     * @throws ClientExceptionInterface
     * @throws EbicsException
