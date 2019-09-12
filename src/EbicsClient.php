@@ -115,16 +115,20 @@ final class EbicsClient implements EbicsClientInterface
    }
 
    /**
-    * @param string $body
+    * Make request to bank server.
+    * @param Request $request
     * @return ResponseInterface
     * @throws TransportExceptionInterface
     */
-   private function post($body): ResponseInterface
+   private function post(Request $request): ResponseInterface
    {
+      $body = $request->getContent();
       $httpClient = HttpClient::create();
       $response = $httpClient->request('POST', $this->bank->getUrl(), [
          'headers' => [
-            'Content-Type' => 'text/xml; charset=ISO-8859-1',
+            'Content-Type' => 'text/xml',
+            'Connection' => 'close',
+            'Accept-Encoding' => 'identity',
          ],
          'body' => $body,
          'verify_peer' => false,
@@ -145,8 +149,7 @@ final class EbicsClient implements EbicsClientInterface
       $request = new Request();
       $xmlRequest = $this->requestHandler->handleHEV($request);
       $this->hostHandler->handle($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -176,8 +179,7 @@ final class EbicsClient implements EbicsClientInterface
       $xmlRequest = $this->requestHandler->handleUnsecured($request);
       $this->headerHandler->handleINI($request, $xmlRequest);
       $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -212,8 +214,7 @@ final class EbicsClient implements EbicsClientInterface
       $xmlRequest = $this->requestHandler->handleUnsecured($request);
       $this->headerHandler->handleHIA($request, $xmlRequest);
       $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -244,8 +245,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -282,8 +282,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -318,8 +317,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -345,8 +343,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
@@ -372,8 +369,7 @@ final class EbicsClient implements EbicsClientInterface
       $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
       $this->authSignatureHandler->handle($request, $xmlRequest);
       $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      $requestContent = $request->getContent();
-      $hostResponse = $this->post($requestContent);
+      $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
