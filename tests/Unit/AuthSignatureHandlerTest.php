@@ -1,19 +1,11 @@
 <?php
 
-namespace AndrewSvirin\tests\Unit;
+use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
+use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Models\Request;
+use AndrewSvirin\tests\common\EbicsTestCase;
 
-use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
-use AndrewSvirin\Ebics\handlers\traits\XPathTrait;
-use AndrewSvirin\Ebics\models\Bank;
-use AndrewSvirin\Ebics\EbicsClient;
-use AndrewSvirin\Ebics\exceptions\EbicsException;
-use AndrewSvirin\Ebics\models\Certificate;
-use AndrewSvirin\Ebics\models\KeyRing;
-use AndrewSvirin\Ebics\models\Request;
-use AndrewSvirin\Ebics\services\CryptService;
-use AndrewSvirin\Ebics\services\KeyRingManager;
-use AndrewSvirin\Ebics\models\User;
-use PHPUnit\Framework\TestCase;
 
 /**
  * Class EbicsTest.
@@ -21,28 +13,15 @@ use PHPUnit\Framework\TestCase;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class AuthSignatureHandlerTest extends TestCase
+class AuthSignatureHandlerTest extends EbicsTestCase
 {
 
    use XPathTrait;
 
-   var $data = __DIR__ . '/../_data';
-   var $fixtures = __DIR__ . '/../_fixtures';
-
    /**
-    * @var EbicsClient
+    * @var AuthSignatureHandler
     */
-   private $client;
-
-   /**
-    * @var KeyRingManager
-    */
-   private $keyRingManager;
-
-   /**
-    * @var KeyRing
-    */
-   private $keyRing;
+   private $authSignatureHandler;
 
    /**
     * @throws EbicsException
@@ -50,13 +29,9 @@ final class AuthSignatureHandlerTest extends TestCase
    public function setUp()
    {
       parent::setUp();
-      $credentials = json_decode(file_get_contents($this->data . '/credentials_2.json'));
-      $keyRingRealPath = $this->data . '/workspace/keyring_2.json';
-      $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
-      $this->keyRing = $this->keyRingManager->loadKeyRing();
-      $bank = new Bank($credentials->hostId, $credentials->hostURL, $credentials->hostIsCertified);
-      $user = new User($credentials->partnerId, $credentials->userId);
-      $this->client = new EbicsClient($bank, $user, $this->keyRing);
+      $this->setupClient();
+      $this->setupKeys();
+      $this->authSignatureHandler = new AuthSignatureHandler($this->keyRing);
    }
 
    /**
@@ -66,8 +41,6 @@ final class AuthSignatureHandlerTest extends TestCase
     */
    public function testDigestValue()
    {
-      $authSignatureHandler = new AuthSignatureHandler(new CryptService($this->keyRing));
-
       $hpb = file_get_contents($this->fixtures . '/hpb.xml');
       $hpbXML = new Request();
       $hpbXML->loadXML($hpb);
@@ -79,7 +52,7 @@ final class AuthSignatureHandlerTest extends TestCase
       $authSignature2 = $hpb2XPath->query('//H004:AuthSignature')->item(0);
       $authSignature2->parentNode->removeChild($authSignature2);
 
-      $authSignatureHandler->handle($hpb2XML, $hpb2Request);
+      $this->authSignatureHandler->handle($hpb2XML, $hpb2Request);
 
       // Rewind. Because after remove and insert XML tree do not work correctly.
       $hpb2XML->loadXML($hpb2XML->saveXML());
@@ -97,17 +70,6 @@ final class AuthSignatureHandlerTest extends TestCase
     */
    public function testSignatureValue()
    {
-      $keys = json_decode(file_get_contents($this->fixtures . '/keys.json'));
-      $this->keyRing->setPassword('mysecret');
-      $this->keyRing->setUserCertificateX(new Certificate(
-         $this->keyRing->getUserCertificateX()->getContent(),
-         $this->keyRing->getUserCertificateX()->getType(),
-         $this->keyRing->getUserCertificateX()->getPublicKey(),
-         $keys->X002
-      ));
-
-      $authSignatureHandler = new AuthSignatureHandler(new CryptService($this->keyRing));
-
       $hpb = file_get_contents($this->fixtures . '/hpb.xml');
       $request = new Request();
       $request->loadXML($hpb);
@@ -117,11 +79,17 @@ final class AuthSignatureHandlerTest extends TestCase
       $request2 = clone $request;
       $request2XPath = $this->prepareH004XPath($request2);
 
+      // Remove AuthSignature.
       $authSignature2 = $request2XPath->query('//H004:AuthSignature')->item(0);
       $authSignature2->parentNode->removeChild($authSignature2);
+      // Remove Body for shift after AuthSignature.
+      $body2 = $request2XPath->query('//H004:body')->item(0);
+      $body2->parentNode->removeChild($body2);
 
       $request2Request = $request2XPath->query('/H004:ebicsNoPubKeyDigestsRequest')->item(0);
-      $authSignatureHandler->handle($request2, $request2Request);
+      $this->authSignatureHandler->handle($request2, $request2Request);
+      // Add removed body after AuthSignature.
+      $request2Request->appendChild($body2);
 
       // Rewind. Because after remove and insert XML tree do not work correctly.
       $request2->loadXML($request2->saveXML());
@@ -129,9 +97,10 @@ final class AuthSignatureHandlerTest extends TestCase
 
       $digestValue2 = $request2XPath->query('//H004:AuthSignature/ds:SignatureValue')->item(0)->nodeValue;
 
-      $c = $request2->getContent();
-
       $this->assertEquals($digestValue, $digestValue2);
-      // TODO: Fails.
+
+//      $hostResponse = $this->client->post($request2);
+//      $hostResponseContent = $hostResponse->getContent();
+//      return;
    }
 }
