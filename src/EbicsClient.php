@@ -2,23 +2,18 @@
 
 namespace AndrewSvirin\Ebics;
 
-use AndrewSvirin\Ebics\contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\factories\CertificateFactory;
-use AndrewSvirin\Ebics\factories\TransactionFactory;
-use AndrewSvirin\Ebics\handlers\AuthSignatureHandler;
-use AndrewSvirin\Ebics\handlers\BodyHandler;
-use AndrewSvirin\Ebics\handlers\HeaderHandler;
-use AndrewSvirin\Ebics\handlers\HostHandler;
-use AndrewSvirin\Ebics\handlers\OrderDataHandler;
-use AndrewSvirin\Ebics\handlers\RequestHandler;
-use AndrewSvirin\Ebics\handlers\ResponseHandler;
-use AndrewSvirin\Ebics\models\Bank;
-use AndrewSvirin\Ebics\models\KeyRing;
-use AndrewSvirin\Ebics\models\OrderData;
-use AndrewSvirin\Ebics\models\Request;
-use AndrewSvirin\Ebics\models\Response;
-use AndrewSvirin\Ebics\models\User;
-use AndrewSvirin\Ebics\services\CryptService;
+use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use AndrewSvirin\Ebics\Factories\CertificateFactory;
+use AndrewSvirin\Ebics\Factories\TransactionFactory;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
+use AndrewSvirin\Ebics\Handlers\RequestHandler;
+use AndrewSvirin\Ebics\Handlers\ResponseHandler;
+use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Request;
+use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Services\CryptService;
 use DateTime;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -49,21 +44,6 @@ final class EbicsClient implements EbicsClientInterface
    private $user;
 
    /**
-    * @var RequestHandler
-    */
-   private $requestHandler;
-
-   /**
-    * @var HeaderHandler
-    */
-   private $headerHandler;
-
-   /**
-    * @var BodyHandler
-    */
-   private $bodyHandler;
-
-   /**
     * @var KeyRing
     */
    private $keyRing;
@@ -74,24 +54,14 @@ final class EbicsClient implements EbicsClientInterface
    private $orderDataHandler;
 
    /**
-    * @var AuthSignatureHandler
-    */
-   private $authSignatureHandler;
-
-   /**
     * @var ResponseHandler
     */
    private $responseHandler;
 
    /**
-    * @var HostHandler
+    * @var RequestHandler
     */
-   private $hostHandler;
-
-   /**
-    * @var CryptService
-    */
-   private $cryptService;
+   private $requestFactory;
 
    /**
     * Constructor.
@@ -104,14 +74,9 @@ final class EbicsClient implements EbicsClientInterface
       $this->bank = $bank;
       $this->user = $user;
       $this->keyRing = $keyRing;
-      $this->cryptService = new CryptService($keyRing);
-      $this->requestHandler = new RequestHandler();
-      $this->headerHandler = new HeaderHandler($bank, $user, $keyRing, $this->cryptService);
-      $this->bodyHandler = new BodyHandler();
+      $this->requestFactory = new RequestHandler($bank, $user, $keyRing);
       $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
-      $this->authSignatureHandler = new AuthSignatureHandler($this->cryptService);
       $this->responseHandler = new ResponseHandler();
-      $this->hostHandler = new HostHandler($bank);
    }
 
    /**
@@ -120,15 +85,13 @@ final class EbicsClient implements EbicsClientInterface
     * @return ResponseInterface
     * @throws TransportExceptionInterface
     */
-   private function post(Request $request): ResponseInterface
+   public function post(Request $request): ResponseInterface
    {
       $body = $request->getContent();
       $httpClient = HttpClient::create();
       $response = $httpClient->request('POST', $this->bank->getUrl(), [
          'headers' => [
-            'Content-Type' => 'text/xml',
-            'Connection' => 'close',
-            'Accept-Encoding' => 'identity',
+            'Content-Type' => 'text/xml; charset=ISO-8859-1',
          ],
          'body' => $body,
          'verify_peer' => false,
@@ -146,9 +109,7 @@ final class EbicsClient implements EbicsClientInterface
     */
    public function HEV(): Response
    {
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleHEV($request);
-      $this->hostHandler->handle($request, $xmlRequest);
+      $request = $this->requestFactory->buildHEV();
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -169,16 +130,8 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $certificateA = CertificateFactory::generateCertificateAFromKeys($this->cryptService->generateKeys());
-      // Order data.
-      $orderData = new OrderData();
-      $this->orderDataHandler->handleINI($orderData, $certificateA, $dateTime);
-      $orderDataContent = $orderData->getContent();
-      // Wrapper for request Order data.
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleUnsecured($request);
-      $this->headerHandler->handleINI($request, $xmlRequest);
-      $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
+      $certificateA = CertificateFactory::generateCertificateAFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
+      $request = $this->requestFactory->buildINI($certificateA, $dateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -203,17 +156,9 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $certificateE = CertificateFactory::generateCertificateEFromKeys($this->cryptService->generateKeys());
-      $certificateX = CertificateFactory::generateCertificateXFromKeys($this->cryptService->generateKeys());
-      // Order data.
-      $orderData = new OrderData();
-      $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);
-      $orderDataContent = $orderData->getContent();
-      // Wrapper for request Order data.
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleUnsecured($request);
-      $this->headerHandler->handleHIA($request, $xmlRequest);
-      $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
+      $certificateE = CertificateFactory::generateCertificateEFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
+      $certificateX = CertificateFactory::generateCertificateXFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
+      $request = $this->requestFactory->buildHIA($certificateE, $certificateX, $dateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -232,7 +177,7 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
+    * @throws Exceptions\EbicsException
     */
    public function HPB(DateTime $dateTime = null): Response
    {
@@ -240,11 +185,7 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleNoPubKeyDigests($request);
-      $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $request = $this->requestFactory->buildHPB($dateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -253,7 +194,7 @@ final class EbicsClient implements EbicsClientInterface
       {
          // Prepare decrypted OrderData.
          $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-         $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
+         $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
          $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
          $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
          $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
@@ -269,7 +210,7 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
+    * @throws Exceptions\EbicsException
     */
    public function HPD(DateTime $dateTime = null): Response
    {
@@ -277,24 +218,21 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleSecured($request);
-      $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $request = $this->requestFactory->buildHPD($dateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
-
-      // TODO: Send Receipt transaction.
-      $transaction = $this->responseHandler->retrieveTransaction($response);
-      $response->addTransaction($transaction);
-
-      // Prepare decrypted OrderData.
-      $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-      $orderData = $this->cryptService->decryptOrderData($orderDataEncrypted);
-      $transaction->setOrderData($orderData);
+      if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response))
+      {
+         // TODO: Send Receipt transaction.
+         $transaction = $this->responseHandler->retrieveTransaction($response);
+         $response->addTransaction($transaction);
+         // Prepare decrypted OrderData.
+         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+         $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+         $transaction->setOrderData($orderData);
+      }
       return $response;
    }
 
@@ -304,7 +242,7 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
+    * @throws Exceptions\EbicsException
     */
    public function HAA(DateTime $dateTime = null): Response
    {
@@ -312,11 +250,7 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleSecured($request);
-      $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $request = $this->requestFactory->buildHAA($dateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -330,7 +264,7 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
+    * @throws Exceptions\EbicsException
     */
    public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
    {
@@ -338,11 +272,7 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleSecured($request);
-      $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $request = $this->requestFactory->buildVMK($dateTime, $startDateTime, $endDateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
@@ -356,7 +286,7 @@ final class EbicsClient implements EbicsClientInterface
     * @throws RedirectionExceptionInterface
     * @throws ServerExceptionInterface
     * @throws TransportExceptionInterface
-    * @throws exceptions\EbicsException
+    * @throws Exceptions\EbicsException
     */
    public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
    {
@@ -364,11 +294,7 @@ final class EbicsClient implements EbicsClientInterface
       {
          $dateTime = DateTime::createFromFormat('U', time());
       }
-      $request = new Request();
-      $xmlRequest = $this->requestHandler->handleSecured($request);
-      $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
+      $request = $this->requestFactory->buildSTA($dateTime, $startDateTime, $endDateTime);
       $hostResponse = $this->post($request);
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
