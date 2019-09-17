@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SignaturePubKeyOrderData xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns="http://www.ebics.org/S001">
+    <SignaturePubKeyInfo>
+        <ds:X509Data>
+            <ds:X509IssuerSerial>
+                <ds:X509IssuerName>{x509_issuer_name}</ds:X509IssuerName>
+                <ds:X509SerialNumber>{x509_serial_number}</ds:X509SerialNumber>
+            </ds:X509IssuerSerial>
+            <ds:X509Certificate>{x509_certificate}</ds:X509Certificate>
+        </ds:X509Data>
+        <PubKeyValue>
+            <ds:RSAKeyValue>
+                <ds:Modulus>{modulus}</ds:Modulus>
+                <ds:Exponent>{exponent}</ds:Exponent>
+            </ds:RSAKeyValue>
+            <TimeStamp>{timestamp}</TimeStamp>
+        </PubKeyValue>
+        <SignatureVersion>A006</SignatureVersion>
+    </SignaturePubKeyInfo>
+    <PartnerID>XETROV00</PartnerID>
+    <UserID>XV024523</UserID>
+</SignaturePubKeyOrderData>
