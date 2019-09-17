@@ -7,6 +7,3 @@ vendor
 
 # Testing env variables.
 envs.local.php
-
-# Testing Workspace.
-tests/_data/workspace
