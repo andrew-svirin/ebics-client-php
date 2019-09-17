@@ -2,12 +2,10 @@
 
 namespace AndrewSvirin\tests\common;
 
-use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Certificate;
-use AndrewSvirin\Ebics\Models\DOMDocument;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\KeyRingManager;
 use AndrewSvirin\Ebics\Models\User;

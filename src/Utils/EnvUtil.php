@@ -39,7 +39,7 @@ class EnvUtil
     */
    public static function getCredentials1(): ?array
    {
-      return is_string(getenv('DEBUG_CREDENTIALS_1')) ? self::prepareCredentials(explode('|', getenv('DEBUG_CREDENTIALS_1'), 5)) : null;
+      return is_string(getenv('DEBUG_CREDENTIALS_1')) ? self::prepareCredentials(explode(':', getenv('DEBUG_CREDENTIALS_1'), 5)) : null;
    }
 
    /**
@@ -48,7 +48,7 @@ class EnvUtil
     */
    public static function getCredentials2(): ?array
    {
-      return is_string(getenv('DEBUG_CREDENTIALS_2')) ? self::prepareCredentials(explode('|', getenv('DEBUG_CREDENTIALS_2'), 5)) : null;
+      return is_string(getenv('DEBUG_CREDENTIALS_2')) ? self::prepareCredentials(explode(':', getenv('DEBUG_CREDENTIALS_2'), 5)) : null;
    }
 
    /**
@@ -57,7 +57,7 @@ class EnvUtil
     */
    public static function getCredentials3(): ?array
    {
-      return is_string(getenv('DEBUG_CREDENTIALS_3')) ? self::prepareCredentials(explode('|', getenv('DEBUG_CREDENTIALS_3'), 5)) : null;
+      return is_string(getenv('DEBUG_CREDENTIALS_3')) ? self::prepareCredentials(explode(':', getenv('DEBUG_CREDENTIALS_3'), 5)) : null;
    }
 
    /**
@@ -69,7 +69,7 @@ class EnvUtil
    {
       $credentials = [
          'hostId' => $data[0],
-         'hostURL' => $data[1],
+         'hostURL' => 'https://' . $data[1],
          'hostIsCertified' => 'TRUE' === $data[2],
          'partnerId' => $data[3],
          'userId' => $data[4],
