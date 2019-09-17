@@ -62,7 +62,7 @@ class EbicsClientTest extends EbicsTestCase
    }
 
    /**
-    * Run first INI.
+    * @depends testINI
     * @group HIA
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -82,6 +82,7 @@ class EbicsClientTest extends EbicsTestCase
 
    /**
     * Run first HIA and Activate account in bank panel.
+    * @depends testHIA
     * @group HPB
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -100,7 +101,7 @@ class EbicsClientTest extends EbicsTestCase
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group HPD
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -118,7 +119,7 @@ class EbicsClientTest extends EbicsTestCase
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group HAA
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -136,7 +137,7 @@ class EbicsClientTest extends EbicsTestCase
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group VMK
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -154,7 +155,7 @@ class EbicsClientTest extends EbicsTestCase
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group STA
     * @throws ClientExceptionInterface
     * @throws EbicsException
