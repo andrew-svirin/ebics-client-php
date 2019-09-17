@@ -170,7 +170,7 @@ class CryptService
       $publicKey->loadKey($certificate->getPublicKey());
       $e0 = $publicKey->exponent->toHex(true);
       $m0 = $publicKey->modulus->toHex(true);
-      // TODO: Remove this fix after RSA corrections.
+      // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
       if (strlen($e0) > strlen($m0))
       {
          $buffer = $e0;
