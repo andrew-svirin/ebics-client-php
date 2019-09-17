@@ -1,6 +1,6 @@
 {
   "name": "andrew-svirin/ebics-client-php",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "library",
   "description": "PHP library to communicate with bank through EBICS protocol.",
   "keywords": [

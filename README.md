@@ -16,19 +16,19 @@ andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENS
       $keyRing = $this->keyRingManager->loadKeyRing();
       $bank = new Bank(__HOST_ID__, __HOST_URL__);
       $user = new User(__PARTNER_ID__, __USER_ID__);
-      $this->client = new EbicsClient($bank, $user, $keyRing);
+      $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
 ### Make INI, STA, HPB requests and update key ring.
 ```
       $ini = $this->client->INI();
-      $this->keyRingManager->saveKeyRing($keyRing);
+      $keyRingManager->saveKeyRing($keyRing);
 
       $hia = $this->client->HIA();
-      $this->keyRingManager->saveKeyRing($keyRing);
+      $keyRingManager->saveKeyRing($keyRing);
 
       $hpb = $this->client->HPB();
-      $this->keyRingManager->saveKeyRing($keyRing);
+      $keyRingManager->saveKeyRing($keyRing);
 ```
 
 More methods you can find in `tests/Unit/EbicsTest`
