@@ -53,8 +53,9 @@ abstract class EbicsTestCase extends TestCase
     */
    protected function setupClient()
    {
-      $keyRingRealPath = $this->data . '/workspace/keyring_1.json';
-      $credentials = json_decode(file_get_contents($this->data . '/credentials_1.json'));
+      $version = 2;
+      $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $version);
+      $credentials = json_decode(file_get_contents(sprintf('%s/credentials_%d.json', $this->data, $version)));
       $this->bank = new Bank($credentials->hostId, $credentials->hostURL, $credentials->hostIsCertified);
       $this->user = new User($credentials->partnerId, $credentials->userId);
       $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');

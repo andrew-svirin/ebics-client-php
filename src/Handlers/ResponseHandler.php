@@ -100,7 +100,6 @@ class ResponseHandler
     */
    public function retrieveTransaction(DOMDocument $xml): Transaction
    {
-      $c = $xml->C14N();
       $xpath = $this->prepareH004XPath($xml);
       $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
       $transactionIdValue = $transactionId->item(0)->nodeValue;

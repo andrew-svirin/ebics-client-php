@@ -11,7 +11,6 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
-use phpseclib\File\X509;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -167,19 +166,17 @@ class CryptService
     */
    public static function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
    {
-      if (null !== $certificate->getContent())
-      {
-         $x509 = new X509();
-         $x509->loadX509($certificate->getContent());
-         $publicKey = $x509->getPublicKey();
-      }
-      else
-      {
-         $publicKey = new RSA();
-         $publicKey->setPublicKey($certificate->getPublicKey());
-      }
+      $publicKey = new RSA();
+      $publicKey->loadKey($certificate->getPublicKey());
       $e0 = $publicKey->exponent->toHex(true);
       $m0 = $publicKey->modulus->toHex(true);
+      // TODO: Remove this fix after RSA corrections.
+      if (strlen($e0) > strlen($m0))
+      {
+         $buffer = $e0;
+         $e0 = $m0;
+         $m0 = $buffer;
+      }
       $e1 = ltrim($e0, '0');
       $m1 = ltrim($m0, '0');
       $key1 = sprintf('%s %s', $e1, $m1);
