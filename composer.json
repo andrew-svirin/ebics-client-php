@@ -6,7 +6,11 @@
   "keywords": [
     "ebics",
     "PHP",
-    "client"
+    "client",
+    "symfony",
+    "openssl",
+    "rsa",
+    "x509"
   ],
   "authors": [
     {
