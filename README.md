@@ -1,12 +1,12 @@
-# EBICS-CLIENT-PHP
+# EBICS-CLIENT-PHP [![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
 PHP library to communicate with bank through EBICS protocol.
 
-### Installation
+### Installation [![PHP version](https://badge.fury.io/js/badge-list.svg)](http://badge.fury.io/js/badge-list)
 ```bash
 $ composer require andrew-swirin/ebics-client-php
 ```
 
-### License
+### License [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://opensource.org/licenses/mit-license.php)
 andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ### Initialize client
@@ -32,6 +32,3 @@ andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENS
 ```
 
 More methods you can find in `tests/Unit/EbicsTest`
-
-### Statistic
-[![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
