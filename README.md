@@ -1,7 +1,7 @@
 # EBICS-CLIENT-PHP [![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
 PHP library to communicate with bank through EBICS protocol.
 
-### Installation [![PHP version](https://badge.fury.io/js/badge-list.svg)](http://badge.fury.io/js/badge-list)
+### Installation for PHP 7.2+
 ```bash
 $ composer require andrew-swirin/ebics-client-php
 ```
