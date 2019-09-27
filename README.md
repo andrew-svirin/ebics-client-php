@@ -13,7 +13,8 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
 ```php
     // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
     $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-    $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
+    // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
+    $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__, __IS_CERTIFIED__);
     $keyRing = $keyRingManager->loadKeyRing();
     $bank = new Bank(__HOST_ID__, __HOST_URL__);
     $user = new User(__PARTNER_ID__, __USER_ID__);
