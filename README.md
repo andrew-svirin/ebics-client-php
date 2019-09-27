@@ -10,7 +10,7 @@ $ composer require andrew-swirin/ebics-client-php
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ### Initialize client
-```
+```php
     // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
     $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
     $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
@@ -21,7 +21,7 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
 ```
 
 ### Make INI, STA, HPB requests and update key ring.
-```
+```php
     $ini = $client->INI();
     $keyRingManager->saveKeyRing($keyRing);
 
