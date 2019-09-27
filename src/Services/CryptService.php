@@ -67,7 +67,11 @@ class CryptService
    public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
    {
       $digestToSignBin = self::filter($hash);
-      $privateKey = $keyRing->getUserCertificateX()->getPrivateKey();
+      if (!($certificateX = $keyRing->getUserCertificateX()))
+      {
+         throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+      }
+      $privateKey = $certificateX->getPrivateKey();
       $passphrase = $keyRing->getPassword();
       $rsa = new RSA();
       $rsa->setPassword($passphrase);
