@@ -9,6 +9,15 @@ $ composer require andrew-svirin/ebics-client-php
 ### License
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
+### Add usage section:
+```php
+    use AndrewSvirin\Ebics\EbicsClient;
+    use AndrewSvirin\Ebics\Handlers\ResponseHandler;
+    use AndrewSvirin\Ebics\Models\Bank;
+    use AndrewSvirin\Ebics\Models\User;
+    use AndrewSvirin\Ebics\Services\KeyRingManager;
+```
+
 ### Initialize client
 ```php
     // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
