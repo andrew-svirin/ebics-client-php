@@ -11,25 +11,40 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
 
 ### Initialize client
 ```
-      // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
-      $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-      $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
-      $keyRing = $keyRingManager->loadKeyRing();
-      $bank = new Bank(__HOST_ID__, __HOST_URL__);
-      $user = new User(__PARTNER_ID__, __USER_ID__);
-      $client = new EbicsClient($bank, $user, $keyRing);
+    // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
+    $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
+    $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
+    $keyRing = $keyRingManager->loadKeyRing();
+    $bank = new Bank(__HOST_ID__, __HOST_URL__);
+    $user = new User(__PARTNER_ID__, __USER_ID__);
+    $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
 ### Make INI, STA, HPB requests and update key ring.
 ```
-      $ini = $client->INI();
-      $keyRingManager->saveKeyRing($keyRing);
+    $ini = $client->INI();
+    $keyRingManager->saveKeyRing($keyRing);
 
-      $hia = $client->HIA();
-      $keyRingManager->saveKeyRing($keyRing);
+    $responseHandler = new ResponseHandler();
+    $code = $responseHandler->retrieveH004ReturnCode($ini);
+    $reportText = $responseHandler->retrieveH004ReportText($ini);
 
-      $hpb = $client->HPB();
-      $keyRingManager->saveKeyRing($keyRing);
+    echo $code . '-' . $reportText . "\n";
+
+    $hia = $client->HIA();
+    $keyRingManager->saveKeyRing($keyRing);
+    $code = $responseHandler->retrieveH004ReturnCode($hia);
+    $reportText = $responseHandler->retrieveH004ReportText($hia);
+
+    echo $code . '-' . $reportText . "\n";
+
+    $hpb = $client->HPB();
+    $keyRingManager->saveKeyRing($keyRing);
+
+    $code = $responseHandler->retrieveH004ReturnCode($hia);
+    $reportText = $responseHandler->retrieveH004ReportText($hia);
+
+    echo $code . '-' . $reportText . "\n";
 ```
 
 More methods you can find in `tests/Unit/EbicsTest`
