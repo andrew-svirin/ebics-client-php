@@ -67,6 +67,10 @@ class CryptService
    public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
    {
       $digestToSignBin = self::filter($hash);
+      if (!($certificateX = $keyRing->getUserCertificateX()))
+      {
+         trigger_error('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+      }
       $privateKey = $keyRing->getUserCertificateX()->getPrivateKey();
       $passphrase = $keyRing->getPassword();
       $rsa = new RSA();
