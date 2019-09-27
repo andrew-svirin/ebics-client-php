@@ -3,7 +3,7 @@ PHP library to communicate with bank through EBICS protocol.
 
 ### Installation
 ```bash
-$ composer require andrew-swirin/ebics-client-php
+$ composer require andrew-svirin/ebics-client-php
 ```
 
 ### License
