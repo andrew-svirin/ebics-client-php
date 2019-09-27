@@ -1,34 +1,53 @@
-# EBICS-CLIENT-PHP [![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
-PHP library to communicate client with bank through EBICS protocol. Register on the bank server. Retrieve payments, account, bank information. Send new payments, files.
+# EBICS-CLIENT-PHP
+PHP library to communicate with bank through EBICS protocol.
 
-### Installation for PHP 7.2+
+### Installation
 ```bash
 $ composer require andrew-swirin/ebics-client-php
 ```
 
-### License [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.png?v=103)](https://opensource.org/licenses/mit-license.php)
-andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+### License
+andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ### Initialize client
 ```
-      $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-      $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
-      $keyRing = $this->keyRingManager->loadKeyRing();
-      $bank = new Bank(__HOST_ID__, __HOST_URL__);
-      $user = new User(__PARTNER_ID__, __USER_ID__);
-      $client = new EbicsClient($bank, $user, $keyRing);
+    // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
+    $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
+    $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
+    $keyRing = $keyRingManager->loadKeyRing();
+    $bank = new Bank(__HOST_ID__, __HOST_URL__);
+    $user = new User(__PARTNER_ID__, __USER_ID__);
+    $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
 ### Make INI, STA, HPB requests and update key ring.
 ```
-      $ini = $this->client->INI();
-      $keyRingManager->saveKeyRing($keyRing);
+    $ini = $client->INI();
+    $keyRingManager->saveKeyRing($keyRing);
 
-      $hia = $this->client->HIA();
-      $keyRingManager->saveKeyRing($keyRing);
+    $responseHandler = new ResponseHandler();
+    $code = $responseHandler->retrieveH004ReturnCode($ini);
+    $reportText = $responseHandler->retrieveH004ReportText($ini);
 
-      $hpb = $this->client->HPB();
-      $keyRingManager->saveKeyRing($keyRing);
+    echo $code . '-' . $reportText . "\n";
+
+    $hia = $client->HIA();
+    $keyRingManager->saveKeyRing($keyRing);
+    $code = $responseHandler->retrieveH004ReturnCode($hia);
+    $reportText = $responseHandler->retrieveH004ReportText($hia);
+
+    echo $code . '-' . $reportText . "\n";
+
+    $hpb = $client->HPB();
+    $keyRingManager->saveKeyRing($keyRing);
+
+    $code = $responseHandler->retrieveH004ReturnCode($hia);
+    $reportText = $responseHandler->retrieveH004ReportText($hia);
+
+    echo $code . '-' . $reportText . "\n";
 ```
 
 More methods you can find in `tests/Unit/EbicsTest`
+
+### Statistic
+[![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
