@@ -8,7 +8,7 @@
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true">
-    <testsuite name="MT942 Unit Test Suite">
+    <testsuite name="Unit Test Suite">
         <directory suffix="Test.php">./tests/Unit/</directory>
     </testsuite>
 
