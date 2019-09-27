@@ -69,9 +69,9 @@ class CryptService
       $digestToSignBin = self::filter($hash);
       if (!($certificateX = $keyRing->getUserCertificateX()))
       {
-         trigger_error('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+         throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
       }
-      $privateKey = $keyRing->getUserCertificateX()->getPrivateKey();
+      $privateKey = $certificateX->getPrivateKey();
       $passphrase = $keyRing->getPassword();
       $rsa = new RSA();
       $rsa->setPassword($passphrase);
