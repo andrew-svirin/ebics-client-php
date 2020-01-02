@@ -3,10 +3,9 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
-use AndrewSvirin\Ebics\Models\OrderData;
+use AndrewSvirin\Ebics\Models\OrderDataDecrypted;
 use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
@@ -36,9 +35,9 @@ class CryptService
     * Decrypt encrypted OrDerData.
     * @param KeyRing $keyRing
     * @param OrderDataEncrypted $orderData
-    * @return OrderData
+    * @return OrderDataDecrypted
     */
-   public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
+   public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderDataDecrypted
    {
       $rsa = new RSA();
       $rsa->setPassword($keyRing->getPassword());
@@ -52,9 +51,7 @@ class CryptService
       // Force openssl_options.
       $aes->openssl_options = OPENSSL_ZERO_PADDING;
       $decrypted = $aes->decrypt($orderData->getOrderData());
-      $content = gzuncompress($decrypted);
-      $orderData = OrderDataFactory::buildOrderDataFromContent($content);
-      return $orderData;
+      return new OrderDataDecrypted(gzuncompress($decrypted), $orderData->getTransactionKey());
    }
 
    /**
