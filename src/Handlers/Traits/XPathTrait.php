@@ -23,6 +23,7 @@ trait XPathTrait
    {
       $xpath = new DomXpath($xml);
       $xpath->registerNamespace('H004', 'urn:org:ebics:H004');
+      $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
       return $xpath;
    }
 
