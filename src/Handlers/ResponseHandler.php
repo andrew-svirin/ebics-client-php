@@ -83,7 +83,7 @@ class ResponseHandler
       $xpath = $this->prepareH004XPath($xml);
       $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
       $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
-      if (!$orderData || !$transactionKey)
+      if (!$orderData || $orderData->length == 0 || !$transactionKey || $transactionKey->length == 0)
       {
          throw new EbicsException('EBICS response empty result.');
       }
