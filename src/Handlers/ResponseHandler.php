@@ -83,7 +83,7 @@ class ResponseHandler
       $xpath = $this->prepareH004XPath($xml);
       $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
       $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
-      if (!$orderData || !$transactionKey)
+      if (!$orderData || 0 === $orderData->length || !$transactionKey || 0 === $transactionKey->length)
       {
          throw new EbicsException('EBICS response empty result.');
       }
@@ -100,7 +100,6 @@ class ResponseHandler
     */
    public function retrieveTransaction(DOMDocument $xml): Transaction
    {
-      $c = $xml->C14N();
       $xpath = $this->prepareH004XPath($xml);
       $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
       $transactionIdValue = $transactionId->item(0)->nodeValue;
