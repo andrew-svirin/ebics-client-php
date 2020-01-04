@@ -5,7 +5,11 @@
   "keywords": [
     "ebics",
     "PHP",
-    "client"
+    "client",
+    "symfony",
+    "openssl",
+    "rsa",
+    "x509"
   ],
   "authors": [
     {
@@ -17,12 +21,12 @@
     "php": "^7.2",
     "ext-dom": "*",
     "ext-openssl": "*",
-    "andrew-svirin/mt942-php": "1.0.0",
+    "andrew-svirin/mt942-php": "~1.0",
     "comodojo/httprequest": "~1.0",
     "phpseclib/phpseclib": "~2.0",
     "ext-zlib": "*",
     "ext-json": "*",
-    "symfony/http-client": "^4.3 || ^5.0"
+    "symfony/http-client": "^4.3||^5.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.5"

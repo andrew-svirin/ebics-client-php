@@ -9,6 +9,7 @@ branches:
 cache:
   directories:
     - vendor
+    - tests/_data
 
 before_script:
   - composer update --dev --no-interaction

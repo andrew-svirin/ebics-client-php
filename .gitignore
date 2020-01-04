@@ -4,3 +4,6 @@
 # Composer
 composer.lock
 vendor
+
+# Testing env variables.
+envs.local.php
