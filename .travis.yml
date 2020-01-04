@@ -13,4 +13,9 @@ cache:
 
 before_script:
   - composer update --dev --no-interaction
-  - printenv
+
+script:
+  - echo "$DEBUG_CREDENTIALS_1"
+  - echo "$DEBUG_CREDENTIALS_2"
+  - echo "$DEBUG_CREDENTIALS_3"
+  - echo "$SECRET"
