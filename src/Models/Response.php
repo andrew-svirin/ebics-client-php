@@ -14,7 +14,7 @@ class Response extends DOMDocument
    /**
     * @var Transaction[]
     */
-   private $transactions;
+   private $transactions = [];
 
    /**
     * @param Transaction $transaction

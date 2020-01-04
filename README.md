@@ -7,7 +7,7 @@ $ composer require andrew-swirin/ebics-client-php
 ```
 
 ### License
-andrew-swirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ### Initialize client
 ```
