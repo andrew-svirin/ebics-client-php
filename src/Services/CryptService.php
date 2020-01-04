@@ -11,7 +11,6 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
-use phpseclib\File\X509;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -68,7 +67,11 @@ class CryptService
    public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
    {
       $digestToSignBin = self::filter($hash);
-      $privateKey = $keyRing->getUserCertificateX()->getPrivateKey();
+      if (!($certificateX = $keyRing->getUserCertificateX()))
+      {
+         throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+      }
+      $privateKey = $certificateX->getPrivateKey();
       $passphrase = $keyRing->getPassword();
       $rsa = new RSA();
       $rsa->setPassword($passphrase);
@@ -167,19 +170,17 @@ class CryptService
     */
    public static function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
    {
-      if (null !== $certificate->getContent())
-      {
-         $x509 = new X509();
-         $x509->loadX509($certificate->getContent());
-         $publicKey = $x509->getPublicKey();
-      }
-      else
-      {
-         $publicKey = new RSA();
-         $publicKey->setPublicKey($certificate->getPublicKey());
-      }
+      $publicKey = new RSA();
+      $publicKey->loadKey($certificate->getPublicKey());
       $e0 = $publicKey->exponent->toHex(true);
       $m0 = $publicKey->modulus->toHex(true);
+      // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
+      if (strlen($e0) > strlen($m0))
+      {
+         $buffer = $e0;
+         $e0 = $m0;
+         $m0 = $buffer;
+      }
       $e1 = ltrim($e0, '0');
       $m1 = ltrim($m0, '0');
       $key1 = sprintf('%s %s', $e1, $m1);

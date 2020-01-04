@@ -18,6 +18,7 @@ class EbicsClientTest extends EbicsTestCase
 {
 
    /**
+    * @dataProvider credentialsDataProvider
     * @throws EbicsException
     */
    public function setUp()
@@ -39,8 +40,7 @@ class EbicsClientTest extends EbicsTestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH000ReturnCode($hev);
       $reportText = $responseHandler->retrieveH000ReportText($hev);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
    }
 
    /**
@@ -57,13 +57,12 @@ class EbicsClientTest extends EbicsTestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($ini);
       $reportText = $responseHandler->retrieveH004ReportText($ini);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
    /**
-    * Run first INI.
+    * @depends testINI
     * @group HIA
     * @throws ClientExceptionInterface
     * @throws RedirectionExceptionInterface
@@ -77,13 +76,13 @@ class EbicsClientTest extends EbicsTestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hia);
       $reportText = $responseHandler->retrieveH004ReportText($hia);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
    /**
     * Run first HIA and Activate account in bank panel.
+    * @depends testHIA
     * @group HPB
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -97,13 +96,12 @@ class EbicsClientTest extends EbicsTestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hpb);
       $reportText = $responseHandler->retrieveH004ReportText($hpb);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
       $this->keyRingManager->saveKeyRing($this->keyRing);
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group HPD
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -113,16 +111,15 @@ class EbicsClientTest extends EbicsTestCase
     */
    public function testHPD()
    {
-      $hpd = $this->client->HPD(null);
+      $hpd = $this->client->HPD();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($hpd);
       $reportText = $responseHandler->retrieveH004ReportText($hpd);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group HAA
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -136,12 +133,11 @@ class EbicsClientTest extends EbicsTestCase
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($haa);
       $reportText = $responseHandler->retrieveH004ReportText($haa);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group VMK
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -151,19 +147,15 @@ class EbicsClientTest extends EbicsTestCase
     */
    public function testVMK()
    {
-      $vmk = $this->client->VMK(null,
-         DateTime::createFromFormat('Y-m-d', '2005-01-01'),
-         DateTime::createFromFormat('Y-m-d', '2019-09-01')
-      );
+      $vmk = $this->client->VMK();
       $responseHandler = new ResponseHandler();
       $code = $responseHandler->retrieveH004ReturnCode($vmk);
       $reportText = $responseHandler->retrieveH004ReportText($vmk);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $this->assertResponseCorrect($code, $reportText);
    }
 
    /**
-    * Run first HPB.
+    * @depends testHPB
     * @group STA
     * @throws ClientExceptionInterface
     * @throws EbicsException
@@ -173,15 +165,11 @@ class EbicsClientTest extends EbicsTestCase
     */
    public function testSTA()
    {
-      $vmk = $this->client->STA(null,
-         DateTime::createFromFormat('Y-m-d', '2005-01-01'),
-         DateTime::createFromFormat('Y-m-d', '2019-09-01')
-      );
+      $sta = $this->client->STA();
       $responseHandler = new ResponseHandler();
-      $code = $responseHandler->retrieveH004ReturnCode($vmk);
-      $reportText = $responseHandler->retrieveH004ReportText($vmk);
-      $this->assertEquals($code, '000000', $reportText);
-      $this->assertEquals($reportText, '[EBICS_OK] OK');
+      $code = $responseHandler->retrieveH004ReturnCode($sta);
+      $reportText = $responseHandler->retrieveH004ReportText($sta);
+      $this->assertResponseCorrect($code, $reportText);
    }
 
 }

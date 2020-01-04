@@ -170,10 +170,10 @@ class HeaderHandler
     * @param DOMDocument $xml
     * @param DOMElement $xmlRequest
     * @param $dateTime
-    * @param DateTime $startDateTime
-    * @param DateTime $endDateTime
+    * @param DateTime|null $startDateTime
+    * @param DateTime|null $endDateTime
     */
-   public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, $dateTime, DateTime $startDateTime, DateTime $endDateTime)
+   public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null)
    {
       $this->handle(
          $xml,
