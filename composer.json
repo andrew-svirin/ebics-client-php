@@ -1,6 +1,9 @@
 {
   "name": "andrew-svirin/ebics-client-php",
+<<<<<<< HEAD
   "version": "1.0.2",
+=======
+>>>>>>> 7d8f2b68cd2ad93317f66771a907ba8b97dac02a
   "type": "library",
   "description": "PHP library to communicate with bank through EBICS protocol.",
   "keywords": [
@@ -26,7 +29,7 @@
     "phpseclib/phpseclib": "~2.0",
     "ext-zlib": "*",
     "ext-json": "*",
-    "symfony/http-client": "^4.3"
+    "symfony/http-client": "^4.3||^5.0"
   },
   "require-dev": {
     "phpunit/phpunit": "^6.5"
