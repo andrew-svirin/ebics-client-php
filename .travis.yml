@@ -13,3 +13,4 @@ cache:
 
 before_script:
   - composer update --dev --no-interaction
+  - printenv
