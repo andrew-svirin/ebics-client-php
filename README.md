@@ -1,5 +1,6 @@
 # EBICS-CLIENT-PHP
 PHP library to communicate with bank through EBICS protocol.
+Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4
 
 ### Installation
 ```bash
