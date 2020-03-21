@@ -1,6 +1,10 @@
 sudo: false
 
 language: php
+php:
+  - '7.2'
+  - '7.3'
+  - '7.4'
 
 branches:
   only:
@@ -13,9 +17,3 @@ cache:
 
 before_script:
   - composer update --dev --no-interaction
-
-script:
-  - echo "$DEBUG_CREDENTIALS_1"
-  - echo "$DEBUG_CREDENTIALS_2"
-  - echo "$DEBUG_CREDENTIALS_3"
-  - echo "$SECRET"
