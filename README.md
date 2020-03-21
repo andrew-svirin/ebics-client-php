@@ -60,4 +60,4 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
 More methods you can find in `tests/Unit/EbicsTest`
 
 ### Statistic
-[![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.com/andrew-svirin/ebics-client-php)
+[![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.org/andrew-svirin/ebics-client-php)
