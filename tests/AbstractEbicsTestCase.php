@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\tests\common;
+namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\EbicsClient;
@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-abstract class EbicsTestCase extends TestCase
+abstract class AbstractEbicsTestCase extends TestCase
 {
 
    /**
@@ -26,8 +26,8 @@ abstract class EbicsTestCase extends TestCase
     */
    const ENCRYPT_ALGO = 'AES-128-ECB';
 
-   var $data = __DIR__ . '/../_data';
-   var $fixtures = __DIR__ . '/../_fixtures';
+   var $data = __DIR__ . '/_data';
+   var $fixtures = __DIR__ . '/_fixtures';
 
    /**
     * @var int

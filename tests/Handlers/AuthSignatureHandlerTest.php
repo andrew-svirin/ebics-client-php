@@ -1,11 +1,12 @@
 <?php
 
+namespace AndrewSvirin\Ebics\Tests\Handlers;
+
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\tests\common\EbicsTestCase;
-
+use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class EbicsTest.
@@ -13,7 +14,7 @@ use AndrewSvirin\tests\common\EbicsTestCase;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class AuthSignatureHandlerTest extends EbicsTestCase
+class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 {
 
    use XPathTrait;
