@@ -8,7 +8,7 @@ use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
  * Legacy X509 certificate generator @see X509GeneratorInterface.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Guillaume Sainthillier
  */
 class LegacyX509Generator extends AbstractX509Generator
 {

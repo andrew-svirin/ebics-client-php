@@ -8,7 +8,7 @@ use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
  * Default X509 generator factory.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Guillaume Sainthillier
  */
 class X509GeneratorFactory
 {
@@ -26,12 +26,20 @@ class X509GeneratorFactory
     public static function setGeneratorClass(string $generatorClass)
     {
         if (!is_a($generatorClass, X509GeneratorInterface::class, true)) {
-            throw new \RuntimeException(sprintf('The class "%s" must implements %s', $generatorClass, X509GeneratorInterface::class));
+            throw new \RuntimeException(sprintf(
+                'The class "%s" must implements %s',
+                $generatorClass,
+                X509GeneratorInterface::class
+            ));
         }
 
         self::$generatorClass = $generatorClass;
     }
 
+    /**
+     * @param array $options
+     * @return X509GeneratorInterface
+     */
     public static function create(array $options = []): X509GeneratorInterface
     {
         //Default behaviour
@@ -42,11 +50,18 @@ class X509GeneratorFactory
         $generator = call_user_func(self::$generatorFunction, $options);
 
         if (null === $generator) {
-            throw new \RuntimeException(sprintf('The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned', X509GeneratorInterface::class));
+            throw new \RuntimeException(sprintf(
+                'The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned',
+                X509GeneratorInterface::class
+            ));
         }
 
         if (!$generator instanceof X509GeneratorInterface) {
-            throw new \RuntimeException(sprintf('The class "%s" must implements %s', get_class($generator), X509GeneratorInterface::class));
+            throw new \RuntimeException(sprintf(
+                'The class "%s" must implements %s',
+                get_class($generator),
+                X509GeneratorInterface::class
+            ));
         }
 
         return $generator;

@@ -3,17 +3,25 @@
 
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Factories\X509\X509ExtentionOptionsNormalizer;
+use AndrewSvirin\Ebics\Factories\X509\X509ExtensionOptionsNormalizer;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
-class X509ExtentionOptionsNormalizerTest extends AbstractEbicsTestCase
+/**
+ * Legacy X509 certificate generator @see X509GeneratorInterface.
+ *
+ * @license http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @author Guillaume Sainthillier
+ */
+class X509ExtensionOptionsNormalizerTest extends AbstractEbicsTestCase
 {
     /**
      * @dataProvider getOptions
+     * @param $value
+     * @param $expected
      */
     public function testOptions($value, $expected)
     {
-        $actualValue = X509ExtentionOptionsNormalizer::normalize($value);
+        $actualValue = X509ExtensionOptionsNormalizer::normalize($value);
 
         $this->assertEquals($expected, $actualValue);
     }
