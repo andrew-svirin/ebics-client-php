@@ -1,8 +1,9 @@
 <?php
 
+namespace AndrewSvirin\Ebics\Tests;
+
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
-use AndrewSvirin\tests\common\EbicsTestCase;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -14,7 +15,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class EbicsClientTest extends EbicsTestCase
+class EbicsClientTest extends AbstractEbicsTestCase
 {
 
    /**

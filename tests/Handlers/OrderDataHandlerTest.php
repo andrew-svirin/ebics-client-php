@@ -1,11 +1,13 @@
 <?php
 
+namespace AndrewSvirin\Ebics\Tests\Handlers;
+
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\OrderData as OrderDataAlias;
 use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\tests\common\EbicsTestCase;
+use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class RequestFactoryTest.
@@ -13,7 +15,7 @@ use AndrewSvirin\tests\common\EbicsTestCase;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class OrderDataHandlerTest extends EbicsTestCase
+class OrderDataHandlerTest extends AbstractEbicsTestCase
 {
 
    use XPathTrait;

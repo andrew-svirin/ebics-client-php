@@ -35,5 +35,10 @@
     "psr-4": {
       "AndrewSvirin\\Ebics\\": "src"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AndrewSvirin\\Ebics\\Tests\\": "tests"
+    }
   }
 }
