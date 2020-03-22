@@ -58,7 +58,55 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
     echo $code . '-' . $reportText . "\n";
 ```
 
-More methods you can find in `tests/Unit/EbicsTest`
+
+### French Bank
+When using french bank, you will need to create a X509 certificate. Create a class which extends the `AbstractX509Generator` (or implements the `X509GeneratorInterface` if you want a total control about the generation)
+```php
+    <?php
+
+    namespace App\Factories\X509;
+    
+    use AndrewSvirin\Ebics\Factories\X509\AbstractX509Generator;
+
+    class MyCompanyX509Generator extends AbstractX509Generator
+    {
+        public function getCertificateOptions(array $options = []) : array{
+            return [
+                 'subject' => [
+                    'DN' => [
+                        'id-at-countryName' => 'FR',
+                        'id-at-stateOrProvinceName' => 'State',
+                        'id-at-localityName' => 'City',
+                        'id-at-organizationName' => 'Your company',
+                        'id-at-commonName' => 'yourwebsite.tld',
+                        ]
+                    ],
+                    'extensions' => [
+                        'id-ce-subjectAltName' => [
+                        'value' => [
+                            [
+                            'dNSName' => '*.yourwebsite.tld',
+                            ],
+                        ]
+                    ],
+                ],
+            ];
+        }
+    }
+```
+You can see more values in the `LegacyX509Generator` class. 
+
+Then call the `X509GeneratorFactory::setGeneratorClass()` method :
+```php
+    X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
+    //...
+    $client->INI();
+```
+
+
+
+
+More methods you can find in `tests/EbicsTest`
 
 ### Statistic
 [![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.org/andrew-svirin/ebics-client-php)
