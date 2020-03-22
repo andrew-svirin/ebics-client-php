@@ -8,13 +8,16 @@
          beStrictAboutOutputDuringTests="true"
          beStrictAboutTodoAnnotatedTests="true"
          verbose="true">
-    <testsuite name="Unit Test Suite">
-        <directory suffix="Test.php">./tests/Unit/</directory>
-    </testsuite>
+
+    <testsuites>
+        <testsuite name="Project Test Suite">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
 
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
+        <whitelist>
+            <directory>src</directory>
         </whitelist>
     </filter>
 </phpunit>
