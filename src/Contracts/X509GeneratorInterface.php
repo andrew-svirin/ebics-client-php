@@ -8,7 +8,7 @@ use phpseclib\Crypt\RSA;
  * X509 Factory Interface representation.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Guillaume Sainthillier
  */
 interface X509GeneratorInterface
 {

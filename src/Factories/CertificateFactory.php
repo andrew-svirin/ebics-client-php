@@ -11,7 +11,7 @@ use phpseclib\Math\BigInteger;
  * Class CertificateFactory represents producers for the @see Certificate.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Andrew Svirin, Guillaume Sainthillier
  */
 class CertificateFactory
 {
@@ -60,8 +60,7 @@ class CertificateFactory
         if ($isCertified) {
             $certificateContent = self::generateCertificateContent($keys, $type);
         }
-        $certificate = new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
-        return $certificate;
+        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
     }
 
     private static function generateCertificateContent(array $keys, string $type): string
@@ -75,7 +74,7 @@ class CertificateFactory
 
         $generator = X509GeneratorFactory::create();
         return $generator->generateX509($privateKey, $publicKey, [
-            'type' => $type
+            'type' => $type,
         ]);
     }
 
@@ -88,7 +87,6 @@ class CertificateFactory
         ]);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
         $privateKey = $rsa->getPrivateKey(RSA::PUBLIC_FORMAT_PKCS1);
-        $certificate = new Certificate($type, $publicKey, $privateKey, $content);
-        return $certificate;
+        return new Certificate($type, $publicKey, $privateKey, $content);
     }
 }

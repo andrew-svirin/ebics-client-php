@@ -10,23 +10,23 @@ use phpseclib\File\X509;
  * Default X509 certificate generator @see X509GeneratorInterface.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Guillaume Sainthillier
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
     /** @var \DateTimeInterface */
-    protected $certificatStartDate;
+    protected $certificateStartDate;
 
     /** @var \DateTimeInterface */
-    protected $certificatEndDate;
+    protected $certificateEndDate;
 
     /** @var string */
     protected $serialNumber;
 
     public function __construct()
     {
-        $this->certificatStartDate = (new \DateTimeImmutable())->modify('-1 days');
-        $this->certificatEndDate = (new \DateTimeImmutable())->modify('+1 year');
+        $this->certificateStartDate = (new \DateTimeImmutable())->modify('-1 days');
+        $this->certificateEndDate = (new \DateTimeImmutable())->modify('+1 year');
         $this->serialNumber = $this->generateSerialNumber();
     }
 
@@ -38,6 +38,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      */
     abstract protected function getCertificateOptions(array $options = []): array;
 
+    /**
+     * {@inheritDoc}
+     * @throws X509GeneratorException
+     */
     public function generateX509(RSA $privateKey, RSA $publicKey, array $options = []): string
     {
         $options = array_merge([
@@ -55,18 +59,22 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $issuer = $this->generateIssuer($privateKey, $publicKey, $subject, $options);
 
         $x509 = new X509();
-        $x509->startDate = $this->certificatStartDate->format('YmdHis');
-        $x509->endDate = $this->certificatEndDate->format('YmdHis');
+        $x509->startDate = $this->certificateStartDate->format('YmdHis');
+        $x509->endDate = $this->certificateEndDate->format('YmdHis');
         $x509->serialNumber = $this->serialNumber;
 
         $result = $x509->sign($issuer, $subject, 'sha256WithRSAEncryption');
         $x509->loadX509($result);
 
         foreach ($options['extensions'] as $id => $extension) {
-            $extension = X509ExtentionOptionsNormalizer::normalize($extension);
+            $extension = X509ExtensionOptionsNormalizer::normalize($extension);
 
             if (false === $x509->setExtension($id, $extension['value'], $extension['critical'], $extension['replace'])) {
-                throw new X509GeneratorException(sprintf('Unable to set "%s" extension with value: %s', $id, var_export($extension['value'], true)));
+                throw new X509GeneratorException(sprintf(
+                    'Unable to set "%s" extension with value: %s',
+                    $id,
+                    var_export($extension['value'], true)
+                ));
             }
         }
 
@@ -124,33 +132,33 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     /**
      * @return \DateTimeInterface
      */
-    public function getCertificatStartDate(): \DateTimeInterface
+    public function getCertificateStartDate(): \DateTimeInterface
     {
-        return $this->certificatStartDate;
+        return $this->certificateStartDate;
     }
 
     /**
-     * @param \DateTimeInterface $certificatStartDate
+     * @param \DateTimeInterface $certificateStartDate
      */
-    public function setCertificatStartDate(\DateTimeInterface $certificatStartDate): void
+    public function setCertificateStartDate(\DateTimeInterface $certificateStartDate): void
     {
-        $this->certificatStartDate = $certificatStartDate;
+        $this->certificateStartDate = $certificateStartDate;
     }
 
     /**
      * @return \DateTimeInterface
      */
-    public function getCertificatEndDate(): \DateTimeInterface
+    public function getCertificateEndDate(): \DateTimeInterface
     {
-        return $this->certificatEndDate;
+        return $this->certificateEndDate;
     }
 
     /**
-     * @param \DateTimeInterface $certificatEndDate
+     * @param \DateTimeInterface $certificateEndDate
      */
-    public function setCertificatEndDate(\DateTimeInterface $certificatEndDate): void
+    public function setCertificateEndDate(\DateTimeInterface $certificateEndDate): void
     {
-        $this->certificatEndDate = $certificatEndDate;
+        $this->certificateEndDate = $certificateEndDate;
     }
 
     /**

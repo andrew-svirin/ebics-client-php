@@ -2,22 +2,22 @@
 
 namespace AndrewSvirin\Ebics\Factories\X509;
 
-use AndrewSvirin\Ebics\Contracts\X509GeneratorFactoryInterface;
 use phpseclib\File\X509;
 
 /**
  * X509 extensions options normalizer.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Guillaume Sainthillier
  */
-class X509ExtentionOptionsNormalizer
+class X509ExtensionOptionsNormalizer
 {
     /**
-     * @param mixed $options
+     * @param mixed|string|array $options
+     * @return array
      * @see X509::setExtension()
      */
-    public static function normalize($options)
+    public static function normalize($options): array
     {
         $value = null;
         $critical = false;
