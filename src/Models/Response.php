@@ -15,6 +15,10 @@ class Response extends DOMDocument
     * @var Transaction[]
     */
    private $transactions = [];
+   /**
+    * @var OrderDataDecrypted
+    */
+   private $decryptedOrderData;
 
    /**
     * @param Transaction $transaction
@@ -31,5 +35,25 @@ class Response extends DOMDocument
    {
       return $this->transactions;
    }
+
+   /**
+    * @return OrderDataDecrypted
+    */
+   public function getDecryptedOrderData(): ?OrderDataDecrypted
+   {
+      return $this->decryptedOrderData;
+   }
+
+   /**
+    * @param OrderDataDecrypted $decryptedOrderData
+    * @return self
+    */
+   public function setDecryptedOrderData(OrderDataDecrypted $decryptedOrderData): self
+   {
+      $this->decryptedOrderData = $decryptedOrderData;
+
+      return $this;
+   }
+
 
 }

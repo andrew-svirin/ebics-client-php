@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
+use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\RequestHandler;
@@ -194,7 +195,9 @@ final class EbicsClient implements EbicsClientInterface
       {
          // Prepare decrypted OrderData.
          $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-         $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+         $orderDataDecrypted = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+         $response->setDecryptedOrderData($orderDataDecrypted);
+         $orderData = OrderDataFactory::buildOrderDataFromContent($orderDataDecrypted->getOrderData());
          $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
          $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
          $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
@@ -230,7 +233,9 @@ final class EbicsClient implements EbicsClientInterface
          $response->addTransaction($transaction);
          // Prepare decrypted OrderData.
          $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-         $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+         $orderDataDecrypted = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+         $response->setDecryptedOrderData($orderDataDecrypted);
+         $orderData = OrderDataFactory::buildOrderDataFromContent($orderDataDecrypted->getOrderData());
          $transaction->setOrderData($orderData);
       }
       return $response;
@@ -299,6 +304,11 @@ final class EbicsClient implements EbicsClientInterface
       $hostResponseContent = $hostResponse->getContent();
       $response = new Response();
       $response->loadXML($hostResponseContent);
+      if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response))
+      {
+          $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+          $response->setDecryptedOrderData(CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted));
+      }
       return $response;
    }
 
