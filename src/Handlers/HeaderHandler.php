@@ -27,6 +27,7 @@ class HeaderHandler
     const ORDER_TYPE_HAA = 'HAA';
     const ORDER_TYPE_HPD = 'HPD';
     const ORDER_TYPE_HKD = 'HKD';
+    const ORDER_TYPE_HTD = 'HTD';
 
     const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
@@ -183,6 +184,25 @@ class HeaderHandler
          $this->handleBank(),
          $this->handleOrderDetails(
             self::ORDER_TYPE_HPD,
+            self::ORDER_ATTRIBUTE_DZHNN,
+            $this->handleStandardOrderParams()
+         ),
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
+      );
+    }
+
+    /**
+     * Add header for HTD Request XML.
+     */
+    public function handleHTD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    {
+        $this->handle(
+         $xml,
+         $xmlRequest,
+         $this->handleNonce($dateTime),
+         $this->handleBank(),
+         $this->handleOrderDetails(
+            self::ORDER_TYPE_HTD,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
          ),

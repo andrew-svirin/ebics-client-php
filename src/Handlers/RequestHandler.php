@@ -142,6 +142,20 @@ class RequestHandler
     /**
      * @throws EbicsException
      */
+    public function buildHTD(DateTime $dateTime): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleHTD($request, $xmlRequest, $dateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
     public function buildHAA(DateTime $dateTime): Request
     {
         $request = new Request();
