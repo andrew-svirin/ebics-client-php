@@ -127,6 +127,25 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
     /**
      * @depends testHPB
+     * @group HKD
+     *
+     * @throws ClientExceptionInterface
+     * @throws EbicsException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testHKD()
+    {
+        $hpd = $this->client->HKD();
+        $responseHandler = new ResponseHandler();
+        $code = $responseHandler->retrieveH004ReturnCode($hpd);
+        $reportText = $responseHandler->retrieveH004ReportText($hpd);
+        $this->assertResponseCorrect($code, $reportText);
+    }
+
+    /**
+     * @depends testHPB
      * @group HAA
      *
      * @throws ClientExceptionInterface
