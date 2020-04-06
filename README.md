@@ -70,7 +70,7 @@ When using french bank, you will need to create a X509 certificate. Create a cla
 
     class MyCompanyX509Generator extends AbstractX509Generator
     {
-        public function getCertificateOptions(array $options = []) : array{
+        public function getCertificateOptions(array $options = []) : array {
             return [
                  'subject' => [
                     'DN' => [
@@ -84,9 +84,7 @@ When using french bank, you will need to create a X509 certificate. Create a cla
                     'extensions' => [
                         'id-ce-subjectAltName' => [
                         'value' => [
-                            [
                             'dNSName' => '*.yourwebsite.tld',
-                            ],
                         ]
                     ],
                 ],
