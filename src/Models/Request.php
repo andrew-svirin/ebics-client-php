@@ -10,5 +10,4 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class Request extends DOMDocument
 {
-
 }

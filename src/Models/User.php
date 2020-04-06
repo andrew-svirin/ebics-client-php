@@ -10,47 +10,49 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class User
 {
+    /**
+     * The assigned PartnerID (Kunden-ID).
+     *
+     * @var string
+     */
+    private $partnerId;
 
-   /**
-    * The assigned PartnerID (Kunden-ID).
-    * @var string
-    */
-   private $partnerId;
+    /**
+     * The assigned UserID (Teilnehmer-ID).
+     *
+     * @var string
+     */
+    private $userId;
 
-   /**
-    * The assigned UserID (Teilnehmer-ID).
-    * @var string
-    */
-   private $userId;
+    /**
+     * Constructor.
+     *
+     * @param string $partnerId
+     * @param string $userId
+     */
+    public function __construct($partnerId, $userId)
+    {
+        $this->partnerId = (string) $partnerId;
+        $this->userId = (string) $userId;
+    }
 
-   /**
-    * Constructor.
-    *
-    * @param string $partnerId
-    * @param string $userId
-    */
-   public function __construct($partnerId, $userId)
-   {
-      $this->partnerId = (string)$partnerId;
-      $this->userId = (string)$userId;
-   }
+    /**
+     * Getter for {partnerId}.
+     *
+     * @return string
+     */
+    public function getPartnerId()
+    {
+        return $this->partnerId;
+    }
 
-   /**
-    * Getter for {partnerId}.
-    * @return string
-    */
-   public function getPartnerId()
-   {
-      return $this->partnerId;
-   }
-
-   /**
-    * Getter for {userId}.
-    * @return string
-    */
-   public function getUserId()
-   {
-      return $this->userId;
-   }
-
+    /**
+     * Getter for {userId}.
+     *
+     * @return string
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
 }

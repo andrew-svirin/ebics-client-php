@@ -12,110 +12,95 @@ use AndrewSvirin\Ebics\Contracts\TransactionInterface;
  */
 class Transaction implements TransactionInterface
 {
+    /**
+     * @var string
+     */
+    private $id;
 
-   /**
-    * @var string
-    */
-   private $id;
+    /**
+     * @var string
+     */
+    private $phase;
 
-   /**
-    * @var string
-    */
-   private $phase;
+    /**
+     * @var int
+     */
+    private $segmentNumber;
 
-   /**
-    * @var int
-    */
-   private $segmentNumber;
+    /**
+     * @var int
+     */
+    private $numSegments;
 
-   /**
-    * @var int
-    */
-   private $numSegments;
+    /**
+     * Uses for encrypted OrderData.
+     *
+     * @var OrderData
+     */
+    private $orderData;
 
-   /**
-    * Uses for encrypted OrderData.
-    * @var OrderData
-    */
-   private $orderData;
+    /**
+     * @return string
+     */
+    public function getPhase(): string
+    {
+        return $this->phase;
+    }
 
-   /**
-    * @return string
-    */
-   public function getPhase(): string
-   {
-      return $this->phase;
-   }
+    public function setPhase(string $phase): void
+    {
+        $this->phase = $phase;
+    }
 
-   /**
-    * @param string $phase
-    */
-   public function setPhase(string $phase): void
-   {
-      $this->phase = $phase;
-   }
+    /**
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-   /**
-    * @return string
-    */
-   public function getId(): string
-   {
-      return $this->id;
-   }
+    public function setId(string $id): void
+    {
+        $this->id = $id;
+    }
 
-   /**
-    * @param string $id
-    */
-   public function setId(string $id): void
-   {
-      $this->id = $id;
-   }
+    /**
+     * @return int
+     */
+    public function getSegmentNumber(): int
+    {
+        return $this->segmentNumber;
+    }
 
-   /**
-    * @return int
-    */
-   public function getSegmentNumber(): int
-   {
-      return $this->segmentNumber;
-   }
+    public function setSegmentNumber(int $segmentNumber): void
+    {
+        $this->segmentNumber = $segmentNumber;
+    }
 
-   /**
-    * @param int $segmentNumber
-    */
-   public function setSegmentNumber(int $segmentNumber): void
-   {
-      $this->segmentNumber = $segmentNumber;
-   }
+    /**
+     * @return int
+     */
+    public function getNumSegments(): int
+    {
+        return $this->numSegments;
+    }
 
-   /**
-    * @return int
-    */
-   public function getNumSegments(): int
-   {
-      return $this->numSegments;
-   }
+    public function setNumSegments(int $numSegments): void
+    {
+        $this->numSegments = $numSegments;
+    }
 
-   /**
-    * @param int $numSegments
-    */
-   public function setNumSegments(int $numSegments): void
-   {
-      $this->numSegments = $numSegments;
-   }
+    /**
+     * @return OrderData
+     */
+    public function getOrderData(): OrderData
+    {
+        return $this->orderData;
+    }
 
-   /**
-    * @return OrderData
-    */
-   public function getOrderData(): OrderData
-   {
-      return $this->orderData;
-   }
-
-   /**
-    * @param OrderData $orderData
-    */
-   public function setOrderData(OrderData $orderData): void
-   {
-      $this->orderData = $orderData;
-   }
+    public function setOrderData(OrderData $orderData): void
+    {
+        $this->orderData = $orderData;
+    }
 }
