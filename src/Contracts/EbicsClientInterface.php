@@ -15,8 +15,6 @@ interface EbicsClientInterface
 {
     /**
      * Supported protocol version for the Bank.
-     *
-     * @return Response
      */
     public function HEV(): Response;
 
@@ -25,9 +23,7 @@ interface EbicsClientInterface
      * Send to the bank public certificate of signature A006.
      * Prepare A006 certificates for KeyRing.
      *
-     * @param DateTime|null $dateTime Current date.
-     *
-     * @return Response
+     * @param DateTime|null $dateTime current date
      */
     public function INI(DateTime $dateTime = null): Response;
 
@@ -36,9 +32,7 @@ interface EbicsClientInterface
      * Send to the bank public certificates of authentication (X002) and encryption (E002).
      * Prepare E002 and X002 user certificates for KeyRing.
      *
-     * @param DateTime|null $dateTime Current date.
-     *
-     * @return Response
+     * @param DateTime|null $dateTime current date
      */
     public function HIA(DateTime $dateTime = null): Response;
 
@@ -47,46 +41,36 @@ interface EbicsClientInterface
      * Decrypt OrderData.
      * Prepare E002 and X002 bank certificates for KeyRing.
      *
-     * @param DateTime|null $dateTime Current date.
-     *
-     * @return Response
+     * @param DateTime|null $dateTime current date
      */
     public function HPB(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve the bank server parameters.
-     *
-     * @return Response
      */
     public function HPD(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve  Bank available order types.
      *
-     * @param DateTime|null $dateTime Current date.
-     *
-     * @return Response
+     * @param DateTime|null $dateTime current date
      */
     public function HAA(DateTime $dateTime = null): Response;
 
     /**
      * Downloads the interim transaction report in SWIFT format (MT942).
      *
-     * @param DateTime|null $dateTime Current date.
-     * @param DateTime|null $startDateTime The start date of requested transactions.
-     * @param DateTime|null $endDateTime The end date of requested transactions.
-     *
-     * @return Response
+     * @param DateTime|null $dateTime      current date
+     * @param DateTime|null $startDateTime the start date of requested transactions
+     * @param DateTime|null $endDateTime   the end date of requested transactions
      */
     public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
     /**
      * Retrieve the bank account statement.
      *
-     * @param DateTime|null $startDateTime The start date of requested transactions.
-     * @param DateTime|null $endDateTime The end date of requested transactions.
-     *
-     * @return Response
+     * @param DateTime|null $startDateTime the start date of requested transactions
+     * @param DateTime|null $endDateTime   the end date of requested transactions
      */
     public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 }

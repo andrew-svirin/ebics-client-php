@@ -98,8 +98,6 @@ class RequestHandler
     }
 
     /**
-     * @return Request
-     *
      * @throws EbicsException
      */
     public function buildHPB(DateTime $dateTime): Request
@@ -114,8 +112,6 @@ class RequestHandler
     }
 
     /**
-     * @return Request
-     *
      * @throws EbicsException
      */
     public function buildHPD(DateTime $dateTime): Request
@@ -146,8 +142,6 @@ class RequestHandler
     }
 
     /**
-     * @return Request
-     *
      * @throws EbicsException
      */
     public function buildVMK(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
@@ -162,8 +156,6 @@ class RequestHandler
     }
 
     /**
-     * @return Request
-     *
      * @throws EbicsException
      */
     public function buildSTA(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
