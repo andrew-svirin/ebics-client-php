@@ -191,8 +191,6 @@ class HeaderHandler
 
     /**
      * Hook to add mutable information.
-     *
-     * @return callable
      */
     private function handleMutable(callable $transactionPhase = null): callable
     {
@@ -210,8 +208,6 @@ class HeaderHandler
 
     /**
      * Hook to add TransactionPhase information.
-     *
-     * @return callable
      */
     private function handleTransactionPhase(string $transactionPhase): callable
     {
@@ -225,8 +221,6 @@ class HeaderHandler
 
     /**
      * Hook to add OrderDetails information.
-     *
-     * @return callable
      */
     private function handleOrderDetails(string $orderType, string $orderAttribute, callable $orderParams = null): callable
     {
@@ -254,8 +248,6 @@ class HeaderHandler
 
     /**
      * Hook to add StandardOrderParams information.
-     *
-     * @return callable
      */
     private function handleStandardOrderParams(DateTime $startDateTime = null, DateTime $endDateTime = null): callable
     {
@@ -282,9 +274,7 @@ class HeaderHandler
     /**
      * Hook to add Nonce and Timestamp information.
      *
-     * @param DateTime $dateTime Stamped by date time and Nonce.
-     *
-     * @return callable
+     * @param DateTime $dateTime stamped by date time and Nonce
      */
     private function handleNonce(DateTime $dateTime): callable
     {
@@ -303,8 +293,6 @@ class HeaderHandler
 
     /**
      * Hook to add BankPubKeyDigests information.
-     *
-     * @return callable
      */
     private function handleBank(): callable
     {
