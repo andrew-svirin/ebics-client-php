@@ -60,6 +60,7 @@ class CertificateFactory
         if ($isCertified) {
             $certificateContent = self::generateCertificateContent($keys, $type);
         }
+
         return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
     }
 
@@ -73,6 +74,7 @@ class CertificateFactory
         $publicKey->setPublicKey();
 
         $generator = X509GeneratorFactory::create();
+
         return $generator->generateX509($privateKey, $publicKey, [
             'type' => $type,
         ]);
@@ -87,6 +89,7 @@ class CertificateFactory
         ]);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
         $privateKey = $rsa->getPrivateKey(RSA::PUBLIC_FORMAT_PKCS1);
+
         return new Certificate($type, $publicKey, $privateKey, $content);
     }
 }

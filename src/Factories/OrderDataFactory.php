@@ -12,12 +12,11 @@ use AndrewSvirin\Ebics\Models\OrderData;
  */
 class OrderDataFactory
 {
+    public static function buildOrderDataFromContent(string $content): OrderData
+    {
+        $orderData = new OrderData();
+        $orderData->loadXML($content);
 
-   public static function buildOrderDataFromContent(string $content): OrderData
-   {
-      $orderData = new OrderData();
-      $orderData->loadXML($content);
-      return $orderData;
-   }
-
+        return $orderData;
+    }
 }

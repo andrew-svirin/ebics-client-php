@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
 use AndrewSvirin\Ebics\Factories\X509\X509ExtensionOptionsNormalizer;
@@ -16,6 +15,7 @@ class X509ExtensionOptionsNormalizerTest extends AbstractEbicsTestCase
 {
     /**
      * @dataProvider getOptions
+     *
      * @param $value
      * @param $expected
      */

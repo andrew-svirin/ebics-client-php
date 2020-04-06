@@ -24,7 +24,7 @@ class SilarhiX509Generator extends AbstractX509Generator
                     'id-at-localityName' => 'Toulouse',
                     'id-at-organizationName' => 'SILARHI',
                     'id-at-commonName' => 'silarhi.fr',
-                ]
+                ],
             ],
             'extensions' => [
                 'id-ce-subjectAltName' => [
@@ -32,21 +32,21 @@ class SilarhiX509Generator extends AbstractX509Generator
                         [
                             'dNSName' => '*.silarhi.fr',
                         ],
-                    ]
+                    ],
                 ],
                 'id-ce-basicConstraints' => [
                     'value' => [
                         'CA' => false,
-                    ]
+                    ],
                 ],
                 'id-ce-keyUsage' => [
                     'value' => ['keyEncipherment', 'digitalSignature', 'nonRepudiation'],
-                    'critical' => true
+                    'critical' => true,
                 ],
                 'id-ce-extKeyUsage' => [
-                    'value' => ['id-kp-serverAuth', 'id-kp-clientAuth']
+                    'value' => ['id-kp-serverAuth', 'id-kp-clientAuth'],
                 ],
-            ]
+            ],
         ];
     }
 }

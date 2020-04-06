@@ -14,7 +14,9 @@ class X509ExtensionOptionsNormalizer
 {
     /**
      * @param mixed|string|array $options
+     *
      * @return array
+     *
      * @see X509::setExtension()
      */
     public static function normalize($options): array
@@ -23,7 +25,7 @@ class X509ExtensionOptionsNormalizer
         $critical = false;
         $replace = true;
 
-        if (!is_array($options)) {
+        if (!\is_array($options)) {
             $value = $options;
         } else {
             if (!isset($options['value'])) {

@@ -26,18 +26,13 @@ class X509GeneratorFactory
     public static function setGeneratorClass(string $generatorClass)
     {
         if (!is_a($generatorClass, X509GeneratorInterface::class, true)) {
-            throw new \RuntimeException(sprintf(
-                'The class "%s" must implements %s',
-                $generatorClass,
-                X509GeneratorInterface::class
-            ));
+            throw new \RuntimeException(sprintf('The class "%s" must implements %s', $generatorClass, X509GeneratorInterface::class));
         }
 
         self::$generatorClass = $generatorClass;
     }
 
     /**
-     * @param array $options
      * @return X509GeneratorInterface
      */
     public static function create(array $options = []): X509GeneratorInterface
@@ -47,21 +42,14 @@ class X509GeneratorFactory
             return new self::$generatorClass();
         }
 
-        $generator = call_user_func(self::$generatorFunction, $options);
+        $generator = \call_user_func(self::$generatorFunction, $options);
 
         if (null === $generator) {
-            throw new \RuntimeException(sprintf(
-                'The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned',
-                X509GeneratorInterface::class
-            ));
+            throw new \RuntimeException(sprintf('The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned', X509GeneratorInterface::class));
         }
 
         if (!$generator instanceof X509GeneratorInterface) {
-            throw new \RuntimeException(sprintf(
-                'The class "%s" must implements %s',
-                get_class($generator),
-                X509GeneratorInterface::class
-            ));
+            throw new \RuntimeException(sprintf('The class "%s" must implements %s', \get_class($generator), X509GeneratorInterface::class));
         }
 
         return $generator;

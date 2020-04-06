@@ -19,162 +19,161 @@ use DateTime;
  */
 class RequestHandler
 {
+    /**
+     * @var EbicsRequestHandler
+     */
+    private $ebicsRequestHandler;
+    /**
+     * @var HeaderHandler
+     */
+    private $headerHandler;
+    /**
+     * @var BodyHandler
+     */
+    private $bodyHandler;
+    /**
+     * @var OrderDataHandler
+     */
+    private $orderDataHandler;
+    /**
+     * @var AuthSignatureHandler
+     */
+    private $authSignatureHandler;
 
-   /**
-    * @var EbicsRequestHandler
-    */
-   private $ebicsRequestHandler;
-   /**
-    * @var HeaderHandler
-    */
-   private $headerHandler;
-   /**
-    * @var BodyHandler
-    */
-   private $bodyHandler;
-   /**
-    * @var OrderDataHandler
-    */
-   private $orderDataHandler;
-   /**
-    * @var AuthSignatureHandler
-    */
-   private $authSignatureHandler;
+    /**
+     * @var HostHandler
+     */
+    private $hostHandler;
 
-   /**
-    * @var HostHandler
-    */
-   private $hostHandler;
+    /**
+     * Constructor.
+     */
+    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    {
+        $this->ebicsRequestHandler = new EbicsRequestHandler();
+        $this->headerHandler = new HeaderHandler($bank, $user, $keyRing);
+        $this->bodyHandler = new BodyHandler();
+        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
+        $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
+        $this->hostHandler = new HostHandler($bank);
+    }
 
-   /**
-    * Constructor.
-    * @param Bank $bank
-    * @param User $user
-    * @param KeyRing $keyRing
-    */
-   public function __construct(Bank $bank, User $user, KeyRing $keyRing)
-   {
-      $this->ebicsRequestHandler = new EbicsRequestHandler();
-      $this->headerHandler = new HeaderHandler($bank, $user, $keyRing);
-      $this->bodyHandler = new BodyHandler();
-      $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
-      $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
-      $this->hostHandler = new HostHandler($bank);
-   }
+    public function buildINI(Certificate $certificateA, DateTime $dateTime): Request
+    {
+        // Order data.
+        $orderData = new OrderData();
+        $this->orderDataHandler->handleINI($orderData, $certificateA, $dateTime);
+        $orderDataContent = $orderData->getContent();
+        // Wrapper for request Order data.
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
+        $this->headerHandler->handleINI($request, $xmlRequest);
+        $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
 
-   public function buildINI(Certificate $certificateA, DateTime $dateTime): Request
-   {
-      // Order data.
-      $orderData = new OrderData();
-      $this->orderDataHandler->handleINI($orderData, $certificateA, $dateTime);
-      $orderDataContent = $orderData->getContent();
-      // Wrapper for request Order data.
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
-      $this->headerHandler->handleINI($request, $xmlRequest);
-      $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
-      return $request;
-   }
+        return $request;
+    }
 
-   public function buildHEV(): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleHEV($request);
-      $this->hostHandler->handle($request, $xmlRequest);
-      return $request;
-   }
+    public function buildHEV(): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleHEV($request);
+        $this->hostHandler->handle($request, $xmlRequest);
 
-   public function buildHIA(Certificate $certificateE, Certificate $certificateX, DateTime $dateTime): Request
-   {
-      // Order data.
-      $orderData = new OrderData();
-      $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);
-      $orderDataContent = $orderData->getContent();
-      // Wrapper for request Order data.
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
-      $this->headerHandler->handleHIA($request, $xmlRequest);
-      $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
-      return $request;
-   }
+        return $request;
+    }
 
-   /**
-    * @param DateTime $dateTime
-    * @return Request
-    * @throws EbicsException
-    */
-   public function buildHPB(DateTime $dateTime): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleNoPubKeyDigests($request);
-      $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      return $request;
-   }
+    public function buildHIA(Certificate $certificateE, Certificate $certificateX, DateTime $dateTime): Request
+    {
+        // Order data.
+        $orderData = new OrderData();
+        $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);
+        $orderDataContent = $orderData->getContent();
+        // Wrapper for request Order data.
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
+        $this->headerHandler->handleHIA($request, $xmlRequest);
+        $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
 
-   /**
-    * @param DateTime $dateTime
-    * @return Request
-    * @throws EbicsException
-    */
-   public function buildHPD(DateTime $dateTime): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-      $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      return $request;
-   }
+        return $request;
+    }
 
-   /**
-    * @param DateTime $dateTime
-    * @return Request
-    * @throws EbicsException
-    */
-   public function buildHAA(DateTime $dateTime): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-      $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      return $request;
-   }
+    /**
+     * @return Request
+     *
+     * @throws EbicsException
+     */
+    public function buildHPB(DateTime $dateTime): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleNoPubKeyDigests($request);
+        $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
 
-   /**
-    * @param DateTime $dateTime
-    * @param DateTime|null $startDateTime
-    * @param DateTime|null $endDateTime
-    * @return Request
-    * @throws EbicsException
-    */
-   public function buildVMK(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-      $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      return $request;
-   }
+        return $request;
+    }
 
-   /**
-    * @param DateTime $dateTime
-    * @param DateTime|null $startDateTime
-    * @param DateTime|null $endDateTime
-    * @return Request
-    * @throws EbicsException
-    */
-   public function buildSTA(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-   {
-      $request = new Request();
-      $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-      $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-      $this->authSignatureHandler->handle($request, $xmlRequest);
-      $this->bodyHandler->handleEmpty($request, $xmlRequest);
-      return $request;
-   }
+    /**
+     * @return Request
+     *
+     * @throws EbicsException
+     */
+    public function buildHPD(DateTime $dateTime): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
 
+        return $request;
+    }
+
+    /**
+     * @return Request
+     *
+     * @throws EbicsException
+     */
+    public function buildHAA(DateTime $dateTime): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
+
+    /**
+     * @return Request
+     *
+     * @throws EbicsException
+     */
+    public function buildVMK(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
+
+    /**
+     * @return Request
+     *
+     * @throws EbicsException
+     */
+    public function buildSTA(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
 }
