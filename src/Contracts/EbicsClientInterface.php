@@ -51,6 +51,11 @@ interface EbicsClientInterface
     public function HPD(DateTime $dateTime = null): Response;
 
     /**
+     * Retrieve customer's customer and subscriber information.
+     */
+    public function HKD(DateTime $dateTime = null): Response;
+
+    /**
      * Retrieve  Bank available order types.
      *
      * @param DateTime|null $dateTime current date

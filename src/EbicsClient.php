@@ -245,6 +245,38 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
+    public function HKD(DateTime $dateTime = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = DateTime::createFromFormat('U', time());
+        }
+        $request = $this->requestFactory->buildHKD($dateTime);
+        $hostResponse = $this->post($request);
+        $hostResponseContent = $hostResponse->getContent();
+        $response = new Response();
+        $response->loadXML($hostResponseContent);
+        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
+            // TODO: Send Receipt transaction.
+            $transaction = $this->responseHandler->retrieveTransaction($response);
+            $response->addTransaction($transaction);
+            // Prepare decrypted OrderData.
+            $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+            $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+            $transaction->setOrderData($orderData);
+        }
+
+        return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws Exceptions\EbicsException
+     */
     public function HAA(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
