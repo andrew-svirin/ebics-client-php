@@ -3,7 +3,9 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
+use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\RequestHandler;
@@ -113,6 +115,7 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
+        $this->checkH000ReturnCode($request, $response);
 
         return $response;
     }
@@ -136,9 +139,9 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            $this->keyRing->setUserCertificateA($certificateA);
-        }
+
+        $this->checkH004ReturnCode($request, $response);
+        $this->keyRing->setUserCertificateA($certificateA);
 
         return $response;
     }
@@ -163,10 +166,10 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            $this->keyRing->setUserCertificateE($certificateE);
-            $this->keyRing->setUserCertificateX($certificateX);
-        }
+
+        $this->checkH004ReturnCode($request, $response);
+        $this->keyRing->setUserCertificateE($certificateE);
+        $this->keyRing->setUserCertificateX($certificateX);
 
         return $response;
     }
@@ -190,16 +193,16 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            // Prepare decrypted OrderData.
-            $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-            $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
-            $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
-            $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
-            $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
-            $this->keyRing->setBankCertificateX($certificateX);
-            $this->keyRing->setBankCertificateE($certificateE);
-        }
+
+        $this->checkH004ReturnCode($request, $response);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
+        $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
+        $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
+        $this->keyRing->setBankCertificateX($certificateX);
+        $this->keyRing->setBankCertificateE($certificateE);
 
         return $response;
     }
@@ -223,15 +226,15 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            // TODO: Send Receipt transaction.
-            $transaction = $this->responseHandler->retrieveTransaction($response);
-            $response->addTransaction($transaction);
-            // Prepare decrypted OrderData.
-            $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-            $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
-            $transaction->setOrderData($orderData);
-        }
+
+        $this->checkH004ReturnCode($request, $response);
+        // TODO: Send Receipt transaction.
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $transaction->setOrderData($orderData);
 
         return $response;
     }
@@ -255,15 +258,15 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            // TODO: Send Receipt transaction.
-            $transaction = $this->responseHandler->retrieveTransaction($response);
-            $response->addTransaction($transaction);
-            // Prepare decrypted OrderData.
-            $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-            $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
-            $transaction->setOrderData($orderData);
-        }
+
+        $this->checkH004ReturnCode($request, $response);
+        // TODO: Send Receipt transaction.
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $transaction->setOrderData($orderData);
 
         return $response;
     }
@@ -287,14 +290,18 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
-        if ('000000' === $this->responseHandler->retrieveH004ReturnCode($response)) {
-            // TODO: Send Receipt transaction.
-            $transaction = $this->responseHandler->retrieveTransaction($response);
-            $response->addTransaction($transaction);
-            // Prepare decrypted OrderData.
-            $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-            $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
-            $transaction->setOrderData($orderData);
+
+        $this->checkH004ReturnCode($request, $response);
+        // TODO: Send Receipt transaction.
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $transaction->setOrderData($orderData);
+
+        return $response;
+    }
         }
 
         return $response;
@@ -320,6 +327,8 @@ final class EbicsClient implements EbicsClientInterface
         $response = new Response();
         $response->loadXML($hostResponseContent);
 
+        $this->checkH004ReturnCode($request, $response);
+
         return $response;
     }
 
@@ -342,6 +351,8 @@ final class EbicsClient implements EbicsClientInterface
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
         $response->loadXML($hostResponseContent);
+
+        $this->checkH004ReturnCode($request, $response);
 
         return $response;
     }
@@ -366,6 +377,38 @@ final class EbicsClient implements EbicsClientInterface
         $response = new Response();
         $response->loadXML($hostResponseContent);
 
+        $this->checkH004ReturnCode($request, $response);
+
         return $response;
+    }
+
+    /**
+     * @throws EbicsResponseExceptionInterface
+     */
+    private function checkH004ReturnCode(Request $request, Response $response): void
+    {
+        $errorCode = $this->responseHandler->retrieveH004BodyOrHeaderReturnCode($response);
+
+        if ('00000' === $errorCode) {
+            return;
+        }
+
+        $reportText = $this->responseHandler->retrieveH004ReportText($response);
+        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+    }
+
+    /**
+     * @throws EbicsResponseExceptionInterface
+     */
+    private function checkH000ReturnCode(Request $request, Response $response): void
+    {
+        $errorCode = $this->responseHandler->retrieveH000ReturnCode($response);
+
+        if ('00000' === $errorCode) {
+            return;
+        }
+
+        $reportText = $this->responseHandler->retrieveH000ReportText($response);
+        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 }

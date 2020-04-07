@@ -34,6 +34,33 @@ class ResponseHandler
     }
 
     /**
+     * Extract H004 > KeyManagementResponse > body > ReturnCode value from the DOM XML.
+     */
+    public function retrieveH004BodyReturnCode(DOMDocument $xml): string
+    {
+        $xpath = $this->prepareH004XPath($xml);
+        $returnCode = $xpath->query('//H004:body/H004:ReturnCode');
+        $returnCodeValue = $returnCode->item(0)->nodeValue;
+
+        return $returnCodeValue;
+    }
+
+    /**
+     * Extract H004 > ReturnCode value from both header and body. Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
+     */
+    public function retrieveH004BodyOrHeaderReturnCode(DOMDocument $xml): string
+    {
+        $headerReturnCode = $this->retrieveH004ReturnCode($xml);
+        $bodyReturnCode = $this->retrieveH004BodyReturnCode($xml);
+
+        if ('000000' !== $headerReturnCode) {
+            return $headerReturnCode;
+        }
+
+        return $bodyReturnCode;
+    }
+
+    /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
      *
      * @return string
