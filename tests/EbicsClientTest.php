@@ -75,12 +75,10 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testHIA()
     {
+        $this->expectException(InvalidUserOrUserStateException::class);
+        $this->expectExceptionCode('091002');
+        $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
         $hia = $this->client->HIA();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($hia);
-        $reportText = $responseHandler->retrieveH004ReportText($hia);
-        $this->assertResponseCorrect($code, $reportText);
-        $this->keyRingManager->saveKeyRing($this->keyRing);
     }
 
     /**
