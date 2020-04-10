@@ -302,10 +302,6 @@ final class EbicsClient implements EbicsClientInterface
 
         return $response;
     }
-        }
-
-        return $response;
-    }
 
     /**
      * {@inheritdoc}
