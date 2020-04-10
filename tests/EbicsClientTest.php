@@ -218,4 +218,23 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $reportText = $responseHandler->retrieveH004ReportText($sta);
         $this->assertResponseCorrect($code, $reportText);
     }
+
+    /**
+     * @depends testHPB
+     * @group HTD
+     *
+     * @throws ClientExceptionInterface
+     * @throws EbicsException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testHTD()
+    {
+        $htd = $this->client->HTD();
+        $responseHandler = new ResponseHandler();
+        $code = $responseHandler->retrieveH004ReturnCode($htd);
+        $reportText = $responseHandler->retrieveH004ReportText($htd);
+        $this->assertResponseCorrect($code, $reportText);
+    }
 }
