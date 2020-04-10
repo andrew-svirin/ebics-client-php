@@ -21,8 +21,6 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH004ReturnCode(DOMDocument $xml): string
     {
@@ -62,8 +60,6 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH004ReportText(DOMDocument $xml): string
     {
@@ -76,8 +72,6 @@ class ResponseHandler
 
     /**
      * Extract H000 > SystemReturnCode > ReturnCode value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH000ReturnCode(DOMDocument $xml): string
     {
@@ -90,8 +84,6 @@ class ResponseHandler
 
     /**
      * Extract H000 > SystemReturnCode > ReportText value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH000ReportText(DOMDocument $xml): string
     {
@@ -104,8 +96,6 @@ class ResponseHandler
 
     /**
      * Retrieve encoded Order data.
-     *
-     * @return OrderDataEncrypted
      *
      * @throws EbicsException
      */
@@ -126,8 +116,6 @@ class ResponseHandler
 
     /**
      * Extract Transaction from the DOM XML.
-     *
-     * @return Transaction
      */
     public function retrieveTransaction(DOMDocument $xml): Transaction
     {

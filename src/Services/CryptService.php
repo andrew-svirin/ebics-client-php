@@ -24,8 +24,6 @@ class CryptService
      * Calculate hash.
      *
      * @param string $algo
-     *
-     * @return string
      */
     public static function calculateHash(string $text, $algo = 'sha256'): string
     {
@@ -34,10 +32,21 @@ class CryptService
 
     /**
      * Decrypt encrypted OrDerData.
+     */
+    public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
+    {
+        $content = self::decryptOrderDataContent($keyRing, $orderData);
+        $orderData = OrderDataFactory::buildOrderDataFromContent($content);
+
+        return $orderData;
+    }
+
+    /**
+     * Decrypt encrypted OrDerData.
      *
      * @return OrderData
      */
-    public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
+    public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
         $rsa = new RSA();
         $rsa->setPassword($keyRing->getPassword());
@@ -52,9 +61,8 @@ class CryptService
         $aes->openssl_options = \OPENSSL_ZERO_PADDING;
         $decrypted = $aes->decrypt($orderData->getOrderData());
         $content = gzuncompress($decrypted);
-        $orderData = OrderDataFactory::buildOrderDataFromContent($content);
 
-        return $orderData;
+        return $content;
     }
 
     /**
@@ -91,12 +99,12 @@ class CryptService
      * Generate public and private keys.
      *
      * @param string $algo
-     * @param int $length
+     * @param int    $length
      *
      * @return array [
-     *    'publickey' => '<string>',
-     *    'privatekey' => '<string>',
-     * ]
+     *               'publickey' => '<string>',
+     *               'privatekey' => '<string>',
+     *               ]
      */
     public static function generateKeys(KeyRing $keyRing, $algo = 'sha256', $length = 2048): array
     {
@@ -201,9 +209,9 @@ class CryptService
      * Transform public key on exponent and modulus.
      *
      * @return array [
-     *    'e' => <bytes>,
-     *    'm' => <bytes>,
-     * ]
+     *               'e' => <bytes>,
+     *               'm' => <bytes>,
+     *               ]
      */
     public static function getPublicKeyDetails(string $publicKey): array
     {

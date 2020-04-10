@@ -28,6 +28,7 @@ class HeaderHandler
     const ORDER_TYPE_HPD = 'HPD';
     const ORDER_TYPE_HKD = 'HKD';
     const ORDER_TYPE_HTD = 'HTD';
+    const ORDER_TYPE_FDL = 'FDL';
 
     const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
@@ -133,6 +134,19 @@ class HeaderHandler
     }
 
     /**
+     * Add header for TransferReceipt Request XML.
+     */
+    public function handleFileAcknowledgement(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction)
+    {
+        $this->handleTransaction(
+         $xml,
+         $xmlRequest,
+         $transaction,
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_RECEIPT))
+      );
+    }
+
+    /**
      * Add header for VMK Request XML.
      */
     public function handleVMK(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null)
@@ -205,6 +219,25 @@ class HeaderHandler
             self::ORDER_TYPE_HTD,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
+         ),
+         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
+      );
+    }
+
+    /**
+     * Add header for FDL Request XML.
+     */
+    public function handleFDL(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null)
+    {
+        $this->handle(
+         $xml,
+         $xmlRequest,
+         $this->handleNonce($dateTime),
+         $this->handleBank(),
+         $this->handleOrderDetails(
+            self::ORDER_TYPE_FDL,
+            self::ORDER_ATTRIBUTE_DZHNN,
+            $this->handleFDLOrderParams($fileInfo, $countryCode, $startDateTime, $endDateTime)
          ),
          $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
@@ -289,16 +322,46 @@ class HeaderHandler
     /**
      * Hook to add StandardOrderParams information.
      */
+    private function handleFDLOrderParams(string $fileInfo, string $countryCode = 'FR', DateTime $startDateTime = null, DateTime $endDateTime = null): callable
+    {
+        return function (DOMDocument $xml, DOMElement $xmlOrderDetails) use ($fileInfo, $countryCode, $startDateTime, $endDateTime) {
+            // Add StandardOrderParams to OrderDetails.
+            $xmlStandardOrderParams = $xml->createElement('FDLOrderParams');
+            $xmlOrderDetails->appendChild($xmlStandardOrderParams);
+
+            // Add FileFormat to FDLOrderParams.
+            $xmlFileFormat = $xml->createElement('FileFormat');
+            $xmlFileFormat->nodeValue = $fileInfo;
+            $xmlFileFormat->setAttribute('CountryCode', $countryCode);
+            $xmlStandardOrderParams->appendChild($xmlFileFormat);
+
+            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlOrderDetails);
+        };
+    }
+
+    /**
+     * Hook to add StandardOrderParams information.
+     */
     private function handleStandardOrderParams(DateTime $startDateTime = null, DateTime $endDateTime = null): callable
     {
         return function (DOMDocument $xml, DOMElement $xmlOrderDetails) use ($startDateTime, $endDateTime) {
             // Add StandardOrderParams to OrderDetails.
             $xmlStandardOrderParams = $xml->createElement('StandardOrderParams');
             $xmlOrderDetails->appendChild($xmlStandardOrderParams);
+            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlOrderDetails);
+        };
+    }
+
+    /**
+     * Hook to add DateRange information.
+     */
+    private function handleDateRangeParams(DateTime $startDateTime = null, DateTime $endDateTime = null): callable
+    {
+        return function (DOMDocument $xml, DOMElement $xmlOrderDetails) use ($startDateTime, $endDateTime) {
             if (null !== $startDateTime && null !== $endDateTime) {
                 // Add DateRange to StandardOrderParams.
                 $xmlDateRange = $xml->createElement('DateRange');
-                $xmlStandardOrderParams->appendChild($xmlDateRange);
+                $xmlOrderDetails->appendChild($xmlDateRange);
                 // Add Start to StandardOrderParams.
                 $xmlStart = $xml->createElement('Start');
                 $xmlStart->nodeValue = $startDateTime->format('Y-m-d');
@@ -416,6 +479,36 @@ class HeaderHandler
         $xmlSecurityMedium = $xml->createElement('SecurityMedium');
         $xmlSecurityMedium->nodeValue = $this->securityMedium;
         $xmlStatic->appendChild($xmlSecurityMedium);
+
+        if (null !== $mutable) {
+            // Add Mutable information to header.
+            $mutable($xml, $xmlHeader);
+        }
+    }
+
+    /**
+     * Add header and children elements to DOM XML.
+     */
+    private function handleTransaction(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction, callable $mutable = null)
+    {
+        // Add header to request.
+        $xmlHeader = $xml->createElement('header');
+        $xmlHeader->setAttribute('authenticate', 'true');
+        $xmlRequest->appendChild($xmlHeader);
+
+        // Add static to header.
+        $xmlStatic = $xml->createElement('static');
+        $xmlHeader->appendChild($xmlStatic);
+
+        // Add HostID to static.
+        $xmlHostId = $xml->createElement('HostID');
+        $xmlHostId->nodeValue = $this->bank->getHostId();
+        $xmlStatic->appendChild($xmlHostId);
+
+        // Add TransactionID to static.
+        $xmlTransactionID = $xml->createElement('TransactionID');
+        $xmlTransactionID->nodeValue = $transaction->getId();
+        $xmlStatic->appendChild($xmlTransactionID);
 
         if (null !== $mutable) {
             // Add Mutable information to header.
