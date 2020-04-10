@@ -2,8 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Exceptions\AuthorisationOrderTypeFailedException;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
+use AndrewSvirin\Ebics\Exceptions\NoDownloadDataAvailableException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -144,6 +146,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testHKD()
     {
+        $this->expectException(AuthorisationOrderTypeFailedException::class);
+        $this->expectExceptionCode('090003');
+        $this->expectExceptionMessage('[EBICS_OK] OK');
         $hpd = $this->client->HKD();
         $responseHandler = new ResponseHandler();
         $code = $responseHandler->retrieveH004ReturnCode($hpd);
@@ -182,6 +187,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testVMK()
     {
+        $this->expectException(NoDownloadDataAvailableException::class);
+        $this->expectExceptionCode('090005');
+        $this->expectExceptionMessage('[EBICS_OK] OK');
         $vmk = $this->client->VMK();
         $responseHandler = new ResponseHandler();
         $code = $responseHandler->retrieveH004ReturnCode($vmk);
@@ -201,6 +209,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testSTA()
     {
+        $this->expectException(NoDownloadDataAvailableException::class);
+        $this->expectExceptionCode('090005');
+        $this->expectExceptionMessage('[EBICS_OK] OK');
         $sta = $this->client->STA();
         $responseHandler = new ResponseHandler();
         $code = $responseHandler->retrieveH004ReturnCode($sta);
