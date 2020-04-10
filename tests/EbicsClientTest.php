@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -56,12 +57,10 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testINI()
     {
-        $ini = $this->client->INI();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($ini);
-        $reportText = $responseHandler->retrieveH004ReportText($ini);
-        $this->assertResponseCorrect($code, $reportText);
-        $this->keyRingManager->saveKeyRing($this->keyRing);
+        $this->expectException(InvalidUserOrUserStateException::class);
+        $this->expectExceptionCode('091002');
+        $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
+        $this->client->INI();
     }
 
     /**
