@@ -10,9 +10,7 @@ namespace AndrewSvirin\Ebics\Contracts;
  */
 interface TransactionInterface
 {
-
-   const PHASE_INITIALIZATION = 'Initialisation';
-   const PHASE_RECEIPT = 'Receipt';
-   const PHASE_TRANSFER = 'Transfer';
-
+    const PHASE_INITIALIZATION = 'Initialisation';
+    const PHASE_RECEIPT = 'Receipt';
+    const PHASE_TRANSFER = 'Transfer';
 }

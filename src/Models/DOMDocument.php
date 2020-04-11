@@ -10,33 +10,35 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class DOMDocument extends \DOMDocument
 {
+    public function __construct()
+    {
+        parent::__construct('1.0', 'utf-8');
+        $this->preserveWhiteSpace = false;
+    }
 
-   public function __construct()
-   {
-      parent::__construct('1.0', 'utf-8');
-      $this->preserveWhiteSpace = false;
-   }
+    /**
+     * Get formatted content.
+     *
+     * @return string
+     */
+    public function getContent(): string
+    {
+        $content = $this->saveXML();
+        $content = str_replace('<?xml version="1.0" encoding="utf-8"?>', "<?xml version='1.0' encoding='utf-8'?>", $content);
+        $content = trim($content);
 
-   /**
-    * Get formatted content.
-    * @return string
-    */
-   public function getContent(): string
-   {
-      $content = $this->saveXML();
-      $content = str_replace('<?xml version="1.0" encoding="utf-8"?>', "<?xml version='1.0' encoding='utf-8'?>", $content);
-      $content = trim($content);
-      return $content;
-   }
+        return $content;
+    }
 
-   /**
-    * Get formatted content.
-    * @return string
-    */
-   public function getFormattedContent(): string
-   {
-      $this->formatOutput = true;
-      return $this->saveXML();
-   }
+    /**
+     * Get formatted content.
+     *
+     * @return string
+     */
+    public function getFormattedContent(): string
+    {
+        $this->formatOutput = true;
 
+        return $this->saveXML();
+    }
 }

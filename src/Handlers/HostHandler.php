@@ -14,27 +14,24 @@ use DOMElement;
  */
 class HostHandler
 {
+    /**
+     * @var Bank
+     */
+    private $bank;
 
-   /**
-    * @var Bank
-    */
-   private $bank;
+    public function __construct(Bank $bank)
+    {
+        $this->bank = $bank;
+    }
 
-   public function __construct(Bank $bank)
-   {
-      $this->bank = $bank;
-   }
-
-   /**
-    * Add HostID for Request XML.
-    * @param DOMDocument $xml
-    * @param DOMElement $xmlRequest
-    */
-   public function handle(DOMDocument $xml, DOMElement $xmlRequest)
-   {
-      // Add HostID to Request.
-      $xmlHostId = $xml->createElement('HostID');
-      $xmlHostId->nodeValue = $this->bank->getHostId();
-      $xmlRequest->appendChild($xmlHostId);
-   }
+    /**
+     * Add HostID for Request XML.
+     */
+    public function handle(DOMDocument $xml, DOMElement $xmlRequest)
+    {
+        // Add HostID to Request.
+        $xmlHostId = $xml->createElement('HostID');
+        $xmlHostId->nodeValue = $this->bank->getHostId();
+        $xmlRequest->appendChild($xmlHostId);
+    }
 }

@@ -10,62 +10,57 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class Bank
 {
+    /**
+     * The HostID of the bank.
+     *
+     * @var string
+     */
+    private $hostId;
 
-   /**
-    * The HostID of the bank.
-    * @var string
-    */
-   private $hostId;
+    /**
+     * The URL of the EBICS server.
+     *
+     * @var string
+     */
+    private $url;
 
-   /**
-    * The URL of the EBICS server.
-    * @var string
-    */
-   private $url;
+    /**
+     * @var bool
+     */
+    private $isCertified;
 
-   /**
-    * @var bool
-    */
-   private $isCertified;
+    /**
+     * Constructor.
+     */
+    public function __construct(string $hostId, string $url, bool $isCertified)
+    {
+        $this->hostId = (string) $hostId;
+        $this->url = (string) $url;
+        $this->isCertified = $isCertified;
+    }
 
-   /**
-    * Constructor.
-    *
-    * @param string $hostId
-    * @param string $url
-    * @param bool $isCertified
-    */
-   public function __construct(string $hostId, string $url, bool $isCertified)
-   {
-      $this->hostId = (string)$hostId;
-      $this->url = (string)$url;
-      $this->isCertified = $isCertified;
-   }
+    /**
+     * Getter for {hostId}.
+     *
+     * @return string
+     */
+    public function getHostId()
+    {
+        return $this->hostId;
+    }
 
-   /**
-    * Getter for {hostId}.
-    * @return string
-    */
-   public function getHostId()
-   {
-      return $this->hostId;
-   }
+    /**
+     * Getter for {url}.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
-   /**
-    * Getter for {url}.
-    * @return string
-    */
-   public function getUrl()
-   {
-      return $this->url;
-   }
-
-   /**
-    * @return bool
-    */
-   public function isCertified(): bool
-   {
-      return $this->isCertified;
-   }
-
+    public function isCertified(): bool
+    {
+        return $this->isCertified;
+    }
 }

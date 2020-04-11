@@ -14,19 +14,16 @@ use DOMXPath;
  */
 trait C14NTrait
 {
-
-   /**
-    * Extract C14N content by path from the XML DOM.
-    * @param DOMXPath $xpath
-    * @param string $path
-    * @param string $algo
-    * @return string
-    * @throws EbicsException
-    */
-   private function calculateC14N(DOMXPath $xpath, string $path = '/', string $algo = 'REC-xml-c14n-20010315'): string
-   {
-      switch ($algo)
-      {
+    /**
+     * Extract C14N content by path from the XML DOM.
+     *
+     * @return string
+     *
+     * @throws EbicsException
+     */
+    private function calculateC14N(DOMXPath $xpath, string $path = '/', string $algo = 'REC-xml-c14n-20010315'): string
+    {
+        switch ($algo) {
          case 'REC-xml-c14n-20010315':
             $exclusive = false;
             $withComments = false;
@@ -34,14 +31,13 @@ trait C14NTrait
          default:
             throw new EbicsException(sprintf('Define algo for %s', $algo));
       }
-      $nodes = $xpath->query($path);
-      $result = '';
-      /* @var $node DOMNode */
-      foreach ($nodes as $node)
-      {
-         $result .= $node->C14N($exclusive, $withComments);
-      }
-      return trim($result);
-   }
+        $nodes = $xpath->query($path);
+        $result = '';
+        /* @var $node DOMNode */
+        foreach ($nodes as $node) {
+            $result .= $node->C14N($exclusive, $withComments);
+        }
 
+        return trim($result);
+    }
 }

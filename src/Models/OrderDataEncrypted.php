@@ -10,36 +10,35 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class OrderDataEncrypted
 {
-   /**
-    * @var string
-    */
-   private $orderData;
+    /**
+     * @var string
+     */
+    private $orderData;
 
-   /**
-    * @var string Binary value.
-    */
-   private $transactionKey;
+    /**
+     * @var string Binary value.
+     */
+    private $transactionKey;
 
-   public function __construct(string $orderData, string $transactionKey)
-   {
-      $this->orderData = $orderData;
-      $this->transactionKey = $transactionKey;
-   }
+    public function __construct(string $orderData, string $transactionKey)
+    {
+        $this->orderData = $orderData;
+        $this->transactionKey = $transactionKey;
+    }
 
-   /**
-    * @return string
-    */
-   public function getOrderData(): string
-   {
-      return $this->orderData;
-   }
+    /**
+     * @return string
+     */
+    public function getOrderData(): string
+    {
+        return $this->orderData;
+    }
 
-   /**
-    * @return string
-    */
-   public function getTransactionKey(): string
-   {
-      return $this->transactionKey;
-   }
-
+    /**
+     * @return string
+     */
+    public function getTransactionKey(): string
+    {
+        return $this->transactionKey;
+    }
 }

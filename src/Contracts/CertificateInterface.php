@@ -10,9 +10,7 @@ namespace AndrewSvirin\Ebics\Contracts;
  */
 interface CertificateInterface
 {
-
-   const TYPE_A = 'A';
-   const TYPE_X = 'X';
-   const TYPE_E = 'E';
-
+    const TYPE_A = 'A';
+    const TYPE_X = 'X';
+    const TYPE_E = 'E';
 }
