@@ -12,17 +12,15 @@ use AndrewSvirin\Ebics\Models\KeyRing;
  */
 interface KeyRingManagerInterface
 {
+    /**
+     * Load Keyring from the saved file or create new one.
+     *
+     * @return KeyRing
+     */
+    public function loadKeyRing(): KeyRing;
 
-   /**
-    * Load Keyring from the saved file or create new one.
-    * @return KeyRing
-    */
-   function loadKeyRing(): KeyRing;
-
-   /**
-    * Save KeyRing to file.
-    * @param KeyRing $keyRing
-    */
-   function saveKeyRing(KeyRing $keyRing);
-
+    /**
+     * Save KeyRing to file.
+     */
+    public function saveKeyRing(KeyRing $keyRing);
 }

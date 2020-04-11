@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
@@ -24,9 +23,9 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         //Certificate generated the 22/03/2020 (1 year validity)
         X509GeneratorFactory::setGeneratorFunction(function () {
             $generator = new LegacyX509Generator();
-            $generator->setCertificateStartDate(new \DateTime("2020-03-21"));
-            $generator->setCertificateEndDate(new \DateTime("2021-03-22"));
-            $generator->setSerialNumber("539453510852155194065233908413342789156542395956670254476154968597583055940");
+            $generator->setCertificateStartDate(new \DateTime('2020-03-21'));
+            $generator->setCertificateEndDate(new \DateTime('2021-03-22'));
+            $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
 
             return $generator;
         });
@@ -49,9 +48,9 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         //Certificate generated with https://certificatetools.com/ the 22/03/2020 (1 year validity)
         X509GeneratorFactory::setGeneratorFunction(function () {
             $generator = new SilarhiX509Generator();
-            $generator->setCertificateStartDate(new \DateTime("2020-03-22"));
-            $generator->setCertificateEndDate(new \DateTime("2021-03-22"));
-            $generator->setSerialNumber("37376365613564393736653364353135633333333932376336366134393663336133663135323432");
+            $generator->setCertificateStartDate(new \DateTime('2020-03-22'));
+            $generator->setCertificateEndDate(new \DateTime('2021-03-22'));
+            $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
 
             return $generator;
         });

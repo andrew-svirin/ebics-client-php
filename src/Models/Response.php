@@ -10,26 +10,21 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class Response extends DOMDocument
 {
+    /**
+     * @var Transaction[]
+     */
+    private $transactions = [];
 
-   /**
-    * @var Transaction[]
-    */
-   private $transactions = [];
+    public function addTransaction(Transaction $transaction)
+    {
+        $this->transactions[] = $transaction;
+    }
 
-   /**
-    * @param Transaction $transaction
-    */
-   public function addTransaction(Transaction $transaction)
-   {
-      $this->transactions[] = $transaction;
-   }
-
-   /**
-    * @return Transaction[]
-    */
-   public function getTransactions(): array
-   {
-      return $this->transactions;
-   }
-
+    /**
+     * @return Transaction[]
+     */
+    public function getTransactions(): array
+    {
+        return $this->transactions;
+    }
 }
