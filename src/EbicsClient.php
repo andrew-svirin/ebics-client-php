@@ -495,7 +495,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $errorCode = $this->responseHandler->retrieveH004BodyOrHeaderReturnCode($response);
 
-        if ('00000' === $errorCode) {
+        if ('000000' === $errorCode) {
             return;
         }
 
@@ -510,7 +510,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $errorCode = $this->responseHandler->retrieveH000ReturnCode($response);
 
-        if ('00000' === $errorCode) {
+        if ('000000' === $errorCode) {
             return;
         }
 

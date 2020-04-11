@@ -34,11 +34,6 @@ abstract class AbstractEbicsTestCase extends TestCase
     private $credentialsId = 3;
 
     /**
-     * @var bool
-     */
-    private $debug = false;
-
-    /**
      * @var EbicsClient
      */
     protected $client;
@@ -112,13 +107,8 @@ abstract class AbstractEbicsTestCase extends TestCase
      */
     protected function assertResponseCorrect($code, $reportText)
     {
-        if ($this->debug) {
-            $this->assertEquals($code, '000000', $reportText);
-            $this->assertEquals($reportText, '[EBICS_OK] OK');
-        } else {
-            $this->assertNotEmpty($code);
-            $this->assertNotEmpty($reportText);
-        }
+        $this->assertEquals($code, '000000', $reportText);
+        $this->assertEquals($reportText, '[EBICS_OK] OK');
     }
 
     /**
