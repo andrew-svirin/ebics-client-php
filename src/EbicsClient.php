@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Exceptions\DownloadPostprocessDoneException;
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
@@ -15,7 +16,6 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Models\Response;
-use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DateTime;
@@ -354,9 +354,14 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function transferReceipt(Transaction $transaction, bool $acknowledged = true)
+    public function transferReceipt(Response $response, bool $acknowledged = true)
     {
-        $request = $this->requestFactory->buildTransferReceipt($transaction, $acknowledged);
+        $lastTransaction = $response->getLastTransaction();
+        if (null === $lastTransaction) {
+            throw new EbicsException("There is no transactions to mark as received");
+        }
+
+        $request = $this->requestFactory->buildTransferReceipt($lastTransaction, $acknowledged);
         $hostResponse = $this->post($request);
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
