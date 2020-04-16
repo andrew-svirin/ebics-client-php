@@ -358,7 +358,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
-            throw new EbicsException("There is no transactions to mark as received");
+            throw new EbicsException('There is no transactions to mark as received');
         }
 
         $request = $this->requestFactory->buildTransferReceipt($lastTransaction, $acknowledged);
