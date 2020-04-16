@@ -136,7 +136,7 @@ class HeaderHandler
     /**
      * Add header for TransferReceipt Request XML.
      */
-    public function handleFileAcknowledgement(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction)
+    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction)
     {
         $this->handleTransaction(
          $xml,
