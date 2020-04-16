@@ -63,7 +63,7 @@ interface EbicsClientInterface
     /**
      * Retrieve subscriber's customer and subscriber information.
      */
-    public function FDL(string $fileInfo, string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
     /**
      * Retrieve  Bank available order types.

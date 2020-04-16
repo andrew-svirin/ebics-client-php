@@ -186,12 +186,12 @@ class RequestHandler
     /**
      * @throws EbicsException
      */
-    public function buildFileAcknowledgement(Transaction $transaction): Request
+    public function buildTransferReceipt(Transaction $transaction, bool $acknowledged): Request
     {
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-        $this->headerHandler->handleFileAcknowledgement($request, $xmlRequest, $transaction);
-        $this->bodyHandler->handleTransferReceipt($request, $xmlRequest, TransactionInterface::CODE_RECEIPT_POSITIVE);
+        $this->headerHandler->handleTransferReceipt($request, $xmlRequest, $transaction);
+        $this->bodyHandler->handleTransferReceipt($request, $xmlRequest, true === $acknowledged ? TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE);
         $this->authSignatureHandler->handle($request, $xmlRequest);
 
         return $request;
