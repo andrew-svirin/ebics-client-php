@@ -28,10 +28,9 @@ class Response extends DOMDocument
         return $this->transactions;
     }
 
-
     public function getLastTransaction(): ?Transaction
     {
-        if (0 === count($this->transactions)) {
+        if (0 === \count($this->transactions)) {
             return null;
         }
 
