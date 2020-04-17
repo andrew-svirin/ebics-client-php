@@ -12,8 +12,6 @@ class EnvUtil
 {
     /**
      * Get secret.
-     *
-     * @return string
      */
     public static function getSecret(): string
     {
@@ -26,8 +24,6 @@ class EnvUtil
 
     /**
      * Is debug mode or not.
-     *
-     * @return bool
      */
     public static function isDebug(): bool
     {
@@ -66,19 +62,15 @@ class EnvUtil
 
     /**
      * Associate credentials data with keys.
-     *
-     * @return array
      */
     private static function prepareCredentials(array $data): array
     {
-        $credentials = [
+        return [
          'hostId' => $data[0],
          'hostURL' => 'https://' . $data[1],
          'hostIsCertified' => 'TRUE' === $data[2],
          'partnerId' => $data[3],
          'userId' => $data[4],
       ];
-
-        return $credentials;
     }
 }

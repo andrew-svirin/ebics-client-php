@@ -20,38 +20,26 @@ class EbicsRequestHandler
 
     /**
      * Add SecuredRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleSecured(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004Secured($xml, self::EBICS_REQUEST);
-
-        return $xmlRequest;
+        return $this->handleH004Secured($xml, self::EBICS_REQUEST);
     }
 
     /**
      * Add UnsecuredRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleUnsecured(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
-
-        return $xmlRequest;
+        return $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
     }
 
     /**
      * Add NoPubKeyDigestsRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004Secured($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
-
-        return $xmlRequest;
+        return $this->handleH004Secured($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
     }
 
     /**
@@ -61,17 +49,13 @@ class EbicsRequestHandler
      */
     public function handleHEV(DOMDocument $xml)
     {
-        $xmlRequest = $this->handleH000($xml, self::EBICS_HEV);
-
-        return $xmlRequest;
+        return $this->handleH000($xml, self::EBICS_HEV);
     }
 
     /**
      * Add H004 Request to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH004(DOMDocument $xml, $request): DOMElement
     {
@@ -87,8 +71,6 @@ class EbicsRequestHandler
      * Add H004 Request with ds:xmlns for sign to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH004Secured(DOMDocument $xml, $request): DOMElement
     {
@@ -105,8 +87,6 @@ class EbicsRequestHandler
      * Add H000 Request to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH000(DOMDocument $xml, $request): DOMElement
     {

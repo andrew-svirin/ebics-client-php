@@ -57,6 +57,26 @@ class BodyHandler
     }
 
     /**
+     * Add body and children elements to transfer request.
+     */
+    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode)
+    {
+        // Add body to request.
+        $xmlBody = $xml->createElement('body');
+        $xmlRequest->appendChild($xmlBody);
+
+        // Add TransferReceipt to body.
+        $xmlTransferReceipt = $xml->createElement('TransferReceipt');
+        $xmlTransferReceipt->setAttribute('authenticate', 'true');
+        $xmlBody->appendChild($xmlTransferReceipt);
+
+        // Add ReceiptCode to TransferReceipt.
+        $xmlReceiptCode = $xml->createElement('ReceiptCode');
+        $xmlReceiptCode->nodeValue = $receiptCode;
+        $xmlTransferReceipt->appendChild($xmlReceiptCode);
+    }
+
+    /**
      * Add empty body element to request.
      */
     public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest)

@@ -4,6 +4,8 @@ namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
+use AndrewSvirin\Ebics\Exceptions\DownloadPostprocessDoneException;
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
@@ -88,16 +90,15 @@ final class EbicsClient implements EbicsClientInterface
     {
         $body = $request->getContent();
         $httpClient = HttpClient::create();
-        $response = $httpClient->request('POST', $this->bank->getUrl(), [
-         'headers' => [
-            'Content-Type' => 'text/xml; charset=ISO-8859-1',
-         ],
-         'body' => $body,
-         'verify_peer' => false,
-         'verify_host' => false,
-      ]);
 
-        return $response;
+        return $httpClient->request('POST', $this->bank->getUrl(), [
+            'headers' => [
+                'Content-Type' => 'text/xml; charset=ISO-8859-1',
+            ],
+            'body' => $body,
+            'verify_peer' => false,
+            'verify_host' => false,
+        ]);
     }
 
     /**
@@ -285,6 +286,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = DateTime::createFromFormat('U', time());
         }
+
         $request = $this->requestFactory->buildHTD($dateTime);
         $hostResponse = $this->post($request);
         $hostResponseContent = $hostResponse->getContent();
@@ -299,6 +301,74 @@ final class EbicsClient implements EbicsClientInterface
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
         $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
+
+        return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws Exceptions\EbicsException
+     * @throws Exceptions\EbicsResponseException
+     * @throws Exceptions\NoDownloadDataAvailableException
+     */
+    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = DateTime::createFromFormat('U', time());
+        }
+
+        $request = $this->requestFactory->buildFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
+        $hostResponse = $this->post($request);
+        $hostResponseContent = $hostResponse->getContent();
+        $response = new Response();
+        $response->loadXML($hostResponseContent);
+
+        $this->checkH004ReturnCode($request, $response);
+
+        // TODO: Send Transfer transaction.
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+
+        // Prepare decrypted datas.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        switch ($format) {
+            case 'plain':
+                $orderDataContent = CryptService::decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
+                $transaction->setPlainOrderData($orderDataContent);
+                break;
+            case 'xml':
+            default:
+                $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+                $transaction->setOrderData($orderData);
+                break;
+        }
+
+        return $response;
+    }
+
+    public function transferReceipt(Response $response, bool $acknowledged = true)
+    {
+        $lastTransaction = $response->getLastTransaction();
+        if (null === $lastTransaction) {
+            throw new EbicsException('There is no transactions to mark as received');
+        }
+
+        $request = $this->requestFactory->buildTransferReceipt($lastTransaction, $acknowledged);
+        $hostResponse = $this->post($request);
+        $hostResponseContent = $hostResponse->getContent();
+        $response = new Response();
+        $response->loadXML($hostResponseContent);
+
+        try {
+            $this->checkH004ReturnCode($request, $response);
+        } catch (DownloadPostprocessDoneException $exception) {
+            //EBICS_DOWNLOAD_POSTPROCESS_DONE, means transfer is OK (...)
+        }
 
         return $response;
     }

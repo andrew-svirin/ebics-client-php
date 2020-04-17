@@ -21,16 +21,13 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH004ReturnCode(DOMDocument $xml): string
     {
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
-        $returnCodeValue = $returnCode->item(0)->nodeValue;
 
-        return $returnCodeValue;
+        return $returnCode->item(0)->nodeValue;
     }
 
     /**
@@ -40,9 +37,8 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:body/H004:ReturnCode');
-        $returnCodeValue = $returnCode->item(0)->nodeValue;
 
-        return $returnCodeValue;
+        return $returnCode->item(0)->nodeValue;
     }
 
     /**
@@ -62,50 +58,39 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH004ReportText(DOMDocument $xml): string
     {
         $xpath = $this->prepareH004XPath($xml);
         $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
-        $reportTextValue = $reportText->item(0)->nodeValue;
 
-        return $reportTextValue;
+        return $reportText->item(0)->nodeValue;
     }
 
     /**
      * Extract H000 > SystemReturnCode > ReturnCode value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH000ReturnCode(DOMDocument $xml): string
     {
         $xpath = $this->prepareH000XPath($xml);
         $returnCode = $xpath->query('//H000:SystemReturnCode/H000:ReturnCode');
-        $returnCodeValue = $returnCode->item(0)->nodeValue;
 
-        return $returnCodeValue;
+        return $returnCode->item(0)->nodeValue;
     }
 
     /**
      * Extract H000 > SystemReturnCode > ReportText value from the DOM XML.
-     *
-     * @return string
      */
     public function retrieveH000ReportText(DOMDocument $xml): string
     {
         $xpath = $this->prepareH000XPath($xml);
         $reportText = $xpath->query('//H000:SystemReturnCode/H000:ReportText');
-        $reportTextValue = $reportText->item(0)->nodeValue;
 
-        return $reportTextValue;
+        return $reportText->item(0)->nodeValue;
     }
 
     /**
      * Retrieve encoded Order data.
-     *
-     * @return OrderDataEncrypted
      *
      * @throws EbicsException
      */
@@ -126,8 +111,6 @@ class ResponseHandler
 
     /**
      * Extract Transaction from the DOM XML.
-     *
-     * @return Transaction
      */
     public function retrieveTransaction(DOMDocument $xml): Transaction
     {

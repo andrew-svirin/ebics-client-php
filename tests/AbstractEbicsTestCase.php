@@ -113,8 +113,6 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     /**
      * Client credentials data provider.
-     *
-     * @return array
      */
     public function credentialsDataProvider(): array
     {
@@ -183,8 +181,6 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     /**
      * Encrypt text.
-     *
-     * @return string
      */
     private function encrypt(string $text, string $secret): string
     {

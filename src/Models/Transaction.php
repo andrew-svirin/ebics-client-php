@@ -40,8 +40,12 @@ class Transaction implements TransactionInterface
     private $orderData;
 
     /**
-     * @return string
+     * Uses for encrypted OrderData.
+     *
+     * @var string
      */
+    private $plainOrderData;
+
     public function getPhase(): string
     {
         return $this->phase;
@@ -52,9 +56,6 @@ class Transaction implements TransactionInterface
         $this->phase = $phase;
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
@@ -65,9 +66,6 @@ class Transaction implements TransactionInterface
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
     public function getSegmentNumber(): int
     {
         return $this->segmentNumber;
@@ -78,9 +76,6 @@ class Transaction implements TransactionInterface
         $this->segmentNumber = $segmentNumber;
     }
 
-    /**
-     * @return int
-     */
     public function getNumSegments(): int
     {
         return $this->numSegments;
@@ -91,9 +86,16 @@ class Transaction implements TransactionInterface
         $this->numSegments = $numSegments;
     }
 
-    /**
-     * @return OrderData
-     */
+    public function getPlainOrderData(): string
+    {
+        return $this->plainOrderData;
+    }
+
+    public function setPlainOrderData(string $plainOrderData): void
+    {
+        $this->plainOrderData = $plainOrderData;
+    }
+
     public function getOrderData(): OrderData
     {
         return $this->orderData;
