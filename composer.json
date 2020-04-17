@@ -24,7 +24,6 @@
     "ext-zlib": "*",
     "ext-json": "*",
     "andrew-svirin/mt942-php": "~1.0",
-    "comodojo/httprequest": "~1.0",
     "phpseclib/phpseclib": "~2.0",
     "symfony/http-client": "^4.3||^5.0"
   },
