@@ -226,13 +226,11 @@ class OrderDataHandler
         $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
         $exponentValue = $exponent->item(0)->nodeValue;
         $exponentValueDe = base64_decode($exponentValue);
-        $certificate = CertificateFactory::buildCertificateXFromDetails(
+        return CertificateFactory::buildCertificateXFromDetails(
          $modulusValueDe,
          $exponentValueDe,
          isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
       );
-
-        return $certificate;
     }
 
     /**
@@ -254,12 +252,10 @@ class OrderDataHandler
         $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
         $exponentValue = $exponent->item(0)->nodeValue;
         $exponentValueDe = base64_decode($exponentValue);
-        $certificate = CertificateFactory::buildCertificateEFromDetails(
+        return CertificateFactory::buildCertificateEFromDetails(
          $modulusValueDe,
          $exponentValueDe,
          isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
       );
-
-        return $certificate;
     }
 }

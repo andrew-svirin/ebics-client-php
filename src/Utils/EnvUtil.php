@@ -71,14 +71,12 @@ class EnvUtil
      */
     private static function prepareCredentials(array $data): array
     {
-        $credentials = [
+        return [
          'hostId' => $data[0],
          'hostURL' => 'https://' . $data[1],
          'hostIsCertified' => 'TRUE' === $data[2],
          'partnerId' => $data[3],
          'userId' => $data[4],
       ];
-
-        return $credentials;
     }
 }

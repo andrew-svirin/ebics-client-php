@@ -31,7 +31,7 @@ class CryptService
     }
 
     /**
-     * Decrypt encrypted OrDerData.
+     * Decrypt encrypted OrderData.
      */
     public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
     {
@@ -42,7 +42,7 @@ class CryptService
     }
 
     /**
-     * Decrypt encrypted OrDerData.
+     * Decrypt encrypted OrderData.
      *
      * @return OrderData
      */
@@ -60,9 +60,7 @@ class CryptService
         // Force openssl_options.
         $aes->openssl_options = \OPENSSL_ZERO_PADDING;
         $decrypted = $aes->decrypt($orderData->getOrderData());
-        $content = gzuncompress($decrypted);
-
-        return $content;
+        return gzuncompress($decrypted);
     }
 
     /**
@@ -114,9 +112,7 @@ class CryptService
         $rsa->setHash($algo);
         $rsa->setMGFHash($algo);
         $rsa->setPassword($keyRing->getPassword());
-        $keys = $rsa->createKey($length);
-
-        return $keys;
+        return $rsa->createKey($length);
     }
 
     /**
@@ -133,9 +129,7 @@ class CryptService
         $digestToSign = [];
         self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, \count($RSA_SHA256prefix));
         self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, \count($RSA_SHA256prefix), \count($signedInfoDigest));
-        $digestToSignBin = self::arrayToBin($digestToSign);
-
-        return $digestToSignBin;
+        return self::arrayToBin($digestToSign);
     }
 
     /**
@@ -186,9 +180,8 @@ class CryptService
         $e1 = ltrim($e0, '0');
         $m1 = ltrim($m0, '0');
         $key1 = sprintf('%s %s', $e1, $m1);
-        $hash = hash($algorithm, $key1, true);
 
-        return $hash;
+        return hash($algorithm, $key1, true);
     }
 
     /**
@@ -200,9 +193,8 @@ class CryptService
     {
         $bytes = Random::string(16);
         $nonce = bin2hex($bytes);
-        $nonceUpper = strtoupper($nonce);
 
-        return $nonceUpper;
+        return strtoupper($nonce);
     }
 
     /**

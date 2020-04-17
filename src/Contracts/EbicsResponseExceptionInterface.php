@@ -5,6 +5,12 @@ namespace AndrewSvirin\Ebics\Contracts;
 use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Models\Response;
 
+/**
+ * EBICS ResponseExceptionInterface representation.
+ *
+ * @license http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @author Guillaume Sainthillier
+ */
 interface EbicsResponseExceptionInterface
 {
     /**
