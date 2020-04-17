@@ -89,7 +89,6 @@ final class EbicsClient implements EbicsClientInterface
     public function post(Request $request): ResponseInterface
     {
         $body = $request->getContent();
-        //dump($body);
         $httpClient = HttpClient::create();
         $response = $httpClient->request('POST', $this->bank->getUrl(), [
             'headers' => [
@@ -99,7 +98,6 @@ final class EbicsClient implements EbicsClientInterface
             'verify_peer' => false,
             'verify_host' => false,
         ]);
-        //dump($response->getContent());
 
         return $response;
     }
