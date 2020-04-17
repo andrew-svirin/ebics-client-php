@@ -18,28 +18,22 @@ class CertificateX509 extends X509
 {
     /**
      * Get Certificate serialNumber.
-     *
-     * @return string
      */
     public function getSerialNumber(): string
     {
         /* @var $certificateSerialNumber BigInteger */
         $certificateSerialNumber = $this->currentCert['tbsCertificate']['serialNumber'];
-        $certificateSerialNumberValue = $certificateSerialNumber->toString();
 
-        return $certificateSerialNumberValue;
+        return $certificateSerialNumber->toString();
     }
 
     /**
      * Get Certificate Issuer DN property id-at-commonName.
-     *
-     * @return string
      */
     public function getInsurerName(): string
     {
         $certificateInsurerName = $this->getIssuerDNProp('id-at-commonName');
-        $certificateInsurerNameValue = array_shift($certificateInsurerName);
 
-        return $certificateInsurerNameValue;
+        return array_shift($certificateInsurerName);
     }
 }

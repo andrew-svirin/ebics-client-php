@@ -61,6 +61,11 @@ interface EbicsClientInterface
     public function HTD(DateTime $dateTime = null): Response;
 
     /**
+     * Retrieve subscriber's customer and subscriber information.
+     */
+    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+
+    /**
      * Retrieve  Bank available order types.
      *
      * @param DateTime|null $dateTime current date

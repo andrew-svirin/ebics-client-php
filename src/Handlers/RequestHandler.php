@@ -2,12 +2,14 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Contracts\TransactionInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\Request;
+use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Models\User;
 use DateTime;
 
@@ -156,6 +158,20 @@ class RequestHandler
     /**
      * @throws EbicsException
      */
+    public function buildFDL(DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleFDL($request, $xmlRequest, $dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
     public function buildHAA(DateTime $dateTime): Request
     {
         $request = new Request();
@@ -163,6 +179,20 @@ class RequestHandler
         $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($request, $xmlRequest);
         $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
+    public function buildTransferReceipt(Transaction $transaction, bool $acknowledged): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleTransferReceipt($request, $xmlRequest, $transaction);
+        $this->bodyHandler->handleTransferReceipt($request, $xmlRequest, true === $acknowledged ? TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
 
         return $request;
     }

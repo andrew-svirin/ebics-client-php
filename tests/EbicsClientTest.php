@@ -25,7 +25,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      *
      * @throws EbicsException
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->setupClient();
@@ -60,14 +60,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
     public function testINI()
     {
         $this->expectException(InvalidUserOrUserStateException::class);
-        $this->expectExceptionCode('091002');
+        $this->expectExceptionCode(91002);
         $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
-        $ini = $this->client->INI();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($ini);
-        $reportText = $responseHandler->retrieveH004ReportText($ini);
-        $this->assertResponseCorrect($code, $reportText);
-        $this->keyRingManager->saveKeyRing($this->keyRing);
+        $this->client->INI();
     }
 
     /**
@@ -83,14 +78,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
     public function testHIA()
     {
         $this->expectException(InvalidUserOrUserStateException::class);
-        $this->expectExceptionCode('091002');
+        $this->expectExceptionCode(91002);
         $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
-        $hia = $this->client->HIA();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($hia);
-        $reportText = $responseHandler->retrieveH004ReportText($hia);
-        $this->assertResponseCorrect($code, $reportText);
-        $this->keyRingManager->saveKeyRing($this->keyRing);
+        $this->client->HIA();
     }
 
     /**
@@ -147,13 +137,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
     public function testHKD()
     {
         $this->expectException(AuthorisationOrderTypeFailedException::class);
-        $this->expectExceptionCode('090003');
+        $this->expectExceptionCode(90003);
         $this->expectExceptionMessage('[EBICS_OK] OK');
-        $hpd = $this->client->HKD();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($hpd);
-        $reportText = $responseHandler->retrieveH004ReportText($hpd);
-        $this->assertResponseCorrect($code, $reportText);
+        $this->client->HKD();
     }
 
     /**
@@ -188,13 +174,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
     public function testVMK()
     {
         $this->expectException(NoDownloadDataAvailableException::class);
-        $this->expectExceptionCode('090005');
+        $this->expectExceptionCode(90005);
         $this->expectExceptionMessage('[EBICS_OK] OK');
-        $vmk = $this->client->VMK();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($vmk);
-        $reportText = $responseHandler->retrieveH004ReportText($vmk);
-        $this->assertResponseCorrect($code, $reportText);
+        $this->client->VMK();
     }
 
     /**
@@ -210,13 +192,9 @@ class EbicsClientTest extends AbstractEbicsTestCase
     public function testSTA()
     {
         $this->expectException(NoDownloadDataAvailableException::class);
-        $this->expectExceptionCode('090005');
+        $this->expectExceptionCode(90005);
         $this->expectExceptionMessage('[EBICS_OK] OK');
-        $sta = $this->client->STA();
-        $responseHandler = new ResponseHandler();
-        $code = $responseHandler->retrieveH004ReturnCode($sta);
-        $reportText = $responseHandler->retrieveH004ReportText($sta);
-        $this->assertResponseCorrect($code, $reportText);
+        $this->client->STA();
     }
 
     /**

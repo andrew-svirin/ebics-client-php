@@ -23,13 +23,11 @@
     "ext-openssl": "*",
     "ext-zlib": "*",
     "ext-json": "*",
-    "andrew-svirin/mt942-php": "~1.0",
-    "comodojo/httprequest": "~1.0",
     "phpseclib/phpseclib": "~2.0",
     "symfony/http-client": "^4.3||^5.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.5"
+    "phpunit/phpunit": "^8.5"
   },
   "autoload": {
     "psr-4": {
@@ -40,5 +38,9 @@
     "psr-4": {
       "AndrewSvirin\\Ebics\\Tests\\": "tests"
     }
+  },
+  "suggest": {
+    "silarhi/cfonb-parser": "If you need to parse CFONB datas from French Bank",
+    "andrew-svirin/mt942-php": "If you need to parse format MT942 from VMK, STA requests."
   }
 }
