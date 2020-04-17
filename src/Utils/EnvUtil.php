@@ -12,8 +12,6 @@ class EnvUtil
 {
     /**
      * Get secret.
-     *
-     * @return string
      */
     public static function getSecret(): string
     {
@@ -26,8 +24,6 @@ class EnvUtil
 
     /**
      * Is debug mode or not.
-     *
-     * @return bool
      */
     public static function isDebug(): bool
     {
@@ -66,8 +62,6 @@ class EnvUtil
 
     /**
      * Associate credentials data with keys.
-     *
-     * @return array
      */
     private static function prepareCredentials(array $data): array
     {

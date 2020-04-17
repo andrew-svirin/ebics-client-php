@@ -90,6 +90,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $body = $request->getContent();
         $httpClient = HttpClient::create();
+
         return $httpClient->request('POST', $this->bank->getUrl(), [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=ISO-8859-1',
