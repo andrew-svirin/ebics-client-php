@@ -1,5 +1,7 @@
 # EBICS-CLIENT-PHP
 [![Build Status](https://travis-ci.org/andrew-svirin/ebics-client-php.svg?branch=master)](https://travis-ci.org/andrew-svirin/ebics-client-php)
+[![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
+[![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 
 PHP library to communicate with bank through EBICS protocol.
 Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4
