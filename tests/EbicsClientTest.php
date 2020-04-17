@@ -25,7 +25,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      *
      * @throws EbicsException
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->setupClient();
