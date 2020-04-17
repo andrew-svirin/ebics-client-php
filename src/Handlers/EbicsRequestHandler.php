@@ -25,9 +25,7 @@ class EbicsRequestHandler
      */
     public function handleSecured(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004Secured($xml, self::EBICS_REQUEST);
-
-        return $xmlRequest;
+        return $this->handleH004Secured($xml, self::EBICS_REQUEST);
     }
 
     /**
@@ -37,9 +35,7 @@ class EbicsRequestHandler
      */
     public function handleUnsecured(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
-
-        return $xmlRequest;
+        return $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
     }
 
     /**
@@ -49,9 +45,7 @@ class EbicsRequestHandler
      */
     public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
     {
-        $xmlRequest = $this->handleH004Secured($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
-
-        return $xmlRequest;
+        return $this->handleH004Secured($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
     }
 
     /**
@@ -61,9 +55,7 @@ class EbicsRequestHandler
      */
     public function handleHEV(DOMDocument $xml)
     {
-        $xmlRequest = $this->handleH000($xml, self::EBICS_HEV);
-
-        return $xmlRequest;
+        return $this->handleH000($xml, self::EBICS_HEV);
     }
 
     /**

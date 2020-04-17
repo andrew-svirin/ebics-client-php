@@ -90,7 +90,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $body = $request->getContent();
         $httpClient = HttpClient::create();
-        $response = $httpClient->request('POST', $this->bank->getUrl(), [
+        return $httpClient->request('POST', $this->bank->getUrl(), [
             'headers' => [
                 'Content-Type' => 'text/xml; charset=ISO-8859-1',
             ],
@@ -98,8 +98,6 @@ final class EbicsClient implements EbicsClientInterface
             'verify_peer' => false,
             'verify_host' => false,
         ]);
-
-        return $response;
     }
 
     /**

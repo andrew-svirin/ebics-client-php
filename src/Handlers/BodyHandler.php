@@ -57,7 +57,7 @@ class BodyHandler
     }
 
     /**
-     * Add body and children elements to request.
+     * Add body and children elements to transfer request.
      */
     public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode)
     {
