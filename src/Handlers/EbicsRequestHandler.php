@@ -20,8 +20,6 @@ class EbicsRequestHandler
 
     /**
      * Add SecuredRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleSecured(DOMDocument $xml): DOMElement
     {
@@ -30,8 +28,6 @@ class EbicsRequestHandler
 
     /**
      * Add UnsecuredRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleUnsecured(DOMDocument $xml): DOMElement
     {
@@ -40,8 +36,6 @@ class EbicsRequestHandler
 
     /**
      * Add NoPubKeyDigestsRequest to DOM XML.
-     *
-     * @return DOMElement
      */
     public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
     {
@@ -62,8 +56,6 @@ class EbicsRequestHandler
      * Add H004 Request to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH004(DOMDocument $xml, $request): DOMElement
     {
@@ -79,8 +71,6 @@ class EbicsRequestHandler
      * Add H004 Request with ds:xmlns for sign to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH004Secured(DOMDocument $xml, $request): DOMElement
     {
@@ -97,8 +87,6 @@ class EbicsRequestHandler
      * Add H000 Request to DOM XML.
      *
      * @param string $request
-     *
-     * @return DOMElement
      */
     private function handleH000(DOMDocument $xml, $request): DOMElement
     {

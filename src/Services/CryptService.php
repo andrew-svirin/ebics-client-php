@@ -60,6 +60,7 @@ class CryptService
         // Force openssl_options.
         $aes->openssl_options = \OPENSSL_ZERO_PADDING;
         $decrypted = $aes->decrypt($orderData->getOrderData());
+
         return gzuncompress($decrypted);
     }
 
@@ -112,6 +113,7 @@ class CryptService
         $rsa->setHash($algo);
         $rsa->setMGFHash($algo);
         $rsa->setPassword($keyRing->getPassword());
+
         return $rsa->createKey($length);
     }
 
@@ -129,6 +131,7 @@ class CryptService
         $digestToSign = [];
         self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, \count($RSA_SHA256prefix));
         self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, \count($RSA_SHA256prefix), \count($signedInfoDigest));
+
         return self::arrayToBin($digestToSign);
     }
 

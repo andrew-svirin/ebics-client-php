@@ -48,7 +48,7 @@ class OrderDataHandler
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
      *
-     * @param Certificate $certificateA Certificate A.
+     * @param Certificate   $certificateA certificate A
      * @param DateTime|null $dateTime
      */
     public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime)
@@ -209,8 +209,6 @@ class OrderDataHandler
 
     /**
      * Extract Authentication Certificate from the $orderData.
-     *
-     * @return Certificate
      */
     public function retrieveAuthenticationCertificate(OrderData $orderData): Certificate
     {
@@ -226,6 +224,7 @@ class OrderDataHandler
         $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
         $exponentValue = $exponent->item(0)->nodeValue;
         $exponentValueDe = base64_decode($exponentValue);
+
         return CertificateFactory::buildCertificateXFromDetails(
          $modulusValueDe,
          $exponentValueDe,
@@ -235,8 +234,6 @@ class OrderDataHandler
 
     /**
      * Extract Encryption Certificate from the $orderData.
-     *
-     * @return Certificate
      */
     public function retrieveEncryptionCertificate(OrderData $orderData): Certificate
     {
@@ -252,6 +249,7 @@ class OrderDataHandler
         $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
         $exponentValue = $exponent->item(0)->nodeValue;
         $exponentValueDe = base64_decode($exponentValue);
+
         return CertificateFactory::buildCertificateEFromDetails(
          $modulusValueDe,
          $exponentValueDe,

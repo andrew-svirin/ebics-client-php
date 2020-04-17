@@ -26,6 +26,7 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
+
         return $returnCode->item(0)->nodeValue;
     }
 
@@ -36,6 +37,7 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:body/H004:ReturnCode');
+
         return $returnCode->item(0)->nodeValue;
     }
 
@@ -61,6 +63,7 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
+
         return $reportText->item(0)->nodeValue;
     }
 
@@ -71,6 +74,7 @@ class ResponseHandler
     {
         $xpath = $this->prepareH000XPath($xml);
         $returnCode = $xpath->query('//H000:SystemReturnCode/H000:ReturnCode');
+
         return $returnCode->item(0)->nodeValue;
     }
 
@@ -81,6 +85,7 @@ class ResponseHandler
     {
         $xpath = $this->prepareH000XPath($xml);
         $reportText = $xpath->query('//H000:SystemReturnCode/H000:ReportText');
+
         return $reportText->item(0)->nodeValue;
     }
 
