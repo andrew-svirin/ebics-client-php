@@ -39,5 +39,8 @@
     "psr-4": {
       "AndrewSvirin\\Ebics\\Tests\\": "tests"
     }
+  },
+  "suggest": {
+    "silarhi/cfonb-parser": "If you need to parse CFONB datas from French Bank"
   }
 }
