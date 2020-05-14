@@ -22,6 +22,8 @@ You will need to have this informations from your Bank :
 - UserID
 
 ```php
+<?php
+
 use AndrewSvirin\Ebics\Services\KeyRingManager
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
@@ -39,6 +41,8 @@ $client = new EbicsClient($bank, $user, $keyRing);
 
 ## Make INI, STA, HPB requests and update key ring.
 ```php
+<?php
+
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
@@ -83,6 +87,7 @@ If you are dealing with a french bank, you will need to create a X509 self-signe
 You can achieve this by creating a class which extends the `AbstractX509Generator` (or implements the `X509GeneratorInterface` if you want a total control about the generation)
 
 ```php
+<?php
 
 namespace App\Factories\X509;
 
@@ -116,6 +121,8 @@ __You can see more values in the `LegacyX509Generator` class.__
 
 Once your class is created, call the `X509GeneratorFactory::setGeneratorClass()` method :
 ```php
+<?php
+
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use App\Factories\X509\MyCompanyX509Generator;
 
@@ -128,6 +135,8 @@ $client->INI();
 
 ### FDL (File Download)
 ````php
+<?php
+
 use AndrewSvirin\Ebics\Exceptions\NoDownloadDataAvailableException;
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
