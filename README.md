@@ -39,7 +39,7 @@ $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
-## Make INI, STA, HPB requests and update key ring.
+## Make INI, HIA, HPB requests and update key ring.
 ```php
 <?php
 
@@ -68,6 +68,7 @@ try {
         $exception->getMeaning()
     );
 }
+
 try {
     $client->HPB();
     $keyRingManager->saveKeyRing($keyRing);
