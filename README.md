@@ -173,7 +173,7 @@ try {
 More methods you can find in `tests/EbicsTest`
 
 
-## Global process with intraction to Bank Department.
+## Global process and intraction with Bank Department
 ### 1. Create an store your 3 certificates
 ```php
 <?php
