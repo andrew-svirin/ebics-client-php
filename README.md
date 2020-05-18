@@ -173,7 +173,7 @@ try {
 More methods you can find in `tests/EbicsTest`
 
 
-## Global process
+## Global process with intraction to Bank Department.
 ### 1. Create an store your 3 certificates
 ```php
 <?php
@@ -181,6 +181,7 @@ More methods you can find in `tests/EbicsTest`
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 $client = new EbicsClient(...);
+// For Franch bamk.
 X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
 
 try {
