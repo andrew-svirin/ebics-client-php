@@ -171,3 +171,63 @@ try {
 ````
 
 More methods you can find in `tests/EbicsTest`
+
+
+## Global process
+### 1. Create an store your 3 certificates
+```php
+<?php
+
+use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
+
+$client = new EbicsClient(...);
+X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
+
+try {
+    $client->INI();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "INI request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+
+try {
+    $client->HIA();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "HIA request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+```
+
+### 2. Generate a EBICS letter
+Not covered for now in this library. **Feel free to open a PR!**
+You'll have to generate a letter with a SHA-256 hash of your 3 X509 certificates.
+
+### 3. Wait for the bank validation
+
+### 4. Fetch the bank tokens
+```php
+
+try {
+    $client->HPB();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+```
+
+### 5. Play with other transactions!
