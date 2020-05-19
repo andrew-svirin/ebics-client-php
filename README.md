@@ -181,7 +181,7 @@ More methods you can find in `tests/EbicsTest`
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 $client = new EbicsClient(...);
-// For Franch bamk.
+// For Franch bank.
 X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
 
 try {
