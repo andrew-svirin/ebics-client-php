@@ -88,4 +88,9 @@ interface EbicsClientInterface
      * @param DateTime|null $endDateTime   the end date of requested transactions
      */
     public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+
+    /**
+     * Mark transactions as received.
+     */
+    public function transferReceipt(Response $response, bool $acknowledged = true): Response;
 }
