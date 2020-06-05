@@ -351,7 +351,7 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function transferReceipt(Response $response, bool $acknowledged = true)
+    public function transferReceipt(Response $response, bool $acknowledged = true) : Response
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
