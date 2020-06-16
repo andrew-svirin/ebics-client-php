@@ -11,6 +11,9 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
+use function Safe\gzuncompress;
+use function Safe\define;
+use function Safe\sprintf;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -43,14 +46,18 @@ class CryptService
 
     /**
      * Decrypt encrypted OrderData.
-     *
-     * @return OrderData
      */
     public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
+        $certificatE = $keyRing->getUserCertificateE();
+
+        if ($certificatE === null) {
+            throw new \RuntimeException('Certificat E not set');
+        }
+
         $rsa = new RSA();
         $rsa->setPassword($keyRing->getPassword());
-        $rsa->loadKey($keyRing->getUserCertificateE()->getPrivateKey());
+        $rsa->loadKey((string) $certificatE->getPrivateKey());
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
         // aes-128-cbc encrypting format.
@@ -78,12 +85,17 @@ class CryptService
             throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
         }
         $privateKey = $certificateX->getPrivateKey();
+
+        if ($privateKey === null) {
+            throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+        }
+
         $passphrase = $keyRing->getPassword();
         $rsa = new RSA();
         $rsa->setPassword($passphrase);
         $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
         if (!\defined('CRYPT_RSA_PKCS15_COMPAT')) {
-            \define('CRYPT_RSA_PKCS15_COMPAT', true);
+            define('CRYPT_RSA_PKCS15_COMPAT', true);
         }
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $encrypted = $rsa->encrypt($digestToSignBin);
@@ -148,6 +160,7 @@ class CryptService
     /**
      * Pack array of bytes to one bytes-string.
      *
+     * @param array<int, int> $bytes
      * @return string (bytes)
      */
     private static function arrayToBin(array $bytes): string

@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DOMDocument;
 use DOMNode;
+use function Safe\sprintf;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -36,7 +37,7 @@ class AuthSignatureHandler
      *
      * @throws EbicsException
      */
-    public function handle(DOMDocument $xml, DOMNode $xmlRequest)
+    public function handle(DOMDocument $xml, DOMNode $xmlRequest) : void
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";

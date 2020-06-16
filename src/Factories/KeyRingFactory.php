@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Factories;
 
 use AndrewSvirin\Ebics\Models\KeyRing;
+use function Safe\base64_decode;
 
 /**
  * Class KeyRingFactory represents producers for the @see KeyRing.
@@ -144,12 +145,12 @@ class KeyRingFactory
       ];
     }
 
-    private static function encodeValue($value)
+    private static function encodeValue(string $value) : string
     {
         return base64_encode($value);
     }
 
-    private static function decodeValue($value)
+    private static function decodeValue(string $value) : string
     {
         return base64_decode($value);
     }

@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics\Handlers\Traits;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use DOMNode;
 use DOMXPath;
+use function Safe\sprintf;
 
 /**
  * Class C14NTrait manage c14n building.
@@ -33,6 +34,11 @@ trait C14NTrait
       }
         $nodes = $xpath->query($path);
         $result = '';
+
+        if (!($nodes instanceof \DOMNodeList)) {
+            return $result;
+        }
+
         /* @var $node DOMNode */
         foreach ($nodes as $node) {
             $result .= $node->C14N($exclusive, $withComments);
