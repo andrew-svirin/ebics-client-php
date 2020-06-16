@@ -3,7 +3,6 @@
 namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\CertificateInterface;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
 
 /**
  * Class Certificate represents Certificate model.
