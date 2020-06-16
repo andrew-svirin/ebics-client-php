@@ -4,7 +4,6 @@ namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\CertificateInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use function Safe\sprintf;
 
 /**
  * Class Certificate represents Certificate model.
@@ -71,15 +70,6 @@ class Certificate implements CertificateInterface
      */
     public function getContent(): ?string
     {
-        return $this->content;
-    }
-
-    public function getContentOrThrowException(): string
-    {
-        if ($this->content === null) {
-            throw new EbicsException(sprintf('Certificat content is empty for type "%s"', $this->type));
-        }
-
         return $this->content;
     }
 

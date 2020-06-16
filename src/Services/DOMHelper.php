@@ -5,12 +5,13 @@ namespace AndrewSvirin\Ebics\Services;
 
 use DOMNodeList;
 
-class SafeItems
+class DOMHelper
 {
     /**
-     * @param DOMNodeList|false $domNodeList
+     * @param  DOMNodeList|false  $domNodeList
+     * @return string
      */
-    public static function safeItemAcces($domNodeList): string
+    public static function safeItemValue($domNodeList): string
     {
         if ($domNodeList === false) {
             throw new \RuntimeException('empty set');

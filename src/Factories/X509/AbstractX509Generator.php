@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Factories\X509;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use phpseclib\Crypt\RSA;
 use phpseclib\File\X509;
-use function Safe\sprintf;
 
 /**
  * Default X509 certificate generator @see X509GeneratorInterface.

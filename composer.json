@@ -23,9 +23,7 @@
     "ext-openssl": "*",
     "ext-zlib": "*",
     "ext-json": "*",
-    "phpseclib/phpseclib": "~2.0",
-    "symfony/http-client": "^4.3||^5.0",
-    "thecodingmachine/safe": "^1.1"
+    "phpseclib/phpseclib": "~2.0"
   },
   "require-dev": {
     "phpstan/phpstan": "^0.12.29",
