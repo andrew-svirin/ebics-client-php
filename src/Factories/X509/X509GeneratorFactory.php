@@ -3,7 +3,6 @@
 namespace AndrewSvirin\Ebics\Factories\X509;
 
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use function Safe\sprintf;
 
 /**
  * Default X509 generator factory.

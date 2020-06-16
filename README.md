@@ -232,3 +232,9 @@ try {
 ```
 
 ### 5. Play with other transactions!
+
+# Involving in development
+First of all - thanks for involving on development.
+If you have any idea how to improve the library, this will be welcome.
+!!! For example library require in Mocker for server responses. That will
+locally simulate from responses on client requests by reading static files.

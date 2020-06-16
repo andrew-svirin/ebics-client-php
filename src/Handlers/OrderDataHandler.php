@@ -11,11 +11,10 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\SafeItems;
+use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTime;
 use DOMDocument;
 use DOMNode;
-use function Safe\base64_decode;
 
 /**
  * Class OrderDataHandler manages OrderData DOM elements.
@@ -129,10 +128,8 @@ class OrderDataHandler
      */
     private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate) : void
     {
-        $certificateX509 = $certificate->toX509();
-
-        if ($certificateX509 === null) {
-            throw new EbicsException('Certificat X509 empty');
+        if (!($certificateX509 = $certificate->toX509())) {
+            throw new EbicsException('Certificate X509 is empty.');
         }
 
         // Add ds:X509Data to Signature.
@@ -155,7 +152,7 @@ class OrderDataHandler
 
         // Add ds:X509Certificate to ds:X509Data.
         $xmlX509Certificate = $xml->createElement('ds:X509Certificate');
-        $xmlX509Certificate->nodeValue = base64_encode($certificate->getContentOrThrowException());
+        $xmlX509Certificate->nodeValue = base64_encode($certificate->getContent());
         $xmlX509Data->appendChild($xmlX509Certificate);
     }
 
@@ -218,14 +215,14 @@ class OrderDataHandler
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
         if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
-            $x509CertificateValue = SafeItems::safeItemAcces($x509Certificate);
+            $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
         $modulus = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
-        $modulusValue = SafeItems::safeItemAcces($modulus);
+        $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
         $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
-        $exponentValue = SafeItems::safeItemAcces($exponent);
+        $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateXFromDetails(
@@ -243,14 +240,14 @@ class OrderDataHandler
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
         if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
-            $x509CertificateValue = SafeItems::safeItemAcces($x509Certificate);
+            $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
         $modulus = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
-        $modulusValue = SafeItems::safeItemAcces($modulus);
+        $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
         $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
-        $exponentValue = SafeItems::safeItemAcces($exponent);
+        $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateEFromDetails(

@@ -4,7 +4,6 @@ namespace AndrewSvirin\Ebics\Handlers;
 
 use DOMDocument;
 use DOMElement;
-use function Safe\gzcompress;
 
 /**
  * Class BodyHandler manage body DOM elements.

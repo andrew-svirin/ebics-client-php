@@ -9,7 +9,6 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DOMDocument;
 use DOMNode;
-use function Safe\sprintf;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.

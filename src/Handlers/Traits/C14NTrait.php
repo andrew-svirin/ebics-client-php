@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Handlers\Traits;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use DOMNode;
 use DOMXPath;
-use function Safe\sprintf;
 
 /**
  * Class C14NTrait manage c14n building.

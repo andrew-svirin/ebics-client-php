@@ -11,9 +11,6 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
-use function Safe\gzuncompress;
-use function Safe\define;
-use function Safe\sprintf;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -25,8 +22,6 @@ class CryptService
 {
     /**
      * Calculate hash.
-     *
-     * @param string $algo
      */
     public static function calculateHash(string $text, $algo = 'sha256'): string
     {
@@ -49,15 +44,13 @@ class CryptService
      */
     public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
-        $certificatE = $keyRing->getUserCertificateE();
-
-        if ($certificatE === null) {
-            throw new \RuntimeException('Certificat E not set');
+        if (!($certificateE = $keyRing->getUserCertificateE())) {
+            throw new \RuntimeException('Certificate E not set');
         }
 
         $rsa = new RSA();
         $rsa->setPassword($keyRing->getPassword());
-        $rsa->loadKey((string) $certificatE->getPrivateKey());
+        $rsa->loadKey((string)$certificateE->getPrivateKey());
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
         // aes-128-cbc encrypting format.
@@ -81,12 +74,12 @@ class CryptService
     public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
     {
         $digestToSignBin = self::filter($hash);
+
         if (!($certificateX = $keyRing->getUserCertificateX())) {
             throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
         }
-        $privateKey = $certificateX->getPrivateKey();
 
-        if ($privateKey === null) {
+        if (!($privateKey = $certificateX->getPrivateKey())) {
             throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
         }
 
@@ -94,7 +87,7 @@ class CryptService
         $rsa = new RSA();
         $rsa->setPassword($passphrase);
         $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
-        if (!\defined('CRYPT_RSA_PKCS15_COMPAT')) {
+        if (!defined('CRYPT_RSA_PKCS15_COMPAT')) {
             define('CRYPT_RSA_PKCS15_COMPAT', true);
         }
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
@@ -109,8 +102,9 @@ class CryptService
     /**
      * Generate public and private keys.
      *
-     * @param string $algo
-     * @param int    $length
+     * @param  KeyRing  $keyRing
+     * @param  string  $algo
+     * @param  int  $length
      *
      * @return array [
      *               'publickey' => '<string>',
@@ -137,12 +131,31 @@ class CryptService
     private static function filter(string $hash)
     {
         $RSA_SHA256prefix = [
-         0x30, 0x31, 0x30, 0x0D, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20,
-      ];
+            0x30,
+            0x31,
+            0x30,
+            0x0D,
+            0x06,
+            0x09,
+            0x60,
+            0x86,
+            0x48,
+            0x01,
+            0x65,
+            0x03,
+            0x04,
+            0x02,
+            0x01,
+            0x05,
+            0x00,
+            0x04,
+            0x20,
+        ];
         $signedInfoDigest = array_values(unpack('C*', $hash));
         $digestToSign = [];
         self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, \count($RSA_SHA256prefix));
-        self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, \count($RSA_SHA256prefix), \count($signedInfoDigest));
+        self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, \count($RSA_SHA256prefix),
+            \count($signedInfoDigest));
 
         return self::arrayToBin($digestToSign);
     }
@@ -160,7 +173,7 @@ class CryptService
     /**
      * Pack array of bytes to one bytes-string.
      *
-     * @param array<int, int> $bytes
+     * @param  array<int, int>  $bytes
      * @return string (bytes)
      */
     private static function arrayToBin(array $bytes): string
@@ -177,7 +190,7 @@ class CryptService
      * Remove leading zeros from both.
      * Calculate digest (SHA256).
      *
-     * @param string $algorithm
+     * @param  string  $algorithm
      *
      * @return string
      */
@@ -227,8 +240,8 @@ class CryptService
         $rsa->setPublicKey($publicKey);
 
         return [
-         'e' => $rsa->exponent->toBytes(),
-         'm' => $rsa->modulus->toBytes(),
-      ];
+            'e' => $rsa->exponent->toBytes(),
+            'm' => $rsa->modulus->toBytes(),
+        ];
     }
 }
