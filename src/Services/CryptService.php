@@ -23,7 +23,7 @@ class CryptService
     /**
      * Calculate hash.
      */
-    public static function calculateHash(string $text, $algo = 'sha256'): string
+    public static function calculateHash(string $text, string $algo = 'sha256'): string
     {
         return hash($algo, $text, true);
     }
