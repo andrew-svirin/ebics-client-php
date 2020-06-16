@@ -7,7 +7,9 @@ use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Services\SafeItems;
 use DOMDocument;
+use function Safe\base64_decode;
 
 /**
  * Class ResponseHandler manage response DOM elements.
@@ -27,7 +29,7 @@ class ResponseHandler
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
 
-        return $returnCode->item(0)->nodeValue;
+        return SafeItems::safeItemAcces($returnCode);
     }
 
     /**
@@ -38,7 +40,7 @@ class ResponseHandler
         $xpath = $this->prepareH004XPath($xml);
         $returnCode = $xpath->query('//H004:body/H004:ReturnCode');
 
-        return $returnCode->item(0)->nodeValue;
+        return SafeItems::safeItemAcces($returnCode);
     }
 
     /**
@@ -64,7 +66,7 @@ class ResponseHandler
         $xpath = $this->prepareH004XPath($xml);
         $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
 
-        return $reportText->item(0)->nodeValue;
+        return SafeItems::safeItemAcces($reportText);
     }
 
     /**
@@ -75,7 +77,7 @@ class ResponseHandler
         $xpath = $this->prepareH000XPath($xml);
         $returnCode = $xpath->query('//H000:SystemReturnCode/H000:ReturnCode');
 
-        return $returnCode->item(0)->nodeValue;
+        return SafeItems::safeItemAcces($returnCode);
     }
 
     /**
@@ -86,7 +88,7 @@ class ResponseHandler
         $xpath = $this->prepareH000XPath($xml);
         $reportText = $xpath->query('//H000:SystemReturnCode/H000:ReportText');
 
-        return $reportText->item(0)->nodeValue;
+        return SafeItems::safeItemAcces($reportText);
     }
 
     /**
@@ -102,8 +104,8 @@ class ResponseHandler
         if (!$orderData || 0 === $orderData->length || !$transactionKey || 0 === $transactionKey->length) {
             throw new EbicsException('EBICS response empty result.');
         }
-        $orderDataValue = $orderData->item(0)->nodeValue;
-        $transactionKeyValue = $transactionKey->item(0)->nodeValue;
+        $orderDataValue = SafeItems::safeItemAcces($orderData);
+        $transactionKeyValue = SafeItems::safeItemAcces($transactionKey);
         $transactionKeyValueDe = base64_decode($transactionKeyValue);
 
         return new OrderDataEncrypted($orderDataValue, $transactionKeyValueDe);
@@ -116,13 +118,13 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
-        $transactionIdValue = $transactionId->item(0)->nodeValue;
+        $transactionIdValue = SafeItems::safeItemAcces($transactionId);
         $numSegments = $xpath->query('//H004:header/H004:static/H004:NumSegments');
-        $numSegmentsValue = $numSegments->item(0)->nodeValue;
+        $numSegmentsValue = SafeItems::safeItemAcces($numSegments);
         $transactionPhase = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
-        $transactionPhaseValue = $transactionPhase->item(0)->nodeValue;
+        $transactionPhaseValue = SafeItems::safeItemAcces($transactionPhase);
         $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
-        $segmentNumberValue = $segmentNumber->item(0)->nodeValue;
+        $segmentNumberValue = SafeItems::safeItemAcces($segmentNumber);
 
         return TransactionFactory::buildTransaction($transactionIdValue, $transactionPhaseValue, $numSegmentsValue, $segmentNumberValue);
     }

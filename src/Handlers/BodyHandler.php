@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Handlers;
 
 use DOMDocument;
 use DOMElement;
+use function Safe\gzcompress;
 
 /**
  * Class BodyHandler manage body DOM elements.
@@ -31,10 +32,8 @@ class BodyHandler
 
     /**
      * Add body and children elements to request.
-     *
-     * @param string $orderData
      */
-    public function handle(DOMDocument $xml, DOMElement $xmlRequest, $orderData)
+    public function handle(DOMDocument $xml, DOMElement $xmlRequest, string $orderData) : void
     {
         // Add body to request.
         $xmlBody = $xml->createElement('body');
@@ -59,7 +58,7 @@ class BodyHandler
     /**
      * Add body and children elements to transfer request.
      */
-    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode)
+    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode) : void
     {
         // Add body to request.
         $xmlBody = $xml->createElement('body');
@@ -72,14 +71,14 @@ class BodyHandler
 
         // Add ReceiptCode to TransferReceipt.
         $xmlReceiptCode = $xml->createElement('ReceiptCode');
-        $xmlReceiptCode->nodeValue = $receiptCode;
+        $xmlReceiptCode->nodeValue = (string) $receiptCode;
         $xmlTransferReceipt->appendChild($xmlReceiptCode);
     }
 
     /**
      * Add empty body element to request.
      */
-    public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest)
+    public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest) : void
     {
         // Add body to request.
         $xmlBody = $xml->createElement('body');

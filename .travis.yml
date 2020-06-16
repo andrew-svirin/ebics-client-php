@@ -6,10 +6,6 @@ php:
   - '7.3'
   - '7.4'
 
-branches:
-  only:
-    - master
-
 cache:
   directories:
     - vendor
@@ -17,3 +13,7 @@ cache:
 
 before_script:
   - composer update --dev --no-interaction
+
+script:
+  - vendor/bin/phpstan analyse
+  - vendor/bin/phpunit

@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Factories\X509;
 
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
+use function Safe\sprintf;
 
 /**
  * Default X509 generator factory.
@@ -18,12 +19,12 @@ class X509GeneratorFactory
     /** @var callable|null */
     private static $generatorFunction;
 
-    public static function setGeneratorFunction(callable $generatorFunction)
+    public static function setGeneratorFunction(callable $generatorFunction) : void
     {
         self::$generatorFunction = $generatorFunction;
     }
 
-    public static function setGeneratorClass(string $generatorClass)
+    public static function setGeneratorClass(string $generatorClass) : void
     {
         if (!is_a($generatorClass, X509GeneratorInterface::class, true)) {
             throw new \RuntimeException(sprintf('The class "%s" must implements %s', $generatorClass, X509GeneratorInterface::class));

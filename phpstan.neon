@@ -1,0 +1,10 @@
+parameters:
+	checkMissingIterableValueType: false
+	checkGenericClassInNonGenericObjectType: false
+	level: 8
+	paths:
+		- src
+	ignoreErrors:
+		- '#.*use Safe\\DateTime.*#'
+includes:
+    - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon

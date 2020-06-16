@@ -6,6 +6,12 @@ use AndrewSvirin\Ebics\Contracts\KeyRingManagerInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\KeyRingFactory;
 use AndrewSvirin\Ebics\Models\KeyRing;
+use Safe\Exceptions\FilesystemException;
+use Safe\Exceptions\JsonException;
+use function Safe\file_get_contents;
+use function Safe\json_decode;
+use function Safe\file_put_contents;
+use function Safe\json_encode;
 
 /**
  * EBICS KeyRing representation manage one key ring stored in the file.
@@ -49,15 +55,13 @@ class KeyRingManager implements KeyRingManagerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws EbicsException
+     * @throws JsonException
+     * @throws FilesystemException
      */
     public function loadKeyRing(): KeyRing
     {
         if (is_file($this->keyRingRealPath) && ($content = file_get_contents($this->keyRingRealPath)) && !empty($content)) {
-            if (!($data = json_decode($content, true))) {
-                throw new EbicsException('Can not extract keys from file.');
-            }
-            $result = KeyRingFactory::buildKeyRingFromData($data);
+            $result = KeyRingFactory::buildKeyRingFromData(json_decode($content, true));
         } else {
             $result = new KeyRing();
         }
@@ -69,13 +73,12 @@ class KeyRingManager implements KeyRingManagerInterface
     /**
      * {@inheritdoc}
      *
-     * @throws EbicsException
+     * @throws JsonException
+     * @throws FilesystemException
      */
-    public function saveKeyRing(KeyRing $keyRing)
+    public function saveKeyRing(KeyRing $keyRing) : void
     {
         $data = KeyRingFactory::buildDataFromKeyRing($keyRing);
-        if (!file_put_contents($this->keyRingRealPath, json_encode($data, \JSON_PRETTY_PRINT))) {
-            throw new EbicsException('Can not save keys to file.');
-        }
+        file_put_contents($this->keyRingRealPath, json_encode($data, \JSON_PRETTY_PRINT));
     }
 }

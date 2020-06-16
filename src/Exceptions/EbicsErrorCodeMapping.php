@@ -10,6 +10,9 @@ namespace AndrewSvirin\Ebics\Exceptions;
  */
 abstract class EbicsErrorCodeMapping
 {
+    /**
+     * @var string[]
+     */
     public static $mapping = [
         '011000' => DownloadPostprocessDoneException::class,
         '011001' => DownloadPostprocessSkippedException::class,
