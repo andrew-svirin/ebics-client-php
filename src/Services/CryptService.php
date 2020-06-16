@@ -153,9 +153,8 @@ class CryptService
         ];
         $signedInfoDigest = array_values(unpack('C*', $hash));
         $digestToSign = [];
-        self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, \count($RSA_SHA256prefix));
-        self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, \count($RSA_SHA256prefix),
-            \count($signedInfoDigest));
+        self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, count($RSA_SHA256prefix));
+        self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, count($RSA_SHA256prefix), count($signedInfoDigest));
 
         return self::arrayToBin($digestToSign);
     }
