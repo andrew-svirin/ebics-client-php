@@ -45,7 +45,7 @@ class CryptService
     public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
         if (!($certificateE = $keyRing->getUserCertificateE())) {
-            throw new \RuntimeException('Certificate E not set');
+            throw new \RuntimeException('Certificate E is not set.');
         }
 
         $rsa = new RSA();
@@ -61,7 +61,11 @@ class CryptService
         $aes->openssl_options = \OPENSSL_ZERO_PADDING;
         $decrypted = $aes->decrypt($orderData->getOrderData());
 
-        return gzuncompress($decrypted);
+        // Try to uncompress from gz order data.
+        if (!($orderData = gzuncompress($decrypted))) {
+            throw new EbicsException('Order Data were uncompressed wrongly.');
+        }
+        return $orderData;
     }
 
     /**
@@ -75,11 +79,7 @@ class CryptService
     {
         $digestToSignBin = self::filter($hash);
 
-        if (!($certificateX = $keyRing->getUserCertificateX())) {
-            throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
-        }
-
-        if (!($privateKey = $certificateX->getPrivateKey())) {
+        if (!($certificateX = $keyRing->getUserCertificateX()) || !($privateKey = $certificateX->getPrivateKey())) {
             throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
         }
 
@@ -102,16 +102,12 @@ class CryptService
     /**
      * Generate public and private keys.
      *
-     * @param  KeyRing  $keyRing
-     * @param  string  $algo
-     * @param  int  $length
-     *
-     * @return array [
-     *               'publickey' => '<string>',
-     *               'privatekey' => '<string>',
-     *               ]
+     * @return array = [
+     *      'publickey' => '<string>',
+     *      'privatekey' => '<string>',
+     *  ]
      */
-    public static function generateKeys(KeyRing $keyRing, $algo = 'sha256', $length = 2048): array
+    public static function generateKeys(KeyRing $keyRing, string $algo = 'sha256', int $length = 2048): array
     {
         $rsa = new RSA();
         $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
