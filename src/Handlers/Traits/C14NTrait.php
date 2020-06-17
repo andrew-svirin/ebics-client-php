@@ -33,6 +33,11 @@ trait C14NTrait
       }
         $nodes = $xpath->query($path);
         $result = '';
+
+        if (!($nodes instanceof \DOMNodeList)) {
+            return $result;
+        }
+
         /* @var $node DOMNode */
         foreach ($nodes as $node) {
             $result .= $node->C14N($exclusive, $withComments);

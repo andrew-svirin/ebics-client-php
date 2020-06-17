@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Utils;
+namespace AndrewSvirin\Ebics\Tests\Utils;
 
 /**
  * Manage environment variables.
@@ -16,7 +16,7 @@ class EnvUtil
     public static function getSecret(): string
     {
         if (!($secret = getenv('SECRET'))) {
-            trigger_error('Should be specified SECRET env var.');
+            throw new \RuntimeException('Should be specified SECRET env var.');
         }
 
         return $secret;

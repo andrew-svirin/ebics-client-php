@@ -11,10 +11,10 @@ class EbicsResponseException extends EbicsException implements EbicsResponseExce
     /** @var string */
     private $responseCode;
 
-    /** @var Request */
+    /** @var Request|null */
     private $request;
 
-    /** @var Response */
+    /** @var Response|null */
     private $response;
 
     /** @var string|null */
@@ -22,7 +22,9 @@ class EbicsResponseException extends EbicsException implements EbicsResponseExce
 
     public function __construct(string $responseCode, ?string $responseMessage, ?string $meaning = null)
     {
-        parent::__construct($responseMessage ?: $meaning, (int) $responseCode);
+        $message = $responseMessage ?: $meaning;
+
+        parent::__construct((string) $message, (int) $responseCode);
 
         $this->responseCode = $responseCode;
         $this->meaning = $meaning;
