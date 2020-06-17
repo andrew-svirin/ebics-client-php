@@ -22,7 +22,9 @@ You will need to have this informations from your Bank :
 - UserID
 
 ```php
-use AndrewSvirin\Ebics\Services\KeyRingManager
+<?php
+
+use AndrewSvirin\Ebics\Services\KeyRingManager;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\EbicsClient;
@@ -30,15 +32,17 @@ use AndrewSvirin\Ebics\EbicsClient;
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
-$keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__, __IS_CERTIFIED__);
+$keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
 $keyRing = $keyRingManager->loadKeyRing();
-$bank = new Bank(__HOST_ID__, __HOST_URL__);
+$bank = new Bank(__HOST_ID__, __HOST_URL__, __IS_CERTIFIED__);
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
-## Make INI, STA, HPB requests and update key ring.
+## Make INI, HIA, HPB requests and update key ring.
 ```php
+<?php
+
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
@@ -64,6 +68,7 @@ try {
         $exception->getMeaning()
     );
 }
+
 try {
     $client->HPB();
     $keyRingManager->saveKeyRing($keyRing);
@@ -83,6 +88,7 @@ If you are dealing with a french bank, you will need to create a X509 self-signe
 You can achieve this by creating a class which extends the `AbstractX509Generator` (or implements the `X509GeneratorInterface` if you want a total control about the generation)
 
 ```php
+<?php
 
 namespace App\Factories\X509;
 
@@ -116,6 +122,8 @@ __You can see more values in the `LegacyX509Generator` class.__
 
 Once your class is created, call the `X509GeneratorFactory::setGeneratorClass()` method :
 ```php
+<?php
+
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use App\Factories\X509\MyCompanyX509Generator;
 
@@ -128,6 +136,8 @@ $client->INI();
 
 ### FDL (File Download)
 ````php
+<?php
+
 use AndrewSvirin\Ebics\Exceptions\NoDownloadDataAvailableException;
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
@@ -161,3 +171,70 @@ try {
 ````
 
 More methods you can find in `tests/EbicsTest`
+
+
+## Global process and intraction with Bank Department
+### 1. Create an store your 3 certificates
+```php
+<?php
+
+use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
+
+$client = new EbicsClient(...);
+// For Franch bank.
+X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
+
+try {
+    $client->INI();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "INI request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+
+try {
+    $client->HIA();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "HIA request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+```
+
+### 2. Generate a EBICS letter
+Not covered for now in this library. **Feel free to open a PR!**
+You'll have to generate a letter with a SHA-256 hash of your 3 X509 certificates.
+
+### 3. Wait for the bank validation
+
+### 4. Fetch the bank tokens
+```php
+
+try {
+    $client->HPB();
+    $keyRingManager->saveKeyRing($keyRing);
+} catch (EbicsResponseExceptionInterface $exception) {
+    echo sprintf(
+        "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
+        $exception->getResponseCode(),
+        $exception->getMessage(),
+        $exception->getMeaning()
+    );
+}
+```
+
+### 5. Play with other transactions!
+
+# Involving in development
+First of all - thanks for involving on development.
+If you have any idea how to improve the library, this will be welcome.
+!!! For example library require in Mocker for server responses. That will
+locally simulate from responses on client requests by reading static files.

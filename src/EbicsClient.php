@@ -132,7 +132,7 @@ final class EbicsClient implements EbicsClientInterface
     public function INI(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $certificateA = CertificateFactory::generateCertificateAFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
         $request = $this->requestFactory->buildINI($certificateA, $dateTime);
@@ -158,7 +158,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HIA(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $certificateE = CertificateFactory::generateCertificateEFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
         $certificateX = CertificateFactory::generateCertificateXFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
@@ -187,7 +187,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HPB(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildHPB($dateTime);
         $hostResponse = $this->post($request);
@@ -220,7 +220,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HPD(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildHPD($dateTime);
         $hostResponse = $this->post($request);
@@ -252,7 +252,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HKD(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildHKD($dateTime);
         $hostResponse = $this->post($request);
@@ -284,7 +284,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HTD(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
 
         $request = $this->requestFactory->buildHTD($dateTime);
@@ -319,7 +319,7 @@ final class EbicsClient implements EbicsClientInterface
     public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
 
         $request = $this->requestFactory->buildFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
@@ -351,7 +351,7 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function transferReceipt(Response $response, bool $acknowledged = true)
+    public function transferReceipt(Response $response, bool $acknowledged = true) : Response
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
@@ -385,7 +385,7 @@ final class EbicsClient implements EbicsClientInterface
     public function HAA(DateTime $dateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildHAA($dateTime);
         $hostResponse = $this->post($request);
@@ -410,7 +410,7 @@ final class EbicsClient implements EbicsClientInterface
     public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildVMK($dateTime, $startDateTime, $endDateTime);
         $hostResponse = $this->post($request);
@@ -435,7 +435,7 @@ final class EbicsClient implements EbicsClientInterface
     public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
         if (null === $dateTime) {
-            $dateTime = DateTime::createFromFormat('U', time());
+            $dateTime = new DateTime();
         }
         $request = $this->requestFactory->buildSTA($dateTime, $startDateTime, $endDateTime);
         $hostResponse = $this->post($request);

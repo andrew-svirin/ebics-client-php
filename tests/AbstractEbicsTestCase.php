@@ -9,7 +9,7 @@ use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\KeyRingManager;
-use AndrewSvirin\Ebics\Utils\EnvUtil;
+use AndrewSvirin\Ebics\Tests\Utils\EnvUtil;
 use PHPUnit\Framework\TestCase;
 
 /**

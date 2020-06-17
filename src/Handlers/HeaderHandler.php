@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\Transaction;
@@ -76,7 +77,7 @@ class HeaderHandler
     /**
      * Add header for INI Request XML.
      */
-    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest)
+    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest) : void
     {
         $this->handle(
          $xml,
@@ -91,7 +92,7 @@ class HeaderHandler
     /**
      * Add header for HIA Request XML.
      */
-    public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest)
+    public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest) : void
     {
         $this->handle(
          $xml,
@@ -106,7 +107,7 @@ class HeaderHandler
     /**
      * Add header for HPB Request XML.
      */
-    public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
          $xml,
@@ -121,7 +122,7 @@ class HeaderHandler
     /**
      * Add header for HAA Request XML.
      */
-    public function handleHAA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    public function handleHAA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
          $xml,
@@ -136,7 +137,7 @@ class HeaderHandler
     /**
      * Add header for TransferReceipt Request XML.
      */
-    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction)
+    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction) : void
     {
         $this->handleTransaction(
          $xml,
@@ -149,7 +150,7 @@ class HeaderHandler
     /**
      * Add header for VMK Request XML.
      */
-    public function handleVMK(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null)
+    public function handleVMK(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
          $xml,
@@ -167,10 +168,8 @@ class HeaderHandler
 
     /**
      * Add header for STA Request XML.
-     *
-     * @param $dateTime
      */
-    public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null)
+    public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
          $xml,
@@ -189,7 +188,7 @@ class HeaderHandler
     /**
      * Add header for HPD Request XML.
      */
-    public function handleHPD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    public function handleHPD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
          $xml,
@@ -208,7 +207,7 @@ class HeaderHandler
     /**
      * Add header for HTD Request XML.
      */
-    public function handleHTD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    public function handleHTD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
          $xml,
@@ -227,7 +226,7 @@ class HeaderHandler
     /**
      * Add header for FDL Request XML.
      */
-    public function handleFDL(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null)
+    public function handleFDL(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
          $xml,
@@ -246,7 +245,7 @@ class HeaderHandler
     /**
      * Add header for HKD Request XML.
      */
-    public function handleHKD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime)
+    public function handleHKD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
          $xml,
@@ -407,11 +406,19 @@ class HeaderHandler
             $xmlBankPubKeyDigests = $xml->createElement('BankPubKeyDigests');
             $xmlStatic->appendChild($xmlBankPubKeyDigests);
 
+            if (!($certificateX = $keyRing->getBankCertificateX())) {
+                throw new EbicsException('Certificate X is empty.');
+            }
+
+            if (!($certificateE = $keyRing->getBankCertificateE())) {
+                throw new EbicsException('Certificate E is empty.');
+            }
+
             // Add Authentication to BankPubKeyDigests.
             $xmlAuthentication = $xml->createElement('Authentication');
             $xmlAuthentication->setAttribute('Version', $keyRing->getBankCertificateXVersion());
             $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateXDigest = CryptService::calculateDigest($keyRing->getBankCertificateX(), $algorithm);
+            $certificateXDigest = CryptService::calculateDigest($certificateX, $algorithm);
             $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
             $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
@@ -419,7 +426,7 @@ class HeaderHandler
             $xmlEncryption = $xml->createElement('Encryption');
             $xmlEncryption->setAttribute('Version', $keyRing->getBankCertificateEVersion());
             $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateEDigest = CryptService::calculateDigest($keyRing->getBankCertificateE(), $algorithm);
+            $certificateEDigest = CryptService::calculateDigest($certificateE, $algorithm);
             $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
             $xmlBankPubKeyDigests->appendChild($xmlEncryption);
         };
@@ -428,7 +435,7 @@ class HeaderHandler
     /**
      * Add header and children elements to DOM XML.
      */
-    private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $mutable = null)
+    private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $mutable = null) : void
     {
         // Add header to request.
         $xmlHeader = $xml->createElement('header');
@@ -489,7 +496,7 @@ class HeaderHandler
     /**
      * Add header and children elements to DOM XML.
      */
-    private function handleTransaction(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction, callable $mutable = null)
+    private function handleTransaction(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction, callable $mutable = null) : void
     {
         // Add header to request.
         $xmlHeader = $xml->createElement('header');
