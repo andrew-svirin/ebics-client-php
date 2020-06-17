@@ -27,6 +27,7 @@
     "symfony/http-client": "^4.3||^5.0"
   },
   "require-dev": {
+    "phpstan/phpstan": "^0.12.29",
     "phpunit/phpunit": "^8.5"
   },
   "autoload": {

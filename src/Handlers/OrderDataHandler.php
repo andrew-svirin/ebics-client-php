@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -10,6 +11,7 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
+use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTime;
 use DOMDocument;
 use DOMNode;
@@ -47,11 +49,8 @@ class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
-     *
-     * @param Certificate   $certificateA certificate A
-     * @param DateTime|null $dateTime
      */
-    public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime)
+    public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime) : void
     {
         // Add SignaturePubKeyOrderData to root.
         $xmlSignaturePubKeyOrderData = $xml->createElementNS('http://www.ebics.org/S001', 'SignaturePubKeyOrderData');
@@ -81,10 +80,8 @@ class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
-     *
-     * @param DateTime|null $dateTime
      */
-    public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime)
+    public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime) : void
     {
         // Add HIARequestOrderData to root.
         $xmlHIARequestOrderData = $xml->createElementNS('urn:org:ebics:H004', 'HIARequestOrderData');
@@ -129,9 +126,12 @@ class OrderDataHandler
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
      */
-    private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate)
+    private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate) : void
     {
-        $certificateX509 = $certificate->toX509();
+        if (!($certificateX509 = $certificate->toX509())) {
+            throw new EbicsException('Certificate X509 is empty.');
+        }
+
         // Add ds:X509Data to Signature.
         $xmlX509Data = $xml->createElement('ds:X509Data');
         $xmlPublicKeyInfo->appendChild($xmlX509Data);
@@ -159,7 +159,7 @@ class OrderDataHandler
     /**
      * Add PubKeyValue to PublicKeyInfo XML Node.
      */
-    private function handlePubKeyValue(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate, DateTime $dateTime = null)
+    private function handlePubKeyValue(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate, DateTime $dateTime) : void
     {
         $publicKeyDetails = CryptService::getPublicKeyDetails($certificate->getPublicKey());
 
@@ -190,7 +190,7 @@ class OrderDataHandler
     /**
      * Add PartnerID to OrderData XML Node.
      */
-    private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml)
+    private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml) : void
     {
         $xmlPartnerID = $xml->createElement('PartnerID');
         $xmlPartnerID->nodeValue = $this->user->getPartnerId();
@@ -200,7 +200,7 @@ class OrderDataHandler
     /**
      * Add UserID to OrderData XML Node.
      */
-    private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml)
+    private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml) : void
     {
         $xmlUserID = $xml->createElement('UserID');
         $xmlUserID->nodeValue = $this->user->getUserId();
@@ -214,15 +214,15 @@ class OrderDataHandler
     {
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
-        if (0 !== $x509Certificate->length) {
-            $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
+        if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
+            $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
         $modulus = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
-        $modulusValue = $modulus->item(0)->nodeValue;
+        $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
         $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
-        $exponentValue = $exponent->item(0)->nodeValue;
+        $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateXFromDetails(
@@ -239,15 +239,15 @@ class OrderDataHandler
     {
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
-        if (0 !== $x509Certificate->length) {
-            $x509CertificateValue = $x509Certificate->item(0)->nodeValue;
+        if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
+            $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
         $modulus = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
-        $modulusValue = $modulus->item(0)->nodeValue;
+        $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
         $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
-        $exponentValue = $exponent->item(0)->nodeValue;
+        $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateEFromDetails(

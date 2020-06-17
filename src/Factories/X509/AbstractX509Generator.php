@@ -83,7 +83,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $x509->saveX509($result);
     }
 
-    protected function generateSubject(RSA $publicKey, $options): X509
+    protected function generateSubject(RSA $publicKey, array $options): X509
     {
         $subject = new X509();
         $subject->setPublicKey($publicKey); // $pubKey is Crypt_RSA object
@@ -117,8 +117,6 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * Generate 74 digits serial number represented in the string.
-     *
-     * @return string
      */
     protected function generateSerialNumber(): string
     {
@@ -128,7 +126,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
             $result .= rand(0, 9);
         }
 
-        return $result;
+        return (string) $result;
     }
 
     /**
