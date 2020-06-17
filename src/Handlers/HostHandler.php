@@ -27,7 +27,7 @@ class HostHandler
     /**
      * Add HostID for Request XML.
      */
-    public function handle(DOMDocument $xml, DOMElement $xmlRequest)
+    public function handle(DOMDocument $xml, DOMElement $xmlRequest) : void
     {
         // Add HostID to Request.
         $xmlHostId = $xml->createElement('HostID');

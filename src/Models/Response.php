@@ -15,7 +15,7 @@ class Response extends DOMDocument
      */
     private $transactions = [];
 
-    public function addTransaction(Transaction $transaction)
+    public function addTransaction(Transaction $transaction) : void
     {
         $this->transactions[] = $transaction;
     }
@@ -30,7 +30,7 @@ class Response extends DOMDocument
 
     public function getLastTransaction(): ?Transaction
     {
-        if (0 === \count($this->transactions)) {
+        if (0 === count($this->transactions)) {
             return null;
         }
 

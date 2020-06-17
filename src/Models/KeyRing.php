@@ -2,6 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
+
 /**
  * EBICS key ring representation.
  *
@@ -11,46 +13,36 @@ namespace AndrewSvirin\Ebics\Models;
 class KeyRing
 {
     /**
-     * @var string
-     */
-    private $userId;
-
-    /**
-     * @var Certificate
+     * @var Certificate|null
      */
     private $userCertificateA;
 
     /**
-     * @var Certificate
+     * @var Certificate|null
      */
     private $userCertificateX;
 
     /**
-     * @var Certificate
+     * @var Certificate|null
      */
     private $userCertificateE;
 
     /**
-     * @var Certificate
+     * @var Certificate|null
      */
     private $bankCertificateX;
 
     /**
-     * @var Certificate
+     * @var Certificate|null
      */
     private $bankCertificateE;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $password;
 
-    public function setUserId(string $userId)
-    {
-        $this->userId = $userId;
-    }
-
-    public function setUserCertificateA(Certificate $certificate)
+    public function setUserCertificateA(Certificate $certificate) : void
     {
         $this->userCertificateA = $certificate;
     }
@@ -65,7 +57,7 @@ class KeyRing
         return 'A006';
     }
 
-    public function setUserCertificateX(Certificate $certificate)
+    public function setUserCertificateX(Certificate $certificate) : void
     {
         $this->userCertificateX = $certificate;
     }
@@ -80,7 +72,7 @@ class KeyRing
         return 'X002';
     }
 
-    public function setUserCertificateE(Certificate $certificate)
+    public function setUserCertificateE(Certificate $certificate) : void
     {
         $this->userCertificateE = $certificate;
     }
@@ -95,13 +87,17 @@ class KeyRing
         return 'E002';
     }
 
-    public function setPassword(string $password)
+    public function setPassword(string $password) : void
     {
         $this->password = $password;
     }
 
     public function getPassword(): string
     {
+        if ($this->password === null) {
+            throw new EbicsException('Password must be set');
+        }
+
         return $this->password;
     }
 
@@ -110,9 +106,6 @@ class KeyRing
         $this->bankCertificateX = $bankCertificateX;
     }
 
-    /**
-     * @return Certificate
-     */
     public function getBankCertificateX(): ?Certificate
     {
         return $this->bankCertificateX;
@@ -128,9 +121,6 @@ class KeyRing
         $this->bankCertificateE = $bankCertificateE;
     }
 
-    /**
-     * @return Certificate
-     */
     public function getBankCertificateE(): ?Certificate
     {
         return $this->bankCertificateE;
