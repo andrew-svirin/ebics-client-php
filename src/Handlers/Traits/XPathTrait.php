@@ -39,17 +39,4 @@ trait XPathTrait
 
         return $xpath;
     }
-
-    /**
-     * Setup S001 XPath for DOM XML.
-     *
-     * @return DOMXPath
-     */
-    private function prepareS001XPath(DOMDocument $xml): DOMXPath
-    {
-        $xpath = new DomXpath($xml);
-        $xpath->registerNamespace('S001', 'http://www.ebics.org/S001');
-
-        return $xpath;
-    }
 }

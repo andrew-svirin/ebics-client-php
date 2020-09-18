@@ -47,7 +47,7 @@ class EbicsRequestHandler
      *
      * @return DOMElement
      */
-    public function handleHEV(DOMDocument $xml)
+    public function handleHEV(DOMDocument $xml): DOMElement
     {
         return $this->handleH000($xml, self::EBICS_HEV);
     }

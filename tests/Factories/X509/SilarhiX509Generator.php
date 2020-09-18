@@ -1,15 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Factories\X509\AbstractX509Generator;
 
 /**
  * Legacy X509 certificate generator @see X509GeneratorInterface.
- *
- * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Guillaume Sainthillier
  */
 class SilarhiX509Generator extends AbstractX509Generator
 {
@@ -29,15 +27,11 @@ class SilarhiX509Generator extends AbstractX509Generator
             'extensions' => [
                 'id-ce-subjectAltName' => [
                     'value' => [
-                        [
-                            'dNSName' => '*.silarhi.fr',
-                        ],
+                        ['dNSName' => '*.silarhi.fr'],
                     ],
                 ],
                 'id-ce-basicConstraints' => [
-                    'value' => [
-                        'CA' => false,
-                    ],
+                    'value' => ['CA' => false],
                 ],
                 'id-ce-keyUsage' => [
                     'value' => ['keyEncipherment', 'digitalSignature', 'nonRepudiation'],

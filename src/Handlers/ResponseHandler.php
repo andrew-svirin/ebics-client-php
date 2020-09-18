@@ -2,10 +2,14 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
+use AndrewSvirin\Ebics\Models\Request;
+use AndrewSvirin\Ebics\Models\Response;
 use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
@@ -126,5 +130,35 @@ class ResponseHandler
         $segmentNumberValue = DOMHelper::safeItemValue($segmentNumber);
 
         return TransactionFactory::buildTransaction($transactionIdValue, $transactionPhaseValue, $numSegmentsValue, $segmentNumberValue);
+    }
+
+    /**
+     * @throws EbicsResponseExceptionInterface
+     */
+    public function checkH000ReturnCode(Request $request, Response $response): Response
+    {
+        $errorCode = $this->retrieveH000ReturnCode($response);
+
+        if ('000000' === $errorCode) {
+            return $response;
+        }
+
+        $reportText = $this->retrieveH000ReportText($response);
+        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+    }
+
+    /**
+     * @throws EbicsResponseExceptionInterface
+     */
+    public function checkH004ReturnCode(Request $request, Response $response): void
+    {
+        $errorCode = $this->retrieveH004BodyOrHeaderReturnCode($response);
+
+        if ('000000' === $errorCode) {
+            return;
+        }
+
+        $reportText = $this->retrieveH004ReportText($response);
+        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 }

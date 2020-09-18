@@ -20,7 +20,7 @@ class DOMHelper
         $domNode = $domNodeList->item(0);
 
         if ($domNode === null) {
-            throw new \RuntimeException('no set');
+            throw new \RuntimeException('index 0 is null');
         }
 
         return $domNode->nodeValue;

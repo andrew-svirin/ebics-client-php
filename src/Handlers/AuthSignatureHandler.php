@@ -22,13 +22,13 @@ class AuthSignatureHandler
     use XPathTrait;
 
     /**
-     * @var KeyRing
+     * @var CryptService
      */
-    private $keyRing;
+    private $cryptService;
 
-    public function __construct(KeyRing $keyRing)
+    public function __construct(CryptService  $cryptService = null)
     {
-        $this->keyRing = $keyRing;
+        $this->cryptService = $cryptService ?? new CryptService();
     }
 
     /**
@@ -36,7 +36,7 @@ class AuthSignatureHandler
      *
      * @throws EbicsException
      */
-    public function handle(DOMDocument $xml, DOMNode $xmlRequest) : void
+    public function handle(KeyRing $keyRing, DOMDocument $xml, DOMNode $xmlRequest) : void
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";
@@ -85,15 +85,15 @@ class AuthSignatureHandler
         // Add ds:DigestValue to ds:Reference.
         $xmlDigestValue = $xml->createElement('ds:DigestValue');
         $canonicalizedHeader = $this->calculateC14N($this->prepareH004XPath($xml), $signaturePath, $canonicalizationMethodAlgorithm);
-        $canonicalizedHeaderHash = CryptService::calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
+        $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
         $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
         $xmlReference->appendChild($xmlDigestValue);
 
         // Add ds:SignatureValue to AuthSignature.
         $xmlSignatureValue = $xml->createElement('ds:SignatureValue');
         $canonicalizedSignedInfo = $this->calculateC14N($this->prepareH004XPath($xml), $canonicalizationPath, $canonicalizationMethodAlgorithm);
-        $canonicalizedSignedInfoHash = CryptService::calculateHash($canonicalizedSignedInfo, $signatureMethodAlgorithm);
-        $canonicalizedSignedInfoHashSigned = CryptService::cryptSignatureValue($this->keyRing, $canonicalizedSignedInfoHash);
+        $canonicalizedSignedInfoHash = $this->cryptService->calculateHash($canonicalizedSignedInfo, $signatureMethodAlgorithm);
+        $canonicalizedSignedInfoHashSigned = $this->cryptService->cryptSignatureValue($keyRing, $canonicalizedSignedInfoHash);
         $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
         $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
         $xmlAuthSignature->appendChild($xmlSignatureValue);

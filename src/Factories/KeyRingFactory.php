@@ -23,61 +23,37 @@ class KeyRingFactory
 
     public static function buildKeyRingFromData(array $data): KeyRing
     {
+        $toCheck = [
+            self::USER_PREFIX => [
+                self::CERTIFICATE_PREFIX_A => ['build' => 'buildCertificateA', 'setter' => 'setUserCertificateA'],
+                self::CERTIFICATE_PREFIX_E => ['build' => 'buildCertificateE', 'setter' => 'setUserCertificateE'],
+                self::CERTIFICATE_PREFIX_X => ['build' => 'buildCertificateX', 'setter' => 'setUserCertificateX'],
+            ],
+            self::BANK_PREFIX => [
+                self::CERTIFICATE_PREFIX_E => ['build' => 'buildCertificateE', 'setter' => 'setBankCertificateE'],
+                self::CERTIFICATE_PREFIX_X => ['build' => 'buildCertificateX', 'setter' => 'setBankCertificateX'],
+            ]
+        ];
+
         $keyRing = new KeyRing();
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateAContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::CERTIFICATE_PREFIX];
-            $userCertificateAPublicKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX];
-            $userCertificateAPrivateKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PRIVATE_KEY_PREFIX];
-            $userCertificateA = CertificateFactory::buildCertificateA(
-            self::decodeValue($userCertificateAPublicKey),
-            self::decodeValue($userCertificateAPrivateKey),
-            !empty($userCertificateAContent) ? self::decodeValue($userCertificateAContent) : null
-         );
-            $keyRing->setUserCertificateA($userCertificateA);
-        }
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateEContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX];
-            $userCertificateEPublicKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
-            $userCertificateEPrivateKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $userCertificateE = CertificateFactory::buildCertificateE(
-            self::decodeValue($userCertificateEPublicKey),
-            self::decodeValue($userCertificateEPrivateKey),
-            !empty($userCertificateEContent) ? self::decodeValue($userCertificateEContent) : null
-         );
-            $keyRing->setUserCertificateE($userCertificateE);
-        }
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateXContent = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX];
-            $userCertificateXPublicKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
-            $userCertificateXPrivateKey = $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $userCertificateX = CertificateFactory::buildCertificateX(
-            self::decodeValue($userCertificateXPublicKey),
-            self::decodeValue($userCertificateXPrivateKey),
-            !empty($userCertificateXContent) ? self::decodeValue($userCertificateXContent) : null
-         );
-            $keyRing->setUserCertificateX($userCertificateX);
-        }
-        if (!empty($data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX])) {
-            $bankCertificateEContent = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX];
-            $bankCertificateEPublicKey = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
-            $bankCertificateEPrivateKey = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateE = CertificateFactory::buildCertificateE(
-            self::decodeValue($bankCertificateEPublicKey),
-            !empty($bankCertificateEPrivateKey) ? self::decodeValue($bankCertificateEPrivateKey) : null,
-            !empty($bankCertificateEContent) ? self::decodeValue($bankCertificateEContent) : null
-         );
-            $keyRing->setBankCertificateE($bankCertificateE);
-        }
-        if (!empty($data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX])) {
-            $bankCertificateXContent = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX];
-            $bankCertificateXPublicKey = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
-            $bankCertificateXPrivateKey = $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateX = CertificateFactory::buildCertificateX(
-            self::decodeValue($bankCertificateXPublicKey),
-            !empty($bankCertificateXPrivateKey) ? self::decodeValue($bankCertificateXPrivateKey) : null,
-            !empty($bankCertificateXContent) ? self::decodeValue($bankCertificateXContent) : null
-         );
-            $keyRing->setBankCertificateX($bankCertificateX);
+
+        foreach ($toCheck as $prefix => $certificatList) {
+            foreach ($certificatList as $certificateName => $methods) {
+                $build = $methods['build'];
+                $setter = $methods['setter'];
+
+                if (!empty($data[$prefix][$certificateName][self::PUBLIC_KEY_PREFIX])) {
+                    $content = $data[$prefix][$certificateName][self::CERTIFICATE_PREFIX];
+                    $publicKey = $data[$prefix][$certificateName][self::PUBLIC_KEY_PREFIX];
+                    $privateKey = $data[$prefix][$certificateName][self::PRIVATE_KEY_PREFIX];
+                    $certificate = CertificateFactory::$build(
+                        self::decodeValue($publicKey),
+                        self::decodeValue($privateKey),
+                        !empty($content) ? self::decodeValue($content) : null
+                    );
+                    $keyRing->$setter($certificate);
+                }
+            }
         }
 
         return $keyRing;

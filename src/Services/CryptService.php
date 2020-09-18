@@ -3,7 +3,6 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
@@ -23,7 +22,7 @@ class CryptService
     /**
      * Calculate hash.
      */
-    public static function calculateHash(string $text, string $algo = 'sha256'): string
+    public function calculateHash(string $text, string $algo = 'sha256'): string
     {
         return hash($algo, $text, true);
     }
@@ -31,21 +30,20 @@ class CryptService
     /**
      * Decrypt encrypted OrderData.
      */
-    public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
+    public function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
     {
-        $content = self::decryptOrderDataContent($keyRing, $orderData);
-        $orderData = OrderDataFactory::buildOrderDataFromContent($content);
+        $content = $this->decryptOrderDataContent($keyRing, $orderData);
 
-        return $orderData;
+        return new OrderData($content);
     }
 
     /**
      * Decrypt encrypted OrderData.
      */
-    public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
+    public function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
         if (!($certificateE = $keyRing->getUserCertificateE())) {
-            throw new \RuntimeException('Certificate E is not set.');
+            throw new EbicsException('Certificate E is not set.');
         }
 
         $rsa = new RSA();
@@ -75,7 +73,7 @@ class CryptService
      *
      * @throws EbicsException
      */
-    public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
+    public function cryptSignatureValue(KeyRing $keyRing, string $hash): string
     {
         $digestToSignBin = self::filter($hash);
 
@@ -107,7 +105,7 @@ class CryptService
      *      'privatekey' => '<string>',
      *  ]
      */
-    public static function generateKeys(KeyRing $keyRing, string $algo = 'sha256', int $length = 2048): array
+    public function generateKeys(KeyRing $keyRing, string $algo = 'sha256', int $length = 2048): array
     {
         $rsa = new RSA();
         $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
@@ -210,10 +208,8 @@ class CryptService
 
     /**
      * generate 16 pseudo bytes.
-     *
-     * @return string
      */
-    public static function generateNonce()
+    public function generateNonce() : string
     {
         $bytes = Random::string(16);
         $nonce = bin2hex($bytes);

@@ -35,16 +35,6 @@ class HeaderHandler
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
 
     /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var Bank
-     */
-    private $bank;
-
-    /**
      * @var string
      */
     private $language;
@@ -58,28 +48,27 @@ class HeaderHandler
      * @var string
      */
     private $product;
-
     /**
-     * @var KeyRing
+     * @var CryptService
      */
-    private $keyRing;
+    private $cryptService;
 
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(CryptService $cryptService = null)
     {
-        $this->bank = $bank;
-        $this->user = $user;
-        $this->keyRing = $keyRing;
         $this->language = 'de';
         $this->securityMedium = '0000';
         $this->product = 'Ebics client PHP';
+        $this->cryptService = $cryptService ?? new CryptService();
     }
 
     /**
      * Add header for INI Request XML.
      */
-    public function handleINI(DOMDocument $xml, DOMElement $xmlRequest) : void
+    public function handleINI(Bank $bank, User $user, DOMDocument $xml, DOMElement $xmlRequest) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
+         $bank,
+         $user,
          $xml,
          $xmlRequest,
          null,
@@ -92,43 +81,49 @@ class HeaderHandler
     /**
      * Add header for HIA Request XML.
      */
-    public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest) : void
+    public function handleHIA(Bank $bank, User $user, DOMDocument $xml, DOMElement $xmlRequest) : DOMDocument
     {
-        $this->handle(
-         $xml,
-         $xmlRequest,
-         null,
-         null,
-         $this->handleOrderDetails(self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN),
-         $this->handleMutable()
+        return $this->handle(
+            $bank,
+            $user,
+            $xml,
+            $xmlRequest,
+            null,
+            null,
+            $this->handleOrderDetails(self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN),
+            $this->handleMutable()
       );
     }
 
     /**
      * Add header for HPB Request XML.
      */
-    public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHPB(Bank $bank, User $user, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : DOMDocument
     {
-        $this->handle(
-         $xml,
-         $xmlRequest,
-         $this->handleNonce($dateTime),
-         null,
-         $this->handleOrderDetails(self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN),
-         $this->handleMutable()
+        return $this->handle(
+            $bank,
+            $user,
+            $xml,
+            $xmlRequest,
+            $this->handleNonce($dateTime),
+            null,
+            $this->handleOrderDetails(self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN),
+            $this->handleMutable()
       );
     }
 
     /**
      * Add header for HAA Request XML.
      */
-    public function handleHAA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHAA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(self::ORDER_TYPE_HAA, self::ORDER_ATTRIBUTE_DZHNN, $this->handleStandardOrderParams()),
          $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
@@ -137,9 +132,10 @@ class HeaderHandler
     /**
      * Add header for TransferReceipt Request XML.
      */
-    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction) : void
+    public function handleTransferReceipt(Bank $bank, DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction) : void
     {
         $this->handleTransaction(
+        $bank,
          $xml,
          $xmlRequest,
          $transaction,
@@ -150,13 +146,15 @@ class HeaderHandler
     /**
      * Add header for VMK Request XML.
      */
-    public function handleVMK(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleVMK(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_VMK,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -169,13 +167,15 @@ class HeaderHandler
     /**
      * Add header for STA Request XML.
      */
-    public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleSTA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_STA,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -188,13 +188,15 @@ class HeaderHandler
     /**
      * Add header for HPD Request XML.
      */
-    public function handleHPD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHPD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_HPD,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -207,13 +209,15 @@ class HeaderHandler
     /**
      * Add header for HTD Request XML.
      */
-    public function handleHTD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHTD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_HTD,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -226,13 +230,15 @@ class HeaderHandler
     /**
      * Add header for FDL Request XML.
      */
-    public function handleFDL(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleFDL(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_FDL,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -245,13 +251,15 @@ class HeaderHandler
     /**
      * Add header for HKD Request XML.
      */
-    public function handleHKD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHKD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
     {
         $this->handle(
+            $bank,
+            $user,
          $xml,
          $xmlRequest,
          $this->handleNonce($dateTime),
-         $this->handleBank(),
+         $this->handleBank($keyRing),
          $this->handleOrderDetails(
             self::ORDER_TYPE_HKD,
             self::ORDER_ATTRIBUTE_DZHNN,
@@ -383,7 +391,7 @@ class HeaderHandler
         return function (DOMDocument $xml, DOMElement $xmlStatic) use ($dateTime) {
             // Add Nonce to static.
             $xmlNonce = $xml->createElement('Nonce');
-            $xmlNonce->nodeValue = CryptService::generateNonce();
+            $xmlNonce->nodeValue = $this->cryptService->generateNonce();
             $xmlStatic->appendChild($xmlNonce);
 
             // Add TimeStamp to static.
@@ -396,10 +404,8 @@ class HeaderHandler
     /**
      * Hook to add BankPubKeyDigests information.
      */
-    private function handleBank(): callable
+    private function handleBank(KeyRing $keyRing): callable
     {
-        $keyRing = $this->keyRing;
-
         return function (DOMDocument $xml, DOMElement $xmlStatic) use ($keyRing) {
             $algorithm = 'sha256';
             // Add BankPubKeyDigests to static.
@@ -435,8 +441,16 @@ class HeaderHandler
     /**
      * Add header and children elements to DOM XML.
      */
-    private function handle(DOMDocument $xml, DOMElement $xmlRequest, callable $nonce = null, callable $bank = null, callable $orderDetails = null, callable $mutable = null) : void
-    {
+    private function handle(
+        Bank $realBank,
+        User $user,
+        DOMDocument $xml,
+        DOMElement $xmlRequest,
+        callable $nonce = null,
+        callable $bank = null,
+        callable $orderDetails = null,
+        callable $mutable = null
+    ) : DOMDocument {
         // Add header to request.
         $xmlHeader = $xml->createElement('header');
         $xmlHeader->setAttribute('authenticate', 'true');
@@ -448,7 +462,7 @@ class HeaderHandler
 
         // Add HostID to static.
         $xmlHostId = $xml->createElement('HostID');
-        $xmlHostId->nodeValue = $this->bank->getHostId();
+        $xmlHostId->nodeValue = $realBank->getHostId();
         $xmlStatic->appendChild($xmlHostId);
 
         if (null !== $nonce) {
@@ -458,12 +472,12 @@ class HeaderHandler
 
         // Add PartnerID to static.
         $xmlPartnerId = $xml->createElement('PartnerID');
-        $xmlPartnerId->nodeValue = $this->user->getPartnerId();
+        $xmlPartnerId->nodeValue = $user->getPartnerId();
         $xmlStatic->appendChild($xmlPartnerId);
 
         // Add UserID to static.
         $xmlUserId = $xml->createElement('UserID');
-        $xmlUserId->nodeValue = $this->user->getUserId();
+        $xmlUserId->nodeValue = $user->getUserId();
         $xmlStatic->appendChild($xmlUserId);
 
         // Add Product to static.
@@ -491,12 +505,14 @@ class HeaderHandler
             // Add Mutable information to header.
             $mutable($xml, $xmlHeader);
         }
+
+        return $xml;
     }
 
     /**
      * Add header and children elements to DOM XML.
      */
-    private function handleTransaction(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction, callable $mutable = null) : void
+    private function handleTransaction(Bank $bank, DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction, callable $mutable = null) : void
     {
         // Add header to request.
         $xmlHeader = $xml->createElement('header');
@@ -509,7 +525,7 @@ class HeaderHandler
 
         // Add HostID to static.
         $xmlHostId = $xml->createElement('HostID');
-        $xmlHostId->nodeValue = $this->bank->getHostId();
+        $xmlHostId->nodeValue = $bank->getHostId();
         $xmlStatic->appendChild($xmlHostId);
 
         // Add TransactionID to static.

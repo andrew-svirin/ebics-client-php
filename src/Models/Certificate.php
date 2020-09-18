@@ -40,33 +40,21 @@ class Certificate implements CertificateInterface
         $this->content = $content;
     }
 
-    /**
-     * @return string
-     */
     public function getType(): string
     {
         return $this->type;
     }
 
-    /**
-     * @return string
-     */
     public function getPublicKey(): string
     {
         return $this->publicKey;
     }
 
-    /**
-     * @return string|null
-     */
     public function getPrivateKey(): ?string
     {
         return $this->privateKey;
     }
 
-    /**
-     * @return string|null
-     */
     public function getContent(): ?string
     {
         return $this->content;
@@ -74,8 +62,6 @@ class Certificate implements CertificateInterface
 
     /**
      * Represents Certificate in the structure X509.
-     *
-     * @return CertificateX509|null
      */
     public function toX509(): ?CertificateX509
     {

@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Models\Request;
 use DOMDocument;
 use DOMElement;
 
@@ -33,18 +34,18 @@ class BodyHandler
     /**
      * Add body and children elements to request.
      */
-    public function handle(DOMDocument $xml, DOMElement $xmlRequest, string $orderData): void
+    public function handle(Request $request, DOMElement $xmlRequest, string $orderData): Request
     {
         // Add body to request.
-        $xmlBody = $xml->createElement('body');
+        $xmlBody = $request->createElement('body');
         $xmlRequest->appendChild($xmlBody);
 
         // Add DataTransfer to body.
-        $xmlDataTransfer = $xml->createElement('DataTransfer');
+        $xmlDataTransfer = $request->createElement('DataTransfer');
         $xmlBody->appendChild($xmlDataTransfer);
 
         // Add OrderData to DataTransfer.
-        $xmlOrderData = $xml->createElement('OrderData');
+        $xmlOrderData = $request->createElement('OrderData');
         if ($this->compress) {
             // Try to compress to gz order data.
             if (!($orderData = gzcompress($orderData))) {
@@ -56,35 +57,41 @@ class BodyHandler
         }
         $xmlOrderData->nodeValue = $orderData;
         $xmlDataTransfer->appendChild($xmlOrderData);
+
+        return $request;
     }
 
     /**
      * Add body and children elements to transfer request.
      */
-    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode): void
+    public function handleTransferReceipt(Request $request, DOMElement $xmlRequest, int $receiptCode): Request
     {
         // Add body to request.
-        $xmlBody = $xml->createElement('body');
+        $xmlBody = $request->createElement('body');
         $xmlRequest->appendChild($xmlBody);
 
         // Add TransferReceipt to body.
-        $xmlTransferReceipt = $xml->createElement('TransferReceipt');
+        $xmlTransferReceipt = $request->createElement('TransferReceipt');
         $xmlTransferReceipt->setAttribute('authenticate', 'true');
         $xmlBody->appendChild($xmlTransferReceipt);
 
         // Add ReceiptCode to TransferReceipt.
-        $xmlReceiptCode = $xml->createElement('ReceiptCode');
+        $xmlReceiptCode = $request->createElement('ReceiptCode');
         $xmlReceiptCode->nodeValue = (string)$receiptCode;
         $xmlTransferReceipt->appendChild($xmlReceiptCode);
+
+        return $request;
     }
 
     /**
      * Add empty body element to request.
      */
-    public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest): void
+    public function handleEmpty(Request $request, DOMElement $xmlRequest): Request
     {
         // Add body to request.
-        $xmlBody = $xml->createElement('body');
+        $xmlBody = $request->createElement('body');
         $xmlRequest->appendChild($xmlBody);
+
+        return $request;
     }
 }

@@ -15,6 +15,15 @@ class Response extends DOMDocument
      */
     private $transactions = [];
 
+    public function __construct(string $content = null)
+    {
+        parent::__construct();
+
+        if ($content) {
+            $this->loadXML($content);
+        }
+    }
+
     public function addTransaction(Transaction $transaction) : void
     {
         $this->transactions[] = $transaction;

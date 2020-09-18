@@ -30,27 +30,27 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_X, $publicKey, $privateKey, $content);
     }
 
-    public static function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_A, $isCertified);
     }
 
-    public static function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_E, $isCertified);
     }
 
-    public static function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
     }
 
-    public static function buildCertificateEFromDetails(string $exponent, string $modulus, string $content = null): Certificate
+    public function buildCertificateEFromDetails(string $exponent, string $modulus, string $content = null): Certificate
     {
         return self::buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
     }
 
-    public static function buildCertificateXFromDetails(string $exponent, string $modulus, string $content = null): Certificate
+    public function buildCertificateXFromDetails(string $exponent, string $modulus, string $content = null): Certificate
     {
         return self::buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
     }

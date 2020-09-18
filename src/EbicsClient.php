@@ -35,25 +35,6 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class EbicsClient implements EbicsClientInterface
 {
     /**
-     * An EbicsBank instance.
-     *
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * An EbicsUser instance.
-     *
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
-
-    /**
      * @var OrderDataHandler
      */
     private $orderDataHandler;
@@ -69,36 +50,32 @@ final class EbicsClient implements EbicsClientInterface
     private $requestFactory;
 
     /**
-     * Constructor.
+     * @var RequestMaker
      */
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
-    {
-        $this->bank = $bank;
-        $this->user = $user;
-        $this->keyRing = $keyRing;
-        $this->requestFactory = new RequestHandler($bank, $user, $keyRing);
-        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
-        $this->responseHandler = new ResponseHandler();
-    }
-
+    private $requestMaker;
     /**
-     * Make request to bank server.
-     *
-     * @throws TransportExceptionInterface
+     * @var CryptService|null
      */
-    public function post(Request $request): ResponseInterface
-    {
-        $body = $request->getContent();
-        $httpClient = HttpClient::create();
+    private $cryptService;
+    /**
+     * @var CertificateFactory|null
+     */
+    private $certificateFactory;
 
-        return $httpClient->request('POST', $this->bank->getUrl(), [
-            'headers' => [
-                'Content-Type' => 'text/xml; charset=ISO-8859-1',
-            ],
-            'body' => $body,
-            'verify_peer' => false,
-            'verify_host' => false,
-        ]);
+    public function __construct(
+        RequestMaker $requestMaker = null,
+        RequestHandler $requestHandler = null,
+        ResponseHandler $responseHandler = null,
+        CryptService $cryptService  = null,
+        CertificateFactory $certificateFactory = null,
+        OrderDataHandler $orderDataHandler = null
+    ) {
+        $this->requestMaker = $requestMaker === null ? new RequestMaker(HttpClient::create()) : $requestMaker;
+        $this->requestFactory = $requestHandler === null ? new RequestHandler() : $requestHandler;
+        $this->responseHandler = $responseHandler === null ? new ResponseHandler() : $responseHandler;
+        $this->orderDataHandler = $orderDataHandler === null ? new OrderDataHandler() : $orderDataHandler;
+        $this->cryptService = $cryptService === null ? new CryptService() : $cryptService;
+        $this->certificateFactory = $certificateFactory === null ? new CertificateFactory() : $certificateFactory;
     }
 
     /**
@@ -109,14 +86,30 @@ final class EbicsClient implements EbicsClientInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function HEV(): Response
+    public function HEV(Bank $bank): Response
     {
-        $request = $this->requestFactory->buildHEV();
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
-        $this->checkH000ReturnCode($request, $response);
+        $request  = $this->requestFactory->buildHEV($bank);
+        $response = $this->requestMaker->post($request, $bank);
+
+        return $this->responseHandler->checkH000ReturnCode($request, $response);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function INI(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
+    {
+        $certificateA = $this->certificateFactory->generateCertificateAFromKeys($this->cryptService->generateKeys($keyRing), $bank->isCertified());
+        $request = $this->requestFactory->buildINI($bank, $user, $keyRing, $certificateA, $dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
+
+        $this->responseHandler->checkH004ReturnCode($request, $response);
+        $keyRing->setUserCertificateA($certificateA);
 
         return $response;
     }
@@ -129,48 +122,16 @@ final class EbicsClient implements EbicsClientInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function INI(DateTime $dateTime = null): Response
+    public function HIA(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $certificateA = CertificateFactory::generateCertificateAFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
-        $request = $this->requestFactory->buildINI($certificateA, $dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $certificateE = $this->certificateFactory->generateCertificateEFromKeys($this->cryptService->generateKeys($keyRing), $bank->isCertified());
+        $certificateX = $this->certificateFactory->generateCertificateXFromKeys($this->cryptService->generateKeys($keyRing), $bank->isCertified());
+        $request = $this->requestFactory->buildHIA($bank, $user, $keyRing, $certificateE, $certificateX, $dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
-        $this->keyRing->setUserCertificateA($certificateA);
-
-        return $response;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ClientExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function HIA(DateTime $dateTime = null): Response
-    {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $certificateE = CertificateFactory::generateCertificateEFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
-        $certificateX = CertificateFactory::generateCertificateXFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
-        $request = $this->requestFactory->buildHIA($certificateE, $certificateX, $dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
-
-        $this->checkH004ReturnCode($request, $response);
-        $this->keyRing->setUserCertificateE($certificateE);
-        $this->keyRing->setUserCertificateX($certificateX);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
+        $keyRing->setUserCertificateE($certificateE);
+        $keyRing->setUserCertificateX($certificateX);
 
         return $response;
     }
@@ -184,26 +145,18 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function HPB(DateTime $dateTime = null): Response
+    public function HPB(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildHPB($dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildHPB($bank, $user, $keyRing,$dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
         // Prepare decrypted OrderData.
-        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($keyRing, $this->responseHandler->retrieveOrderData($response));
+
         $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
-        $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
-        $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
-        $this->keyRing->setBankCertificateX($certificateX);
-        $this->keyRing->setBankCertificateE($certificateE);
+        $keyRing->setBankCertificateX($this->orderDataHandler->retrieveAuthenticationCertificate($orderData));
+        $keyRing->setBankCertificateE($this->orderDataHandler->retrieveEncryptionCertificate($orderData));
 
         return $response;
     }
@@ -217,24 +170,18 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function HPD(DateTime $dateTime = null): Response
+    public function HPD(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildHPD($dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildHPD($bank, $user, $keyRing,$dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
         // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -249,24 +196,18 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function HKD(DateTime $dateTime = null): Response
+    public function HKD(Bank $bank, User $user, KeyRing $keyRing,  DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildHKD($dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildHKD($bank, $user, $keyRing,$dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
         // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -281,25 +222,18 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function HTD(DateTime $dateTime = null): Response
+    public function HTD(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
+        $request = $this->requestFactory->buildHTD($bank, $user, $keyRing, $dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $request = $this->requestFactory->buildHTD($dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
-
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
         // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -316,19 +250,12 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws Exceptions\NoDownloadDataAvailableException
      */
-    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
+    public function FDL(Bank $bank, User $user, KeyRing $keyRing, string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
+        $request = $this->requestFactory->buildFDL($bank, $user, $keyRing, $dateTime ?? new DateTime(), $fileInfo, $countryCode, $startDateTime, $endDateTime);
+        $response = $this->requestMaker->post($request, $bank);
 
-        $request = $this->requestFactory->buildFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
-
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
 
         // TODO: Send Transfer transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
@@ -338,12 +265,12 @@ final class EbicsClient implements EbicsClientInterface
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
         switch ($format) {
             case 'plain':
-                $orderDataContent = CryptService::decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
+                $orderDataContent = $this->cryptService->decryptOrderDataContent($keyRing, $orderDataEncrypted);
                 $transaction->setPlainOrderData($orderDataContent);
                 break;
             case 'xml':
             default:
-                $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+                $orderData = $this->cryptService->decryptOrderData($keyRing, $orderDataEncrypted);
                 $transaction->setOrderData($orderData);
                 break;
         }
@@ -351,21 +278,18 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function transferReceipt(Response $response, bool $acknowledged = true) : Response
+    public function transferReceipt(Bank $bank, KeyRing $keyRing, Response $response, bool $acknowledged = true) : Response
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
             throw new EbicsException('There is no transactions to mark as received');
         }
 
-        $request = $this->requestFactory->buildTransferReceipt($lastTransaction, $acknowledged);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildTransferReceipt($bank, $keyRing, $lastTransaction, $acknowledged);
+        $response = $this->requestMaker->post($request, $bank);
 
         try {
-            $this->checkH004ReturnCode($request, $response);
+            $this->responseHandler->checkH004ReturnCode($request, $response);
         } catch (DownloadPostprocessDoneException $exception) {
             //EBICS_DOWNLOAD_POSTPROCESS_DONE, means transfer is OK (...)
         }
@@ -382,18 +306,12 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function HAA(DateTime $dateTime = null): Response
+    public function HAA(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildHAA($dateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildHAA($bank, $user, $keyRing,$dateTime ?? new DateTime());
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
 
         return $response;
     }
@@ -407,18 +325,12 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
+    public function VMK(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildVMK($dateTime, $startDateTime, $endDateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildVMK($bank, $user, $keyRing,$dateTime ?? new DateTime(), $startDateTime, $endDateTime);
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
 
         return $response;
     }
@@ -432,49 +344,13 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
+    public function STA(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
     {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildSTA($dateTime, $startDateTime, $endDateTime);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
+        $request = $this->requestFactory->buildSTA($bank, $user, $keyRing,$dateTime ?? new DateTime(), $startDateTime, $endDateTime);
+        $response = $this->requestMaker->post($request, $bank);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->responseHandler->checkH004ReturnCode($request, $response);
 
         return $response;
-    }
-
-    /**
-     * @throws EbicsResponseExceptionInterface
-     */
-    private function checkH004ReturnCode(Request $request, Response $response): void
-    {
-        $errorCode = $this->responseHandler->retrieveH004BodyOrHeaderReturnCode($response);
-
-        if ('000000' === $errorCode) {
-            return;
-        }
-
-        $reportText = $this->responseHandler->retrieveH004ReportText($response);
-        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
-    }
-
-    /**
-     * @throws EbicsResponseExceptionInterface
-     */
-    private function checkH000ReturnCode(Request $request, Response $response): void
-    {
-        $errorCode = $this->responseHandler->retrieveH000ReturnCode($response);
-
-        if ('000000' === $errorCode) {
-            return;
-        }
-
-        $reportText = $this->responseHandler->retrieveH000ReportText($response);
-        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 }

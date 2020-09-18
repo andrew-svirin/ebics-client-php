@@ -6,7 +6,7 @@ use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\Transaction;
 
 /**
- * Class OrderDataFactory represents producers for the @see OrderData.
+ * Class TransactionFactory represents producers for the @see OrderData.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
