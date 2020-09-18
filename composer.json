@@ -23,7 +23,7 @@
     "ext-openssl": "*",
     "ext-zlib": "*",
     "ext-json": "*",
-    "phpseclib/phpseclib": "~2.0",
+    "phpseclib/phpseclib": ">=2.0.5",
     "symfony/http-client": "^4.3||^5.0"
   },
   "require-dev": {
