@@ -41,10 +41,10 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-${{ matrix.dependencies }}"
 
       - name: Install PHP
-          uses: shivammathur/setup-php@v2
-          with:
-            php-version: ${{ matrix.php-versions }}
-            extensions: intl openssl zlib json dom
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: intl openssl zlib json dom
 
       - name: "Install lowest dependencies"
         if: ${{ matrix.dependencies == 'lowest' }}
