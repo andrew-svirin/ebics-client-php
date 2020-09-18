@@ -9,7 +9,20 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dependencies:
+          - "lowest"
+          - "highest"
+          - "locked"
+        php-version:
+          - "7.2"
+          - "7.3"
+          - "7.4"
+          - "8.0"
+        operating-system:
+          - "ubuntu-latest"
+          - "windows-latest"
 
     steps:
       - uses: actions/checkout@v2
