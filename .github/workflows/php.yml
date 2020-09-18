@@ -28,6 +28,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: intl openssl zlib json dom
+
       - name: Validate composer.json and composer.lock
         run: composer validate
 
@@ -39,12 +45,6 @@ jobs:
             vendor
           key: "php-${{ matrix.php-version }}-${{ matrix.dependencies }}"
           restore-keys: "php-${{ matrix.php-version }}-${{ matrix.dependencies }}"
-
-      - name: Install PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: intl openssl zlib json dom
 
       - name: "Install lowest dependencies"
         if: ${{ matrix.dependencies == 'lowest' }}
