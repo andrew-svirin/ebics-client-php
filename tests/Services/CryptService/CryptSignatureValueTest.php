@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace AndrewSvirin\Ebics\Tests\Services\CryptService;
-
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Certificate;
@@ -10,11 +10,13 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use PHPUnit\Framework\TestCase;
 
+use function ctype_print;
+
 class CryptSignatureValueTest extends TestCase
 {
-    public function testUserCertificateXEmpty()
+    public function testUserCertificateXEmpty(): void
     {
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
 
         self::expectException(EbicsException::class);
@@ -23,9 +25,9 @@ class CryptSignatureValueTest extends TestCase
         $sUT->cryptSignatureValue($keyring, 'test');
     }
 
-    public function testUserCertificateXPrivateKeyEmpty()
+    public function testUserCertificateXPrivateKeyEmpty(): void
     {
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
         $keyring->setUserCertificateX(new Certificate('test', 'test'));
 
@@ -35,9 +37,9 @@ class CryptSignatureValueTest extends TestCase
         $sUT->cryptSignatureValue($keyring, 'test');
     }
 
-    public function testNotEncryped()
+    public function testNotEncryped(): void
     {
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
         $keyring->setPassword('test');
         $keyring->setUserCertificateX(new Certificate('test', 'test', 'test'));
@@ -48,9 +50,9 @@ class CryptSignatureValueTest extends TestCase
         $sUT->cryptSignatureValue($keyring, 'test');
     }
 
-    public function testOk()
+    public function testOk(): void
     {
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
         $keyring->setPassword('');
         $keyring->setUserCertificateX(new Certificate('test', '-----BEGIN PUBLIC KEY-----

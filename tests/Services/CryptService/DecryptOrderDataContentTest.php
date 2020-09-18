@@ -1,8 +1,8 @@
 <?php
 
+declare(strict_types=1);
 
 namespace AndrewSvirin\Ebics\Tests\Services\CryptService;
-
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Certificate;
@@ -13,9 +13,9 @@ use PHPUnit\Framework\TestCase;
 
 class DecryptOrderDataContentTest extends TestCase
 {
-    public function testUserCertificateEEmpty()
+    public function testUserCertificateEEmpty(): void
     {
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
 
         self::expectException(EbicsException::class);
@@ -24,15 +24,15 @@ class DecryptOrderDataContentTest extends TestCase
         $sUT->decryptOrderDataContent($keyring, new OrderDataEncrypted('hop', 'test'));
     }
 
-    public function testOk()
+    public function testOk(): void
     {
         $this->markTestSkipped('not working');
         $orderDataEncrypted = new OrderDataEncrypted(
-    'iB5GQXBKoZUA3ubhkcdaW3Bp2J4vQU3CmyDXFophjh6Jteta0PZLGcHis8ZAPe74OmngDF3GowdtuTGSUs+ekCcA4oTHWOE4PfKR4cSwMvvIUfkHKMveptc+8x4XFbMGmuyEn/Wj0DNeiccIQw6f9oRIm6m5R6qI+u3deBSLaP4=',
-    'WHoY075ZzqqZWgYAG24NN8JgmDpSacVlMYhHZbUHg6vcfKpf/q0LN5SxtevUCeTLTnbdoeQ5kIpgh0x0EaEiiXJw1nkm5md/Md4BUMAfpVEgeMbQkExEuSBcYyh9tBa5+oR397n59H5qrOmJsA4lbWznpO2EzcQAoRk/z2LzVOw='
+            'iB5GQXBKoZUA3ubhkcdaW3Bp2J4vQU3CmyDXFophjh6Jteta0PZLGcHis8ZAPe74OmngDF3GowdtuTGSUs+ekCcA4oTHWOE4PfKR4cSwMvvIUfkHKMveptc+8x4XFbMGmuyEn/Wj0DNeiccIQw6f9oRIm6m5R6qI+u3deBSLaP4=',
+            'WHoY075ZzqqZWgYAG24NN8JgmDpSacVlMYhHZbUHg6vcfKpf/q0LN5SxtevUCeTLTnbdoeQ5kIpgh0x0EaEiiXJw1nkm5md/Md4BUMAfpVEgeMbQkExEuSBcYyh9tBa5+oR397n59H5qrOmJsA4lbWznpO2EzcQAoRk/z2LzVOw='
         );
 
-        $sUT = new CryptService();
+        $sUT     = new CryptService();
         $keyring = new KeyRing();
         $keyring->setPassword('');
         $keyring->setUserCertificateE(new Certificate('test', '-----BEGIN PUBLIC KEY-----
@@ -56,9 +56,7 @@ pOB+UpwM5ZHiQz1+fWmuwXpHyhTdPM/q1YSs0RZwDJiz/PNVl3uEIOuAm20JCg91
 IIRmkAsdQK8Bw2HiyC0CQQC6bwZd7tNSjlvNgvA5xuGAmCpqy/zSuvTOuebAJ6Ur
 RHLoIwam/w9SMVFsbGpN0rCOvIQlTrW/N+50Rw2Y4yry
 -----END RSA PRIVATE KEY-----
-'
-
-));
+'));
 
         $result = $sUT->decryptOrderDataContent($keyring, $orderDataEncrypted);
 
