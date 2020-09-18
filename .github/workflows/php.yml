@@ -43,7 +43,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-versions }}
+          php-version: ${{ matrix.php-version }}
           extensions: intl openssl zlib json dom
 
       - name: "Install lowest dependencies"
