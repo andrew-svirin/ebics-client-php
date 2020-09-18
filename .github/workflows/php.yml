@@ -24,7 +24,7 @@ jobs:
           - "8.0"
         operating-system:
           - "ubuntu-latest"
-          - "windows-latest"
+          # - "windows-latest"
 
     steps:
       - uses: actions/checkout@v2
