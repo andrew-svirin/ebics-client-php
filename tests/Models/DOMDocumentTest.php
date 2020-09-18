@@ -7,6 +7,8 @@ namespace AndrewSvirin\Ebics\Tests\Models;
 use AndrewSvirin\Ebics\Models\DOMDocument;
 use PHPUnit\Framework\TestCase;
 
+use const PHP_EOL;
+
 class DOMDocumentTest extends TestCase
 {
     public function testGetter(): void
@@ -16,7 +18,7 @@ class DOMDocumentTest extends TestCase
         self::assertFalse($sUT->preserveWhiteSpace);
         self::assertSame("<?xml version='1.0' encoding='utf-8'?>", $sUT->getContent());
         self::assertFalse($sUT->formatOutput);
-        self::assertSame('<?xml version="1.0" encoding="utf-8"?>'.PHP_EOL, $sUT->getFormattedContent());
+        self::assertSame('<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL, $sUT->getFormattedContent());
         self::assertTrue($sUT->formatOutput);
     }
 }
