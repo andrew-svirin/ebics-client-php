@@ -59,6 +59,7 @@ A3jkP/yhA0WITVryywIDAQAB
         $cryptService->expects(self::once())->method('generateNonce')->willReturn('myNonce');
         $cryptService->expects(self::exactly(2))->method('calculateHash')->willReturn('myNonce');
         $cryptService->expects(self::once())->method('cryptSignatureValue')->willReturn('myNonce');
+        $cryptService->expects(self::exactly(2))->method('calculateDigest')->willReturn('myDigest');
 
         $headerHandler        = new HeaderHandler($cryptService);
         $authSignatureHandler = new AuthSignatureHandler($cryptService);
@@ -82,8 +83,8 @@ A3jkP/yhA0WITVryywIDAQAB
             <StandardOrderParams />
          </OrderDetails>
          <BankPubKeyDigests>
-            <Authentication Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">xQR4tHm5y6NBc3o3hEhZbCN9FJM8Tygw/EvHpzFo7kc=</Authentication>
-            <Encryption Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">xQR4tHm5y6NBc3o3hEhZbCN9FJM8Tygw/EvHpzFo7kc=</Encryption>
+            <Authentication Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">bXlEaWdlc3Q=</Authentication>
+            <Encryption Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">bXlEaWdlc3Q=</Encryption>
          </BankPubKeyDigests>
          <SecurityMedium>0000</SecurityMedium>
       </static>

@@ -18,7 +18,7 @@ class X509GeneratorFactory
     /** @var callable|null */
     private static $generatorFunction;
 
-    public static function setGeneratorFunction(callable $generatorFunction) : void
+    public static function setGeneratorFunction(callable $generatorFunction = null) : void
     {
         self::$generatorFunction = $generatorFunction;
     }

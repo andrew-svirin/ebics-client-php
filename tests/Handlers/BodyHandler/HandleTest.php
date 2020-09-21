@@ -20,6 +20,6 @@ class HandleTest extends TestCase
 
         $request = $sUT->handle($request, $domElement, 'test');
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body><DataTransfer><OrderData>eJwrSS0uAQAEXQHB</OrderData></DataTransfer></body></test>', $request->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body><DataTransfer><OrderData>eJwrSS0uAQAEXQHB</OrderData></DataTransfer></body></test>', (string) $request->saveXML());
     }
 }

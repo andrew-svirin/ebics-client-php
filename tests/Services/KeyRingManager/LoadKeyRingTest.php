@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace AndrewSvirin\Ebics\Tests\Services\KeyRingManager;
 
+use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\KeyRingManager;
 use PHPUnit\Framework\TestCase;
+
+use function base64_decode;
 
 class LoadKeyRingTest extends TestCase
 {
@@ -35,6 +38,7 @@ class LoadKeyRingTest extends TestCase
 
         $expected = (new KeyRing());
         $expected->setPassword('test');
+        $expected->setUserCertificateA(new Certificate('A', base64_decode('test'), base64_decode('test'), base64_decode('test')));
 
         self::assertEquals($expected, $sUT->loadKeyRing());
     }

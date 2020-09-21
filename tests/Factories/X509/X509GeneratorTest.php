@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\Factories\CertificateFactory;
 use AndrewSvirin\Ebics\Factories\X509\LegacyX509Generator;
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use DateTime;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 use function file_get_contents;
@@ -71,43 +72,45 @@ class X509GeneratorTest extends TestCase
 
     private function assertCertificateEquals(string $generatedContent, string $fileContent): void
     {
-        $generatedInfos   = openssl_x509_parse($generatedContent);
-        $certificateInfos = openssl_x509_parse($fileContent);
+        $generatedInfos   = (array) openssl_x509_parse($generatedContent);
+        $certificateInfos = (array) openssl_x509_parse($fileContent);
 
         $this->assertEquals($generatedInfos['subject'], $certificateInfos['subject']);
         $this->assertEquals($generatedInfos['issuer'], $certificateInfos['issuer']);
         $this->assertEquals(
-            DateTime::createFromFormat(
-                'U',
-                (string) $generatedInfos['validFrom_time_t']
-            )->format('d/m/Y'),
-            DateTime::createFromFormat('U', (string) $certificateInfos['validFrom_time_t'])->format('d/m/Y')
+            self::safeDate('U', (string) $generatedInfos['validFrom_time_t'])->format('d/m/Y'),
+            self::safeDate('U', (string) $certificateInfos['validFrom_time_t'])->format('d/m/Y')
         );
         $this->assertEquals(
-            DateTime::createFromFormat(
-                'U',
-                (string) $generatedInfos['validTo_time_t']
-            )->format('d/m/Y'),
-            DateTime::createFromFormat(
-                'U',
-                (string) $certificateInfos['validTo_time_t']
-            )->format('d/m/Y')
+            self::safeDate('U', (string) $generatedInfos['validTo_time_t'])->format('d/m/Y'),
+            self::safeDate('U', (string) $certificateInfos['validTo_time_t'])->format('d/m/Y')
         );
         $this->assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
     }
 
+    private static function safeDate(string $format, string $time): DateTime
+    {
+        $date = DateTime::createFromFormat($format, $time);
+
+        if ($date === false) {
+            throw new Exception('cant create date');
+        }
+
+        return $date;
+    }
+
     private function getCertificateContent(string $name): string
     {
-        return file_get_contents(getcwd() . '/tests/_data/certificates/' . $name);
+        return (string) file_get_contents(getcwd() . '/tests/_data/certificates/' . $name);
     }
 
     private function getPrivateKey(): string
     {
-        return file_get_contents(getcwd() . '/tests/_data/private_key.rsa');
+        return (string) file_get_contents(getcwd() . '/tests/_data/private_key.rsa');
     }
 
     private function getPublicKey(): string
     {
-        return file_get_contents(getcwd() . '/tests/_data/public_key.rsa');
+        return (string) file_get_contents(getcwd() . '/tests/_data/public_key.rsa');
     }
 }

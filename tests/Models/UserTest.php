@@ -11,11 +11,6 @@ class UserTest extends TestCase
 {
     public function testGetter(): void
     {
-        $sUT = new User(10, 12);
-
-        self::assertSame('10', $sUT->getPartnerId());
-        self::assertSame('12', $sUT->getUserId());
-
         $sUT = new User('hello', 'ehg!');
 
         self::assertSame('hello', $sUT->getPartnerId());

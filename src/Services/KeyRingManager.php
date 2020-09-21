@@ -33,13 +33,7 @@ class KeyRingManager implements KeyRingManagerInterface
      */
     private $password;
 
-    /**
-     * Constructor.
-     *
-     * @param string $keyRingRealPath
-     * @param string $passphrase
-     */
-    public function __construct($keyRingRealPath, $passphrase)
+    public function __construct(string $keyRingRealPath, string $passphrase)
     {
         $this->keyRingRealPath = $keyRingRealPath;
         $this->password = $passphrase;
@@ -50,11 +44,14 @@ class KeyRingManager implements KeyRingManagerInterface
      */
     public function loadKeyRing(): KeyRing
     {
-        if (is_file($this->keyRingRealPath) && ($content = file_get_contents($this->keyRingRealPath)) && !empty($content)) {
-            $result = KeyRingFactory::buildKeyRingFromData(json_decode($content, true));
-        } else {
-            $result = new KeyRing();
+        $result = new KeyRing();
+
+        if (is_file($this->keyRingRealPath) && ($content = file_get_contents($this->keyRingRealPath))) {
+            if (!empty($content)) {
+                $result = KeyRingFactory::buildKeyRingFromData(json_decode($content, true));
+            }
         }
+
         $result->setPassword($this->password);
 
         return $result;

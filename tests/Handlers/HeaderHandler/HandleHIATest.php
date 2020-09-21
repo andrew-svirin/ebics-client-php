@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AndrewSvirin\Ebics\Tests\Handlers\RequestHandler;
+namespace AndrewSvirin\Ebics\Tests\Handlers\HeaderHandler;
 
 use AndrewSvirin\Ebics\Handlers\HeaderHandler;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -31,8 +31,6 @@ class HandleHIATest extends TestCase
         $domElement  = $domDocument->createElement('test');
         $domDocument->appendChild($domElement);
 
-        $returned = $sUT->handleHIA($bank, $user, $domDocument, $domElement);
-
-        self::assertXmlStringEqualsXmlString($expected, $returned->saveXML());
+        self::assertXmlStringEqualsXmlString($expected, $sUT->handleHIA($bank, $user, $domDocument, $domElement));
     }
 }

@@ -16,6 +16,13 @@ use phpseclib\Math\BigInteger;
  */
 class CertificateX509 extends X509
 {
+    public function __construct(string $content)
+    {
+        parent::__construct();
+
+        $this->loadX509($content);
+    }
+
     /**
      * Get Certificate serialNumber.
      */

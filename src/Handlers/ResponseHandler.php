@@ -129,7 +129,7 @@ class ResponseHandler
         $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
         $segmentNumberValue = DOMHelper::safeItemValue($segmentNumber);
 
-        return TransactionFactory::buildTransaction($transactionIdValue, $transactionPhaseValue, $numSegmentsValue, $segmentNumberValue);
+        return Transaction::buildTransaction($transactionIdValue, $transactionPhaseValue, (int) $numSegmentsValue, (int) $segmentNumberValue);
     }
 
     /**

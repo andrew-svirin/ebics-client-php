@@ -13,8 +13,6 @@ class GenerateNonceTest extends TestCase
     {
         $sUT = new CryptService();
 
-        $result = $sUT->generateNonce();
-
-        self::assertRegExp('/[A-Z0-9]{16}/', $result);
+        self::assertRegExp('/^[A-Z0-9]{32}$/', $sUT->generateNonce());
     }
 }

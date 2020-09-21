@@ -22,8 +22,6 @@ class HandleTest extends TestCase
         $bank = self::createMock(Bank::class);
         $bank->expects(self::once())->method('getHostId')->willReturn('myId');
 
-        $request = $sUT->handle($bank, $request, $domElement);
-
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<HostID>myId</HostID></test>', $request->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<HostID>myId</HostID></test>', $sUT->handle($bank, $request, $domElement));
     }
 }

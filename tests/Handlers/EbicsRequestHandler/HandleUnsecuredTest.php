@@ -18,10 +18,10 @@ class HandleUnsecuredTest extends TestCase
 
         $domElement = $sUT->handleUnsecured($domDocument);
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" Revision="1" Version="H004"/>', $domDocument->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" Revision="1" Version="H004"/>', (string) $domDocument->saveXML());
 
         $domElement->nodeValue = 'test!';
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" Revision="1" Version="H004">test!</ebicsUnsecuredRequest>', $domDocument->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsUnsecuredRequest xmlns="urn:org:ebics:H004" Revision="1" Version="H004">test!</ebicsUnsecuredRequest>', (string) $domDocument->saveXML());
     }
 }

@@ -78,6 +78,8 @@ use PHPUnit\Framework\TestCase;
 class EbicsExceptionFactoryTest extends TestCase
 {
     /**
+     * @param class-string<object> $expectedExceptionClass
+     *
      * @dataProvider getExceptions
      */
     public function testExceptions(string $errorCode, ?string $errorText, string $expectedExceptionClass, ?string $meaning): void
@@ -100,6 +102,8 @@ class EbicsExceptionFactoryTest extends TestCase
     }
 
     /**
+     * @param class-string<object> $expectedExceptionClass
+     *
      * @dataProvider getExceptions
      */
     public function testExceptionsWithRequestAndReponse(string $errorCode, ?string $errorText, string $expectedExceptionClass, ?string $meaning): void

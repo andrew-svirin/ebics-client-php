@@ -10,6 +10,7 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use PHPUnit\Framework\TestCase;
 
+use function bin2hex;
 use function ctype_print;
 
 class CryptSignatureValueTest extends TestCase
@@ -80,5 +81,9 @@ v1b6X4qQcv3OBSGf8QJAZC1CjeJ0/cgJGnnC9rHNZLgIv9Ei/SuQK7K1/J9Pz46E
 
         self::assertIsString($result);
         self::assertFalse(ctype_print($result)); // binary
+        self::assertSame(
+            '3232c62266b55a8c06a95534de5350c56c53311f2b26769e7f5ca362cffac84f8c9cc82bd4765dd86e9eb7c685346a458a544911bbdccf0ecbcd53b8e5e8612e3610ff36d43675ebbba85b64f2798f81c068e719986c3ad5fd6526b558c83b0b6565733ffa875bed6b3f593e51bbb0dcc1d78bc755c1bc9a2037d5fc0edd0698',
+            bin2hex($result)
+        );
     }
 }

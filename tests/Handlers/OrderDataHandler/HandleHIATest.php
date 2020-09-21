@@ -47,8 +47,6 @@ QSYlFuShWrHPtiLmUdPoP6CV2mML1tk+l7DIIqXrQhLUKDACeM5roMx0kLhUWB8P
 +0uj1CNlNN4JRZlC7xFfqiMbFRU9Z4N6YwIDAQAB
 -----END RSA PUBLIC KEY-----');
 
-        $orderData = $sUT->handleHIA($bank, $user, $keyRing, $orderData, $certificateE, $certificateX, $datetime);
-
         self::assertXmlStringEqualsXmlString('<?xml version="1.0"?>
 <HIARequestOrderData xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <AuthenticationPubKeyInfo>
@@ -74,7 +72,7 @@ QSYlFuShWrHPtiLmUdPoP6CV2mML1tk+l7DIIqXrQhLUKDACeM5roMx0kLhUWB8P
   <PartnerID/>
   <UserID/>
 </HIARequestOrderData>
-', $orderData->saveXML());
+', $sUT->handleHIA($bank, $user, $keyRing, $orderData, $certificateE, $certificateX, $datetime));
     }
 
     public function testCertified(): void
@@ -114,8 +112,6 @@ QSYlFuShWrHPtiLmUdPoP6CV2mML1tk+l7DIIqXrQhLUKDACeM5roMx0kLhUWB8P
 +0uj1CNlNN4JRZlC7xFfqiMbFRU9Z4N6YwIDAQAB
 -----END RSA PUBLIC KEY-----');
 
-        $orderData = $sUT->handleHIA($bank, $user, $keyRing, $orderData, $certificateE, $certificateX, $datetime);
-
         self::assertXmlStringEqualsXmlString('<?xml version="1.0"?>
 <HIARequestOrderData xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
   <AuthenticationPubKeyInfo>
@@ -156,7 +152,7 @@ QSYlFuShWrHPtiLmUdPoP6CV2mML1tk+l7DIIqXrQhLUKDACeM5roMx0kLhUWB8P
   <UserID/>
 </HIARequestOrderData>
 
-', $orderData->saveXML());
+', $sUT->handleHIA($bank, $user, $keyRing, $orderData, $certificateE, $certificateX, $datetime));
     }
 
     public function testCertifiedButEmptyX509(): void

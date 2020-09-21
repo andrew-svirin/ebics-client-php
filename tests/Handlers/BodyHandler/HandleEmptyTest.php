@@ -20,6 +20,6 @@ class HandleEmptyTest extends TestCase
 
         $domDocument = $sUT->handleEmpty($domDocument, $domElement);
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body/></test>', $domDocument->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body/></test>', (string) $domDocument->saveXML());
     }
 }

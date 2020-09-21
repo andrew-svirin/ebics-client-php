@@ -36,7 +36,9 @@ class CheckH004ReturnCodeTest extends TestCase
         $request  = new Request();
         $response = new Response($xml);
 
-        self::assertNull($sUT->checkH004ReturnCode($request, $response));
+        $sUT->checkH004ReturnCode($request, $response);
+
+        self::assertSame('fake assert', 'fake assert');
     }
 
     public function testNotFound(): void

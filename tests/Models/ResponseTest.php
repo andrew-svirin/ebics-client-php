@@ -16,7 +16,7 @@ class ResponseTest extends TestCase
     {
         $sUT = new Response();
 
-        self::assertEquals('<?xml version="1.0" encoding="utf-8"?>', trim($sUT->saveXML()));
+        self::assertEquals('<?xml version="1.0" encoding="utf-8"?>', trim((string) $sUT->saveXML()));
         self::assertCount(0, $sUT->getTransactions());
         self::assertNull($sUT->getLastTransaction());
 
@@ -35,6 +35,6 @@ class ResponseTest extends TestCase
 
         $sUT = new Response('<?xml version="1.0" encoding="utf-8"?><toto></toto>');
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0" encoding="utf-8"?><toto></toto>', trim($sUT->saveXML()));
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0" encoding="utf-8"?><toto></toto>', trim((string) $sUT->saveXML()));
     }
 }

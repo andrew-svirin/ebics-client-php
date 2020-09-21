@@ -23,16 +23,9 @@ class BuildHKDTest extends TestCase
         $user    = self::createMock(User::class);
         $keyring = self::createMock(KeyRing::class);
 
-        $rsaPublicKey = '-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWidncNpkqmHnFZbicgeZfmRht
-/+TzVO9RtZQ7NDHPWvWYih3LBMsBKfX9rSKeso+c+feDLge5+Tp9vKt3Ip1vnaBr
-48jfAvkmzQyGk6OAMk2HTXY7rOZls3Cv5jhuR95h+pO6AVCloN6wq4+Y5PnyyX7Z
-A3jkP/yhA0WITVryywIDAQAB
------END PUBLIC KEY-----';
-
         $certificatX = self::createMock(Certificate::class);
 
-        $certificatX->expects(self::exactly(2))->method('getPublicKey')->willReturn($rsaPublicKey);
+        $certificatX->expects(self::never())->method('getPublicKey');
         $keyring->expects(self::once())->method('getBankCertificateX')->willReturn($certificatX);
         $keyring->expects(self::once())->method('getBankCertificateE')->willReturn($certificatX);
         $bank->expects(self::once())->method('getHostId')->willReturn('myHostId');
@@ -41,6 +34,7 @@ A3jkP/yhA0WITVryywIDAQAB
         $cryptService->expects(self::once())->method('generateNonce')->willReturn('myNonce');
         $cryptService->expects(self::exactly(2))->method('calculateHash')->willReturn('myNonce');
         $cryptService->expects(self::once())->method('cryptSignatureValue')->willReturn('myNonce');
+        $cryptService->expects(self::exactly(2))->method('calculateDigest')->willReturn('myDigest');
 
         $headerHandler        = new HeaderHandler($cryptService);
         $authSignatureHandler = new AuthSignatureHandler($cryptService);
@@ -64,8 +58,8 @@ A3jkP/yhA0WITVryywIDAQAB
             <StandardOrderParams />
          </OrderDetails>
          <BankPubKeyDigests>
-            <Authentication Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">xQR4tHm5y6NBc3o3hEhZbCN9FJM8Tygw/EvHpzFo7kc=</Authentication>
-            <Encryption Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">xQR4tHm5y6NBc3o3hEhZbCN9FJM8Tygw/EvHpzFo7kc=</Encryption>
+            <Authentication Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">bXlEaWdlc3Q=</Authentication>
+            <Encryption Version="" Algorithm="http://www.w3.org/2001/04/xmlenc#sha256">bXlEaWdlc3Q=</Encryption>
          </BankPubKeyDigests>
          <SecurityMedium>0000</SecurityMedium>
       </static>

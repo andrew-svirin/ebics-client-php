@@ -1,3 +1,9 @@
 {
-
+  "USER": {
+    "A": {
+      "CERTIFICATE": "test",
+      "PUBLIC_KEY": "test",
+      "PRIVATE_KEY": "test"
+    }
+  }
 }

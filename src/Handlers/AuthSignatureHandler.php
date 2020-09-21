@@ -36,7 +36,7 @@ class AuthSignatureHandler
      *
      * @throws EbicsException
      */
-    public function handle(KeyRing $keyRing, DOMDocument $xml, DOMNode $xmlRequest) : void
+    public function handle(KeyRing $keyRing, DOMDocument $xml, DOMNode $xmlRequest) : DOMDocument
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";
@@ -97,5 +97,7 @@ class AuthSignatureHandler
         $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
         $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
         $xmlAuthSignature->appendChild($xmlSignatureValue);
+
+        return $xml;
     }
 }

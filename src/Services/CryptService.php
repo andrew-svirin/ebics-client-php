@@ -187,7 +187,7 @@ class CryptService
      *
      * @return string
      */
-    public static function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
+    public function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
     {
         $publicKey = new RSA();
         $publicKey->loadKey($certificate->getPublicKey());

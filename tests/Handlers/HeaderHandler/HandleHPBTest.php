@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AndrewSvirin\Ebics\Tests\Handlers\RequestHandler;
+namespace AndrewSvirin\Ebics\Tests\Handlers\HeaderHandler;
 
 use AndrewSvirin\Ebics\Handlers\HeaderHandler;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -53,8 +53,6 @@ class HandleHPBTest extends TestCase
         $domElement  = $domDocument->createElement('test');
         $domDocument->appendChild($domElement);
 
-        $returned = $sUT->handleHPB($bank, $user, $domDocument, $domElement, new DateTime('2010-10-10 10:10:10'));
-
-        self::assertXmlStringEqualsXmlString($expected, $returned->saveXML());
+        self::assertXmlStringEqualsXmlString($expected, $sUT->handleHPB($bank, $user, $domDocument, $domElement, new DateTime('2010-10-10 10:10:10')));
     }
 }

@@ -18,10 +18,10 @@ class HandleNoPubKeyDigestsTest extends TestCase
 
         $domElement = $sUT->handleNoPubKeyDigests($domDocument);
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsNoPubKeyDigestsRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004"/>', $domDocument->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsNoPubKeyDigestsRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004"/>', (string) $domDocument->saveXML());
 
         $domElement->nodeValue = 'test!';
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsNoPubKeyDigestsRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004">test!</ebicsNoPubKeyDigestsRequest>', $domDocument->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><ebicsNoPubKeyDigestsRequest xmlns="urn:org:ebics:H004" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Revision="1" Version="H004">test!</ebicsNoPubKeyDigestsRequest>', (string) $domDocument->saveXML());
     }
 }

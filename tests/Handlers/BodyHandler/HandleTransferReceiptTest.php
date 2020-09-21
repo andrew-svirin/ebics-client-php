@@ -20,6 +20,6 @@ class HandleTransferReceiptTest extends TestCase
 
         $request = $sUT->handleTransferReceipt($request, $domElement, 10);
 
-        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body><TransferReceipt authenticate="true"><ReceiptCode>10</ReceiptCode></TransferReceipt></body></test>', $request->saveXML());
+        self::assertXmlStringEqualsXmlString('<?xml version="1.0"?><test>fezfze<body><TransferReceipt authenticate="true"><ReceiptCode>10</ReceiptCode></TransferReceipt></body></test>', (string) $request->saveXML());
     }
 }

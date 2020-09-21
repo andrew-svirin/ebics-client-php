@@ -24,16 +24,10 @@ class User
      */
     private $userId;
 
-    /**
-     * Constructor.
-     *
-     * @param string $partnerId
-     * @param string $userId
-     */
-    public function __construct($partnerId, $userId)
+    public function __construct(string $partnerId, string $userId)
     {
-        $this->partnerId = (string) $partnerId;
-        $this->userId = (string) $userId;
+        $this->partnerId = $partnerId;
+        $this->userId = $userId;
     }
 
     /**

@@ -16,6 +16,7 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DateTime;
@@ -154,7 +155,7 @@ final class EbicsClient implements EbicsClientInterface
         // Prepare decrypted OrderData.
         $orderData = $this->cryptService->decryptOrderData($keyRing, $this->responseHandler->retrieveOrderData($response));
 
-        $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
+        $response->addTransaction(Transaction::buildTransactionFromOrderData($orderData));
         $keyRing->setBankCertificateX($this->orderDataHandler->retrieveAuthenticationCertificate($orderData));
         $keyRing->setBankCertificateE($this->orderDataHandler->retrieveEncryptionCertificate($orderData));
 

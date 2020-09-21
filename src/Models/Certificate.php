@@ -68,9 +68,7 @@ class Certificate implements CertificateInterface
         if (null === $this->content) {
             return null;
         }
-        $x509 = new CertificateX509();
-        $x509->loadX509($this->content);
 
-        return $x509;
+        return new CertificateX509($this->content);
     }
 }

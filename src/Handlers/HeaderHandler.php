@@ -115,9 +115,9 @@ class HeaderHandler
     /**
      * Add header for HAA Request XML.
      */
-    public function handleHAA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHAA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -146,9 +146,9 @@ class HeaderHandler
     /**
      * Add header for VMK Request XML.
      */
-    public function handleVMK(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleVMK(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -167,9 +167,9 @@ class HeaderHandler
     /**
      * Add header for STA Request XML.
      */
-    public function handleSTA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleSTA(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -188,9 +188,9 @@ class HeaderHandler
     /**
      * Add header for HPD Request XML.
      */
-    public function handleHPD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHPD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -209,9 +209,9 @@ class HeaderHandler
     /**
      * Add header for HTD Request XML.
      */
-    public function handleHTD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHTD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -230,9 +230,9 @@ class HeaderHandler
     /**
      * Add header for FDL Request XML.
      */
-    public function handleFDL(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    public function handleFDL(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -251,9 +251,9 @@ class HeaderHandler
     /**
      * Add header for HKD Request XML.
      */
-    public function handleHKD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : void
+    public function handleHKD(Bank $bank, User $user, KeyRing $keyRing, DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime) : DOMDocument
     {
-        $this->handle(
+        return $this->handle(
             $bank,
             $user,
          $xml,
@@ -424,7 +424,7 @@ class HeaderHandler
             $xmlAuthentication = $xml->createElement('Authentication');
             $xmlAuthentication->setAttribute('Version', $keyRing->getBankCertificateXVersion());
             $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateXDigest = CryptService::calculateDigest($certificateX, $algorithm);
+            $certificateXDigest = $this->cryptService->calculateDigest($certificateX, $algorithm);
             $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
             $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
@@ -432,7 +432,7 @@ class HeaderHandler
             $xmlEncryption = $xml->createElement('Encryption');
             $xmlEncryption->setAttribute('Version', $keyRing->getBankCertificateEVersion());
             $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateEDigest = CryptService::calculateDigest($certificateE, $algorithm);
+            $certificateEDigest = $this->cryptService->calculateDigest($certificateE, $algorithm);
             $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
             $xmlBankPubKeyDigests->appendChild($xmlEncryption);
         };
