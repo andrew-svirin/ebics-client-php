@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
 use phpseclib\Crypt\RSA;
@@ -30,38 +31,47 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_X, $publicKey, $privateKey, $content);
     }
 
-    public static function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_A, $isCertified);
     }
 
-    public static function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_E, $isCertified);
     }
 
-    public static function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
     {
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
     }
 
-    public static function buildCertificateEFromDetails(string $exponent, string $modulus, string $content = null): Certificate
+    public function buildCertificateEFromDetails(string $exponent, string $modulus, string $content = null): Certificate
     {
         return self::buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
     }
 
-    public static function buildCertificateXFromDetails(string $exponent, string $modulus, string $content = null): Certificate
+    public function buildCertificateXFromDetails(string $exponent, string $modulus, string $content = null): Certificate
     {
         return self::buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
     }
 
     private static function generateCertificateFromKeys(array $keys, string $type, bool $isCertified): Certificate
     {
+        if (!array_key_exists('publickey', $keys)) {
+            throw new EbicsException(sprintf('key "publickey" does not exist for certificat type "%s"', $type));
+        }
+        if (!array_key_exists('privatekey', $keys)) {
+            throw new EbicsException(sprintf('key "privatekey" does not exist for certificat type "%s"', $type));
+        }
+
+        $certificateContent = null;
+
         if ($isCertified) {
             $certificateContent = self::generateCertificateContent($keys, $type);
         }
 
-        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
+        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent);
     }
 
     private static function generateCertificateContent(array $keys, string $type): string

@@ -32,4 +32,8 @@ interface EbicsResponseExceptionInterface extends \Throwable
      * Returns the full response from the bank server
      */
     public function getResponse(): ?Response;
+
+    public function setRequest(Request $request): void;
+
+    public function setResponse(Response $response): void;
 }

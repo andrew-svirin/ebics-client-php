@@ -26,17 +26,11 @@ class OrderDataEncrypted
         $this->transactionKey = $transactionKey;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderData(): string
     {
         return $this->orderData;
     }
 
-    /**
-     * @return string
-     */
     public function getTransactionKey(): string
     {
         return $this->transactionKey;

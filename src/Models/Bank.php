@@ -16,45 +16,35 @@ class Bank
      * @var string
      */
     private $hostId;
-
     /**
      * The URL of the EBICS server.
      *
      * @var string
      */
     private $url;
-
     /**
      * @var bool
      */
     private $isCertified;
-
     /**
-     * Constructor.
+     * @var string
      */
-    public function __construct(string $hostId, string $url, bool $isCertified)
+    private $version;
+
+    public function __construct(string $hostId, string $url, bool $isCertified, string $version = Version::V25)
     {
-        $this->hostId = (string) $hostId;
-        $this->url = (string) $url;
+        $this->hostId = $hostId;
+        $this->url = $url;
         $this->isCertified = $isCertified;
+        $this->version = $version;
     }
 
-    /**
-     * Getter for {hostId}.
-     *
-     * @return string
-     */
-    public function getHostId()
+    public function getHostId(): string
     {
         return $this->hostId;
     }
 
-    /**
-     * Getter for {url}.
-     *
-     * @return string
-     */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }
@@ -62,5 +52,13 @@ class Bank
     public function isCertified(): bool
     {
         return $this->isCertified;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 }

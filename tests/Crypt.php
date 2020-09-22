@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+
+namespace AndrewSvirin\Ebics\Tests;
+
+class Crypt
+{
+    public const RSA_PRIVATE_KEY = '-----BEGIN RSA PRIVATE KEY-----
+MIICXAIBAAKBgQDWidncNpkqmHnFZbicgeZfmRht/+TzVO9RtZQ7NDHPWvWYih3L
+BMsBKfX9rSKeso+c+feDLge5+Tp9vKt3Ip1vnaBr48jfAvkmzQyGk6OAMk2HTXY7
+rOZls3Cv5jhuR95h+pO6AVCloN6wq4+Y5PnyyX7ZA3jkP/yhA0WITVryywIDAQAB
+AoGBAMHvTUR3CpBp0zIxGOhJuOHUODQ/rUyWC9y2IvA954UFOZwRxoreo1BDCT6v
+AuuoiJAjmq43rv5boJdHNUz1upAijaA7Ffz+kgnyxcpEydNN5/LeAGRbQoR0OOCy
+0X8kTuigCDSX5Jz40D8IPTyQt4ClaVads7z405Cc8K21LzyxAkEA7pYGe3vC3asM
+++wo6ZoG6op9csIq7DQLdFbSrc5pK80X3lc9tFwCgvLrpjGTqrT7DxVqSTaw69Zs
+iNmmeK41SQJBAOYyf2aN9AwJ+aETcx3L/dRb9AlvlghVdy6pbEQRSfW+Ix/0BnPr
+OelUyb3uvfnNJNrMmFCCToPiD/QPwG2363MCQCQ4GEHUtu9p0S3JWyijXltqrMKo
+IVX8TKTbrV3/UM36c54oRlDECwmQESAItK8cjGRsztbQe6lBwvY/fFsjrykCQGrI
+aALpvJjNE8hdnlvnIeMdmLG72owZIUU7AGb+4iElx2NuLoQdTOrpEwCRO/0h5YO9
+vrYyDDvvZNkhaXE8DPMCQCelc+4FrWDAmVwjmBSIRK8wmlNYuzEDp6Y5XjO1gQcG
+CdS9998mcx0ebl+HQ0y4oUSxPnXkuuoRb60MTqcAOmg=
+-----END RSA PRIVATE KEY-----';
+
+    public const  RSA_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWidncNpkqmHnFZbicgeZfmRht
+/+TzVO9RtZQ7NDHPWvWYih3LBMsBKfX9rSKeso+c+feDLge5+Tp9vKt3Ip1vnaBr
+48jfAvkmzQyGk6OAMk2HTXY7rOZls3Cv5jhuR95h+pO6AVCloN6wq4+Y5PnyyX7Z
+A3jkP/yhA0WITVryywIDAQAB
+-----END PUBLIC KEY-----';
+}

@@ -10,4 +10,12 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class OrderData extends DOMDocument
 {
+    public function __construct(string $content = null)
+    {
+        parent::__construct();
+
+        if ($content) {
+            $this->loadXML($content);
+        }
+    }
 }

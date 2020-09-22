@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Exceptions;
 
 /**
- * Mapping class between error code and exception classes. @see \AndrewSvirin\Ebics\Factories\EbicsExceptionFactory
+ * Mapping class Between error code and exception classes. @see \AndrewSvirin\Ebics\Factories\EbicsExceptionFactory
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier

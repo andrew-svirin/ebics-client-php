@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\Request;
 use DOMDocument;
 use DOMElement;
 
@@ -15,23 +16,15 @@ use DOMElement;
 class HostHandler
 {
     /**
-     * @var Bank
-     */
-    private $bank;
-
-    public function __construct(Bank $bank)
-    {
-        $this->bank = $bank;
-    }
-
-    /**
      * Add HostID for Request XML.
      */
-    public function handle(DOMDocument $xml, DOMElement $xmlRequest) : void
+    public function handle(Bank $bank, Request $request, DOMElement $xmlRequest) : Request
     {
         // Add HostID to Request.
-        $xmlHostId = $xml->createElement('HostID');
-        $xmlHostId->nodeValue = $this->bank->getHostId();
+        $xmlHostId = $request->createElement('HostID');
+        $xmlHostId->nodeValue = $bank->getHostId();
         $xmlRequest->appendChild($xmlHostId);
+
+        return $request;
     }
 }
