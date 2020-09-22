@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
 use phpseclib\Crypt\RSA;
@@ -57,11 +58,20 @@ class CertificateFactory
 
     private static function generateCertificateFromKeys(array $keys, string $type, bool $isCertified): Certificate
     {
+        if (!array_key_exists('publickey', $keys)) {
+            throw new EbicsException(sprintf('key "publickey" does not exist for certificat type "%s"', $type));
+        }
+        if (!array_key_exists('privatekey', $keys)) {
+            throw new EbicsException(sprintf('key "privatekey" does not exist for certificat type "%s"', $type));
+        }
+
+        $certificateContent = null;
+
         if ($isCertified) {
             $certificateContent = self::generateCertificateContent($keys, $type);
         }
 
-        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
+        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent);
     }
 
     private static function generateCertificateContent(array $keys, string $type): string

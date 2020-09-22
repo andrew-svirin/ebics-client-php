@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Models\Version;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DateTime;
 use DOMDocument;
@@ -73,7 +74,7 @@ class HeaderHandler
          $xmlRequest,
          null,
          null,
-         $this->handleOrderDetails(self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN),
+         $this->handleOrderDetails($bank, self::ORDER_TYPE_INI, self::ORDER_ATTRIBUTE_DZNNN),
          $this->handleMutable()
       );
     }
@@ -90,7 +91,7 @@ class HeaderHandler
             $xmlRequest,
             null,
             null,
-            $this->handleOrderDetails(self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN),
+            $this->handleOrderDetails($bank, self::ORDER_TYPE_HIA, self::ORDER_ATTRIBUTE_DZNNN),
             $this->handleMutable()
       );
     }
@@ -107,7 +108,7 @@ class HeaderHandler
             $xmlRequest,
             $this->handleNonce($dateTime),
             null,
-            $this->handleOrderDetails(self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN),
+            $this->handleOrderDetails($bank, self::ORDER_TYPE_HPB, self::ORDER_ATTRIBUTE_DZHNN),
             $this->handleMutable()
       );
     }
@@ -124,7 +125,7 @@ class HeaderHandler
          $xmlRequest,
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
-         $this->handleOrderDetails(self::ORDER_TYPE_HAA, self::ORDER_ATTRIBUTE_DZHNN, $this->handleStandardOrderParams()),
+         $this->handleOrderDetails($bank, self::ORDER_TYPE_HAA, self::ORDER_ATTRIBUTE_DZHNN, $this->handleStandardOrderParams()),
          $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
       );
     }
@@ -156,7 +157,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_VMK,
+             $bank,
+             self::ORDER_TYPE_VMK,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams($startDateTime, $endDateTime)
          ),
@@ -177,7 +179,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_STA,
+             $bank,
+             self::ORDER_TYPE_STA,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams($startDateTime, $endDateTime)
          ),
@@ -198,7 +201,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_HPD,
+             $bank,
+             self::ORDER_TYPE_HPD,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
          ),
@@ -219,7 +223,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_HTD,
+             $bank,
+             self::ORDER_TYPE_HTD,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
          ),
@@ -240,7 +245,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_FDL,
+             $bank,
+             self::ORDER_TYPE_FDL,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleFDLOrderParams($fileInfo, $countryCode, $startDateTime, $endDateTime)
          ),
@@ -261,7 +267,8 @@ class HeaderHandler
          $this->handleNonce($dateTime),
          $this->handleBank($keyRing),
          $this->handleOrderDetails(
-            self::ORDER_TYPE_HKD,
+             $bank,
+             self::ORDER_TYPE_HKD,
             self::ORDER_ATTRIBUTE_DZHNN,
             $this->handleStandardOrderParams()
          ),
@@ -302,22 +309,30 @@ class HeaderHandler
     /**
      * Hook to add OrderDetails information.
      */
-    private function handleOrderDetails(string $orderType, string $orderAttribute, callable $orderParams = null): callable
+    private function handleOrderDetails(Bank $bank, string $orderType, string $orderAttribute, callable $orderParams = null): callable
     {
-        return function (DOMDocument $xml, DOMElement $xmlStatic) use ($orderType, $orderAttribute, $orderParams) {
+        return function (DOMDocument $xml, DOMElement $xmlStatic) use ($bank, $orderType, $orderAttribute, $orderParams) {
             // Add OrderDetails to static.
             $xmlOrderDetails = $xml->createElement('OrderDetails');
             $xmlStatic->appendChild($xmlOrderDetails);
 
             // Add OrderType to OrderDetails.
-            $xmlOrderType = $xml->createElement('OrderType');
+            $xmlOrderType = $xml->createElement($bank->getVersion() === Version::V30 ? 'AdminOrderType' : 'OrderType');
             $xmlOrderType->nodeValue = $orderType;
             $xmlOrderDetails->appendChild($xmlOrderType);
 
-            // Add OrderAttribute to OrderDetails.
-            $xmlOrderAttribute = $xml->createElement('OrderAttribute');
-            $xmlOrderAttribute->nodeValue = $orderAttribute;
-            $xmlOrderDetails->appendChild($xmlOrderAttribute);
+            if ($bank->getVersion() === Version::V24) {
+                $xmlOrderAttribute = $xml->createElement('OrderID');
+                $xmlOrderAttribute->nodeValue = 'A102';
+                $xmlOrderDetails->appendChild($xmlOrderAttribute);
+            }
+
+            if ($bank->getVersion() !== Version::V30) {
+                // Add OrderAttribute to OrderDetails.
+                $xmlOrderAttribute = $xml->createElement('OrderAttribute');
+                $xmlOrderAttribute->nodeValue = $orderAttribute;
+                $xmlOrderDetails->appendChild($xmlOrderAttribute);
+            }
 
             if (null !== $orderParams) {
                 // Add OrderParams information to OrderDetails.
@@ -413,11 +428,11 @@ class HeaderHandler
             $xmlStatic->appendChild($xmlBankPubKeyDigests);
 
             if (!($certificateX = $keyRing->getBankCertificateX())) {
-                throw new EbicsException('Certificate X is empty.');
+                throw new EbicsException('Certificate bank X is empty.');
             }
 
             if (!($certificateE = $keyRing->getBankCertificateE())) {
-                throw new EbicsException('Certificate E is empty.');
+                throw new EbicsException('Certificate bank E is empty.');
             }
 
             // Add Authentication to BankPubKeyDigests.

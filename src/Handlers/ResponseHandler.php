@@ -11,6 +11,7 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Models\Response;
 use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Models\Version;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 
@@ -27,10 +28,10 @@ class ResponseHandler
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
      */
-    public function retrieveH004ReturnCode(DOMDocument $xml): string
+    public function retrieveH004ReturnCode(Response $xml): string
     {
-        $xpath = $this->prepareH004XPath($xml);
-        $returnCode = $xpath->query('//H004:header/H004:mutable/H004:ReturnCode');
+        $xpath = $this->prepareH004XPath($xml, $xml->getVersion());
+        $returnCode = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':mutable/'.$xml->getVersion().':ReturnCode');
 
         return DOMHelper::safeItemValue($returnCode);
     }
@@ -38,10 +39,10 @@ class ResponseHandler
     /**
      * Extract H004 > KeyManagementResponse > body > ReturnCode value from the DOM XML.
      */
-    public function retrieveH004BodyReturnCode(DOMDocument $xml): string
+    public function retrieveH004BodyReturnCode(Response $xml): string
     {
-        $xpath = $this->prepareH004XPath($xml);
-        $returnCode = $xpath->query('//H004:body/H004:ReturnCode');
+        $xpath = $this->prepareH004XPath($xml, $xml->getVersion());
+        $returnCode = $xpath->query('//'.$xml->getVersion().':body/'.$xml->getVersion().':ReturnCode');
 
         return DOMHelper::safeItemValue($returnCode);
     }
@@ -49,7 +50,7 @@ class ResponseHandler
     /**
      * Extract H004 > ReturnCode value from both header and body. Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
      */
-    public function retrieveH004BodyOrHeaderReturnCode(DOMDocument $xml): string
+    public function retrieveH004BodyOrHeaderReturnCode(Response $xml): string
     {
         $headerReturnCode = $this->retrieveH004ReturnCode($xml);
         $bodyReturnCode = $this->retrieveH004BodyReturnCode($xml);
@@ -64,10 +65,10 @@ class ResponseHandler
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
      */
-    public function retrieveH004ReportText(DOMDocument $xml): string
+    public function retrieveH004ReportText(Response $xml): string
     {
-        $xpath = $this->prepareH004XPath($xml);
-        $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
+        $xpath = $this->prepareH004XPath($xml, $xml->getVersion());
+        $reportText = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':mutable/'.$xml->getVersion().':ReportText');
 
         return DOMHelper::safeItemValue($reportText);
     }
@@ -75,7 +76,7 @@ class ResponseHandler
     /**
      * Extract H000 > SystemReturnCode > ReturnCode value from the DOM XML.
      */
-    public function retrieveH000ReturnCode(DOMDocument $xml): string
+    public function retrieveH000ReturnCode(Response $xml): string
     {
         $xpath = $this->prepareH000XPath($xml);
         $returnCode = $xpath->query('//H000:SystemReturnCode/H000:ReturnCode');
@@ -86,7 +87,7 @@ class ResponseHandler
     /**
      * Extract H000 > SystemReturnCode > ReportText value from the DOM XML.
      */
-    public function retrieveH000ReportText(DOMDocument $xml): string
+    public function retrieveH000ReportText(Response $xml): string
     {
         $xpath = $this->prepareH000XPath($xml);
         $reportText = $xpath->query('//H000:SystemReturnCode/H000:ReportText');
@@ -99,11 +100,11 @@ class ResponseHandler
      *
      * @throws EbicsException
      */
-    public function retrieveOrderData(DOMDocument $xml): OrderDataEncrypted
+    public function retrieveOrderData(Response $xml): OrderDataEncrypted
     {
         $xpath = $this->prepareH004XPath($xml);
-        $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
-        $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
+        $orderData = $xpath->query('//'.$xml->getVersion().':body/'.$xml->getVersion().':DataTransfer/'.$xml->getVersion().':OrderData');
+        $transactionKey = $xpath->query('//'.$xml->getVersion().':body/'.$xml->getVersion().':DataTransfer/'.$xml->getVersion().':DataEncryptionInfo/'.$xml->getVersion().':TransactionKey');
         if (!$orderData || 0 === $orderData->length || !$transactionKey || 0 === $transactionKey->length) {
             throw new EbicsException('EBICS response empty result.');
         }
@@ -117,16 +118,16 @@ class ResponseHandler
     /**
      * Extract Transaction from the DOM XML.
      */
-    public function retrieveTransaction(DOMDocument $xml): Transaction
+    public function retrieveTransaction(Response $xml): Transaction
     {
         $xpath = $this->prepareH004XPath($xml);
-        $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
+        $transactionId = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':static/'.$xml->getVersion().':TransactionID');
         $transactionIdValue = DOMHelper::safeItemValue($transactionId);
-        $numSegments = $xpath->query('//H004:header/H004:static/H004:NumSegments');
+        $numSegments = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':static/'.$xml->getVersion().':NumSegments');
         $numSegmentsValue = DOMHelper::safeItemValue($numSegments);
-        $transactionPhase = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
+        $transactionPhase = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':mutable/'.$xml->getVersion().':TransactionPhase');
         $transactionPhaseValue = DOMHelper::safeItemValue($transactionPhase);
-        $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
+        $segmentNumber = $xpath->query('//'.$xml->getVersion().':header/'.$xml->getVersion().':mutable/'.$xml->getVersion().':SegmentNumber');
         $segmentNumberValue = DOMHelper::safeItemValue($segmentNumber);
 
         return Transaction::buildTransaction($transactionIdValue, $transactionPhaseValue, (int) $numSegmentsValue, (int) $segmentNumberValue);

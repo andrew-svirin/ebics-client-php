@@ -26,12 +26,17 @@ class Bank
      * @var bool
      */
     private $isCertified;
+    /**
+     * @var string
+     */
+    private $version;
 
-    public function __construct(string $hostId, string $url, bool $isCertified)
+    public function __construct(string $hostId, string $url, bool $isCertified, string $version = Version::V25)
     {
         $this->hostId = $hostId;
         $this->url = $url;
         $this->isCertified = $isCertified;
+        $this->version = $version;
     }
 
     public function getHostId(): string
@@ -47,5 +52,13 @@ class Bank
     public function isCertified(): bool
     {
         return $this->isCertified;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 }

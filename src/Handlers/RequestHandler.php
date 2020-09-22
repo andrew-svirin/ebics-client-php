@@ -68,7 +68,7 @@ class RequestHandler
         $orderDataContent = $this->orderDataHandler->handleINI($bank, $user, $keyRing, new OrderData(), $certificateA, $dateTime)->getContent();
         // Wrapper for request Order data.
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request, $bank);
         $this->headerHandler->handleINI($bank, $user, $request, $xmlRequest);
 
         return $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
@@ -85,11 +85,10 @@ class RequestHandler
     public function buildHIA(Bank $bank, User $user, KeyRing $keyRing, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime): Request
     {
         // Order data.
-        $orderData = $this->orderDataHandler->handleHIA($bank, $user, $keyRing, new OrderData(), $certificateE, $certificateX, $dateTime);
-        $orderDataContent = $orderData->getContent();
+        $orderDataContent = $this->orderDataHandler->handleHIA($bank, $user, $keyRing, new OrderData(), $certificateE, $certificateX, $dateTime)->getContent();
         // Wrapper for request Order data.
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleUnsecured($request, $bank);
         $this->headerHandler->handleHIA($bank, $user, $request, $xmlRequest);
 
         return $this->bodyHandler->handle($request, $xmlRequest, $orderDataContent);
@@ -101,7 +100,7 @@ class RequestHandler
     public function buildHPB(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleNoPubKeyDigests($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleNoPubKeyDigests($request, $bank);
         $this->headerHandler->handleHPB($bank, $user, $request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -114,7 +113,7 @@ class RequestHandler
     public function buildHPD(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleHPD($bank, $user, $keyRing,$request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -127,7 +126,7 @@ class RequestHandler
     public function buildHKD(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleHKD($bank, $user, $keyRing,$request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -140,7 +139,7 @@ class RequestHandler
     public function buildHTD(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleHTD($bank, $user, $keyRing, $request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -153,7 +152,7 @@ class RequestHandler
     public function buildFDL(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleFDL($bank, $user, $keyRing, $request, $xmlRequest, $dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -166,7 +165,7 @@ class RequestHandler
     public function buildHAA(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleHAA($bank, $user, $keyRing, $request, $xmlRequest, $dateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -179,7 +178,7 @@ class RequestHandler
     public function buildTransferReceipt(Bank $bank, KeyRing $keyRing, Transaction $transaction, bool $acknowledged): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleTransferReceipt($bank, $request, $xmlRequest, $transaction);
         $this->bodyHandler->handleTransferReceipt($request, $xmlRequest, true === $acknowledged ? TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
@@ -193,7 +192,7 @@ class RequestHandler
     public function buildVMK(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleVMK($bank, $user, $keyRing, $request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 
@@ -206,7 +205,7 @@ class RequestHandler
     public function buildSTA(Bank $bank, User $user, KeyRing $keyRing, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
     {
         $request = new Request();
-        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request, $bank);
         $this->headerHandler->handleSTA($bank, $user, $keyRing, $request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
         $this->authSignatureHandler->handle($keyRing, $request, $xmlRequest);
 

@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers\Traits;
 
+use AndrewSvirin\Ebics\Models\Version;
 use DOMDocument;
 use DOMXPath;
 
@@ -18,10 +19,10 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareH004XPath(DOMDocument $xml): DOMXPath
+    private function prepareH004XPath(DOMDocument $xml, string $version = Version::V25): DOMXPath
     {
         $xpath = new DomXpath($xml);
-        $xpath->registerNamespace('H004', 'urn:org:ebics:H004');
+        $xpath->registerNamespace($version, Version::ns($version));
         $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
         return $xpath;

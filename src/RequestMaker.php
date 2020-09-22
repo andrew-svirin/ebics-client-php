@@ -37,6 +37,6 @@ class RequestMaker
             'body' => $request->getContent(),
             'verify_peer' => false,
             'verify_host' => false,
-        ])->getContent());
+        ])->getContent(), $bank->getVersion());
     }
 }

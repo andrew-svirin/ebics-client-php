@@ -78,7 +78,7 @@ class CryptService
         $digestToSignBin = self::filter($hash);
 
         if (!($certificateX = $keyRing->getUserCertificateX()) || !($privateKey = $certificateX->getPrivateKey())) {
-            throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+            throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them. (missing user certificat X)');
         }
 
         $passphrase = $keyRing->getPassword();
@@ -225,7 +225,7 @@ class CryptService
      *               'm' => <bytes>,
      *               ]
      */
-    public static function getPublicKeyDetails(string $publicKey): array
+    public function getPublicKeyDetails(string $publicKey): array
     {
         $rsa = new RSA();
         $rsa->setPublicKey($publicKey);

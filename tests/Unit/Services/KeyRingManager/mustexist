@@ -1,0 +1,31 @@
+{
+    "USER": {
+        "A": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": null,
+            "PRIVATE_KEY": null
+        },
+        "E": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": null,
+            "PRIVATE_KEY": null
+        },
+        "X": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": null,
+            "PRIVATE_KEY": null
+        }
+    },
+    "BANK": {
+        "E": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": null,
+            "PRIVATE_KEY": null
+        },
+        "X": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": null,
+            "PRIVATE_KEY": null
+        }
+    }
+}

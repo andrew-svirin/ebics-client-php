@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Request;
 use DOMDocument;
 use DOMElement;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class BodyHandler manage body DOM elements.

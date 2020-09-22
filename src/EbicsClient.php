@@ -55,11 +55,11 @@ final class EbicsClient implements EbicsClientInterface
      */
     private $requestMaker;
     /**
-     * @var CryptService|null
+     * @var CryptService
      */
     private $cryptService;
     /**
-     * @var CertificateFactory|null
+     * @var CertificateFactory
      */
     private $certificateFactory;
 
@@ -156,8 +156,8 @@ final class EbicsClient implements EbicsClientInterface
         $orderData = $this->cryptService->decryptOrderData($keyRing, $this->responseHandler->retrieveOrderData($response));
 
         $response->addTransaction(Transaction::buildTransactionFromOrderData($orderData));
-        $keyRing->setBankCertificateX($this->orderDataHandler->retrieveAuthenticationCertificate($orderData));
-        $keyRing->setBankCertificateE($this->orderDataHandler->retrieveEncryptionCertificate($orderData));
+        $keyRing->setBankCertificateX($this->orderDataHandler->retrieveAuthenticationCertificate($orderData, $bank));
+        $keyRing->setBankCertificateE($this->orderDataHandler->retrieveEncryptionCertificate($orderData, $bank));
 
         return $response;
     }

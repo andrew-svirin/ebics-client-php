@@ -2,6 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\Version;
 use DOMDocument;
 use DOMElement;
 
@@ -21,25 +23,25 @@ class EbicsRequestHandler
     /**
      * Add SecuredRequest to DOM XML.
      */
-    public function handleSecured(DOMDocument $xml): DOMElement
+    public function handleSecured(DOMDocument $xml, Bank $bank): DOMElement
     {
-        return $this->handleH004Secured($xml, self::EBICS_REQUEST);
+        return $this->handleH004Secured($xml, $bank, self::EBICS_REQUEST);
     }
 
     /**
      * Add UnsecuredRequest to DOM XML.
      */
-    public function handleUnsecured(DOMDocument $xml): DOMElement
+    public function handleUnsecured(DOMDocument $xml, Bank $bank): DOMElement
     {
-        return $this->handleH004($xml, self::EBICS_UNSECURED_REQUEST);
+        return $this->handleH004($xml, $bank, self::EBICS_UNSECURED_REQUEST);
     }
 
     /**
      * Add NoPubKeyDigestsRequest to DOM XML.
      */
-    public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
+    public function handleNoPubKeyDigests(DOMDocument $xml, Bank $bank): DOMElement
     {
-        return $this->handleH004Secured($xml, self::EBICS_NO_PUB_KEY_DIGESTS);
+        return $this->handleH004Secured($xml, $bank, self::EBICS_NO_PUB_KEY_DIGESTS);
     }
 
     /**
@@ -57,10 +59,10 @@ class EbicsRequestHandler
      *
      * @param string $request
      */
-    private function handleH004(DOMDocument $xml, $request): DOMElement
+    private function handleH004(DOMDocument $xml, Bank $bank, $request): DOMElement
     {
-        $xmlRequest = $xml->createElementNS('urn:org:ebics:H004', $request);
-        $xmlRequest->setAttribute('Version', 'H004');
+        $xmlRequest = $xml->createElementNS(Version::ns($bank->getVersion()), $request);
+        $xmlRequest->setAttribute('Version', $bank->getVersion());
         $xmlRequest->setAttribute('Revision', '1');
         $xml->appendChild($xmlRequest);
 
@@ -72,11 +74,11 @@ class EbicsRequestHandler
      *
      * @param string $request
      */
-    private function handleH004Secured(DOMDocument $xml, $request): DOMElement
+    private function handleH004Secured(DOMDocument $xml, Bank $bank, $request): DOMElement
     {
-        $xmlRequest = $xml->createElementNS('urn:org:ebics:H004', $request);
+        $xmlRequest = $xml->createElementNS(Version::ns($bank->getVersion()), $request);
         $xmlRequest->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
-        $xmlRequest->setAttribute('Version', 'H004');
+        $xmlRequest->setAttribute('Version', $bank->getVersion());
         $xmlRequest->setAttribute('Revision', '1');
         $xml->appendChild($xmlRequest);
 
