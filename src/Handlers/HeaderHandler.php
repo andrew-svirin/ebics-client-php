@@ -334,7 +334,7 @@ class HeaderHandler
             $xmlFileFormat->setAttribute('CountryCode', $countryCode);
             $xmlStandardOrderParams->appendChild($xmlFileFormat);
 
-            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlOrderDetails);
+            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlStandardOrderParams);
         };
     }
 
@@ -347,7 +347,7 @@ class HeaderHandler
             // Add StandardOrderParams to OrderDetails.
             $xmlStandardOrderParams = $xml->createElement('StandardOrderParams');
             $xmlOrderDetails->appendChild($xmlStandardOrderParams);
-            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlOrderDetails);
+            $this->handleDateRangeParams($startDateTime, $endDateTime)($xml, $xmlStandardOrderParams);
         };
     }
 
