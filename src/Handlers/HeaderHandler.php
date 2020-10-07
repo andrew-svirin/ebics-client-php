@@ -25,6 +25,7 @@ class HeaderHandler
     const ORDER_TYPE_HPB = 'HPB';
     const ORDER_TYPE_VMK = 'VMK';
     const ORDER_TYPE_STA = 'STA';
+    const ORDER_TYPE_C53 = 'C53';
     const ORDER_TYPE_HAA = 'HAA';
     const ORDER_TYPE_HPD = 'HPD';
     const ORDER_TYPE_HKD = 'HKD';
@@ -172,17 +173,36 @@ class HeaderHandler
     public function handleSTA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
     {
         $this->handle(
-         $xml,
-         $xmlRequest,
-         $this->handleNonce($dateTime),
-         $this->handleBank(),
-         $this->handleOrderDetails(
-            self::ORDER_TYPE_STA,
-            self::ORDER_ATTRIBUTE_DZHNN,
-            $this->handleStandardOrderParams($startDateTime, $endDateTime)
-         ),
-         $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
-      );
+            $xml,
+            $xmlRequest,
+            $this->handleNonce($dateTime),
+            $this->handleBank(),
+            $this->handleOrderDetails(
+                self::ORDER_TYPE_STA,
+                self::ORDER_ATTRIBUTE_DZHNN,
+                $this->handleStandardOrderParams($startDateTime, $endDateTime)
+            ),
+            $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
+        );
+    }
+
+    /**
+     * Add header for C53 Request XML.
+     */
+    public function handleC53(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null) : void
+    {
+        $this->handle(
+            $xml,
+            $xmlRequest,
+            $this->handleNonce($dateTime),
+            $this->handleBank(),
+            $this->handleOrderDetails(
+                self::ORDER_TYPE_C53,
+                self::ORDER_ATTRIBUTE_DZHNN,
+                $this->handleStandardOrderParams($startDateTime, $endDateTime)
+            ),
+            $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_INITIALIZATION))
+        );
     }
 
     /**
