@@ -90,6 +90,14 @@ interface EbicsClientInterface
     public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
     /**
+     * Retrieve the bank account statement in Camt.053 format.
+     *
+     * @param DateTime|null $startDateTime the start date of requested transactions
+     * @param DateTime|null $endDateTime   the end date of requested transactions
+     */
+    public function C53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+
+    /**
      * Mark transactions as received.
      */
     public function transferReceipt(Response $response, bool $acknowledged = true): Response;

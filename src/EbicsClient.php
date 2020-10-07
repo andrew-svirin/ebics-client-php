@@ -449,6 +449,31 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws Exceptions\EbicsException
+     */
+    public function C53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->buildC53($dateTime, $startDateTime, $endDateTime);
+        $hostResponse = $this->post($request);
+        $hostResponseContent = $hostResponse->getContent();
+        $response = new Response();
+        $response->loadXML($hostResponseContent);
+
+        $this->checkH004ReturnCode($request, $response);
+
+        return $response;
+    }
+
+    /**
      * @throws EbicsResponseExceptionInterface
      */
     private function checkH004ReturnCode(Request $request, Response $response): void
