@@ -238,4 +238,18 @@ class RequestHandler
 
         return $request;
     }
+
+    /**
+     * @throws EbicsException
+     */
+    public function buildZ53(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
+    {
+        $request = new Request();
+        $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
+        $this->headerHandler->handleZ53($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
+        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+
+        return $request;
+    }
 }
