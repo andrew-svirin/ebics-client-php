@@ -92,10 +92,22 @@ interface EbicsClientInterface
     /**
      * Retrieve the bank account statement in Camt.053 format.
      *
+     * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
-     * @param DateTime|null $endDateTime   the end date of requested transactions
+     * @param DateTime|null $endDateTime the end date of requested transactions
+     * @return Response
      */
     public function C53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+
+    /**
+     * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services)
+     *
+     * @param DateTime|null $dateTime
+     * @param DateTime|null $startDateTime the start date of requested transactions
+     * @param DateTime|null $endDateTime the end date of requested transactions
+     * @return Response
+     */
+    public function Z53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
 
     /**
      * Mark transactions as received.
