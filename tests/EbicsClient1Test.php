@@ -2,10 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Exceptions\AuthorisationOrderTypeFailedException;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
-use AndrewSvirin\Ebics\Exceptions\NoDownloadDataAvailableException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -17,12 +15,18 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @group SERVER-1
  */
-class EbicsClientTest extends AbstractEbicsTestCase
+class EbicsClient1Test extends AbstractEbicsTestCase
 {
+
     /**
-     * @dataProvider credentialsDataProvider
-     *
+     * @var int
+     */
+    protected $credentialsId = 1;
+
+    /**
      * @throws EbicsException
      */
     public function setUp(): void
@@ -55,38 +59,56 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
-     * @throws EbicsException
      */
     public function testINI()
     {
-        $this->expectException(InvalidUserOrUserStateException::class);
-        $this->expectExceptionCode(91002);
-        $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
-        $this->client->INI();
+        // Check that keyring is empty and or wait on success or wait on exception.
+        $userExists = $this->keyRing->getUserCertificateA();
+        if ($userExists) {
+            $this->expectException(InvalidUserOrUserStateException::class);
+            $this->expectExceptionCode(91002);
+            $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
+        }
+        $ini = $this->client->INI();
+        if (!$userExists) {
+            $responseHandler = new ResponseHandler();
+            $this->keyRingManager->saveKeyRing($this->keyRing);
+            $code = $responseHandler->retrieveH004ReturnCode($ini);
+            $reportText = $responseHandler->retrieveH004ReportText($ini);
+            $this->assertResponseCorrect($code, $reportText);
+        }
     }
 
     /**
-     * @depends testINI
      * @group HIA
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
-     * @throws EbicsException
      */
     public function testHIA()
     {
-        $this->expectException(InvalidUserOrUserStateException::class);
-        $this->expectExceptionCode(91002);
-        $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
-        $this->client->HIA();
+        // Check that keyring is empty and or wait on success or wait on exception.
+        $bankExists = $this->keyRing->getUserCertificateX();
+        if ($bankExists) {
+            $this->expectException(InvalidUserOrUserStateException::class);
+            $this->expectExceptionCode(91002);
+            $this->expectExceptionMessage('[EBICS_INVALID_USER_OR_USER_STATE] Teilnehmer unbekannt oder Teilnehmerzustand unzulässig');
+        }
+        $hia = $this->client->HIA();
+        if (!$bankExists) {
+            $responseHandler = new ResponseHandler();
+            $this->keyRingManager->saveKeyRing($this->keyRing);
+            $code = $responseHandler->retrieveH004ReturnCode($hia);
+            $reportText = $responseHandler->retrieveH004ReportText($hia);
+            $this->assertResponseCorrect($code, $reportText);
+        }
     }
 
     /**
      * Run first HIA and Activate account in bank panel.
      *
-     * @depends testHIA
      * @group HPB
      *
      * @throws ClientExceptionInterface
@@ -125,7 +147,6 @@ class EbicsClientTest extends AbstractEbicsTestCase
     }
 
     /**
-     * @depends testHPB
      * @group HKD
      *
      * @throws ClientExceptionInterface
@@ -136,14 +157,14 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testHKD()
     {
-        $this->expectException(AuthorisationOrderTypeFailedException::class);
-        $this->expectExceptionCode(90003);
-        $this->expectExceptionMessage('[EBICS_OK] OK');
-        $this->client->HKD();
+        $responseHandler = new ResponseHandler();
+        $hkd = $this->client->HKD();
+        $code = $responseHandler->retrieveH004ReturnCode($hkd);
+        $reportText = $responseHandler->retrieveH004ReportText($hkd);
+        $this->assertResponseCorrect($code, $reportText);
     }
 
     /**
-     * @depends testHPB
      * @group HAA
      *
      * @throws ClientExceptionInterface
@@ -162,43 +183,6 @@ class EbicsClientTest extends AbstractEbicsTestCase
     }
 
     /**
-     * @depends testHPB
-     * @group VMK
-     *
-     * @throws ClientExceptionInterface
-     * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function testVMK()
-    {
-        $this->expectException(NoDownloadDataAvailableException::class);
-        $this->expectExceptionCode(90005);
-        $this->expectExceptionMessage('[EBICS_OK] OK');
-        $this->client->VMK();
-    }
-
-    /**
-     * @depends testHPB
-     * @group STA
-     *
-     * @throws ClientExceptionInterface
-     * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     */
-    public function testSTA()
-    {
-        $this->expectException(NoDownloadDataAvailableException::class);
-        $this->expectExceptionCode(90005);
-        $this->expectExceptionMessage('[EBICS_OK] OK');
-        $this->client->STA();
-    }
-
-    /**
-     * @depends testHPB
      * @group HTD
      *
      * @throws ClientExceptionInterface
