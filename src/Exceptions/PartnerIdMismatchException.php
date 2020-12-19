@@ -12,6 +12,10 @@ class PartnerIdMismatchException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091120', $responseMessage, 'The partner ID of the electronic signature file differs from the partner ID of the submitter.');
+        parent::__construct(
+            '091120',
+            $responseMessage,
+            'The partner ID of the electronic signature file differs from the partner ID of the submitter.'
+        );
     }
 }

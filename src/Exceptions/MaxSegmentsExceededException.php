@@ -12,6 +12,10 @@ class MaxSegmentsExceededException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091118', $responseMessage, 'The submitted number of segments for upload is very high.');
+        parent::__construct(
+            '091118',
+            $responseMessage,
+            'The submitted number of segments for upload is very high.'
+        );
     }
 }

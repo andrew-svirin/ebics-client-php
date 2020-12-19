@@ -54,33 +54,33 @@ class LegacyX509Generator extends AbstractX509Generator
                 'id-ce-cRLDistributionPoints' => [
                     [
                         'distributionPoint' => [
-                                'fullName' => [
-                                        [
-                                            'uniformResourceIdentifier' => 'http://gn.symcb.com/gn.crl',
-                                        ],
-                                    ],
+                            'fullName' => [
+                                [
+                                    'uniformResourceIdentifier' => 'http://gn.symcb.com/gn.crl',
+                                ],
                             ],
+                        ],
                     ],
                 ],
                 'id-ce-certificatePolicies' => [
                     [
                         'policyIdentifier' => '2.23.140.1.2.2',
                         'policyQualifiers' => [
-                                [
-                                    'policyQualifierId' => 'id-qt-cps',
-                                    'qualifier' => [
-                                            'ia5String' => 'https://www.geotrust.com/resources/repository/legal',
-                                        ],
-                                ],
-                                [
-                                    'policyQualifierId' => 'id-qt-unotice',
-                                    'qualifier' => [
-                                            'explicitText' => [
-                                                    'utf8String' => 'https://www.geotrust.com/resources/repository/legal',
-                                                ],
-                                        ],
+                            [
+                                'policyQualifierId' => 'id-qt-cps',
+                                'qualifier' => [
+                                    'ia5String' => 'https://www.geotrust.com/resources/repository/legal',
                                 ],
                             ],
+                            [
+                                'policyQualifierId' => 'id-qt-unotice',
+                                'qualifier' => [
+                                    'explicitText' => [
+                                        'utf8String' => 'https://www.geotrust.com/resources/repository/legal',
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 'id-ce-extKeyUsage' => [
@@ -90,17 +90,23 @@ class LegacyX509Generator extends AbstractX509Generator
                     [
                         'accessMethod' => 'id-ad-ocsp',
                         'accessLocation' => [
-                                'uniformResourceIdentifier' => 'http://gn.symcd.com',
-                            ],
+                            'uniformResourceIdentifier' => 'http://gn.symcd.com',
+                        ],
                     ],
                     [
                         'accessMethod' => 'id-ad-caIssuers',
                         'accessLocation' => [
-                                'uniformResourceIdentifier' => 'http://gn.symcb.com/gn.crt',
-                            ],
+                            'uniformResourceIdentifier' => 'http://gn.symcb.com/gn.crt',
+                        ],
                     ],
                 ],
-                '1.3.6.1.4.1.11129.2.4.2' => 'BIIBbAFqAHcA3esdK3oNT6Ygi4GtgWhwfi6OnQHVXIiNPRHEzbbsvswAAAFdCJcynQAABAMASDBGAiEAgJgQE9466xkMy6olq+1xvTGt9ROXcgmdUIht4EE4g14CIQDZNjYcKbVU6taN/unn2WHlsDgphMgQXzALHt7vrI/bIgB2AKS5CZC0GFgUh7sTosxncAo8NZgE+RvfuON3zQ7IDdwQAAABXQiXMtAAAAQDAEcwRQIgTx+2uvI9ReTYiO9Ii85qoet1dc+y58RT4wAO9C4OCakCIQCRhO2kJWxeSfP1L2/Q24I3MGLMn//mwhdJ43mu4e9n8gB3AO5Lvbd1zmC64UJpH6vhnmajD35fsHLYgwDEe4l6qP3LAAABXQiXNJcAAAQDAEgwRgIhAM+dK3OLBL5nGzp/PSt3yRab85AD3jz69g5TqGdrMuhkAiEAnDMu/ZiqyBWO3+li3L9/hi3BcHX74rAmA3OX1jNxIKE=',
+                '1.3.6.1.4.1.11129.2.4.2' => 'BIIBbAFqAHcA3esdK3oNT6Ygi4GtgWhwfi6OnQHVXIiNPR' .
+                    'HEzbbsvswAAAFdCJcynQAABAMASDBGAiEAgJgQE9466xkMy6olq+1xvTGt9ROXcgmdUIht4EE' .
+                    '4g14CIQDZNjYcKbVU6taN/unn2WHlsDgphMgQXzALHt7vrI/bIgB2AKS5CZC0GFgUh7sTosxnc' .
+                    'Ao8NZgE+RvfuON3zQ7IDdwQAAABXQiXMtAAAAQDAEcwRQIgTx+2uvI9ReTYiO9Ii85qoet1dc+' .
+                    'y58RT4wAO9C4OCakCIQCRhO2kJWxeSfP1L2/Q24I3MGLMn//mwhdJ43mu4e9n8gB3AO5Lvbd1zm' .
+                    'C64UJpH6vhnmajD35fsHLYgwDEe4l6qP3LAAABXQiXNJcAAAQDAEgwRgIhAM+dK3OLBL5nGzp/PS' .
+                    't3yRab85AD3jz69g5TqGdrMuhkAiEAnDMu/ZiqyBWO3+li3L9/hi3BcHX74rAmA3OX1jNxIKE=',
             ],
         ];
     }

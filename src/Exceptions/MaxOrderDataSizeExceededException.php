@@ -12,6 +12,10 @@ class MaxOrderDataSizeExceededException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091117', $responseMessage, 'The bank does not support the requested order size.');
+        parent::__construct(
+            '091117',
+            $responseMessage,
+            'The bank does not support the requested order size.'
+        );
     }
 }

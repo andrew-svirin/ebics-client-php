@@ -20,5 +20,5 @@ interface KeyRingManagerInterface
     /**
      * Save KeyRing to file.
      */
-    public function saveKeyRing(KeyRing $keyRing) : void;
+    public function saveKeyRing(KeyRing $keyRing): void;
 }

@@ -11,6 +11,12 @@ use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use phpseclib\Crypt\AES;
 use phpseclib\Crypt\Random;
 use phpseclib\Crypt\RSA;
+use RuntimeException;
+
+use function call_user_func_array;
+use function strlen;
+
+use const OPENSSL_ZERO_PADDING;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -45,7 +51,7 @@ class CryptService
     public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
         if (!($certificateE = $keyRing->getUserCertificateE())) {
-            throw new \RuntimeException('Certificate E is not set.');
+            throw new RuntimeException('Certificate E is not set.');
         }
 
         $rsa = new RSA();
@@ -58,7 +64,7 @@ class CryptService
         $aes->setKeyLength(128);
         $aes->setKey($transactionKeyDecrypted);
         // Force openssl_options.
-        $aes->openssl_options = \OPENSSL_ZERO_PADDING;
+        $aes->openssl_options = OPENSSL_ZERO_PADDING;
         $decrypted = $aes->decrypt($orderData->getOrderData());
 
         // Try to uncompress from gz order data.
@@ -80,7 +86,10 @@ class CryptService
         $digestToSignBin = self::filter($hash);
 
         if (!($certificateX = $keyRing->getUserCertificateX()) || !($privateKey = $certificateX->getPrivateKey())) {
-            throw new EbicsException('On this stage must persist certificate for authorization. Run INI and HIA requests for retrieve them.');
+            throw new EbicsException(
+                'On this stage must persist certificate for authorization. ' .
+                'Run INI and HIA requests for retrieve them.'
+            );
         }
 
         $passphrase = $keyRing->getPassword();
@@ -147,7 +156,10 @@ class CryptService
             0x04,
             0x20,
         ];
-        $signedInfoDigest = array_values(unpack('C*', $hash));
+        if (!($unpHash = unpack('C*', $hash))) {
+            throw new RuntimeException('Unpack failed.');
+        }
+        $signedInfoDigest = array_values($unpHash);
         $digestToSign = [];
         self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, count($RSA_SHA256prefix));
         self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, count($RSA_SHA256prefix), count($signedInfoDigest));
@@ -168,12 +180,13 @@ class CryptService
     /**
      * Pack array of bytes to one bytes-string.
      *
-     * @param  array<int, int>  $bytes
+     * @param array<int, int> $bytes
+     *
      * @return string (bytes)
      */
     private static function arrayToBin(array $bytes): string
     {
-        return \call_user_func_array('pack', array_merge(['c*'], $bytes));
+        return call_user_func_array('pack', array_merge(['c*'], $bytes));
     }
 
     /**
@@ -185,7 +198,7 @@ class CryptService
      * Remove leading zeros from both.
      * Calculate digest (SHA256).
      *
-     * @param  string  $algorithm
+     * @param string $algorithm
      *
      * @return string
      */
@@ -196,7 +209,7 @@ class CryptService
         $e0 = $publicKey->exponent->toHex(true);
         $m0 = $publicKey->modulus->toHex(true);
         // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
-        if (\strlen($e0) > \strlen($m0)) {
+        if (strlen($e0) > strlen($m0)) {
             $buffer = $e0;
             $e0 = $m0;
             $m0 = $buffer;

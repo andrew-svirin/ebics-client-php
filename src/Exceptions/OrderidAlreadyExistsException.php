@@ -12,6 +12,10 @@ class OrderidAlreadyExistsException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091115', $responseMessage, 'The submitted order number already exists.');
+        parent::__construct(
+            '091115',
+            $responseMessage,
+            'The submitted order number already exists.'
+        );
     }
 }

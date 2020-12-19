@@ -12,6 +12,10 @@ class InvalidXmlException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091010', $responseMessage, 'The XML schema does not conform to the EBICS specifications.');
+        parent::__construct(
+            '091010',
+            $responseMessage,
+            'The XML schema does not conform to the EBICS specifications.'
+        );
     }
 }

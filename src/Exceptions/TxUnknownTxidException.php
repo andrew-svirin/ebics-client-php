@@ -12,6 +12,10 @@ class TxUnknownTxidException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091101', $responseMessage, 'The supplied transaction ID is invalid.');
+        parent::__construct(
+            '091101',
+            $responseMessage,
+            'The supplied transaction ID is invalid.'
+        );
     }
 }

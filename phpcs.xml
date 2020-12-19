@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<ruleset name="PSR2">
+    <description>The PSR2 coding standard.</description>
+    <rule ref="PSR2"/>
+    <file>src</file>
+
+    <!-- Exclude files that do not contain PHP, Javascript or CSS code. -->
+    <exclude-pattern>*.xml</exclude-pattern>
+    <exclude-pattern>composer.lock</exclude-pattern>
+
+    <!-- Exclude the `vendor` folder. -->
+    <exclude-pattern>vendor/</exclude-pattern>
+    <exclude-pattern>tests/</exclude-pattern>
+
+    <!-- PHP CodeSniffer command line options -->
+    <arg name="extensions" value="php"/>
+    <arg name="report" value="full"/>
+    <arg value="p"/>
+</ruleset>

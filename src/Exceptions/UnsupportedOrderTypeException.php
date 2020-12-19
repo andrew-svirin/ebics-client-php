@@ -12,6 +12,11 @@ class UnsupportedOrderTypeException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091006', $responseMessage, 'Upon verification, the bank finds that the order type specified in valid but not supported by the bank.');
+        parent::__construct(
+            '091006',
+            $responseMessage,
+            'Upon verification, the bank finds that the order type ' .
+            'specified in valid but not supported by the bank.'
+        );
     }
 }

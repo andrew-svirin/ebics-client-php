@@ -42,7 +42,7 @@ class KeyRing
      */
     private $password;
 
-    public function setUserCertificateA(Certificate $certificate) : void
+    public function setUserCertificateA(Certificate $certificate): void
     {
         $this->userCertificateA = $certificate;
     }
@@ -57,7 +57,7 @@ class KeyRing
         return 'A006';
     }
 
-    public function setUserCertificateX(Certificate $certificate) : void
+    public function setUserCertificateX(Certificate $certificate): void
     {
         $this->userCertificateX = $certificate;
     }
@@ -72,7 +72,7 @@ class KeyRing
         return 'X002';
     }
 
-    public function setUserCertificateE(Certificate $certificate) : void
+    public function setUserCertificateE(Certificate $certificate): void
     {
         $this->userCertificateE = $certificate;
     }
@@ -87,7 +87,7 @@ class KeyRing
         return 'E002';
     }
 
-    public function setPassword(string $password) : void
+    public function setPassword(string $password): void
     {
         $this->password = $password;
     }

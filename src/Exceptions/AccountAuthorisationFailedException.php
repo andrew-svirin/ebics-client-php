@@ -12,6 +12,10 @@ class AccountAuthorisationFailedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091302', $responseMessage, 'Preliminary verification of the account authorization has failed.');
+        parent::__construct(
+            '091302',
+            $responseMessage,
+            'Preliminary verification of the account authorization has failed.'
+        );
     }
 }

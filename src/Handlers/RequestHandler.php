@@ -25,18 +25,22 @@ class RequestHandler
      * @var EbicsRequestHandler
      */
     private $ebicsRequestHandler;
+
     /**
      * @var HeaderHandler
      */
     private $headerHandler;
+
     /**
      * @var BodyHandler
      */
     private $bodyHandler;
+
     /**
      * @var OrderDataHandler
      */
     private $orderDataHandler;
+
     /**
      * @var AuthSignatureHandler
      */
@@ -158,11 +162,24 @@ class RequestHandler
     /**
      * @throws EbicsException
      */
-    public function buildFDL(DateTime $dateTime, string $fileInfo, string $countryCode, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-    {
+    public function buildFDL(
+        DateTime $dateTime,
+        string $fileInfo,
+        string $countryCode,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Request {
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-        $this->headerHandler->handleFDL($request, $xmlRequest, $dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
+        $this->headerHandler->handleFDL(
+            $request,
+            $xmlRequest,
+            $dateTime,
+            $fileInfo,
+            $countryCode,
+            $startDateTime,
+            $endDateTime
+        );
         $this->authSignatureHandler->handle($request, $xmlRequest);
         $this->bodyHandler->handleEmpty($request, $xmlRequest);
 
@@ -191,7 +208,12 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleTransferReceipt($request, $xmlRequest, $transaction);
-        $this->bodyHandler->handleTransferReceipt($request, $xmlRequest, true === $acknowledged ? TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE);
+        $this->bodyHandler->handleTransferReceipt(
+            $request,
+            $xmlRequest,
+            true === $acknowledged ?
+                TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE
+        );
         $this->authSignatureHandler->handle($request, $xmlRequest);
 
         return $request;

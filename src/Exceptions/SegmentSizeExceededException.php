@@ -12,6 +12,10 @@ class SegmentSizeExceededException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091009', $responseMessage, 'If the size of the transmitted order data segment exceeds 1 MB, the transaction is terminated.');
+        parent::__construct(
+            '091009',
+            $responseMessage,
+            'If the size of the transmitted order data segment exceeds 1 MB, the transaction is terminated.'
+        );
     }
 }
