@@ -12,6 +12,10 @@ class InvalidHostIdException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091011', $responseMessage, 'The transmitted host ID is not known to the bank.');
+        parent::__construct(
+            '091011',
+            $responseMessage,
+            'The transmitted host ID is not known to the bank.'
+        );
     }
 }

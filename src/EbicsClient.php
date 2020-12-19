@@ -134,7 +134,10 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $certificateA = CertificateFactory::generateCertificateAFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
+        $certificateA = CertificateFactory::generateCertificateAFromKeys(
+            CryptService::generateKeys($this->keyRing),
+            $this->bank->isCertified()
+        );
         $request = $this->requestFactory->buildINI($certificateA, $dateTime);
         $hostResponse = $this->post($request);
         $hostResponseContent = $hostResponse->getContent();
@@ -160,8 +163,14 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $certificateE = CertificateFactory::generateCertificateEFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
-        $certificateX = CertificateFactory::generateCertificateXFromKeys(CryptService::generateKeys($this->keyRing), $this->bank->isCertified());
+        $certificateE = CertificateFactory::generateCertificateEFromKeys(
+            CryptService::generateKeys($this->keyRing),
+            $this->bank->isCertified()
+        );
+        $certificateX = CertificateFactory::generateCertificateXFromKeys(
+            CryptService::generateKeys($this->keyRing),
+            $this->bank->isCertified()
+        );
         $request = $this->requestFactory->buildHIA($certificateE, $certificateX, $dateTime);
         $hostResponse = $this->post($request);
         $hostResponseContent = $hostResponse->getContent();
@@ -316,8 +325,14 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws Exceptions\NoDownloadDataAvailableException
      */
-    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
-    {
+    public function FDL(
+        string $fileInfo,
+        string $format = 'plain',
+        string $countryCode = 'FR',
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -351,7 +366,7 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function transferReceipt(Response $response, bool $acknowledged = true) : Response
+    public function transferReceipt(Response $response, bool $acknowledged = true): Response
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
@@ -407,8 +422,11 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
-    {
+    public function VMK(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -432,8 +450,11 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
-    {
+    public function STA(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -457,8 +478,13 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function C53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
-    {
+    // @codingStandardsIgnoreStart
+    public function C53(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response {
+        // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -482,8 +508,13 @@ final class EbicsClient implements EbicsClientInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
      */
-    public function Z53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response
-    {
+    // @codingStandardsIgnoreStart
+    public function Z53(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response {
+        // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }

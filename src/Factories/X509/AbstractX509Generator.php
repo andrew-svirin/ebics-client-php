@@ -72,9 +72,18 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         foreach ($options['extensions'] as $id => $extension) {
             $extension = X509ExtensionOptionsNormalizer::normalize($extension);
-
-            if (false === $x509->setExtension($id, $extension['value'], $extension['critical'], $extension['replace'])) {
-                throw new X509GeneratorException(sprintf('Unable to set "%s" extension with value: %s', $id, var_export($extension['value'], true)));
+            $setExtension = $x509->setExtension(
+                $id,
+                $extension['value'],
+                $extension['critical'],
+                $extension['replace']
+            );
+            if (false === $setExtension) {
+                throw new X509GeneratorException(sprintf(
+                    'Unable to set "%s" extension with value: %s',
+                    $id,
+                    var_export($extension['value'], true)
+                ));
             }
         }
 
@@ -126,7 +135,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
             $result .= rand(0, 9);
         }
 
-        return (string) $result;
+        return (string)$result;
     }
 
     /**

@@ -91,7 +91,11 @@ class EbicsRequestHandler
     private function handleH000(DOMDocument $xml, $request): DOMElement
     {
         $xmlRequest = $xml->createElementNS('http://www.ebics.org/H000', $request);
-        $xmlRequest->setAttributeNS('http://www.w3.org/2001/XMLSchema-instance', 'xsi:schemaLocation', 'http://www.ebics.org/H000 http://www.ebics.org/H000/ebics_hev.xsd');
+        $xmlRequest->setAttributeNS(
+            'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation',
+            'http://www.ebics.org/H000 http://www.ebics.org/H000/ebics_hev.xsd'
+        );
         $xml->appendChild($xmlRequest);
 
         return $xmlRequest;

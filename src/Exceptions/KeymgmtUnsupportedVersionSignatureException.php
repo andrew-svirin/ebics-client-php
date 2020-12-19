@@ -12,6 +12,11 @@ class KeymgmtUnsupportedVersionSignatureException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091201', $responseMessage, 'When processing an INI request, the order data contains an inadmissible version of the bank-technical signature process.');
+        parent::__construct(
+            '091201',
+            $responseMessage,
+            'When processing an INI request, the order data contains an inadmissible ' .
+            'version of the bank-technical signature process.'
+        );
     }
 }

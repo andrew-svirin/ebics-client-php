@@ -12,6 +12,11 @@ class KeymgmtUnsupportedVersionEncryptionException extends EbicsResponseExceptio
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091203', $responseMessage, 'When processing an HIA request, the order data contains an inadmissible version of the encryption process.');
+        parent::__construct(
+            '091203',
+            $responseMessage,
+            'When processing an HIA request, the order data contains an inadmissible ' .
+            'version of the encryption process.'
+        );
     }
 }

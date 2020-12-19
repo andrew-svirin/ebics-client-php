@@ -12,6 +12,11 @@ class KeymgmtKeylengthErrorSignatureException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091204', $responseMessage, 'When processing an INI request, the order data contains an bank-technical key of inadmissible length.');
+        parent::__construct(
+            '091204',
+            $responseMessage,
+            'When processing an INI request, the order data contains ' .
+            'an bank-technical key of inadmissible length.'
+        );
     }
 }

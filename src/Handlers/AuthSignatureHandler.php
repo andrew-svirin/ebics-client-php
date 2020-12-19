@@ -36,7 +36,7 @@ class AuthSignatureHandler
      *
      * @throws EbicsException
      */
-    public function handle(DOMDocument $xml, DOMNode $xmlRequest) : void
+    public function handle(DOMDocument $xml, DOMNode $xmlRequest): void
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";
@@ -55,12 +55,18 @@ class AuthSignatureHandler
 
         // Add ds:CanonicalizationMethod to ds:SignedInfo.
         $xmlCanonicalizationMethod = $xml->createElement('ds:CanonicalizationMethod');
-        $xmlCanonicalizationMethod->setAttribute('Algorithm', sprintf('http://www.w3.org/TR/2001/%s', $canonicalizationMethodAlgorithm));
+        $xmlCanonicalizationMethod->setAttribute(
+            'Algorithm',
+            sprintf('http://www.w3.org/TR/2001/%s', $canonicalizationMethodAlgorithm)
+        );
         $xmlSignedInfo->appendChild($xmlCanonicalizationMethod);
 
         // Add ds:SignatureMethod to ds:SignedInfo.
         $xmlSignatureMethod = $xml->createElement('ds:SignatureMethod');
-        $xmlSignatureMethod->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmldsig-more#rsa-%s', $signatureMethodAlgorithm));
+        $xmlSignatureMethod->setAttribute(
+            'Algorithm',
+            sprintf('http://www.w3.org/2001/04/xmldsig-more#rsa-%s', $signatureMethodAlgorithm)
+        );
         $xmlSignedInfo->appendChild($xmlSignatureMethod);
 
         // Add ds:Reference to ds:SignedInfo.
@@ -79,21 +85,35 @@ class AuthSignatureHandler
 
         // Add ds:DigestMethod to ds:Reference.
         $xmlDigestMethod = $xml->createElement('ds:DigestMethod');
-        $xmlDigestMethod->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $digestMethodAlgorithm));
+        $xmlDigestMethod->setAttribute(
+            'Algorithm',
+            sprintf('http://www.w3.org/2001/04/xmlenc#%s', $digestMethodAlgorithm)
+        );
         $xmlReference->appendChild($xmlDigestMethod);
 
         // Add ds:DigestValue to ds:Reference.
         $xmlDigestValue = $xml->createElement('ds:DigestValue');
-        $canonicalizedHeader = $this->calculateC14N($this->prepareH004XPath($xml), $signaturePath, $canonicalizationMethodAlgorithm);
+        $canonicalizedHeader = $this->calculateC14N(
+            $this->prepareH004XPath($xml),
+            $signaturePath,
+            $canonicalizationMethodAlgorithm
+        );
         $canonicalizedHeaderHash = CryptService::calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
         $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
         $xmlReference->appendChild($xmlDigestValue);
 
         // Add ds:SignatureValue to AuthSignature.
         $xmlSignatureValue = $xml->createElement('ds:SignatureValue');
-        $canonicalizedSignedInfo = $this->calculateC14N($this->prepareH004XPath($xml), $canonicalizationPath, $canonicalizationMethodAlgorithm);
+        $canonicalizedSignedInfo = $this->calculateC14N(
+            $this->prepareH004XPath($xml),
+            $canonicalizationPath,
+            $canonicalizationMethodAlgorithm
+        );
         $canonicalizedSignedInfoHash = CryptService::calculateHash($canonicalizedSignedInfo, $signatureMethodAlgorithm);
-        $canonicalizedSignedInfoHashSigned = CryptService::cryptSignatureValue($this->keyRing, $canonicalizedSignedInfoHash);
+        $canonicalizedSignedInfoHashSigned = CryptService::cryptSignatureValue(
+            $this->keyRing,
+            $canonicalizedSignedInfoHash
+        );
         $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
         $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
         $xmlAuthSignature->appendChild($xmlSignatureValue);

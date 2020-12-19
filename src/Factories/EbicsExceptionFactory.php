@@ -16,8 +16,12 @@ use AndrewSvirin\Ebics\Models\Response;
  */
 class EbicsExceptionFactory
 {
-    public static function buildExceptionFromCode(string $errorCode, ?string $errorText = null, ?Request $request = null, ?Response $response = null): EbicsResponseExceptionInterface
-    {
+    public static function buildExceptionFromCode(
+        string $errorCode,
+        ?string $errorText = null,
+        ?Request $request = null,
+        ?Response $response = null
+    ): EbicsResponseExceptionInterface {
         if (!empty(EbicsErrorCodeMapping::$mapping[$errorCode])) {
             $exceptionClass = EbicsErrorCodeMapping::$mapping[$errorCode];
 

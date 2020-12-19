@@ -12,6 +12,10 @@ class NoDownloadDataAvailableException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('090005', $responseMessage, 'If the requested download data is not available, the EBICS transaction is terminated.');
+        parent::__construct(
+            '090005',
+            $responseMessage,
+            'If the requested download data is not available, the EBICS transaction is terminated.'
+        );
     }
 }

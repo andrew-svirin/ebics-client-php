@@ -24,13 +24,13 @@ trait C14NTrait
     private function calculateC14N(DOMXPath $xpath, string $path = '/', string $algo = 'REC-xml-c14n-20010315'): string
     {
         switch ($algo) {
-         case 'REC-xml-c14n-20010315':
-            $exclusive = false;
-            $withComments = false;
-            break;
-         default:
-            throw new EbicsException(sprintf('Define algo for %s', $algo));
-      }
+            case 'REC-xml-c14n-20010315':
+                $exclusive = false;
+                $withComments = false;
+                break;
+            default:
+                throw new EbicsException(sprintf('Define algo for %s', $algo));
+        }
         $nodes = $xpath->query($path);
         $result = '';
 

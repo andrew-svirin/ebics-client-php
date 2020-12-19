@@ -12,6 +12,11 @@ class KeymgmtKeylengthErrorAuthenticationException extends EbicsResponseExceptio
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091205', $responseMessage, 'When processing an HIA request, the order data contains an identification and authentication key of inadmissible length.');
+        parent::__construct(
+            '091205',
+            $responseMessage,
+            'When processing an HIA request, the order data contains an identification ' .
+            'and authentication key of inadmissible length.'
+        );
     }
 }

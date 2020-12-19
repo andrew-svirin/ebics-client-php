@@ -12,6 +12,10 @@ class X509UnknownCertificateAuthorityException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091214', $responseMessage, 'The chain cannot be verified because of an unknown certificate authority (CA).');
+        parent::__construct(
+            '091214',
+            $responseMessage,
+            'The chain cannot be verified because of an unknown certificate authority (CA).'
+        );
     }
 }

@@ -32,8 +32,8 @@ class User
      */
     public function __construct($partnerId, $userId)
     {
-        $this->partnerId = (string) $partnerId;
-        $this->userId = (string) $userId;
+        $this->partnerId = (string)$partnerId;
+        $this->userId = (string)$userId;
     }
 
     /**

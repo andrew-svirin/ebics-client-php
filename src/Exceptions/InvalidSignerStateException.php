@@ -12,6 +12,10 @@ class InvalidSignerStateException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091305', $responseMessage, 'The state of the signatory is not admissible.');
+        parent::__construct(
+            '091305',
+            $responseMessage,
+            'The state of the signatory is not admissible.'
+        );
     }
 }

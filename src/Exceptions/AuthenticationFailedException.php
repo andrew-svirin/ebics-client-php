@@ -12,6 +12,10 @@ class AuthenticationFailedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('061001', $responseMessage, 'The bank is unable to verify the identification and authentication signature of an EBICS request.');
+        parent::__construct(
+            '061001',
+            $responseMessage,
+            'The bank is unable to verify the identification and authentication signature of an EBICS request.'
+        );
     }
 }

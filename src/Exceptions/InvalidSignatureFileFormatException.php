@@ -12,6 +12,10 @@ class InvalidSignatureFileFormatException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091111', $responseMessage, 'The submitted electronic signature file does not conform to the defined format.');
+        parent::__construct(
+            '091111',
+            $responseMessage,
+            'The submitted electronic signature file does not conform to the defined format.'
+        );
     }
 }

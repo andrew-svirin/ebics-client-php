@@ -12,6 +12,11 @@ class RecoveryNotSupportedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091105', $responseMessage, 'If the bank does not support transaction recovery, the upload transaction is terminated.');
+        parent::__construct(
+            '091105',
+            $responseMessage,
+            'If the bank does not support transaction recovery, ' .
+            'the upload transaction is terminated.'
+        );
     }
 }

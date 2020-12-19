@@ -14,7 +14,8 @@ interface TransactionInterface
     const PHASE_RECEIPT = 'Receipt';
     const PHASE_TRANSFER = 'Transfer';
 
-    //The value of the acknowledgement is 0 (“positive acknowledgement”) if download and processing of the order data was successful
+    // The value of the acknowledgement is 0 (“positive acknowledgement”)
+    // if download and processing of the order data was successful
     const CODE_RECEIPT_POSITIVE = 0;
 
     // Otherwise the value of the acknowledgement is 1 (“negative acknowledgement”).

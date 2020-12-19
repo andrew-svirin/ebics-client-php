@@ -12,6 +12,10 @@ class OrderParamsIgnoredException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('031001', $responseMessage, 'The supplied order parameters that are not supported by the bank are ignored.');
+        parent::__construct(
+            '031001',
+            $responseMessage,
+            'The supplied order parameters that are not supported by the bank are ignored.'
+        );
     }
 }
