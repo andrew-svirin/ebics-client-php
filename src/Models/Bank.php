@@ -34,8 +34,8 @@ class Bank
      */
     public function __construct(string $hostId, string $url, bool $isCertified)
     {
-        $this->hostId = (string) $hostId;
-        $this->url = (string) $url;
+        $this->hostId = (string)$hostId;
+        $this->url = (string)$url;
         $this->isCertified = $isCertified;
     }
 

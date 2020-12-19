@@ -12,6 +12,10 @@ class OnlyX509SupportException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091217', $responseMessage, 'The bank supports evaluation of X.509 data only.');
+        parent::__construct(
+            '091217',
+            $responseMessage,
+            'The bank supports evaluation of X.509 data only.'
+        );
     }
 }

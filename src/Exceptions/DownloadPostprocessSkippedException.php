@@ -12,6 +12,11 @@ class DownloadPostprocessSkippedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('011001', $responseMessage, 'The negative acknowledgment of the EBICS response that is sent to the client from the server.');
+        parent::__construct(
+            '011001',
+            $responseMessage,
+            'The negative acknowledgment of the EBICS response that is ' .
+            'sent to the client from the server.'
+        );
     }
 }

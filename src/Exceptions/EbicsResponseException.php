@@ -24,7 +24,7 @@ class EbicsResponseException extends EbicsException implements EbicsResponseExce
     {
         $message = $responseMessage ?: $meaning;
 
-        parent::__construct((string) $message, (int) $responseCode);
+        parent::__construct((string)$message, (int)$responseCode);
 
         $this->responseCode = $responseCode;
         $this->meaning = $meaning;

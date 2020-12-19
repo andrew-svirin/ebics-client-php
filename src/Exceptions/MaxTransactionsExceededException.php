@@ -12,6 +12,10 @@ class MaxTransactionsExceededException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091119', $responseMessage, 'The maximum number of parallel transactions per customer is exceeded.');
+        parent::__construct(
+            '091119',
+            $responseMessage,
+            'The maximum number of parallel transactions per customer is exceeded.'
+        );
     }
 }

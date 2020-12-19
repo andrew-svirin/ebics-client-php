@@ -12,6 +12,11 @@ class CertificatesValidationErrorException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091219', $responseMessage, 'The server is unable to match the certificate with the previously declared information automatically.');
+        parent::__construct(
+            '091219',
+            $responseMessage,
+            'The server is unable to match the certificate with the ' .
+            'previously declared information automatically.'
+        );
     }
 }

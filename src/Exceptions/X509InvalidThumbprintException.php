@@ -12,6 +12,10 @@ class X509InvalidThumbprintException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091212', $responseMessage, 'The thumb print does not correspond to the certificate.');
+        parent::__construct(
+            '091212',
+            $responseMessage,
+            'The thumb print does not correspond to the certificate.'
+        );
     }
 }

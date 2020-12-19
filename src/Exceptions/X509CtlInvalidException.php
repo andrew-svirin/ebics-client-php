@@ -12,6 +12,11 @@ class X509CtlInvalidException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091213', $responseMessage, 'When verifying the certificate, the bank detects that the certificate trust list (CTL) is not valid.');
+        parent::__construct(
+            '091213',
+            $responseMessage,
+            'When verifying the certificate, the bank detects ' .
+            'that the certificate trust list (CTL) is not valid.'
+        );
     }
 }

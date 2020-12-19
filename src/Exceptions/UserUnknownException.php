@@ -12,6 +12,11 @@ class UserUnknownException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091003', $responseMessage, 'The identification and authentication signature of the technical user is successfully verified but the non-technical subscriber is not known to the bank.');
+        parent::__construct(
+            '091003',
+            $responseMessage,
+            'The identification and authentication signature of the technical user is ' .
+            'successfully verified but the non-technical subscriber is not known to the bank.'
+        );
     }
 }

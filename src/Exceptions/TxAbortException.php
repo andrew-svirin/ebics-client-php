@@ -12,6 +12,12 @@ class TxAbortException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091102', $responseMessage, 'If the bank supports transaction recovery, the bank verifies whether an upload transaction can be recovered. If the transaction cannot be recovered, the bank terminates the transaction.');
+        parent::__construct(
+            '091102',
+            $responseMessage,
+            'If the bank supports transaction recovery, the bank verifies whether ' .
+            'an upload transaction can be recovered. If the transaction cannot be recovered, ' .
+            'the bank terminates the transaction.'
+        );
     }
 }
