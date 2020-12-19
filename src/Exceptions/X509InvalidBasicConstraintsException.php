@@ -12,6 +12,10 @@ class X509InvalidBasicConstraintsException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091216', $responseMessage, 'The basic constraints are not valid when determining certificate verification.');
+        parent::__construct(
+            '091216',
+            $responseMessage,
+            'The basic constraints are not valid when determining certificate verification.'
+        );
     }
 }

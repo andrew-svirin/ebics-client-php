@@ -12,6 +12,10 @@ class X509InvalidPolicyException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091215', $responseMessage, 'The certificate has invalid policy when determining certificate verification.');
+        parent::__construct(
+            '091215',
+            $responseMessage,
+            'The certificate has invalid policy when determining certificate verification.'
+        );
     }
 }

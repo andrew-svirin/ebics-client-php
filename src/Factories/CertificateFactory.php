@@ -20,13 +20,19 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_A, $publicKey, $privateKey, $content);
     }
 
-    public static function buildCertificateE(string $publicKey, string $privateKey = null, string $content = null): Certificate
-    {
+    public static function buildCertificateE(
+        string $publicKey,
+        string $privateKey = null,
+        string $content = null
+    ): Certificate {
         return new Certificate(Certificate::TYPE_E, $publicKey, $privateKey, $content);
     }
 
-    public static function buildCertificateX(string $publicKey, string $privateKey = null, string $content = null): Certificate
-    {
+    public static function buildCertificateX(
+        string $publicKey,
+        string $privateKey = null,
+        string $content = null
+    ): Certificate {
         return new Certificate(Certificate::TYPE_X, $publicKey, $privateKey, $content);
     }
 
@@ -45,13 +51,19 @@ class CertificateFactory
         return self::generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
     }
 
-    public static function buildCertificateEFromDetails(string $exponent, string $modulus, string $content = null): Certificate
-    {
+    public static function buildCertificateEFromDetails(
+        string $exponent,
+        string $modulus,
+        string $content = null
+    ): Certificate {
         return self::buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
     }
 
-    public static function buildCertificateXFromDetails(string $exponent, string $modulus, string $content = null): Certificate
-    {
+    public static function buildCertificateXFromDetails(
+        string $exponent,
+        string $modulus,
+        string $content = null
+    ): Certificate {
         return self::buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
     }
 
@@ -80,8 +92,12 @@ class CertificateFactory
         ]);
     }
 
-    private static function buildCertificateFromDetails(string $type, string $exponent, string $modulus, string $content = null): Certificate
-    {
+    private static function buildCertificateFromDetails(
+        string $type,
+        string $exponent,
+        string $modulus,
+        string $content = null
+    ): Certificate {
         $rsa = new RSA();
         $rsa->loadKey([
             'n' => new BigInteger($modulus, 256),

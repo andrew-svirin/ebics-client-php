@@ -12,6 +12,10 @@ class InternalErrorException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('061099', $responseMessage, 'An internal error occurred when processing an EBICS request.');
+        parent::__construct(
+            '061099',
+            $responseMessage,
+            'An internal error occurred when processing an EBICS request.'
+        );
     }
 }

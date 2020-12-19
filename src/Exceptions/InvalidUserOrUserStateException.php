@@ -12,6 +12,10 @@ class InvalidUserOrUserStateException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091002', $responseMessage, 'Error that results from an invalid combination of user ID or an invalid subscriber state.');
+        parent::__construct(
+            '091002',
+            $responseMessage,
+            'Error that results from an invalid combination of user ID or an invalid subscriber state.'
+        );
     }
 }

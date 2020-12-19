@@ -12,6 +12,10 @@ class AmountCheckFailedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091303', $responseMessage, 'Preliminary verification of the account amount limit has failed.');
+        parent::__construct(
+            '091303',
+            $responseMessage,
+            'Preliminary verification of the account amount limit has failed.'
+        );
     }
 }

@@ -18,13 +18,17 @@ class TransactionFactory
      *
      * @return Transaction
      */
-    public static function buildTransaction(string $transactionId, string $transactionPhase, string $numSegments, string $segmentNumber): Transaction
-    {
+    public static function buildTransaction(
+        string $transactionId,
+        string $transactionPhase,
+        string $numSegments,
+        string $segmentNumber
+    ): Transaction {
         $transaction = new Transaction();
         $transaction->setId($transactionId);
         $transaction->setPhase($transactionPhase);
-        $transaction->setNumSegments((int) $numSegments);
-        $transaction->setSegmentNumber((int) $segmentNumber);
+        $transaction->setNumSegments((int)$numSegments);
+        $transaction->setSegmentNumber((int)$segmentNumber);
 
         return $transaction;
     }

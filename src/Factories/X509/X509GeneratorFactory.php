@@ -4,6 +4,11 @@ namespace AndrewSvirin\Ebics\Factories\X509;
 
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 
+use RuntimeException;
+
+use function call_user_func;
+use function get_class;
+
 /**
  * Default X509 generator factory.
  *
@@ -18,15 +23,19 @@ class X509GeneratorFactory
     /** @var callable|null */
     private static $generatorFunction;
 
-    public static function setGeneratorFunction(callable $generatorFunction) : void
+    public static function setGeneratorFunction(callable $generatorFunction): void
     {
         self::$generatorFunction = $generatorFunction;
     }
 
-    public static function setGeneratorClass(string $generatorClass) : void
+    public static function setGeneratorClass(string $generatorClass): void
     {
         if (!is_a($generatorClass, X509GeneratorInterface::class, true)) {
-            throw new \RuntimeException(sprintf('The class "%s" must implements %s', $generatorClass, X509GeneratorInterface::class));
+            throw new RuntimeException(sprintf(
+                'The class "%s" must implements %s',
+                $generatorClass,
+                X509GeneratorInterface::class
+            ));
         }
 
         self::$generatorClass = $generatorClass;
@@ -42,14 +51,21 @@ class X509GeneratorFactory
             return new self::$generatorClass();
         }
 
-        $generator = \call_user_func(self::$generatorFunction, $options);
+        $generator = call_user_func(self::$generatorFunction, $options);
 
         if (null === $generator) {
-            throw new \RuntimeException(sprintf('The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned', X509GeneratorInterface::class));
+            throw new RuntimeException(sprintf(
+                'The X509GeneratorFactory::generatorFunction must returns a instance of "%s", none returned',
+                X509GeneratorInterface::class
+            ));
         }
 
         if (!$generator instanceof X509GeneratorInterface) {
-            throw new \RuntimeException(sprintf('The class "%s" must implements %s', \get_class($generator), X509GeneratorInterface::class));
+            throw new RuntimeException(sprintf(
+                'The class "%s" must implements %s',
+                get_class($generator),
+                X509GeneratorInterface::class
+            ));
         }
 
         return $generator;

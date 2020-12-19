@@ -23,8 +23,12 @@ class DOMDocument extends \DOMDocument
      */
     public function getContent(): string
     {
-        $content = (string) $this->saveXML();
-        $content = str_replace('<?xml version="1.0" encoding="utf-8"?>', "<?xml version='1.0' encoding='utf-8'?>", $content);
+        $content = (string)$this->saveXML();
+        $content = str_replace(
+            '<?xml version="1.0" encoding="utf-8"?>',
+            "<?xml version='1.0' encoding='utf-8'?>",
+            $content
+        );
         $content = trim($content);
 
         return $content;
@@ -39,6 +43,6 @@ class DOMDocument extends \DOMDocument
     {
         $this->formatOutput = true;
 
-        return (string) $this->saveXML();
+        return (string)$this->saveXML();
     }
 }

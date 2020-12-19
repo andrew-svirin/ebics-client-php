@@ -15,7 +15,7 @@ class Response extends DOMDocument
      */
     private $transactions = [];
 
-    public function addTransaction(Transaction $transaction) : void
+    public function addTransaction(Transaction $transaction): void
     {
         $this->transactions[] = $transaction;
     }

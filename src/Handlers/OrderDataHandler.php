@@ -50,11 +50,18 @@ class OrderDataHandler
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
      */
-    public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime) : void
+    public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime): void
     {
         // Add SignaturePubKeyOrderData to root.
-        $xmlSignaturePubKeyOrderData = $xml->createElementNS('http://www.ebics.org/S001', 'SignaturePubKeyOrderData');
-        $xmlSignaturePubKeyOrderData->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
+        $xmlSignaturePubKeyOrderData = $xml->createElementNS(
+            'http://www.ebics.org/S001',
+            'SignaturePubKeyOrderData'
+        );
+        $xmlSignaturePubKeyOrderData->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ds',
+            'http://www.w3.org/2000/09/xmldsig#'
+        );
         $xml->appendChild($xmlSignaturePubKeyOrderData);
 
         // Add SignaturePubKeyInfo to SignaturePubKeyOrderData.
@@ -81,11 +88,22 @@ class OrderDataHandler
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
      */
-    public function handleHIA(DOMDocument $xml, Certificate $certificateE, Certificate $certificateX, DateTime $dateTime) : void
-    {
+    public function handleHIA(
+        DOMDocument $xml,
+        Certificate $certificateE,
+        Certificate $certificateX,
+        DateTime $dateTime
+    ): void {
         // Add HIARequestOrderData to root.
-        $xmlHIARequestOrderData = $xml->createElementNS('urn:org:ebics:H004', 'HIARequestOrderData');
-        $xmlHIARequestOrderData->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
+        $xmlHIARequestOrderData = $xml->createElementNS(
+            'urn:org:ebics:H004',
+            'HIARequestOrderData'
+        );
+        $xmlHIARequestOrderData->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ds',
+            'http://www.w3.org/2000/09/xmldsig#'
+        );
         $xml->appendChild($xmlHIARequestOrderData);
 
         // Add AuthenticationPubKeyInfo to HIARequestOrderData.
@@ -126,7 +144,7 @@ class OrderDataHandler
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
      */
-    private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate) : void
+    private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate): void
     {
         if (!($certificateX509 = $certificate->toX509())) {
             throw new EbicsException('Certificate X509 is empty.');
@@ -159,8 +177,12 @@ class OrderDataHandler
     /**
      * Add PubKeyValue to PublicKeyInfo XML Node.
      */
-    private function handlePubKeyValue(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate, DateTime $dateTime) : void
-    {
+    private function handlePubKeyValue(
+        DOMNode $xmlPublicKeyInfo,
+        DOMDocument $xml,
+        Certificate $certificate,
+        DateTime $dateTime
+    ): void {
         $publicKeyDetails = CryptService::getPublicKeyDetails($certificate->getPublicKey());
 
         // Add PubKeyValue to Signature.
@@ -190,7 +212,7 @@ class OrderDataHandler
     /**
      * Add PartnerID to OrderData XML Node.
      */
-    private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml) : void
+    private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
         $xmlPartnerID = $xml->createElement('PartnerID');
         $xmlPartnerID->nodeValue = $this->user->getPartnerId();
@@ -200,7 +222,7 @@ class OrderDataHandler
     /**
      * Add UserID to OrderData XML Node.
      */
-    private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml) : void
+    private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
         $xmlUserID = $xml->createElement('UserID');
         $xmlUserID->nodeValue = $this->user->getUserId();
@@ -226,10 +248,10 @@ class OrderDataHandler
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateXFromDetails(
-         $modulusValueDe,
-         $exponentValueDe,
-         isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
-      );
+            $modulusValueDe,
+            $exponentValueDe,
+            isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
+        );
     }
 
     /**
@@ -251,9 +273,9 @@ class OrderDataHandler
         $exponentValueDe = base64_decode($exponentValue);
 
         return CertificateFactory::buildCertificateEFromDetails(
-         $modulusValueDe,
-         $exponentValueDe,
-         isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
-      );
+            $modulusValueDe,
+            $exponentValueDe,
+            isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
+        );
     }
 }

@@ -63,7 +63,14 @@ interface EbicsClientInterface
     /**
      * Retrieve subscriber's customer and subscriber information.
      */
-    public function FDL(string $fileInfo, string $format = 'plain', string $countryCode = 'FR', DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+    public function FDL(
+        string $fileInfo,
+        string $format = 'plain',
+        string $countryCode = 'FR',
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response;
 
     /**
      * Retrieve  Bank available order types.
@@ -75,19 +82,27 @@ interface EbicsClientInterface
     /**
      * Downloads the interim transaction report in SWIFT format (MT942).
      *
-     * @param DateTime|null $dateTime      current date
+     * @param DateTime|null $dateTime current date
      * @param DateTime|null $startDateTime the start date of requested transactions
-     * @param DateTime|null $endDateTime   the end date of requested transactions
+     * @param DateTime|null $endDateTime the end date of requested transactions
      */
-    public function VMK(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+    public function VMK(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response;
 
     /**
      * Retrieve the bank account statement.
      *
      * @param DateTime|null $startDateTime the start date of requested transactions
-     * @param DateTime|null $endDateTime   the end date of requested transactions
+     * @param DateTime|null $endDateTime the end date of requested transactions
      */
-    public function STA(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
+    public function STA(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response;
 
     /**
      * Retrieve the bank account statement in Camt.053 format.
@@ -95,20 +110,32 @@ interface EbicsClientInterface
      * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
      * @param DateTime|null $endDateTime the end date of requested transactions
+     *
      * @return Response
      */
-    public function C53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
-
+    // @codingStandardsIgnoreStart
+    public function C53(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response;
+    // @codingStandardsIgnoreEnd
     /**
      * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services)
      *
      * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
      * @param DateTime|null $endDateTime the end date of requested transactions
+     *
      * @return Response
      */
-    public function Z53(DateTime $dateTime = null, DateTime $startDateTime = null, DateTime $endDateTime = null): Response;
-
+    // @codingStandardsIgnoreStart
+    public function Z53(
+        DateTime $dateTime = null,
+        DateTime $startDateTime = null,
+        DateTime $endDateTime = null
+    ): Response;
+    // @codingStandardsIgnoreEnd
     /**
      * Mark transactions as received.
      */

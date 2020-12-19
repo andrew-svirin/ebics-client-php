@@ -12,6 +12,11 @@ class X509WrongKeyUsageException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091210', $responseMessage, 'When verifying the certificate key usage, the bank detects that the certificate is not issued for current use.');
+        parent::__construct(
+            '091210',
+            $responseMessage,
+            'When verifying the certificate key usage, the bank ' .
+            'detects that the certificate is not issued for current use.'
+        );
     }
 }

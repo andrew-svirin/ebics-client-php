@@ -50,7 +50,9 @@ class KeyRingManager implements KeyRingManagerInterface
      */
     public function loadKeyRing(): KeyRing
     {
-        if (is_file($this->keyRingRealPath) && ($content = file_get_contents($this->keyRingRealPath)) && !empty($content)) {
+        if (is_file($this->keyRingRealPath) &&
+            ($content = file_get_contents($this->keyRingRealPath)) &&
+            !empty($content)) {
             $result = KeyRingFactory::buildKeyRingFromData(json_decode($content, true));
         } else {
             $result = new KeyRing();
@@ -63,7 +65,7 @@ class KeyRingManager implements KeyRingManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function saveKeyRing(KeyRing $keyRing) : void
+    public function saveKeyRing(KeyRing $keyRing): void
     {
         $data = KeyRingFactory::buildDataFromKeyRing($keyRing);
         file_put_contents($this->keyRingRealPath, json_encode($data, JSON_PRETTY_PRINT));

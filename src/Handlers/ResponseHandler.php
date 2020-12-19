@@ -43,7 +43,8 @@ class ResponseHandler
     }
 
     /**
-     * Extract H004 > ReturnCode value from both header and body. Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
+     * Extract H004 > ReturnCode value from both header and body.
+     * Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
      */
     public function retrieveH004BodyOrHeaderReturnCode(DOMDocument $xml): string
     {
@@ -125,6 +126,11 @@ class ResponseHandler
         $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
         $segmentNumberValue = DOMHelper::safeItemValue($segmentNumber);
 
-        return TransactionFactory::buildTransaction($transactionIdValue, $transactionPhaseValue, $numSegmentsValue, $segmentNumberValue);
+        return TransactionFactory::buildTransaction(
+            $transactionIdValue,
+            $transactionPhaseValue,
+            $numSegmentsValue,
+            $segmentNumberValue
+        );
     }
 }

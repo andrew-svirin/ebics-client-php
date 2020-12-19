@@ -12,6 +12,11 @@ class DistributedSignatureAuthorisationFailedException extends EbicsResponseExce
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091007', $responseMessage, 'Subscriber possesses no authorization of signature for the referenced order in the VEU administration.');
+        parent::__construct(
+            '091007',
+            $responseMessage,
+            'Subscriber possesses no authorization of signature for ' .
+            'the referenced order in the VEU administration.'
+        );
     }
 }

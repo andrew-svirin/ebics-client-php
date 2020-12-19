@@ -15,9 +15,9 @@ interface X509GeneratorInterface
     /**
      * Generate a X509 certificate and returns its content
      *
-     * @param RSA   $privateKey the private key
-     * @param RSA   $publicKey  the public key
-     * @param array $options    optional generation options (may be empty)
+     * @param RSA $privateKey the private key
+     * @param RSA $publicKey the public key
+     * @param array $options optional generation options (may be empty)
      *
      * @return string the X509 content
      */

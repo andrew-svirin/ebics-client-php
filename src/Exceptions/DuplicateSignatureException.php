@@ -12,6 +12,10 @@ class DuplicateSignatureException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091306', $responseMessage, 'The signatory has already signed the order.');
+        parent::__construct(
+            '091306',
+            $responseMessage,
+            'The signatory has already signed the order.'
+        );
     }
 }

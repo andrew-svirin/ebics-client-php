@@ -12,6 +12,10 @@ class X509CertificateExpiredException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091208', $responseMessage, 'The certificate is not valid because it has expired.');
+        parent::__construct(
+            '091208',
+            $responseMessage,
+            'The certificate is not valid because it has expired.'
+        );
     }
 }

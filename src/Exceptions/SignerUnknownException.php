@@ -12,6 +12,10 @@ class SignerUnknownException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091304', $responseMessage, 'The signatory of the order is not a valid subscriber.');
+        parent::__construct(
+            '091304',
+            $responseMessage,
+            'The signatory of the order is not a valid subscriber.'
+        );
     }
 }

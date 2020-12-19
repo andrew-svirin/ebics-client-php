@@ -12,6 +12,10 @@ class SignatureVerificationFailedException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091301', $responseMessage, 'Verification of the electronic signature has failed.');
+        parent::__construct(
+            '091301',
+            $responseMessage,
+            'Verification of the electronic signature has failed.'
+        );
     }
 }

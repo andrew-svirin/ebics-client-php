@@ -12,6 +12,11 @@ class KeymgmtUnsupportedVersionAuthenticationException extends EbicsResponseExce
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091202', $responseMessage, 'When processing an HIA request, the order data contains an inadmissible version of the identification and authentication signature process.');
+        parent::__construct(
+            '091202',
+            $responseMessage,
+            'When processing an HIA request, the order data contains an inadmissible ' .
+            'version of the identification and authentication signature process.'
+        );
     }
 }

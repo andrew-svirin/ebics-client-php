@@ -12,6 +12,10 @@ class ProcessingErrorException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {
-        parent::__construct('091116', $responseMessage, 'When processing an EBICS request, other business-related errors occurred.');
+        parent::__construct(
+            '091116',
+            $responseMessage,
+            'When processing an EBICS request, other business-related errors occurred.'
+        );
     }
 }
