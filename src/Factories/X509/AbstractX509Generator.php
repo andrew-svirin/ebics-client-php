@@ -111,8 +111,12 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $subject;
     }
 
-    protected function generateIssuer(RSAInterface $privateKey, RSAInterface $publicKey, X509 $subject, array $options): X509
-    {
+    protected function generateIssuer(
+        RSAInterface $privateKey,
+        RSAInterface $publicKey,
+        X509 $subject,
+        array $options
+    ): X509 {
         $issuer = new X509();
         $issuer->setPrivateKey($privateKey); // $privKey is Crypt_RSA object
 
