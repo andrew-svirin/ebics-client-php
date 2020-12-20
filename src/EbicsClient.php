@@ -69,6 +69,16 @@ final class EbicsClient implements EbicsClientInterface
     private $requestFactory;
 
     /**
+     * @var CryptService
+     */
+    private $cryptService;
+
+    /**
+     * @var CertificateFactory
+     */
+    private $certificateFactory;
+
+    /**
      * Constructor.
      */
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
@@ -79,6 +89,8 @@ final class EbicsClient implements EbicsClientInterface
         $this->requestFactory = new RequestHandler($bank, $user, $keyRing);
         $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
         $this->responseHandler = new ResponseHandler();
+        $this->cryptService = new CryptService();
+        $this->certificateFactory = new CertificateFactory();
     }
 
     /**
@@ -134,8 +146,8 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $certificateA = CertificateFactory::generateCertificateAFromKeys(
-            CryptService::generateKeys($this->keyRing),
+        $certificateA = $this->certificateFactory->generateCertificateAFromKeys(
+            $this->cryptService->generateKeys($this->keyRing),
             $this->bank->isCertified()
         );
         $request = $this->requestFactory->buildINI($certificateA, $dateTime);
@@ -163,12 +175,12 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $certificateE = CertificateFactory::generateCertificateEFromKeys(
-            CryptService::generateKeys($this->keyRing),
+        $certificateE = $this->certificateFactory->generateCertificateEFromKeys(
+            $this->cryptService->generateKeys($this->keyRing),
             $this->bank->isCertified()
         );
-        $certificateX = CertificateFactory::generateCertificateXFromKeys(
-            CryptService::generateKeys($this->keyRing),
+        $certificateX = $this->certificateFactory->generateCertificateXFromKeys(
+            $this->cryptService->generateKeys($this->keyRing),
             $this->bank->isCertified()
         );
         $request = $this->requestFactory->buildHIA($certificateE, $certificateX, $dateTime);
@@ -207,7 +219,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->checkH004ReturnCode($request, $response);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
         $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
         $certificateX = $this->orderDataHandler->retrieveAuthenticationCertificate($orderData);
         $certificateE = $this->orderDataHandler->retrieveEncryptionCertificate($orderData);
@@ -243,7 +255,7 @@ final class EbicsClient implements EbicsClientInterface
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -275,7 +287,7 @@ final class EbicsClient implements EbicsClientInterface
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -308,7 +320,7 @@ final class EbicsClient implements EbicsClientInterface
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
-        $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -353,12 +365,12 @@ final class EbicsClient implements EbicsClientInterface
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
         switch ($format) {
             case 'plain':
-                $orderDataContent = CryptService::decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
+                $orderDataContent = $this->cryptService->decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
                 $transaction->setPlainOrderData($orderDataContent);
                 break;
             case 'xml':
             default:
-                $orderData = CryptService::decryptOrderData($this->keyRing, $orderDataEncrypted);
+                $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
                 $transaction->setOrderData($orderData);
                 break;
         }

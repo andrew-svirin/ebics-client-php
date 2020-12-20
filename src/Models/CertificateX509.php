@@ -2,9 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
-use phpseclib\Crypt\RSA;
+use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
+use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use phpseclib\File\X509;
-use phpseclib\Math\BigInteger;
 
 /**
  * Class CertificateX509 represents Certificate model in X509 structure.
@@ -12,7 +12,7 @@ use phpseclib\Math\BigInteger;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  *
- * @method RSA getPublicKey()
+ * @method RSAInterface getPublicKey()
  */
 class CertificateX509 extends X509
 {
@@ -21,8 +21,9 @@ class CertificateX509 extends X509
      */
     public function getSerialNumber(): string
     {
-        /* @var $certificateSerialNumber BigInteger */
-        $certificateSerialNumber = $this->currentCert['tbsCertificate']['serialNumber'];
+        $certificateSerialNumber = BigIntegerFactory::createFromPhpSecLib(
+            $this->currentCert['tbsCertificate']['serialNumber']
+        );
 
         return $certificateSerialNumber->toString();
     }

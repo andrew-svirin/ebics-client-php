@@ -15,6 +15,7 @@ use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTime;
 use DOMDocument;
 use DOMNode;
+use DOMNodeList;
 
 /**
  * Class OrderDataHandler manages OrderData DOM elements.
@@ -35,16 +36,29 @@ class OrderDataHandler
      * @var User
      */
     private $user;
+
     /**
      * @var KeyRing
      */
     private $keyRing;
+
+    /**
+     * @var CryptService
+     */
+    private $cryptService;
+
+    /**
+     * @var CertificateFactory
+     */
+    private $certificateFactory;
 
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
+        $this->cryptService = new CryptService();
+        $this->certificateFactory = new CertificateFactory();
     }
 
     /**
@@ -183,7 +197,7 @@ class OrderDataHandler
         Certificate $certificate,
         DateTime $dateTime
     ): void {
-        $publicKeyDetails = CryptService::getPublicKeyDetails($certificate->getPublicKey());
+        $publicKeyDetails = $this->cryptService->getPublicKeyDetails($certificate->getPublicKey());
 
         // Add PubKeyValue to Signature.
         $xmlPubKeyValue = $xml->createElement('PubKeyValue');
@@ -236,7 +250,7 @@ class OrderDataHandler
     {
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
-        if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
+        if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
@@ -247,7 +261,7 @@ class OrderDataHandler
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
-        return CertificateFactory::buildCertificateXFromDetails(
+        return $this->certificateFactory->buildCertificateXFromDetails(
             $modulusValueDe,
             $exponentValueDe,
             isset($x509CertificateValueDe) ? $x509CertificateValueDe : null
@@ -261,7 +275,7 @@ class OrderDataHandler
     {
         $xpath = $this->prepareH004XPath($orderData);
         $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
-        if ($x509Certificate instanceof \DOMNodeList && 0 !== $x509Certificate->length) {
+        if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
         }
@@ -272,7 +286,7 @@ class OrderDataHandler
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
-        return CertificateFactory::buildCertificateEFromDetails(
+        return $this->certificateFactory->buildCertificateEFromDetails(
             $modulusValueDe,
             $exponentValueDe,
             isset($x509CertificateValueDe) ? $x509CertificateValueDe : null

@@ -3,14 +3,15 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
+use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
+use AndrewSvirin\Ebics\Models\Crypt\AES;
+use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
-use phpseclib\Crypt\AES;
-use phpseclib\Crypt\Random;
-use phpseclib\Crypt\RSA;
 use RuntimeException;
 
 use function call_user_func_array;
@@ -26,10 +27,39 @@ use const OPENSSL_ZERO_PADDING;
  */
 class CryptService
 {
+
+    /**
+     * @var RSAFactory
+     */
+    private $rsaFactory;
+
+    /**
+     * @var AESFactory
+     */
+    private $aesFactory;
+
+    /**
+     * @var RandomService
+     */
+    private $randomService;
+
+    /**
+     * @var OrderDataFactory
+     */
+    private $orderDataFactory;
+
+    public function __construct()
+    {
+        $this->rsaFactory = new RSAFactory();
+        $this->aesFactory = new AESFactory();
+        $this->randomService = new RandomService();
+        $this->orderDataFactory = new OrderDataFactory();
+    }
+
     /**
      * Calculate hash.
      */
-    public static function calculateHash(string $text, string $algo = 'sha256'): string
+    public function calculateHash(string $text, string $algo = 'sha256'): string
     {
         return hash($algo, $text, true);
     }
@@ -37,10 +67,10 @@ class CryptService
     /**
      * Decrypt encrypted OrderData.
      */
-    public static function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
+    public function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
     {
-        $content = self::decryptOrderDataContent($keyRing, $orderData);
-        $orderData = OrderDataFactory::buildOrderDataFromContent($content);
+        $content = $this->decryptOrderDataContent($keyRing, $orderData);
+        $orderData = $this->orderDataFactory->buildOrderDataFromContent($content);
 
         return $orderData;
     }
@@ -48,23 +78,23 @@ class CryptService
     /**
      * Decrypt encrypted OrderData.
      */
-    public static function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
+    public function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
         if (!($certificateE = $keyRing->getUserCertificateE())) {
             throw new RuntimeException('Certificate E is not set.');
         }
 
-        $rsa = new RSA();
+        $rsa = $this->rsaFactory->create();
         $rsa->setPassword($keyRing->getPassword());
         $rsa->loadKey((string)$certificateE->getPrivateKey());
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
         // aes-128-cbc encrypting format.
-        $aes = new AES(AES::MODE_CBC);
+        $aes = $this->aesFactory->create(AES::MODE_CBC);
         $aes->setKeyLength(128);
         $aes->setKey($transactionKeyDecrypted);
         // Force openssl_options.
-        $aes->openssl_options = OPENSSL_ZERO_PADDING;
+        $aes->setOpenSSLOptions(OPENSSL_ZERO_PADDING);
         $decrypted = $aes->decrypt($orderData->getOrderData());
 
         // Try to uncompress from gz order data.
@@ -81,9 +111,9 @@ class CryptService
      *
      * @throws EbicsException
      */
-    public static function cryptSignatureValue(KeyRing $keyRing, string $hash): string
+    public function cryptSignatureValue(KeyRing $keyRing, string $hash): string
     {
-        $digestToSignBin = self::filter($hash);
+        $digestToSignBin = $this->filter($hash);
 
         if (!($certificateX = $keyRing->getUserCertificateX()) || !($privateKey = $certificateX->getPrivateKey())) {
             throw new EbicsException(
@@ -93,7 +123,7 @@ class CryptService
         }
 
         $passphrase = $keyRing->getPassword();
-        $rsa = new RSA();
+        $rsa = $this->rsaFactory->create();
         $rsa->setPassword($passphrase);
         $rsa->loadKey($privateKey, RSA::PRIVATE_FORMAT_PKCS1);
         if (!defined('CRYPT_RSA_PKCS15_COMPAT')) {
@@ -116,9 +146,9 @@ class CryptService
      *      'privatekey' => '<string>',
      *  ]
      */
-    public static function generateKeys(KeyRing $keyRing, string $algo = 'sha256', int $length = 2048): array
+    public function generateKeys(KeyRing $keyRing, string $algo = 'sha256', int $length = 2048): array
     {
-        $rsa = new RSA();
+        $rsa = $this->rsaFactory->create();
         $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
         $rsa->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
         $rsa->setHash($algo);
@@ -133,7 +163,7 @@ class CryptService
      *
      * @return string
      */
-    private static function filter(string $hash)
+    private function filter(string $hash)
     {
         $RSA_SHA256prefix = [
             0x30,
@@ -161,16 +191,16 @@ class CryptService
         }
         $signedInfoDigest = array_values($unpHash);
         $digestToSign = [];
-        self::systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, count($RSA_SHA256prefix));
-        self::systemArrayCopy($signedInfoDigest, 0, $digestToSign, count($RSA_SHA256prefix), count($signedInfoDigest));
+        $this->systemArrayCopy($RSA_SHA256prefix, 0, $digestToSign, 0, count($RSA_SHA256prefix));
+        $this->systemArrayCopy($signedInfoDigest, 0, $digestToSign, count($RSA_SHA256prefix), count($signedInfoDigest));
 
-        return self::arrayToBin($digestToSign);
+        return $this->arrayToBin($digestToSign);
     }
 
     /**
      * System.arrayCopy java function interpretation.
      */
-    private static function systemArrayCopy(array $a, int $c, array &$b, int $d, int $length): void
+    private function systemArrayCopy(array $a, int $c, array &$b, int $d, int $length): void
     {
         for ($i = 0; $i < $length; ++$i) {
             $b[$i + $d] = $a[$i + $c];
@@ -184,7 +214,7 @@ class CryptService
      *
      * @return string (bytes)
      */
-    private static function arrayToBin(array $bytes): string
+    private function arrayToBin(array $bytes): string
     {
         return call_user_func_array('pack', array_merge(['c*'], $bytes));
     }
@@ -198,16 +228,17 @@ class CryptService
      * Remove leading zeros from both.
      * Calculate digest (SHA256).
      *
+     * @param Certificate $certificate
      * @param string $algorithm
      *
      * @return string
      */
-    public static function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
+    public function calculateDigest(Certificate $certificate, $algorithm = 'sha256')
     {
-        $publicKey = new RSA();
+        $publicKey = $this->rsaFactory->create();
         $publicKey->loadKey($certificate->getPublicKey());
-        $e0 = $publicKey->exponent->toHex(true);
-        $m0 = $publicKey->modulus->toHex(true);
+        $e0 = $publicKey->getExponent()->toHex(true);
+        $m0 = $publicKey->getModulus()->toHex(true);
         // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
         if (strlen($e0) > strlen($m0)) {
             $buffer = $e0;
@@ -226,9 +257,9 @@ class CryptService
      *
      * @return string
      */
-    public static function generateNonce()
+    public function generateNonce()
     {
-        $bytes = Random::string(16);
+        $bytes = $this->randomService->string(16);
         $nonce = bin2hex($bytes);
 
         return strtoupper($nonce);
@@ -237,19 +268,21 @@ class CryptService
     /**
      * Transform public key on exponent and modulus.
      *
-     * @return array [
-     *               'e' => <bytes>,
-     *               'm' => <bytes>,
-     *               ]
+     * @param string $publicKey
+     *
+     * @return array = [
+     *   'e' => '<bytes>',
+     *   'm' => '<bytes>',
+     * ]
      */
-    public static function getPublicKeyDetails(string $publicKey): array
+    public function getPublicKeyDetails(string $publicKey): array
     {
-        $rsa = new RSA();
+        $rsa = $this->rsaFactory->create();
         $rsa->setPublicKey($publicKey);
 
         return [
-            'e' => $rsa->exponent->toBytes(),
-            'm' => $rsa->modulus->toBytes(),
+            'e' => $rsa->getExponent()->toBytes(),
+            'm' => $rsa->getModulus()->toBytes(),
         ];
     }
 }
