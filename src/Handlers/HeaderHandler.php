@@ -66,6 +66,11 @@ class HeaderHandler
      */
     private $keyRing;
 
+    /**
+     * @var CryptService
+     */
+    private $cryptService;
+
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->bank = $bank;
@@ -74,6 +79,7 @@ class HeaderHandler
         $this->language = 'de';
         $this->securityMedium = '0000';
         $this->product = 'Ebics client PHP';
+        $this->cryptService = new CryptService();
     }
 
     /**
@@ -469,7 +475,7 @@ class HeaderHandler
         return function (DOMDocument $xml, DOMElement $xmlStatic) use ($dateTime) {
             // Add Nonce to static.
             $xmlNonce = $xml->createElement('Nonce');
-            $xmlNonce->nodeValue = CryptService::generateNonce();
+            $xmlNonce->nodeValue = $this->cryptService->generateNonce();
             $xmlStatic->appendChild($xmlNonce);
 
             // Add TimeStamp to static.
@@ -504,7 +510,7 @@ class HeaderHandler
             $xmlAuthentication = $xml->createElement('Authentication');
             $xmlAuthentication->setAttribute('Version', $keyRing->getBankCertificateXVersion());
             $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateXDigest = CryptService::calculateDigest($certificateX, $algorithm);
+            $certificateXDigest = $this->cryptService->calculateDigest($certificateX, $algorithm);
             $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
             $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
@@ -512,7 +518,7 @@ class HeaderHandler
             $xmlEncryption = $xml->createElement('Encryption');
             $xmlEncryption->setAttribute('Version', $keyRing->getBankCertificateEVersion());
             $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateEDigest = CryptService::calculateDigest($certificateE, $algorithm);
+            $certificateEDigest = $this->cryptService->calculateDigest($certificateE, $algorithm);
             $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
             $xmlBankPubKeyDigests->appendChild($xmlEncryption);
         };

@@ -26,9 +26,15 @@ class AuthSignatureHandler
      */
     private $keyRing;
 
+    /**
+     * @var CryptService
+     */
+    private $cryptService;
+
     public function __construct(KeyRing $keyRing)
     {
         $this->keyRing = $keyRing;
+        $this->cryptService = new CryptService();
     }
 
     /**
@@ -98,7 +104,7 @@ class AuthSignatureHandler
             $signaturePath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedHeaderHash = CryptService::calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
+        $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
         $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
         $xmlReference->appendChild($xmlDigestValue);
 
@@ -109,8 +115,11 @@ class AuthSignatureHandler
             $canonicalizationPath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedSignedInfoHash = CryptService::calculateHash($canonicalizedSignedInfo, $signatureMethodAlgorithm);
-        $canonicalizedSignedInfoHashSigned = CryptService::cryptSignatureValue(
+        $canonicalizedSignedInfoHash = $this->cryptService->calculateHash(
+            $canonicalizedSignedInfo,
+            $signatureMethodAlgorithm
+        );
+        $canonicalizedSignedInfoHashSigned = $this->cryptService->cryptSignatureValue(
             $this->keyRing,
             $canonicalizedSignedInfoHash
         );

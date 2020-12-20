@@ -34,6 +34,11 @@ class KeyRingManager implements KeyRingManagerInterface
     private $password;
 
     /**
+     * @var KeyRingFactory
+     */
+    private $keyRingFactory;
+
+    /**
      * Constructor.
      *
      * @param string $keyRingRealPath
@@ -43,6 +48,7 @@ class KeyRingManager implements KeyRingManagerInterface
     {
         $this->keyRingRealPath = $keyRingRealPath;
         $this->password = $passphrase;
+        $this->keyRingFactory = new KeyRingFactory();
     }
 
     /**
@@ -53,7 +59,7 @@ class KeyRingManager implements KeyRingManagerInterface
         if (is_file($this->keyRingRealPath) &&
             ($content = file_get_contents($this->keyRingRealPath)) &&
             !empty($content)) {
-            $result = KeyRingFactory::buildKeyRingFromData(json_decode($content, true));
+            $result = $this->keyRingFactory->buildKeyRingFromData(json_decode($content, true));
         } else {
             $result = new KeyRing();
         }
@@ -67,7 +73,7 @@ class KeyRingManager implements KeyRingManagerInterface
      */
     public function saveKeyRing(KeyRing $keyRing): void
     {
-        $data = KeyRingFactory::buildDataFromKeyRing($keyRing);
+        $data = $this->keyRingFactory->buildDataFromKeyRing($keyRing);
         file_put_contents($this->keyRingRealPath, json_encode($data, JSON_PRETTY_PRINT));
     }
 }

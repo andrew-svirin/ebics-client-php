@@ -21,7 +21,17 @@ class KeyRingFactory
     const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
     const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
 
-    public static function buildKeyRingFromData(array $data): KeyRing
+    /**
+     * @var CertificateFactory
+     */
+    private $certificateFactory;
+
+    public function __construct()
+    {
+        $this->certificateFactory = new CertificateFactory();
+    }
+
+    public function buildKeyRingFromData(array $data): KeyRing
     {
         $keyRing = new KeyRing();
         if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX])) {
@@ -31,10 +41,10 @@ class KeyRingFactory
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX];
             $userCertificateAPrivateKey =
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PRIVATE_KEY_PREFIX];
-            $userCertificateA = CertificateFactory::buildCertificateA(
-                self::decodeValue($userCertificateAPublicKey),
-                self::decodeValue($userCertificateAPrivateKey),
-                !empty($userCertificateAContent) ? self::decodeValue($userCertificateAContent) : null
+            $userCertificateA = $this->certificateFactory->buildCertificateA(
+                $this->decodeValue($userCertificateAPublicKey),
+                $this->decodeValue($userCertificateAPrivateKey),
+                !empty($userCertificateAContent) ? $this->decodeValue($userCertificateAContent) : null
             );
             $keyRing->setUserCertificateA($userCertificateA);
         }
@@ -45,10 +55,10 @@ class KeyRingFactory
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
             $userCertificateEPrivateKey =
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $userCertificateE = CertificateFactory::buildCertificateE(
-                self::decodeValue($userCertificateEPublicKey),
-                self::decodeValue($userCertificateEPrivateKey),
-                !empty($userCertificateEContent) ? self::decodeValue($userCertificateEContent) : null
+            $userCertificateE = $this->certificateFactory->buildCertificateE(
+                $this->decodeValue($userCertificateEPublicKey),
+                $this->decodeValue($userCertificateEPrivateKey),
+                !empty($userCertificateEContent) ? $this->decodeValue($userCertificateEContent) : null
             );
             $keyRing->setUserCertificateE($userCertificateE);
         }
@@ -59,10 +69,10 @@ class KeyRingFactory
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
             $userCertificateXPrivateKey =
                 $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $userCertificateX = CertificateFactory::buildCertificateX(
-                self::decodeValue($userCertificateXPublicKey),
-                self::decodeValue($userCertificateXPrivateKey),
-                !empty($userCertificateXContent) ? self::decodeValue($userCertificateXContent) : null
+            $userCertificateX = $this->certificateFactory->buildCertificateX(
+                $this->decodeValue($userCertificateXPublicKey),
+                $this->decodeValue($userCertificateXPrivateKey),
+                !empty($userCertificateXContent) ? $this->decodeValue($userCertificateXContent) : null
             );
             $keyRing->setUserCertificateX($userCertificateX);
         }
@@ -73,10 +83,10 @@ class KeyRingFactory
                 $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
             $bankCertificateEPrivateKey =
                 $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateE = CertificateFactory::buildCertificateE(
-                self::decodeValue($bankCertificateEPublicKey),
-                !empty($bankCertificateEPrivateKey) ? self::decodeValue($bankCertificateEPrivateKey) : null,
-                !empty($bankCertificateEContent) ? self::decodeValue($bankCertificateEContent) : null
+            $bankCertificateE = $this->certificateFactory->buildCertificateE(
+                $this->decodeValue($bankCertificateEPublicKey),
+                !empty($bankCertificateEPrivateKey) ? $this->decodeValue($bankCertificateEPrivateKey) : null,
+                !empty($bankCertificateEContent) ? $this->decodeValue($bankCertificateEContent) : null
             );
             $keyRing->setBankCertificateE($bankCertificateE);
         }
@@ -87,10 +97,10 @@ class KeyRingFactory
                 $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
             $bankCertificateXPrivateKey =
                 $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateX = CertificateFactory::buildCertificateX(
-                self::decodeValue($bankCertificateXPublicKey),
-                !empty($bankCertificateXPrivateKey) ? self::decodeValue($bankCertificateXPrivateKey) : null,
-                !empty($bankCertificateXContent) ? self::decodeValue($bankCertificateXContent) : null
+            $bankCertificateX = $this->certificateFactory->buildCertificateX(
+                $this->decodeValue($bankCertificateXPublicKey),
+                !empty($bankCertificateXPrivateKey) ? $this->decodeValue($bankCertificateXPrivateKey) : null,
+                !empty($bankCertificateXContent) ? $this->decodeValue($bankCertificateXContent) : null
             );
             $keyRing->setBankCertificateX($bankCertificateX);
         }
@@ -98,7 +108,7 @@ class KeyRingFactory
         return $keyRing;
     }
 
-    public static function buildDataFromKeyRing(KeyRing $keyRing): array
+    public function buildDataFromKeyRing(KeyRing $keyRing): array
     {
         if (null !== $keyRing->getUserCertificateA()) {
             $userCertificateAB64 = $keyRing->getUserCertificateA()->getContent();
@@ -130,56 +140,56 @@ class KeyRingFactory
             self::USER_PREFIX => [
                 self::CERTIFICATE_PREFIX_A => [
                     self::CERTIFICATE_PREFIX => isset($userCertificateAB64) ?
-                        self::encodeValue($userCertificateAB64) : null,
+                        $this->encodeValue($userCertificateAB64) : null,
                     self::PUBLIC_KEY_PREFIX => isset($userCertificateAPublicKey) ?
-                        self::encodeValue($userCertificateAPublicKey) : null,
+                        $this->encodeValue($userCertificateAPublicKey) : null,
                     self::PRIVATE_KEY_PREFIX => isset($userCertificateAPrivateKey) ?
-                        self::encodeValue($userCertificateAPrivateKey) : null,
+                        $this->encodeValue($userCertificateAPrivateKey) : null,
                 ],
                 self::CERTIFICATE_PREFIX_E => [
                     self::CERTIFICATE_PREFIX => isset($userCertificateEB64) ?
-                        self::encodeValue($userCertificateEB64) : null,
+                        $this->encodeValue($userCertificateEB64) : null,
                     self::PUBLIC_KEY_PREFIX => isset($userCertificateEPublicKey) ?
-                        self::encodeValue($userCertificateEPublicKey) : null,
+                        $this->encodeValue($userCertificateEPublicKey) : null,
                     self::PRIVATE_KEY_PREFIX => isset($userCertificateEPrivateKey) ?
-                        self::encodeValue($userCertificateEPrivateKey) : null,
+                        $this->encodeValue($userCertificateEPrivateKey) : null,
                 ],
                 self::CERTIFICATE_PREFIX_X => [
                     self::CERTIFICATE_PREFIX => isset($userCertificateXB64) ?
-                        self::encodeValue($userCertificateXB64) : null,
+                        $this->encodeValue($userCertificateXB64) : null,
                     self::PUBLIC_KEY_PREFIX => isset($userCertificateXPublicKey) ?
-                        self::encodeValue($userCertificateXPublicKey) : null,
+                        $this->encodeValue($userCertificateXPublicKey) : null,
                     self::PRIVATE_KEY_PREFIX => isset($userCertificateXPrivateKey) ?
-                        self::encodeValue($userCertificateXPrivateKey) : null,
+                        $this->encodeValue($userCertificateXPrivateKey) : null,
                 ],
             ],
             self::BANK_PREFIX => [
                 self::CERTIFICATE_PREFIX_E => [
                     self::CERTIFICATE_PREFIX => isset($bankCertificateEB64) ?
-                        self::encodeValue($bankCertificateEB64) : null,
+                        $this->encodeValue($bankCertificateEB64) : null,
                     self::PUBLIC_KEY_PREFIX => isset($bankCertificateEPublicKey) ?
-                        self::encodeValue($bankCertificateEPublicKey) : null,
+                        $this->encodeValue($bankCertificateEPublicKey) : null,
                     self::PRIVATE_KEY_PREFIX => isset($bankCertificateEPrivateKey) ?
-                        self::encodeValue($bankCertificateEPrivateKey) : null,
+                        $this->encodeValue($bankCertificateEPrivateKey) : null,
                 ],
                 self::CERTIFICATE_PREFIX_X => [
                     self::CERTIFICATE_PREFIX => isset($bankCertificateXB64) ?
-                        self::encodeValue($bankCertificateXB64) : null,
+                        $this->encodeValue($bankCertificateXB64) : null,
                     self::PUBLIC_KEY_PREFIX => isset($bankCertificateXPublicKey) ?
-                        self::encodeValue($bankCertificateXPublicKey) : null,
+                        $this->encodeValue($bankCertificateXPublicKey) : null,
                     self::PRIVATE_KEY_PREFIX => isset($bankCertificateXPrivateKey) ?
-                        self::encodeValue($bankCertificateXPrivateKey) : null,
+                        $this->encodeValue($bankCertificateXPrivateKey) : null,
                 ],
             ],
         ];
     }
 
-    private static function encodeValue(string $value): string
+    private function encodeValue(string $value): string
     {
         return base64_encode($value);
     }
 
-    private static function decodeValue(string $value): string
+    private function decodeValue(string $value): string
     {
         return base64_decode($value);
     }
