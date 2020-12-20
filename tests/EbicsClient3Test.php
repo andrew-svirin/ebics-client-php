@@ -16,15 +16,15 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  *
- * @group SERVER-1
+ * @group SERVER-3
  */
-class EbicsClient1Test extends AbstractEbicsTestCase
+class EbicsClient3Test extends AbstractEbicsTestCase
 {
 
     /**
      * @var int
      */
-    protected $credentialsId = 1;
+    protected $credentialsId = 3;
 
     /**
      * @throws EbicsException
@@ -198,6 +198,22 @@ class EbicsClient1Test extends AbstractEbicsTestCase
         $code = $responseHandler->retrieveH004ReturnCode($htd);
         $reportText = $responseHandler->retrieveH004ReportText($htd);
         $this->assertResponseCorrect($code, $reportText);
+    }
+
+    /**
+     * @group VMK
+     *
+     * @throws ClientExceptionInterface
+     * @throws EbicsException
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     */
+    public function testVMK()
+    {
+        $this->expectExceptionCode(91005);
+        $this->expectExceptionMessage('[EBICS_INVALID_ORDER_TYPE] Auftragsart unzulässig');
+        $this->client->VMK();
     }
 
     /**
