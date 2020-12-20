@@ -2,8 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Factories\X509;
 
+use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use phpseclib\Crypt\RSA;
+use DateTimeImmutable;
+use DateTimeInterface;
 use phpseclib\File\X509;
 
 /**
@@ -14,10 +16,10 @@ use phpseclib\File\X509;
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
-    /** @var \DateTimeInterface */
+    /** @var DateTimeInterface */
     protected $certificateStartDate;
 
-    /** @var \DateTimeInterface */
+    /** @var DateTimeInterface */
     protected $certificateEndDate;
 
     /** @var string */
@@ -25,8 +27,8 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     public function __construct()
     {
-        $this->certificateStartDate = (new \DateTimeImmutable())->modify('-1 days');
-        $this->certificateEndDate = (new \DateTimeImmutable())->modify('+1 year');
+        $this->certificateStartDate = (new DateTimeImmutable())->modify('-1 days');
+        $this->certificateEndDate = (new DateTimeImmutable())->modify('+1 year');
         $this->serialNumber = $this->generateSerialNumber();
     }
 
@@ -46,7 +48,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      *
      * @throws X509GeneratorException
      */
-    public function generateX509(RSA $privateKey, RSA $publicKey, array $options = []): string
+    public function generateX509(RSAInterface $privateKey, RSAInterface $publicKey, array $options = []): string
     {
         $options = array_merge([
             'subject' => [
@@ -92,7 +94,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $x509->saveX509($result);
     }
 
-    protected function generateSubject(RSA $publicKey, array $options): X509
+    protected function generateSubject(RSAInterface $publicKey, array $options): X509
     {
         $subject = new X509();
         $subject->setPublicKey($publicKey); // $pubKey is Crypt_RSA object
@@ -109,8 +111,12 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $subject;
     }
 
-    protected function generateIssuer(RSA $privateKey, RSA $publicKey, X509 $subject, array $options): X509
-    {
+    protected function generateIssuer(
+        RSAInterface $privateKey,
+        RSAInterface $publicKey,
+        X509 $subject,
+        array $options
+    ): X509 {
         $issuer = new X509();
         $issuer->setPrivateKey($privateKey); // $privKey is Crypt_RSA object
 
@@ -139,27 +145,27 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function getCertificateStartDate(): \DateTimeInterface
+    public function getCertificateStartDate(): DateTimeInterface
     {
         return $this->certificateStartDate;
     }
 
-    public function setCertificateStartDate(\DateTimeInterface $certificateStartDate): void
+    public function setCertificateStartDate(DateTimeInterface $certificateStartDate): void
     {
         $this->certificateStartDate = $certificateStartDate;
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return DateTimeInterface
      */
-    public function getCertificateEndDate(): \DateTimeInterface
+    public function getCertificateEndDate(): DateTimeInterface
     {
         return $this->certificateEndDate;
     }
 
-    public function setCertificateEndDate(\DateTimeInterface $certificateEndDate): void
+    public function setCertificateEndDate(DateTimeInterface $certificateEndDate): void
     {
         $this->certificateEndDate = $certificateEndDate;
     }
