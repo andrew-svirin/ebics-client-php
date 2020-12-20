@@ -2,10 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
+use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
-use phpseclib\Crypt\RSA;
-use phpseclib\Math\BigInteger;
+use AndrewSvirin\Ebics\Models\Crypt\RSA;
 
 /**
  * Class CertificateFactory represents producers for the @see Certificate.
@@ -15,12 +16,29 @@ use phpseclib\Math\BigInteger;
  */
 class CertificateFactory
 {
-    public static function buildCertificateA(string $publicKey, string $privateKey, string $content = null): Certificate
+
+    /**
+     * @var RSAFactory
+     */
+    private $rsaFactory;
+
+    /**
+     * @var BigIntegerFactory
+     */
+    private $bigIntegerFactory;
+
+    public function __construct()
+    {
+        $this->rsaFactory = new RSAFactory();
+        $this->bigIntegerFactory = new BigIntegerFactory();
+    }
+
+    public function buildCertificateA(string $publicKey, string $privateKey, string $content = null): Certificate
     {
         return new Certificate(Certificate::TYPE_A, $publicKey, $privateKey, $content);
     }
 
-    public static function buildCertificateE(
+    public function buildCertificateE(
         string $publicKey,
         string $privateKey = null,
         string $content = null
@@ -28,7 +46,7 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_E, $publicKey, $privateKey, $content);
     }
 
-    public static function buildCertificateX(
+    public function buildCertificateX(
         string $publicKey,
         string $privateKey = null,
         string $content = null
@@ -36,52 +54,52 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_X, $publicKey, $privateKey, $content);
     }
 
-    public static function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
     {
-        return self::generateCertificateFromKeys($keys, Certificate::TYPE_A, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_A, $isCertified);
     }
 
-    public static function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
     {
-        return self::generateCertificateFromKeys($keys, Certificate::TYPE_E, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_E, $isCertified);
     }
 
-    public static function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
+    public function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
     {
-        return self::generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
     }
 
-    public static function buildCertificateEFromDetails(
+    public function buildCertificateEFromDetails(
         string $exponent,
         string $modulus,
         string $content = null
     ): Certificate {
-        return self::buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
+        return $this->buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
     }
 
-    public static function buildCertificateXFromDetails(
+    public function buildCertificateXFromDetails(
         string $exponent,
         string $modulus,
         string $content = null
     ): Certificate {
-        return self::buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
+        return $this->buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
     }
 
-    private static function generateCertificateFromKeys(array $keys, string $type, bool $isCertified): Certificate
+    private function generateCertificateFromKeys(array $keys, string $type, bool $isCertified): Certificate
     {
         if ($isCertified) {
-            $certificateContent = self::generateCertificateContent($keys, $type);
+            $certificateContent = $this->generateCertificateContent($keys, $type);
         }
 
         return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
     }
 
-    private static function generateCertificateContent(array $keys, string $type): string
+    private function generateCertificateContent(array $keys, string $type): string
     {
-        $privateKey = new RSA();
+        $privateKey = $this->rsaFactory->create();
         $privateKey->loadKey($keys['privatekey']);
 
-        $publicKey = new RSA();
+        $publicKey = $this->rsaFactory->create();
         $publicKey->loadKey($keys['publickey']);
         $publicKey->setPublicKey();
 
@@ -92,16 +110,16 @@ class CertificateFactory
         ]);
     }
 
-    private static function buildCertificateFromDetails(
+    private function buildCertificateFromDetails(
         string $type,
         string $exponent,
         string $modulus,
         string $content = null
     ): Certificate {
-        $rsa = new RSA();
+        $rsa = $this->rsaFactory->create();
         $rsa->loadKey([
-            'n' => new BigInteger($modulus, 256),
-            'e' => new BigInteger($exponent, 256),
+            'n' => $this->bigIntegerFactory->create($modulus, 256),
+            'e' => $this->bigIntegerFactory->create($exponent, 256),
         ]);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
         $privateKey = $rsa->getPrivateKey(RSA::PUBLIC_FORMAT_PKCS1);
