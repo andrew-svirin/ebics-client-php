@@ -19,7 +19,7 @@ class AESFactory
      *
      * @return AESInterface
      */
-    public function create($mode = AESInterface::MODE_CBC): AESInterface
+    public function create($mode = AES::MODE_CBC): AESInterface
     {
         return new AES($mode);
     }

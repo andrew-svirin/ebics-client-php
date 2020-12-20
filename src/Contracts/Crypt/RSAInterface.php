@@ -49,7 +49,7 @@ interface RSAInterface
      * @return void
      * @see \phpseclib\Crypt\RSA::setEncryptionMode()
      */
-    function setEncryptionMode($mode);
+    public function setEncryptionMode($mode);
 
     /**
      * @param string $ciphertext
@@ -57,7 +57,7 @@ interface RSAInterface
      * @return string
      * @see \phpseclib\Crypt\RSA::decrypt()
      */
-    function decrypt($ciphertext);
+    public function decrypt($ciphertext);
 
     /**
      * @param string $plaintext
@@ -65,7 +65,7 @@ interface RSAInterface
      * @return string
      * @see \phpseclib\Crypt\RSA::encrypt()
      */
-    function encrypt($plaintext);
+    public function encrypt($plaintext);
 
     /**
      * @param int $format
@@ -73,7 +73,7 @@ interface RSAInterface
      * @return void
      * @see \phpseclib\Crypt\RSA::setPublicKeyFormat()
      */
-    function setPublicKeyFormat($format);
+    public function setPublicKeyFormat($format);
 
     /**
      * @param int $format
@@ -81,7 +81,7 @@ interface RSAInterface
      * @return void
      * @see \phpseclib\Crypt\RSA::setPrivateKeyFormat()
      */
-    function setPrivateKeyFormat($format);
+    public function setPrivateKeyFormat($format);
 
     /**
      * @param string $hash
@@ -89,7 +89,7 @@ interface RSAInterface
      * @return void
      * @see \phpseclib\Crypt\RSA::setHash()
      */
-    function setHash($hash);
+    public function setHash($hash);
 
     /**
      * @param string $hash
@@ -97,7 +97,7 @@ interface RSAInterface
      * @return void
      * @see \phpseclib\Crypt\RSA::setMGFHash()
      */
-    function setMGFHash($hash);
+    public function setMGFHash($hash);
 
     /**
      * @param int $bits
@@ -111,21 +111,21 @@ interface RSAInterface
      * ]
      * @see \phpseclib\Crypt\RSA::createKey()
      */
-    function createKey($bits = 1024, $timeout = false, $partial = array());
+    public function createKey($bits = 1024, $timeout = false, $partial = array());
 
     /**
      * @param int $type optional
      *
-     * @return array|string
+     * @return string
      * @see \phpseclib\Crypt\RSA::getPublicKey()
      */
-    function getPublicKey($type = RSA::PUBLIC_FORMAT_PKCS8);
+    public function getPublicKey($type = RSA::PUBLIC_FORMAT_PKCS8);
 
     /**
      * @param int $type optional
      *
-     * @return false|string
+     * @return string
      * @see \phpseclib\Crypt\RSA::getPrivateKey()
      */
-    function getPrivateKey($type = RSA::PUBLIC_FORMAT_PKCS1);
+    public function getPrivateKey($type = RSA::PUBLIC_FORMAT_PKCS1);
 }
