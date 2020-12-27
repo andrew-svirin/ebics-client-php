@@ -16,6 +16,11 @@ class TransactionFactory
     /**
      * Build Transactions from arguments.
      *
+     * @param string $transactionId
+     * @param string $transactionPhase
+     * @param string $numSegments
+     * @param string $segmentNumber
+     *
      * @return Transaction
      */
     public static function buildTransaction(
@@ -35,6 +40,8 @@ class TransactionFactory
 
     /**
      * Build empty Transaction.
+     *
+     * @param OrderData $orderData
      *
      * @return Transaction
      */

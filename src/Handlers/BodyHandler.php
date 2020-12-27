@@ -3,8 +3,12 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use DOMDocument;
 use DOMElement;
+use DOMNode;
+use DOMXPath;
+use RuntimeException;
 
 /**
  * Class BodyHandler manage body DOM elements.
@@ -14,6 +18,9 @@ use DOMElement;
  */
 class BodyHandler
 {
+
+    use XPathTrait;
+
     /**
      * @var bool
      */
@@ -32,6 +39,12 @@ class BodyHandler
 
     /**
      * Add body and children elements to request.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param string $orderData
+     *
+     * @throws EbicsException
      */
     public function handle(DOMDocument $xml, DOMElement $xmlRequest, string $orderData): void
     {
@@ -60,6 +73,10 @@ class BodyHandler
 
     /**
      * Add body and children elements to transfer request.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param int $receiptCode
      */
     public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, int $receiptCode): void
     {
@@ -80,11 +97,25 @@ class BodyHandler
 
     /**
      * Add empty body element to request.
+     *
+     * @param DOMDocument $request
+     * @param DOMNode|null $xmlRequestHeader
      */
-    public function handleEmpty(DOMDocument $xml, DOMElement $xmlRequest): void
+    public function handleEmpty(DOMDocument $request, DOMNode $xmlRequestHeader = null): void
     {
-        // Add body to request.
-        $xmlBody = $xml->createElement('body');
-        $xmlRequest->appendChild($xmlBody);
+        // Create body element.
+        $xmlBody = $request->createElement('body');
+
+        // Find Header element to insert after.
+        if (null === $xmlRequestHeader) {
+            $xpath = new DOMXpath($request);
+            $headerList = $xpath->query('//header');
+            if (false === $headerList) {
+                throw new RuntimeException('Header element not found.');
+            }
+            $xmlRequestHeader = $headerList->item(0);
+        }
+
+        $this->insertAfter($xmlBody, $xmlRequestHeader);
     }
 }

@@ -14,11 +14,15 @@ interface KeyRingManagerInterface
 {
     /**
      * Load Keyring from the saved file or create new one.
+     *
+     * @return KeyRing
      */
     public function loadKeyRing(): KeyRing;
 
     /**
      * Save KeyRing to file.
+     *
+     * @param KeyRing $keyRing
      */
     public function saveKeyRing(KeyRing $keyRing): void;
 }

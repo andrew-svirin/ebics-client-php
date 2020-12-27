@@ -30,7 +30,7 @@ class User
      * @param string $partnerId
      * @param string $userId
      */
-    public function __construct($partnerId, $userId)
+    public function __construct(string $partnerId, string $userId)
     {
         $this->partnerId = (string)$partnerId;
         $this->userId = (string)$userId;
@@ -41,7 +41,7 @@ class User
      *
      * @return string
      */
-    public function getPartnerId()
+    public function getPartnerId(): string
     {
         return $this->partnerId;
     }
@@ -51,7 +51,7 @@ class User
      *
      * @return string
      */
-    public function getUserId()
+    public function getUserId(): string
     {
         return $this->userId;
     }

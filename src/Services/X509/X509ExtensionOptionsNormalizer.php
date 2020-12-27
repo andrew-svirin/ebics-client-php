@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\X509;
+namespace AndrewSvirin\Ebics\Services\X509;
 
 use phpseclib\File\X509;
 
@@ -8,14 +8,22 @@ use phpseclib\File\X509;
  * X509 extensions options normalizer.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Guillaume Sainthillier
+ * @author Guillaume Sainthillier, Andrew Svirin
  */
 class X509ExtensionOptionsNormalizer
 {
     /**
-     * @param mixed|string|array $options
+     * @param mixed|string|array $options [
+     *  'value' => '<string>',
+     *  'critical' => '<bool>',
+     *  'replace' => '<string>',
+     * ]
      *
-     * @return array
+     * @return array [
+     *  'value' => '<string>',
+     *  'critical' => '<bool>',
+     *  'replace' => '<string>',
+     * ]
      *
      * @see X509::setExtension()
      */
@@ -25,7 +33,7 @@ class X509ExtensionOptionsNormalizer
         $critical = false;
         $replace = true;
 
-        if (!\is_array($options)) {
+        if (!is_array($options)) {
             $value = $options;
         } else {
             if (!isset($options['value'])) {

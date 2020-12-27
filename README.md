@@ -3,11 +3,14 @@
 [![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 
-PHP library to communicate with bank through EBICS protocol.
+PHP library to communicate with a bank through EBICS protocol.
 Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4
 
 ## License
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+
+## Development and integration Ebics for your project and other development
+👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
 
 ## Installation
 ```bash
@@ -15,7 +18,7 @@ $ composer require andrew-svirin/ebics-client-php
 ```
 
 ## Initialize client
-You will need to have this informations from your Bank : 
+You will need to have this information from your Bank: 
 - HostID
 - HostURL
 - PartnerID
@@ -173,7 +176,7 @@ try {
 More methods you can find in `tests/EbicsTest`
 
 
-## Global process and intraction with Bank Department
+## Global process and interaction with Bank Department
 ### 1. Create an store your 3 certificates
 ```php
 <?php
@@ -181,8 +184,8 @@ More methods you can find in `tests/EbicsTest`
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 $client = new EbicsClient(...);
-// For Franch bank.
-X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
+// For French bank.
+$client->setX509Generator(new MyCompanyX509Generator);
 
 try {
     $client->INI();
@@ -210,10 +213,19 @@ try {
 ```
 
 ### 2. Generate a EBICS letter
-Not covered for now in this library. **Feel free to open a PR!**
-You'll have to generate a letter with a SHA-256 hash of your 3 X509 certificates.
+```php
+        $ebicsBankLetter = new EbicsBankLetter();
 
-### 3. Wait for the bank validation
+        $bankLetter = $ebicsBankLetter->prepareBankLetter(
+            $client->getBank(),
+            $client->getUser(),
+            $client->getKeyRing()
+        );
+
+        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, new BankLetterFormatterTxt());
+```
+
+### 3. Wait for the bank validation and activation access.
 
 ### 4. Fetch the bank tokens
 ```php

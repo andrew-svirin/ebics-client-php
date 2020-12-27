@@ -22,6 +22,10 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH004ReturnCode(DOMDocument $xml): string
     {
@@ -33,6 +37,10 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > body > ReturnCode value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH004BodyReturnCode(DOMDocument $xml): string
     {
@@ -45,6 +53,10 @@ class ResponseHandler
     /**
      * Extract H004 > ReturnCode value from both header and body.
      * Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH004BodyOrHeaderReturnCode(DOMDocument $xml): string
     {
@@ -60,6 +72,10 @@ class ResponseHandler
 
     /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH004ReportText(DOMDocument $xml): string
     {
@@ -71,6 +87,10 @@ class ResponseHandler
 
     /**
      * Extract H000 > SystemReturnCode > ReturnCode value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH000ReturnCode(DOMDocument $xml): string
     {
@@ -82,6 +102,10 @@ class ResponseHandler
 
     /**
      * Extract H000 > SystemReturnCode > ReportText value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
      */
     public function retrieveH000ReportText(DOMDocument $xml): string
     {
@@ -94,6 +118,9 @@ class ResponseHandler
     /**
      * Retrieve encoded Order data.
      *
+     * @param DOMDocument $xml
+     *
+     * @return OrderDataEncrypted
      * @throws EbicsException
      */
     public function retrieveOrderData(DOMDocument $xml): OrderDataEncrypted
@@ -113,6 +140,10 @@ class ResponseHandler
 
     /**
      * Extract Transaction from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return Transaction
      */
     public function retrieveTransaction(DOMDocument $xml): Transaction
     {

@@ -1,9 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\X509;
+namespace AndrewSvirin\Ebics\Models\X509;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
+use AndrewSvirin\Ebics\Exceptions\X509\X509GeneratorException;
+use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
 use DateTimeImmutable;
 use DateTimeInterface;
 use phpseclib\File\X509;
@@ -12,7 +14,7 @@ use phpseclib\File\X509;
  * Default X509 certificate generator @see X509GeneratorInterface.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Guillaume Sainthillier
+ * @author Guillaume Sainthillier, Andrew Svirin
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
@@ -44,8 +46,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     abstract protected function getCertificateOptions(array $options = []): array;
 
     /**
-     * {@inheritdoc}
-     *
+     * @inheritDoc
      * @throws X509GeneratorException
      */
     public function generateX509(RSAInterface $privateKey, RSAInterface $publicKey, array $options = []): string
@@ -94,6 +95,12 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $x509->saveX509($result);
     }
 
+    /**
+     * @param RSAInterface $publicKey
+     * @param array $options
+     *
+     * @return X509
+     */
     protected function generateSubject(RSAInterface $publicKey, array $options): X509
     {
         $subject = new X509();
@@ -111,6 +118,14 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $subject;
     }
 
+    /**
+     * @param RSAInterface $privateKey
+     * @param RSAInterface $publicKey
+     * @param X509 $subject
+     * @param array $options
+     *
+     * @return X509
+     */
     protected function generateIssuer(
         RSAInterface $privateKey,
         RSAInterface $publicKey,
@@ -132,6 +147,8 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * Generate 74 digits serial number represented in the string.
+     *
+     * @return string
      */
     protected function generateSerialNumber(): string
     {
@@ -178,6 +195,9 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         return $this->serialNumber;
     }
 
+    /**
+     * @param string $serialNumber
+     */
     public function setSerialNumber(string $serialNumber): void
     {
         $this->serialNumber = $serialNumber;

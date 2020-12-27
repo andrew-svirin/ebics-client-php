@@ -31,6 +31,11 @@ class KeyRingFactory
         $this->certificateFactory = new CertificateFactory();
     }
 
+    /**
+     * @param array $data
+     *
+     * @return KeyRing
+     */
     public function buildKeyRingFromData(array $data): KeyRing
     {
         $keyRing = new KeyRing();
@@ -108,6 +113,11 @@ class KeyRingFactory
         return $keyRing;
     }
 
+    /**
+     * @param KeyRing $keyRing
+     *
+     * @return array
+     */
     public function buildDataFromKeyRing(KeyRing $keyRing): array
     {
         if (null !== $keyRing->getUserCertificateA()) {
@@ -184,11 +194,21 @@ class KeyRingFactory
         ];
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     private function encodeValue(string $value): string
     {
         return base64_encode($value);
     }
 
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
     private function decodeValue(string $value): string
     {
         return base64_decode($value);

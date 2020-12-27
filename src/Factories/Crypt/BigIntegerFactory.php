@@ -20,7 +20,7 @@ class BigIntegerFactory
      *
      * @return BigIntegerInterface
      */
-    public function create($x = 0, $base = 10): BigIntegerInterface
+    public function create($x = 0, int $base = 10): BigIntegerInterface
     {
         return new BigInteger($x, $base);
     }
