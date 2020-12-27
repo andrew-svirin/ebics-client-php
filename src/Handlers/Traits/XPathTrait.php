@@ -67,7 +67,7 @@ trait XPathTrait
      * @param DOMNode $newNode
      * @param DOMNode $afterNode
      */
-    private function insertAfter(DOMNode $newNode, DOMNode $afterNode)
+    private function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
     {
         try {
             $afterNode->parentNode->insertBefore($newNode, $afterNode->nextSibling);

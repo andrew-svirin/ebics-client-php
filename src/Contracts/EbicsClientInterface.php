@@ -179,7 +179,7 @@ interface EbicsClientInterface
         DateTime $dateTime = null,
         DateTime $startDateTime = null,
         DateTime $endDateTime = null
-    );
+    ): Response;
     // @codingStandardsIgnoreEnd
 
     /**

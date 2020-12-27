@@ -8,6 +8,7 @@ use DOMDocument;
 use DOMElement;
 use DOMNode;
 use DOMXPath;
+use RuntimeException;
 
 /**
  * Class BodyHandler manage body DOM elements.
@@ -108,7 +109,11 @@ class BodyHandler
         // Find Header element to insert after.
         if (null === $xmlRequestHeader) {
             $xpath = new DOMXpath($request);
-            $xmlRequestHeader = $xpath->query('//header')->item(0);
+            $headerList = $xpath->query('//header');
+            if (false === $headerList) {
+                throw new RuntimeException('Header element not found.');
+            }
+            $xmlRequestHeader = $headerList->item(0);
         }
 
         $this->insertAfter($xmlBody, $xmlRequestHeader);
