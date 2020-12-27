@@ -13,6 +13,8 @@ use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @group auth-signature-handler
  */
 class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 {
@@ -23,15 +25,12 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
      */
     private $authSignatureHandler;
 
-    /**
-     * @throws EbicsException
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->setupClient();
-        $this->setupKeys();
-        $this->authSignatureHandler = new AuthSignatureHandler($this->keyRing);
+        $client = $this->setupClient(1);
+        $this->setupKeys($client->getKeyRing());
+        $this->authSignatureHandler = new AuthSignatureHandler($client->getKeyRing());
     }
 
     /**
@@ -50,11 +49,11 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 
         $hpb2XML = clone $hpbXML;
         $hpb2XPath = $this->prepareH004XPath($hpb2XML);
-        $hpb2Request = $hpb2XPath->query('/H004:ebicsNoPubKeyDigestsRequest')->item(0);
+        $hpb2Header = $hpb2XPath->query('//H004:header')->item(0);
         $authSignature2 = $hpb2XPath->query('//H004:AuthSignature')->item(0);
         $authSignature2->parentNode->removeChild($authSignature2);
 
-        $this->authSignatureHandler->handle($hpb2XML, $hpb2Request);
+        $this->authSignatureHandler->handle($hpb2XML, $hpb2Header);
 
         // Rewind. Because after remove and insert XML tree do not work correctly.
         $hpb2XML->loadXML($hpb2XML->saveXML());
@@ -91,7 +90,8 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
         $body2->parentNode->removeChild($body2);
 
         $request2Request = $request2XPath->query('/H004:ebicsNoPubKeyDigestsRequest')->item(0);
-        $this->authSignatureHandler->handle($request2, $request2Request);
+        $request2RequestHeader = $request2XPath->query('//H004:header')->item(0);
+        $this->authSignatureHandler->handle($request2, $request2RequestHeader);
         // Add removed body after AuthSignature.
         $request2Request->appendChild($body2);
 

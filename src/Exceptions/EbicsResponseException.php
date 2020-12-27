@@ -20,6 +20,13 @@ class EbicsResponseException extends EbicsException implements EbicsResponseExce
     /** @var string|null */
     private $meaning;
 
+    /**
+     * EbicsResponseException constructor.
+     *
+     * @param string $responseCode
+     * @param string|null $responseMessage
+     * @param string|null $meaning
+     */
     public function __construct(string $responseCode, ?string $responseMessage, ?string $meaning = null)
     {
         $message = $responseMessage ?: $meaning;
@@ -30,21 +37,33 @@ class EbicsResponseException extends EbicsException implements EbicsResponseExce
         $this->meaning = $meaning;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getRequest(): ?Request
     {
         return $this->request;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getResponse(): ?Response
     {
         return $this->response;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getMeaning(): ?string
     {
         return $this->meaning;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getResponseCode(): string
     {
         return $this->responseCode;

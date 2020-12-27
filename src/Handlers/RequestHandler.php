@@ -53,6 +53,10 @@ class RequestHandler
 
     /**
      * Constructor.
+     *
+     * @param Bank $bank
+     * @param User $user
+     * @param KeyRing $keyRing
      */
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
@@ -64,6 +68,13 @@ class RequestHandler
         $this->hostHandler = new HostHandler($bank);
     }
 
+    /**
+     * @param Certificate $certificateA
+     * @param DateTime $dateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
     public function buildINI(Certificate $certificateA, DateTime $dateTime): Request
     {
         // Order data.
@@ -79,6 +90,9 @@ class RequestHandler
         return $request;
     }
 
+    /**
+     * @return Request
+     */
     public function buildHEV(): Request
     {
         $request = new Request();
@@ -88,6 +102,14 @@ class RequestHandler
         return $request;
     }
 
+    /**
+     * @param Certificate $certificateE
+     * @param Certificate $certificateX
+     * @param DateTime $dateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
     public function buildHIA(Certificate $certificateE, Certificate $certificateX, DateTime $dateTime): Request
     {
         // Order data.
@@ -104,6 +126,9 @@ class RequestHandler
     }
 
     /**
+     * @param DateTime $dateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildHPB(DateTime $dateTime): Request
@@ -111,13 +136,16 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleNoPubKeyDigests($request);
         $this->headerHandler->handleHPB($request, $xmlRequest, $dateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildHPD(DateTime $dateTime): Request
@@ -125,13 +153,16 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleHPD($request, $xmlRequest, $dateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildHKD(DateTime $dateTime): Request
@@ -139,13 +170,16 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleHKD($request, $xmlRequest, $dateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildHTD(DateTime $dateTime): Request
@@ -153,13 +187,20 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleHTD($request, $xmlRequest, $dateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     * @param string $fileInfo
+     * @param string $countryCode
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildFDL(
@@ -180,13 +221,16 @@ class RequestHandler
             $startDateTime,
             $endDateTime
         );
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildHAA(DateTime $dateTime): Request
@@ -194,32 +238,41 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleHAA($request, $xmlRequest, $dateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param string $transactionId
+     * @param bool $acknowledged
+     *
+     * @return Request
      * @throws EbicsException
      */
-    public function buildTransferReceipt(Transaction $transaction, bool $acknowledged): Request
+    public function buildTransferReceipt(string $transactionId, bool $acknowledged): Request
     {
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
-        $this->headerHandler->handleTransferReceipt($request, $xmlRequest, $transaction);
+        $this->headerHandler->handleTransferReceipt($request, $xmlRequest, $transactionId);
         $this->bodyHandler->handleTransferReceipt(
             $request,
             $xmlRequest,
             true === $acknowledged ?
                 TransactionInterface::CODE_RECEIPT_POSITIVE : TransactionInterface::CODE_RECEIPT_NEGATIVE
         );
-        $this->authSignatureHandler->handle($request, $xmlRequest);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildVMK(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
@@ -227,13 +280,18 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleVMK($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildSTA(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
@@ -241,13 +299,18 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleSTA($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildC53(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
@@ -255,13 +318,18 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleC53($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
 
     /**
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Request
      * @throws EbicsException
      */
     public function buildZ53(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
@@ -269,8 +337,8 @@ class RequestHandler
         $request = new Request();
         $xmlRequest = $this->ebicsRequestHandler->handleSecured($request);
         $this->headerHandler->handleZ53($request, $xmlRequest, $dateTime, $startDateTime, $endDateTime);
-        $this->authSignatureHandler->handle($request, $xmlRequest);
-        $this->bodyHandler->handleEmpty($request, $xmlRequest);
+        $this->bodyHandler->handleEmpty($request);
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }

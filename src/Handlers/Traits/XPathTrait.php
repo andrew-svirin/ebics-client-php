@@ -3,7 +3,9 @@
 namespace AndrewSvirin\Ebics\Handlers\Traits;
 
 use DOMDocument;
+use DOMNode;
 use DOMXPath;
+use Exception;
 
 /**
  * Class XPathTrait manage XPath building.
@@ -15,6 +17,8 @@ trait XPathTrait
 {
     /**
      * Setup H004 XPath for DOM XML.
+     *
+     * @param DOMDocument $xml
      *
      * @return DOMXPath
      */
@@ -30,6 +34,8 @@ trait XPathTrait
     /**
      * Setup H000 XPath for DOM XML.
      *
+     * @param DOMDocument $xml
+     *
      * @return DOMXPath
      */
     private function prepareH000XPath(DOMDocument $xml): DOMXPath
@@ -43,6 +49,8 @@ trait XPathTrait
     /**
      * Setup S001 XPath for DOM XML.
      *
+     * @param DOMDocument $xml
+     *
      * @return DOMXPath
      */
     private function prepareS001XPath(DOMDocument $xml): DOMXPath
@@ -51,5 +59,20 @@ trait XPathTrait
         $xpath->registerNamespace('S001', 'http://www.ebics.org/S001');
 
         return $xpath;
+    }
+
+    /**
+     * Insert to DOMDocument after node.
+     *
+     * @param DOMNode $newNode
+     * @param DOMNode $afterNode
+     */
+    private function insertAfter(DOMNode $newNode, DOMNode $afterNode)
+    {
+        try {
+            $afterNode->parentNode->insertBefore($newNode, $afterNode->nextSibling);
+        } catch (Exception $e) {
+            $afterNode->parentNode->appendChild($newNode);
+        }
     }
 }

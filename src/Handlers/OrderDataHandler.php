@@ -63,6 +63,12 @@ class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
+     *
+     * @param DOMDocument $xml
+     * @param Certificate $certificateA
+     * @param DateTime $dateTime
+     *
+     * @throws EbicsException
      */
     public function handleINI(DOMDocument $xml, Certificate $certificateA, DateTime $dateTime): void
     {
@@ -101,6 +107,13 @@ class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
+     *
+     * @param DOMDocument $xml
+     * @param Certificate $certificateE
+     * @param Certificate $certificateX
+     * @param DateTime $dateTime
+     *
+     * @throws EbicsException
      */
     public function handleHIA(
         DOMDocument $xml,
@@ -157,6 +170,12 @@ class OrderDataHandler
 
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
+     *
+     * @param DOMNode $xmlPublicKeyInfo
+     * @param DOMDocument $xml
+     * @param Certificate $certificate
+     *
+     * @throws EbicsException
      */
     private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, Certificate $certificate): void
     {
@@ -190,6 +209,11 @@ class OrderDataHandler
 
     /**
      * Add PubKeyValue to PublicKeyInfo XML Node.
+     *
+     * @param DOMNode $xmlPublicKeyInfo
+     * @param DOMDocument $xml
+     * @param Certificate $certificate
+     * @param DateTime $dateTime
      */
     private function handlePubKeyValue(
         DOMNode $xmlPublicKeyInfo,
@@ -225,6 +249,9 @@ class OrderDataHandler
 
     /**
      * Add PartnerID to OrderData XML Node.
+     *
+     * @param DOMNode $xmlOrderData
+     * @param DOMDocument $xml
      */
     private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
@@ -235,6 +262,9 @@ class OrderDataHandler
 
     /**
      * Add UserID to OrderData XML Node.
+     *
+     * @param DOMNode $xmlOrderData
+     * @param DOMDocument $xml
      */
     private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
@@ -245,6 +275,10 @@ class OrderDataHandler
 
     /**
      * Extract Authentication Certificate from the $orderData.
+     *
+     * @param OrderData $orderData
+     *
+     * @return Certificate
      */
     public function retrieveAuthenticationCertificate(OrderData $orderData): Certificate
     {
@@ -270,6 +304,10 @@ class OrderDataHandler
 
     /**
      * Extract Encryption Certificate from the $orderData.
+     *
+     * @param OrderData $orderData
+     *
+     * @return Certificate
      */
     public function retrieveEncryptionCertificate(OrderData $orderData): Certificate
     {

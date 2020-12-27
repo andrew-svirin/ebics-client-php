@@ -15,6 +15,8 @@ interface EbicsClientInterface
 {
     /**
      * Supported protocol version for the Bank.
+     *
+     * @return Response
      */
     public function HEV(): Response;
 
@@ -24,6 +26,8 @@ interface EbicsClientInterface
      * Prepare A006 certificates for KeyRing.
      *
      * @param DateTime|null $dateTime current date
+     *
+     * @return Response
      */
     public function INI(DateTime $dateTime = null): Response;
 
@@ -33,6 +37,8 @@ interface EbicsClientInterface
      * Prepare E002 and X002 user certificates for KeyRing.
      *
      * @param DateTime|null $dateTime current date
+     *
+     * @return Response
      */
     public function HIA(DateTime $dateTime = null): Response;
 
@@ -42,26 +48,53 @@ interface EbicsClientInterface
      * Prepare E002 and X002 bank certificates for KeyRing.
      *
      * @param DateTime|null $dateTime current date
+     *
+     * @return Response
      */
     public function HPB(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve the bank server parameters.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTime|null $dateTime
+     *
+     * @return Response
      */
     public function HPD(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve customer's customer and subscriber information.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTime|null $dateTime
+     *
+     * @return Response
      */
     public function HKD(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve subscriber's customer and subscriber information.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTime|null $dateTime
+     *
+     * @return Response
      */
     public function HTD(DateTime $dateTime = null): Response;
 
     /**
      * Retrieve subscriber's customer and subscriber information.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param string $fileInfo
+     * @param string $format
+     * @param string $countryCode
+     * @param DateTime|null $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return Response
      */
     public function FDL(
         string $fileInfo,
@@ -74,17 +107,23 @@ interface EbicsClientInterface
 
     /**
      * Retrieve  Bank available order types.
+     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTime|null $dateTime current date
+     *
+     * @return Response
      */
     public function HAA(DateTime $dateTime = null): Response;
 
     /**
      * Downloads the interim transaction report in SWIFT format (MT942).
+     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTime|null $dateTime current date
      * @param DateTime|null $startDateTime the start date of requested transactions
      * @param DateTime|null $endDateTime the end date of requested transactions
+     *
+     * @return Response
      */
     public function VMK(
         DateTime $dateTime = null,
@@ -94,9 +133,13 @@ interface EbicsClientInterface
 
     /**
      * Retrieve the bank account statement.
+     * Send self::transferReceipt() after transaction finished.
      *
+     * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
      * @param DateTime|null $endDateTime the end date of requested transactions
+     *
+     * @return Response
      */
     public function STA(
         DateTime $dateTime = null,
@@ -106,6 +149,7 @@ interface EbicsClientInterface
 
     /**
      * Retrieve the bank account statement in Camt.053 format.
+     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
@@ -121,7 +165,8 @@ interface EbicsClientInterface
     ): Response;
     // @codingStandardsIgnoreEnd
     /**
-     * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services)
+     * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services).
+     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime the start date of requested transactions
@@ -134,10 +179,23 @@ interface EbicsClientInterface
         DateTime $dateTime = null,
         DateTime $startDateTime = null,
         DateTime $endDateTime = null
-    ): Response;
+    );
     // @codingStandardsIgnoreEnd
+
     /**
      * Mark transactions as received.
+     *
+     * @param Response $response
+     * @param bool $acknowledged
+     *
+     * @return Response
      */
     public function transferReceipt(Response $response, bool $acknowledged = true): Response;
+
+    /**
+     * Set certificate X509 Generator for French bank.
+     *
+     * @param X509GeneratorInterface|null $x509Generator
+     */
+    public function setX509Generator(X509GeneratorInterface $x509Generator = null): void;
 }
