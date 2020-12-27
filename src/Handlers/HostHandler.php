@@ -26,6 +26,9 @@ class HostHandler
 
     /**
      * Add HostID for Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
      */
     public function handle(DOMDocument $xml, DOMElement $xmlRequest): void
     {

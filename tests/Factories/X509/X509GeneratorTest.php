@@ -3,8 +3,6 @@
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
-use AndrewSvirin\Ebics\Factories\X509\LegacyX509Generator;
-use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 use DateTime;
 
@@ -12,7 +10,9 @@ use DateTime;
  * Legacy X509 certificate generator @see X509GeneratorInterface.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Guillaume Sainthillier
+ * @author Guillaume Sainthillier, Andrew Svirin
+ *
+ * @group x509-generator
  */
 class X509GeneratorTest extends AbstractEbicsTestCase
 {
@@ -22,20 +22,16 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $publicKey = $this->getPublicKey();
 
         //Certificate generated the 22/03/2020 (1 year validity)
-        X509GeneratorFactory::setGeneratorFunction(function () {
-            $generator = new LegacyX509Generator();
-            $generator->setCertificateStartDate(new DateTime('2020-03-21'));
-            $generator->setCertificateEndDate(new DateTime('2021-03-22'));
-            $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
-
-            return $generator;
-        });
+        $generator = new WeBankX509Generator();
+        $generator->setCertificateStartDate(new DateTime('2020-03-21'));
+        $generator->setCertificateEndDate(new DateTime('2021-03-22'));
+        $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
 
         $certificateFactory = new CertificateFactory();
         $certificate = $certificateFactory->generateCertificateAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
-        ], true);
+        ], $generator);
 
         $this->assertEquals($certificate->getPrivateKey(), $privateKey);
         $this->assertEquals($certificate->getPublicKey(), $publicKey);
@@ -48,20 +44,16 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $publicKey = $this->getPublicKey();
 
         //Certificate generated with https://certificatetools.com/ the 22/03/2020 (1 year validity)
-        X509GeneratorFactory::setGeneratorFunction(function () {
-            $generator = new SilarhiX509Generator();
-            $generator->setCertificateStartDate(new DateTime('2020-03-22'));
-            $generator->setCertificateEndDate(new DateTime('2021-03-22'));
-            $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
-
-            return $generator;
-        });
+        $generator = new SilarhiX509Generator();
+        $generator->setCertificateStartDate(new DateTime('2020-03-22'));
+        $generator->setCertificateEndDate(new DateTime('2021-03-22'));
+        $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
 
         $certificateFactory = new CertificateFactory();
         $certificate = $certificateFactory->generateCertificateAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
-        ], true);
+        ], $generator);
 
         $this->assertEquals($certificate->getPrivateKey(), $privateKey);
         $this->assertEquals($certificate->getPublicKey(), $publicKey);
@@ -71,6 +63,10 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         );
     }
 
+    /**
+     * @param string $generatedContent
+     * @param string $fileContent
+     */
     private function assertCertificateEquals(string $generatedContent, string $fileContent)
     {
         $generatedInfos = openssl_x509_parse($generatedContent);
@@ -97,17 +93,28 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $this->assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
     }
 
+    /**
+     * @param string $name
+     *
+     * @return false|string
+     */
     private function getCertificateContent(string $name)
     {
         return file_get_contents($this->data . '/certificates/' . $name);
     }
 
-    private function getPrivateKey(): string
+    /**
+     * @return string
+     */
+    private function getPrivateKey()
     {
         return file_get_contents($this->data . '/private_key.rsa');
     }
 
-    private function getPublicKey(): string
+    /**
+     * @return string
+     */
+    private function getPublicKey()
     {
         return file_get_contents($this->data . '/public_key.rsa');
     }

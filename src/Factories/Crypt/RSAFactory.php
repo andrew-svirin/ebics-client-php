@@ -13,6 +13,10 @@ use AndrewSvirin\Ebics\Models\Crypt\RSA;
  */
 class RSAFactory
 {
+
+    /**
+     * @return RSAInterface
+     */
     public function create(): RSAInterface
     {
         return new RSA();

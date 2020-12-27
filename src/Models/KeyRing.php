@@ -47,11 +47,17 @@ class KeyRing
         $this->userCertificateA = $certificate;
     }
 
+    /**
+     * @return Certificate|null
+     */
     public function getUserCertificateA(): ?Certificate
     {
         return $this->userCertificateA;
     }
 
+    /**
+     * @return string
+     */
     public function getUserCertificateAVersion(): string
     {
         return 'A006';
@@ -62,11 +68,17 @@ class KeyRing
         $this->userCertificateX = $certificate;
     }
 
+    /**
+     * @return Certificate|null
+     */
     public function getUserCertificateX(): ?Certificate
     {
         return $this->userCertificateX;
     }
 
+    /**
+     * @return string
+     */
     public function getUserCertificateXVersion(): string
     {
         return 'X002';
@@ -77,11 +89,17 @@ class KeyRing
         $this->userCertificateE = $certificate;
     }
 
+    /**
+     * @return Certificate|null
+     */
     public function getUserCertificateE(): ?Certificate
     {
         return $this->userCertificateE;
     }
 
+    /**
+     * @return string
+     */
     public function getUserCertificateEVersion(): string
     {
         return 'E002';
@@ -92,6 +110,10 @@ class KeyRing
         $this->password = $password;
     }
 
+    /**
+     * @return string
+     * @throws EbicsException
+     */
     public function getPassword(): string
     {
         if ($this->password === null) {
@@ -106,11 +128,17 @@ class KeyRing
         $this->bankCertificateX = $bankCertificateX;
     }
 
+    /**
+     * @return Certificate|null
+     */
     public function getBankCertificateX(): ?Certificate
     {
         return $this->bankCertificateX;
     }
 
+    /**
+     * @return string
+     */
     public function getBankCertificateXVersion(): string
     {
         return 'X002';
@@ -121,11 +149,17 @@ class KeyRing
         $this->bankCertificateE = $bankCertificateE;
     }
 
+    /**
+     * @return Certificate|null
+     */
     public function getBankCertificateE(): ?Certificate
     {
         return $this->bankCertificateE;
     }
 
+    /**
+     * @return string
+     */
     public function getBankCertificateEVersion(): string
     {
         return 'E002';

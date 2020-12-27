@@ -84,6 +84,9 @@ class HeaderHandler
 
     /**
      * Add header for INI Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
      */
     public function handleINI(DOMDocument $xml, DOMElement $xmlRequest): void
     {
@@ -99,6 +102,9 @@ class HeaderHandler
 
     /**
      * Add header for HIA Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
      */
     public function handleHIA(DOMDocument $xml, DOMElement $xmlRequest): void
     {
@@ -114,6 +120,10 @@ class HeaderHandler
 
     /**
      * Add header for HPB Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
      */
     public function handleHPB(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime): void
     {
@@ -129,6 +139,10 @@ class HeaderHandler
 
     /**
      * Add header for HAA Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
      */
     public function handleHAA(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime): void
     {
@@ -148,19 +162,29 @@ class HeaderHandler
 
     /**
      * Add header for TransferReceipt Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param string $transactionId
      */
-    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, Transaction $transaction): void
+    public function handleTransferReceipt(DOMDocument $xml, DOMElement $xmlRequest, string $transactionId): void
     {
         $this->handleTransaction(
             $xml,
             $xmlRequest,
-            $transaction,
+            $transactionId,
             $this->handleMutable($this->handleTransactionPhase(Transaction::PHASE_RECEIPT))
         );
     }
 
     /**
      * Add header for VMK Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
      */
     public function handleVMK(
         DOMDocument $xml,
@@ -185,6 +209,12 @@ class HeaderHandler
 
     /**
      * Add header for STA Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
      */
     public function handleSTA(
         DOMDocument $xml,
@@ -209,6 +239,12 @@ class HeaderHandler
 
     /**
      * Add header for C53 Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
      */
     public function handleC53(
         DOMDocument $xml,
@@ -233,6 +269,12 @@ class HeaderHandler
 
     /**
      * Add header for C53 Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
      */
     public function handleZ53(
         DOMDocument $xml,
@@ -257,6 +299,10 @@ class HeaderHandler
 
     /**
      * Add header for HPD Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
      */
     public function handleHPD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime): void
     {
@@ -276,6 +322,10 @@ class HeaderHandler
 
     /**
      * Add header for HTD Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
      */
     public function handleHTD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime): void
     {
@@ -295,6 +345,14 @@ class HeaderHandler
 
     /**
      * Add header for FDL Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
+     * @param string $fileInfo
+     * @param string $countryCode
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
      */
     public function handleFDL(
         DOMDocument $xml,
@@ -321,6 +379,10 @@ class HeaderHandler
 
     /**
      * Add header for HKD Request XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param DateTime $dateTime
      */
     public function handleHKD(DOMDocument $xml, DOMElement $xmlRequest, DateTime $dateTime): void
     {
@@ -340,10 +402,15 @@ class HeaderHandler
 
     /**
      * Hook to add mutable information.
+     *
+     * @param callable|null $transactionPhase
+     * @param callable|null $segmentNumber
+     *
+     * @return callable
      */
-    private function handleMutable(callable $transactionPhase = null): callable
+    private function handleMutable(callable $transactionPhase = null, callable $segmentNumber = null): callable
     {
-        return function (DOMDocument $xml, DOMElement $xmlHeader) use ($transactionPhase) {
+        return function (DOMDocument $xml, DOMElement $xmlHeader) use ($transactionPhase, $segmentNumber) {
             // Add mutable to header.
             $xmlMutable = $xml->createElement('mutable');
             $xmlHeader->appendChild($xmlMutable);
@@ -352,11 +419,20 @@ class HeaderHandler
                 // Add TransactionPhase information to mutable.
                 $transactionPhase($xml, $xmlMutable);
             }
+
+            if (null !== $segmentNumber) {
+                // Add TransactionPhase information to mutable.
+                $segmentNumber($xml, $xmlMutable);
+            }
         };
     }
 
     /**
      * Hook to add TransactionPhase information.
+     *
+     * @param string $transactionPhase
+     *
+     * @return callable
      */
     private function handleTransactionPhase(string $transactionPhase): callable
     {
@@ -370,6 +446,12 @@ class HeaderHandler
 
     /**
      * Hook to add OrderDetails information.
+     *
+     * @param string $orderType
+     * @param string $orderAttribute
+     * @param callable|null $orderParams
+     *
+     * @return callable
      */
     private function handleOrderDetails(
         string $orderType,
@@ -400,6 +482,13 @@ class HeaderHandler
 
     /**
      * Hook to add StandardOrderParams information.
+     *
+     * @param string $fileInfo
+     * @param string $countryCode
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return callable
      */
     private function handleFDLOrderParams(
         string $fileInfo,
@@ -432,6 +521,11 @@ class HeaderHandler
 
     /**
      * Hook to add StandardOrderParams information.
+     *
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return callable
      */
     private function handleStandardOrderParams(DateTime $startDateTime = null, DateTime $endDateTime = null): callable
     {
@@ -445,6 +539,11 @@ class HeaderHandler
 
     /**
      * Hook to add DateRange information.
+     *
+     * @param DateTime|null $startDateTime
+     * @param DateTime|null $endDateTime
+     *
+     * @return callable
      */
     private function handleDateRangeParams(DateTime $startDateTime = null, DateTime $endDateTime = null): callable
     {
@@ -469,6 +568,8 @@ class HeaderHandler
      * Hook to add Nonce and Timestamp information.
      *
      * @param DateTime $dateTime stamped by date time and Nonce
+     *
+     * @return callable
      */
     private function handleNonce(DateTime $dateTime): callable
     {
@@ -487,13 +588,16 @@ class HeaderHandler
 
     /**
      * Hook to add BankPubKeyDigests information.
+     *
+     * @param string $algorithm
+     *
+     * @return callable
      */
-    private function handleBank(): callable
+    private function handleBank(string $algorithm = 'sha256'): callable
     {
         $keyRing = $this->keyRing;
 
-        return function (DOMDocument $xml, DOMElement $xmlStatic) use ($keyRing) {
-            $algorithm = 'sha256';
+        return function (DOMDocument $xml, DOMElement $xmlStatic) use ($keyRing, $algorithm) {
             // Add BankPubKeyDigests to static.
             $xmlBankPubKeyDigests = $xml->createElement('BankPubKeyDigests');
             $xmlStatic->appendChild($xmlBankPubKeyDigests);
@@ -526,6 +630,13 @@ class HeaderHandler
 
     /**
      * Add header and children elements to DOM XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param callable|null $nonce
+     * @param callable|null $bank
+     * @param callable|null $orderDetails
+     * @param callable|null $mutable
      */
     private function handle(
         DOMDocument $xml,
@@ -593,11 +704,16 @@ class HeaderHandler
 
     /**
      * Add header and children elements to DOM XML.
+     *
+     * @param DOMDocument $xml
+     * @param DOMElement $xmlRequest
+     * @param string $transactionId
+     * @param callable|null $mutable
      */
     private function handleTransaction(
         DOMDocument $xml,
         DOMElement $xmlRequest,
-        Transaction $transaction,
+        string $transactionId,
         callable $mutable = null
     ): void {
         // Add header to request.
@@ -616,7 +732,7 @@ class HeaderHandler
 
         // Add TransactionID to static.
         $xmlTransactionID = $xml->createElement('TransactionID');
-        $xmlTransactionID->nodeValue = $transaction->getId();
+        $xmlTransactionID->nodeValue = $transactionId;
         $xmlStatic->appendChild($xmlTransactionID);
 
         if (null !== $mutable) {

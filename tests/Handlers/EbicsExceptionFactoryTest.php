@@ -13,6 +13,8 @@ use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
+ *
+ * @group ebics-exception-factory
  */
 class EbicsExceptionFactoryTest extends AbstractEbicsTestCase
 {
@@ -21,10 +23,14 @@ class EbicsExceptionFactoryTest extends AbstractEbicsTestCase
      */
     public function testExceptions(string $errorCode, ?string $errorText, string $expectedExceptionClass, ?string $meaning)
     {
-        $exception = EbicsExceptionFactory::buildExceptionFromCode($errorCode, $errorText);
-        $this->assertInstanceOf($expectedExceptionClass, $exception);
-        $this->assertEquals($exception->getResponseCode(), $errorCode);
-        $this->assertEquals($exception->getMeaning(), $meaning);
+        try{
+            EbicsExceptionFactory::buildExceptionFromCode($errorCode, $errorText);
+        } catch (EbicsResponseException $exception){
+            $this->assertInstanceOf($expectedExceptionClass, $exception);
+            $this->assertEquals($exception->getResponseCode(), $errorCode);
+            $this->assertEquals($exception->getMeaning(), $meaning);
+        }
+
     }
 
     public function getExceptions()

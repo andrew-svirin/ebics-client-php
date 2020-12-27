@@ -18,6 +18,8 @@ class CertificateX509 extends X509
 {
     /**
      * Get Certificate serialNumber.
+     *
+     * @return string
      */
     public function getSerialNumber(): string
     {
@@ -30,6 +32,8 @@ class CertificateX509 extends X509
 
     /**
      * Get Certificate Issuer DN property id-at-commonName.
+     *
+     * @return string
      */
     public function getInsurerName(): string
     {

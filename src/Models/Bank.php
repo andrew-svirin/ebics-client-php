@@ -31,6 +31,10 @@ class Bank
 
     /**
      * Constructor.
+     *
+     * @param string $hostId
+     * @param string $url
+     * @param bool $isCertified
      */
     public function __construct(string $hostId, string $url, bool $isCertified)
     {
@@ -59,6 +63,9 @@ class Bank
         return $this->url;
     }
 
+    /**
+     * @return bool
+     */
     public function isCertified(): bool
     {
         return $this->isCertified;

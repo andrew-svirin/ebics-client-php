@@ -44,7 +44,7 @@ class KeyRingManager implements KeyRingManagerInterface
      * @param string $keyRingRealPath
      * @param string $passphrase
      */
-    public function __construct($keyRingRealPath, $passphrase)
+    public function __construct(string $keyRingRealPath, string $passphrase)
     {
         $this->keyRingRealPath = $keyRingRealPath;
         $this->password = $passphrase;
@@ -52,7 +52,7 @@ class KeyRingManager implements KeyRingManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function loadKeyRing(): KeyRing
     {
@@ -69,7 +69,7 @@ class KeyRingManager implements KeyRingManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function saveKeyRing(KeyRing $keyRing): void
     {

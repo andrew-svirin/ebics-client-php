@@ -19,7 +19,7 @@ class RandomService
      * @return string
      * @see Random::string
      */
-    public function string($length)
+    public function string(int $length): string
     {
         return Random::string($length);
     }

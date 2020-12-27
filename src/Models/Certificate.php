@@ -32,6 +32,14 @@ class Certificate implements CertificateInterface
      */
     private $content;
 
+    /**
+     * Certificate constructor.
+     *
+     * @param string $type
+     * @param string $publicKey
+     * @param string|null $privateKey
+     * @param string|null $content
+     */
     public function __construct(string $type, string $publicKey, string $privateKey = null, string $content = null)
     {
         $this->type = $type;

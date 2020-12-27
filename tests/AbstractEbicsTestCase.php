@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Certificate;
@@ -18,91 +19,86 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class AbstractEbicsTestCase extends TestCase
 {
-    /**
-     * Algo to encode/decode session.
-     */
-    const ENCRYPT_ALGO = 'AES-128-ECB';
 
-    public $data = __DIR__ . '/_data';
-    public $fixtures = __DIR__ . '/_fixtures';
+    protected $data = __DIR__ . '/_data';
 
-    /**
-     * @var int
-     */
-    protected $credentialsId = 1;
+    protected $fixtures = __DIR__ . '/_fixtures';
 
-    /**
-     * @var EbicsClient
-     */
-    protected $client;
-
-    /**
-     * @var KeyRingManager
-     */
-    protected $keyRingManager;
-
-    /**
-     * @var KeyRing
-     */
-    protected $keyRing;
-
-    /**
-     * @var Bank
-     */
-    protected $bank;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    protected function setupClient()
+    protected function setupClient(int $credentialsId, X509GeneratorInterface $x509Generator = null): EbicsClient
     {
-        $credentials = $this->credentialsDataProvider($this->credentialsId);
-        $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $this->credentialsId);
-        $this->bank = new Bank($credentials['hostId'], $credentials['hostURL'], $credentials['hostIsCertified']);
-        $this->user = new User($credentials['partnerId'], $credentials['userId']);
-        $this->keyRingManager = new KeyRingManager($keyRingRealPath, 'test123');
-        $this->keyRing = $this->keyRingManager->loadKeyRing();
-        $this->client = new EbicsClient($this->bank, $this->user, $this->keyRing);
+        $credentials = $this->credentialsDataProvider($credentialsId);
+
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], $credentials['hostIsCertified']);
+        $user = new User($credentials['partnerId'], $credentials['userId']);
+        $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
+        $keyRing = $keyRingManager->loadKeyRing();
+
+        $ebicsClient = new EbicsClient($bank, $user, $keyRing);
+        $ebicsClient->setX509Generator($x509Generator);
+        return $ebicsClient;
     }
 
-    protected function setupKeys()
+    protected function setupKeyKeyRingManager($credentialsId): KeyRingManager
+    {
+        $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
+        return new KeyRingManager($keyRingRealPath, 'test123');
+    }
+
+    protected function setupKeys(KeyRing $keyRing)
     {
         $keys = json_decode(file_get_contents($this->fixtures . '/keys.json'));
-        $this->keyRing->setPassword('mysecret');
-        $this->keyRing->setUserCertificateX(new Certificate(
-            $this->keyRing->getUserCertificateX()->getType(),
-            $this->keyRing->getUserCertificateX()->getPublicKey(),
+        $keyRing->setPassword('mysecret');
+        $keyRing->setUserCertificateX(new Certificate(
+            $keyRing->getUserCertificateX()->getType(),
+            $keyRing->getUserCertificateX()->getPublicKey(),
             $keys->X002,
-            $this->keyRing->getUserCertificateX()->getContent()
+            $keyRing->getUserCertificateX()->getContent()
         ));
-        $this->keyRing->setUserCertificateE(new Certificate(
-            $this->keyRing->getUserCertificateE()->getType(),
-            $this->keyRing->getUserCertificateE()->getPublicKey(),
+        $keyRing->setUserCertificateE(new Certificate(
+            $keyRing->getUserCertificateE()->getType(),
+            $keyRing->getUserCertificateE()->getPublicKey(),
             $keys->E002,
-            $this->keyRing->getUserCertificateX()->getContent()
+            $keyRing->getUserCertificateX()->getContent()
         ));
-        $this->keyRing->setUserCertificateA(new Certificate(
-            $this->keyRing->getUserCertificateA()->getType(),
-            $this->keyRing->getUserCertificateA()->getPublicKey(),
+        $keyRing->setUserCertificateA(new Certificate(
+            $keyRing->getUserCertificateA()->getType(),
+            $keyRing->getUserCertificateA()->getPublicKey(),
             $keys->A006,
-            $this->keyRing->getUserCertificateX()->getContent()
+            $keyRing->getUserCertificateX()->getContent()
         ));
     }
 
     /**
-     * Validate response data.
+     * Validate response data is Ok.
      *
-     * @param $code
-     * @param $reportText
+     * @param string $code
+     * @param string $reportText
      *
      * @return void
      */
-    protected function assertResponseCorrect($code, $reportText)
+    protected function assertResponseOk(string $code, string $reportText)
     {
-        $this->assertEquals($code, '000000', $reportText);
-        $this->assertEquals($reportText, '[EBICS_OK] OK');
+        $this->assertEquals('000000', $code, $reportText);
+    }
+
+    /**
+     * Validate response data is Done.
+     *
+     * @param string $code
+     * @param string $reportText
+     *
+     * @return void
+     */
+    protected function assertResponseDone(string $code, string $reportText)
+    {
+        $this->assertEquals('011000', $code, $reportText);
+    }
+
+    protected function assertExceptionCode(string $code = null)
+    {
+        if (null !== $code) {
+            $this->expectExceptionCode((int)$code);
+        }
     }
 
     /**
@@ -112,7 +108,7 @@ abstract class AbstractEbicsTestCase extends TestCase
      *
      * @return array
      */
-    public function credentialsDataProvider($credentialsId): array
+    public function credentialsDataProvider(int $credentialsId): array
     {
         $path = sprintf('%s/credentials/credentials_%d.json', $this->data, $credentialsId);
         $credentialsEnc = json_decode(file_get_contents($path), true);

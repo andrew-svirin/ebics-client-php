@@ -2,9 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
-use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
 use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 
@@ -33,11 +33,25 @@ class CertificateFactory
         $this->bigIntegerFactory = new BigIntegerFactory();
     }
 
+    /**
+     * @param string $publicKey
+     * @param string $privateKey
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     public function buildCertificateA(string $publicKey, string $privateKey, string $content = null): Certificate
     {
         return new Certificate(Certificate::TYPE_A, $publicKey, $privateKey, $content);
     }
 
+    /**
+     * @param string $publicKey
+     * @param string|null $privateKey
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     public function buildCertificateE(
         string $publicKey,
         string $privateKey = null,
@@ -46,6 +60,13 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_E, $publicKey, $privateKey, $content);
     }
 
+    /**
+     * @param string $publicKey
+     * @param string|null $privateKey
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     public function buildCertificateX(
         string $publicKey,
         string $privateKey = null,
@@ -54,21 +75,46 @@ class CertificateFactory
         return new Certificate(Certificate::TYPE_X, $publicKey, $privateKey, $content);
     }
 
-    public function generateCertificateAFromKeys(array $keys, bool $isCertified): Certificate
+    /**
+     * @param array $keys
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @return Certificate
+     */
+    public function generateCertificateAFromKeys(array $keys, X509GeneratorInterface $x509Generator = null): Certificate
     {
-        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_A, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_A, $x509Generator);
     }
 
-    public function generateCertificateEFromKeys(array $keys, bool $isCertified): Certificate
+    /**
+     * @param array $keys
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @return Certificate
+     */
+    public function generateCertificateEFromKeys(array $keys, X509GeneratorInterface $x509Generator = null): Certificate
     {
-        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_E, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_E, $x509Generator);
     }
 
-    public function generateCertificateXFromKeys(array $keys, bool $isCertified): Certificate
+    /**
+     * @param array $keys
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @return Certificate
+     */
+    public function generateCertificateXFromKeys(array $keys, X509GeneratorInterface $x509Generator = null): Certificate
     {
-        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_X, $isCertified);
+        return $this->generateCertificateFromKeys($keys, Certificate::TYPE_X, $x509Generator);
     }
 
+    /**
+     * @param string $exponent
+     * @param string $modulus
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     public function buildCertificateEFromDetails(
         string $exponent,
         string $modulus,
@@ -77,6 +123,13 @@ class CertificateFactory
         return $this->buildCertificateFromDetails(Certificate::TYPE_E, $exponent, $modulus, $content);
     }
 
+    /**
+     * @param string $exponent
+     * @param string $modulus
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     public function buildCertificateXFromDetails(
         string $exponent,
         string $modulus,
@@ -85,17 +138,42 @@ class CertificateFactory
         return $this->buildCertificateFromDetails(Certificate::TYPE_X, $exponent, $modulus, $content);
     }
 
-    private function generateCertificateFromKeys(array $keys, string $type, bool $isCertified): Certificate
-    {
-        if ($isCertified) {
-            $certificateContent = $this->generateCertificateContent($keys, $type);
+    /**
+     * @param array $keys
+     * @param string $type
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @return Certificate
+     */
+    private function generateCertificateFromKeys(
+        array $keys,
+        string $type,
+        X509GeneratorInterface $x509Generator = null
+    ): Certificate {
+        if (null !== $x509Generator) {
+            $certificateContent = $this->generateCertificateContent($keys, $type, $x509Generator);
         }
 
-        return new Certificate($type, $keys['publickey'], $keys['privatekey'], $certificateContent ?? null);
+        return new Certificate(
+            $type,
+            $keys['publickey'],
+            $keys['privatekey'],
+            $certificateContent ?? null
+        );
     }
 
-    private function generateCertificateContent(array $keys, string $type): string
-    {
+    /**
+     * @param array $keys
+     * @param string $type
+     * @param X509GeneratorInterface $x509Generator
+     *
+     * @return string
+     */
+    private function generateCertificateContent(
+        array $keys,
+        string $type,
+        X509GeneratorInterface $x509Generator
+    ): string {
         $privateKey = $this->rsaFactory->create();
         $privateKey->loadKey($keys['privatekey']);
 
@@ -103,13 +181,19 @@ class CertificateFactory
         $publicKey->loadKey($keys['publickey']);
         $publicKey->setPublicKey();
 
-        $generator = X509GeneratorFactory::create();
-
-        return $generator->generateX509($privateKey, $publicKey, [
+        return $x509Generator->generateX509($privateKey, $publicKey, [
             'type' => $type,
         ]);
     }
 
+    /**
+     * @param string $type
+     * @param string $exponent
+     * @param string $modulus
+     * @param string|null $content
+     *
+     * @return Certificate
+     */
     private function buildCertificateFromDetails(
         string $type,
         string $exponent,

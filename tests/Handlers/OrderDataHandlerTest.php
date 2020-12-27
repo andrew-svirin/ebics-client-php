@@ -2,10 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Tests\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\OrderData as OrderDataAlias;
+use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
@@ -14,6 +13,8 @@ use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @group order-data-handler
  */
 class OrderDataHandlerTest extends AbstractEbicsTestCase
 {
@@ -24,15 +25,12 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
      */
     private $orderDataHandler;
 
-    /**
-     * @throws EbicsException
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->setupClient();
-        $this->setupKeys();
-        $this->orderDataHandler = new OrderDataHandler($this->bank, $this->user, $this->keyRing);
+        $client = $this->setupClient(3);
+        $this->setupKeys($client->getKeyRing());
+        $this->orderDataHandler = new OrderDataHandler($client->getBank(), $client->getUser(), $client->getKeyRing());
     }
 
     /**
@@ -46,7 +44,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         $iniXPath = $this->prepareH004XPath($iniXML);
         $orderData = $iniXPath->query('//H004:body/H004:DataTransfer/H004:OrderData')->item(0)->nodeValue;
         $orderDataDeUn = gzuncompress(base64_decode($orderData));
-        $orderDataXML = new OrderDataAlias();
+        $orderDataXML = new OrderData();
         $orderDataXML->loadXML($orderDataDeUn);
         $orderDataXPath = $this->prepareS001XPath($orderDataXML);
         $iniDatetime = $orderDataXPath->query('//S001:SignaturePubKeyInfo/S001:PubKeyValue/S001:TimeStamp')->item(0)->nodeValue;

@@ -12,6 +12,12 @@ use AndrewSvirin\Ebics\Models\OrderData;
  */
 class OrderDataFactory
 {
+
+    /**
+     * @param string $content
+     *
+     * @return OrderData
+     */
     public function buildOrderDataFromContent(string $content): OrderData
     {
         $orderData = new OrderData();
