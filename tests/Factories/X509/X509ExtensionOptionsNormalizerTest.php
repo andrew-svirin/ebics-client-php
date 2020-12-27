@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Factories\X509\X509ExtensionOptionsNormalizer;
+use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**

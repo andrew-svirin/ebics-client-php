@@ -18,7 +18,7 @@ class AES extends \phpseclib\Crypt\AES implements AESInterface
      */
     const MODE_CBC = 2;
 
-    public function setOpenSSLOptions($options)
+    public function setOpenSSLOptions($options): void
     {
         $this->openssl_options = $options;
     }

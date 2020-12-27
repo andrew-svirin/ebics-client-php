@@ -20,6 +20,10 @@ class EbicsRequestHandler
 
     /**
      * Add SecuredRequest to DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return DOMElement
      */
     public function handleSecured(DOMDocument $xml): DOMElement
     {
@@ -28,6 +32,10 @@ class EbicsRequestHandler
 
     /**
      * Add UnsecuredRequest to DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return DOMElement
      */
     public function handleUnsecured(DOMDocument $xml): DOMElement
     {
@@ -36,6 +44,10 @@ class EbicsRequestHandler
 
     /**
      * Add NoPubKeyDigestsRequest to DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return DOMElement
      */
     public function handleNoPubKeyDigests(DOMDocument $xml): DOMElement
     {
@@ -45,9 +57,11 @@ class EbicsRequestHandler
     /**
      * Add HEV Request to DOM XML.
      *
+     * @param DOMDocument $xml
+     *
      * @return DOMElement
      */
-    public function handleHEV(DOMDocument $xml)
+    public function handleHEV(DOMDocument $xml): DOMElement
     {
         return $this->handleH000($xml, self::EBICS_HEV);
     }
@@ -55,9 +69,12 @@ class EbicsRequestHandler
     /**
      * Add H004 Request to DOM XML.
      *
+     * @param DOMDocument $xml
      * @param string $request
+     *
+     * @return DOMElement
      */
-    private function handleH004(DOMDocument $xml, $request): DOMElement
+    private function handleH004(DOMDocument $xml, string $request): DOMElement
     {
         $xmlRequest = $xml->createElementNS('urn:org:ebics:H004', $request);
         $xmlRequest->setAttribute('Version', 'H004');
@@ -70,9 +87,12 @@ class EbicsRequestHandler
     /**
      * Add H004 Request with ds:xmlns for sign to DOM XML.
      *
+     * @param DOMDocument $xml
      * @param string $request
+     *
+     * @return DOMElement
      */
-    private function handleH004Secured(DOMDocument $xml, $request): DOMElement
+    private function handleH004Secured(DOMDocument $xml, string $request): DOMElement
     {
         $xmlRequest = $xml->createElementNS('urn:org:ebics:H004', $request);
         $xmlRequest->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:ds', 'http://www.w3.org/2000/09/xmldsig#');
@@ -86,9 +106,12 @@ class EbicsRequestHandler
     /**
      * Add H000 Request to DOM XML.
      *
+     * @param DOMDocument $xml
      * @param string $request
+     *
+     * @return DOMElement
      */
-    private function handleH000(DOMDocument $xml, $request): DOMElement
+    private function handleH000(DOMDocument $xml, string $request): DOMElement
     {
         $xmlRequest = $xml->createElementNS('http://www.ebics.org/H000', $request);
         $xmlRequest->setAttributeNS(

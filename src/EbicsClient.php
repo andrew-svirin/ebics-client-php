@@ -3,8 +3,7 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
-use AndrewSvirin\Ebics\Exceptions\DownloadPostprocessDoneException;
+use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
@@ -79,7 +78,16 @@ final class EbicsClient implements EbicsClientInterface
     private $certificateFactory;
 
     /**
+     * @var X509GeneratorInterface|null
+     */
+    private $x509Generator;
+
+    /**
      * Constructor.
+     *
+     * @param Bank $bank
+     * @param User $user
+     * @param KeyRing $keyRing
      */
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
@@ -96,9 +104,12 @@ final class EbicsClient implements EbicsClientInterface
     /**
      * Make request to bank server.
      *
+     * @param Request $request
+     *
+     * @return ResponseInterface
      * @throws TransportExceptionInterface
      */
-    public function post(Request $request): ResponseInterface
+    public function post(Request $request)
     {
         $body = $request->getContent();
         $httpClient = HttpClient::create();
@@ -114,7 +125,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -134,12 +145,12 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
+     * @throws TransportExceptionInterface|EbicsException
      */
     public function INI(DateTime $dateTime = null): Response
     {
@@ -148,7 +159,7 @@ final class EbicsClient implements EbicsClientInterface
         }
         $certificateA = $this->certificateFactory->generateCertificateAFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->isCertified()
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->buildINI($certificateA, $dateTime);
         $hostResponse = $this->post($request);
@@ -163,12 +174,13 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
+     * @throws EbicsException
      */
     public function HIA(DateTime $dateTime = null): Response
     {
@@ -177,11 +189,11 @@ final class EbicsClient implements EbicsClientInterface
         }
         $certificateE = $this->certificateFactory->generateCertificateEFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->isCertified()
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $certificateX = $this->certificateFactory->generateCertificateXFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->isCertified()
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->buildHIA($certificateE, $certificateX, $dateTime);
         $hostResponse = $this->post($request);
@@ -197,7 +209,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -230,7 +242,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -250,7 +262,6 @@ final class EbicsClient implements EbicsClientInterface
         $response->loadXML($hostResponseContent);
 
         $this->checkH004ReturnCode($request, $response);
-        // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
@@ -262,7 +273,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -282,7 +293,6 @@ final class EbicsClient implements EbicsClientInterface
         $response->loadXML($hostResponseContent);
 
         $this->checkH004ReturnCode($request, $response);
-        // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
@@ -294,7 +304,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -315,7 +325,6 @@ final class EbicsClient implements EbicsClientInterface
         $response->loadXML($hostResponseContent);
 
         $this->checkH004ReturnCode($request, $response);
-        // TODO: Send Receipt transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
         // Prepare decrypted OrderData.
@@ -327,20 +336,18 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      * @throws Exceptions\EbicsException
-     * @throws Exceptions\EbicsResponseException
-     * @throws Exceptions\NoDownloadDataAvailableException
      */
     public function FDL(
-        string $fileInfo,
-        string $format = 'plain',
-        string $countryCode = 'FR',
+        $fileInfo,
+        $format = 'plain',
+        $countryCode = 'FR',
         DateTime $dateTime = null,
         DateTime $startDateTime = null,
         DateTime $endDateTime = null
@@ -357,7 +364,6 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
-        // TODO: Send Transfer transaction.
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
@@ -378,6 +384,9 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function transferReceipt(Response $response, bool $acknowledged = true): Response
     {
         $lastTransaction = $response->getLastTransaction();
@@ -385,36 +394,7 @@ final class EbicsClient implements EbicsClientInterface
             throw new EbicsException('There is no transactions to mark as received');
         }
 
-        $request = $this->requestFactory->buildTransferReceipt($lastTransaction, $acknowledged);
-        $hostResponse = $this->post($request);
-        $hostResponseContent = $hostResponse->getContent();
-        $response = new Response();
-        $response->loadXML($hostResponseContent);
-
-        try {
-            $this->checkH004ReturnCode($request, $response);
-        } catch (DownloadPostprocessDoneException $exception) {
-            //EBICS_DOWNLOAD_POSTPROCESS_DONE, means transfer is OK (...)
-        }
-
-        return $response;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ClientExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
-     * @throws Exceptions\EbicsException
-     */
-    public function HAA(DateTime $dateTime = null): Response
-    {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->buildHAA($dateTime);
+        $request = $this->requestFactory->buildTransferReceipt($lastTransaction->getId(), $acknowledged);
         $hostResponse = $this->post($request);
         $hostResponseContent = $hostResponse->getContent();
         $response = new Response();
@@ -426,7 +406,38 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
+     *
+     * @throws ClientExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws TransportExceptionInterface
+     * @throws Exceptions\EbicsException
+     */
+    public function HAA(DateTime $dateTime = null, string $phase = null, string $transactionId = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->buildHAA($dateTime);
+        $hostResponse = $this->post($request);
+        $hostResponseContent = $hostResponse->getContent();
+        $response = new Response();
+        $response->loadXML($hostResponseContent);
+
+        $this->checkH004ReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
+        $transaction->setOrderData($orderData);
+
+        return $response;
+    }
+
+    /**
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -454,7 +465,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -482,7 +493,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -512,7 +523,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      *
      * @throws ClientExceptionInterface
      * @throws RedirectionExceptionInterface
@@ -542,7 +553,8 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @throws EbicsResponseExceptionInterface
+     * @param Request $request
+     * @param Response $response
      */
     private function checkH004ReturnCode(Request $request, Response $response): void
     {
@@ -552,12 +564,18 @@ final class EbicsClient implements EbicsClientInterface
             return;
         }
 
+        // For Transaction Done.
+        if ('011000' === $errorCode) {
+            return;
+        }
+
         $reportText = $this->responseHandler->retrieveH004ReportText($response);
         throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 
     /**
-     * @throws EbicsResponseExceptionInterface
+     * @param Request $request
+     * @param Response $response
      */
     private function checkH000ReturnCode(Request $request, Response $response): void
     {
@@ -569,5 +587,37 @@ final class EbicsClient implements EbicsClientInterface
 
         $reportText = $this->responseHandler->retrieveH000ReportText($response);
         throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+    }
+
+    /**
+     * @return KeyRing
+     */
+    public function getKeyRing(): KeyRing
+    {
+        return $this->keyRing;
+    }
+
+    /**
+     * @return Bank
+     */
+    public function getBank(): Bank
+    {
+        return $this->bank;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setX509Generator(X509GeneratorInterface $x509Generator = null): void
+    {
+        $this->x509Generator = $x509Generator;
     }
 }

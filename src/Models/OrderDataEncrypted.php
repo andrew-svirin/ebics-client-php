@@ -20,6 +20,12 @@ class OrderDataEncrypted
      */
     private $transactionKey;
 
+    /**
+     * OrderDataEncrypted constructor.
+     *
+     * @param string $orderData
+     * @param string $transactionKey
+     */
     public function __construct(string $orderData, string $transactionKey)
     {
         $this->orderData = $orderData;

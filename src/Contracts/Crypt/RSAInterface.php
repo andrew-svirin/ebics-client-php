@@ -13,8 +13,14 @@ use AndrewSvirin\Ebics\Models\Crypt\RSA;
 interface RSAInterface
 {
 
+    /**
+     * @return BigIntegerInterface
+     */
     public function getExponent(): BigIntegerInterface;
 
+    /**
+     * @return BigIntegerInterface
+     */
     public function getModulus(): BigIntegerInterface;
 
     /**

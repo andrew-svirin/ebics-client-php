@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Tests\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\OrderData as OrderDataAlias;
@@ -14,6 +13,8 @@ use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @group order-data-handler
  */
 class OrderDataHandlerTest extends AbstractEbicsTestCase
 {
@@ -24,15 +25,12 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
      */
     private $orderDataHandler;
 
-    /**
-     * @throws EbicsException
-     */
     public function setUp(): void
     {
         parent::setUp();
-        $this->setupClient();
-        $this->setupKeys();
-        $this->orderDataHandler = new OrderDataHandler($this->bank, $this->user, $this->keyRing);
+        $client = $this->setupClient(1);
+        $this->setupKeys($client->getKeyRing());
+        $this->orderDataHandler = new OrderDataHandler($client->getBank(), $client->getUser(), $client->getKeyRing());
     }
 
     /**
