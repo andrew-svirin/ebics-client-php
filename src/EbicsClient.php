@@ -570,7 +570,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $reportText = $this->responseHandler->retrieveH004ReportText($response);
-        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+        EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 
     /**
@@ -586,7 +586,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $reportText = $this->responseHandler->retrieveH000ReportText($response);
-        throw EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+        EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 
     /**

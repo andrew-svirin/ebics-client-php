@@ -25,8 +25,7 @@ class BankLetterFactory
         CertificateBankLetter $certificateBankLetterA,
         CertificateBankLetter $certificateBankLetterE,
         CertificateBankLetter $certificateBankLetterX
-    ): BankLetter
-    {
+    ): BankLetter {
         return new BankLetter(
             $certificateBankLetterA,
             $certificateBankLetterE,

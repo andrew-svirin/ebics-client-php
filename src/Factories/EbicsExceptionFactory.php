@@ -23,14 +23,15 @@ class EbicsExceptionFactory
      * @param Request|null $request
      * @param Response|null $response
      *
-     * @return EbicsResponseExceptionInterface
+     * @return void
+     * @throws EbicsResponseException
      */
     public static function buildExceptionFromCode(
         string $errorCode,
         ?string $errorText = null,
         ?Request $request = null,
         ?Response $response = null
-    ): EbicsResponseExceptionInterface {
+    ): void {
         if (!empty(EbicsErrorCodeMapping::$mapping[$errorCode])) {
             $exceptionClass = EbicsErrorCodeMapping::$mapping[$errorCode];
 
@@ -47,6 +48,6 @@ class EbicsExceptionFactory
             $exception->setResponse($response);
         }
 
-        return $exception;
+        throw $exception;
     }
 }

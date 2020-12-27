@@ -144,7 +144,7 @@ class KeyRing
         return 'X002';
     }
 
-    public function setBankCertificateE(Certificate $bankCertificateE)
+    public function setBankCertificateE(Certificate $bankCertificateE): void
     {
         $this->bankCertificateE = $bankCertificateE;
     }

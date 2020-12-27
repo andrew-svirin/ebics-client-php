@@ -10,10 +10,19 @@ namespace AndrewSvirin\Ebics\Models;
  */
 class BankLetter
 {
+    /**
+     * @var CertificateBankLetter
+     */
     private $certificateBankLetterA;
 
+    /**
+     * @var CertificateBankLetter
+     */
     private $certificateBankLetterE;
 
+    /**
+     * @var CertificateBankLetter
+     */
     private $certificateBankLetterX;
 
     public function __construct(

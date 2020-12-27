@@ -116,7 +116,7 @@ class KeyRingFactory
     /**
      * @param KeyRing $keyRing
      *
-     * @return \array[][]
+     * @return array
      */
     public function buildDataFromKeyRing(KeyRing $keyRing): array
     {
