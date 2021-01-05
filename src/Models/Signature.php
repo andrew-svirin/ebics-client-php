@@ -2,15 +2,15 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\CertificateInterface;
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 
 /**
- * Class Certificate represents Certificate model.
+ * Class Signature represents Signature model.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Certificate implements CertificateInterface
+class Signature implements SignatureInterface
 {
     /**
      * @var string
@@ -23,6 +23,7 @@ class Certificate implements CertificateInterface
     private $publicKey;
 
     /**
+     * Private key null for represent bank signature.
      * @var string|null
      */
     private $privateKey;
@@ -30,26 +31,22 @@ class Certificate implements CertificateInterface
     /**
      * @var string|null
      */
-    private $content;
+    private $certificateContent;
 
     /**
-     * Certificate constructor.
-     *
      * @param string $type
      * @param string $publicKey
      * @param string|null $privateKey
-     * @param string|null $content
      */
-    public function __construct(string $type, string $publicKey, string $privateKey = null, string $content = null)
+    public function __construct(string $type, string $publicKey, string $privateKey = null)
     {
         $this->type = $type;
         $this->publicKey = $publicKey;
         $this->privateKey = $privateKey;
-        $this->content = $content;
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function getType(): string
     {
@@ -57,7 +54,7 @@ class Certificate implements CertificateInterface
     }
 
     /**
-     * @return string
+     * @inheritDoc
      */
     public function getPublicKey(): string
     {
@@ -65,7 +62,7 @@ class Certificate implements CertificateInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
     public function getPrivateKey(): ?string
     {
@@ -73,26 +70,18 @@ class Certificate implements CertificateInterface
     }
 
     /**
-     * @return string|null
+     * @inheritDoc
      */
-    public function getContent(): ?string
+    public function setCertificateContent(?string $certificateContent): void
     {
-        return $this->content;
+        $this->certificateContent = $certificateContent;
     }
 
     /**
-     * Represents Certificate in the structure X509.
-     *
-     * @return CertificateX509|null
+     * @inheritDoc
      */
-    public function toX509(): ?CertificateX509
+    public function getCertificateContent(): ?string
     {
-        if (null === $this->content) {
-            return null;
-        }
-        $x509 = new CertificateX509();
-        $x509->loadX509($this->content);
-
-        return $x509;
+        return $this->certificateContent;
     }
 }

@@ -67,7 +67,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $client = $this->setupClient($credentialsId, $x509Generator);
 
         // Check that keyring is empty and or wait on success or wait on exception.
-        $userExists = $client->getKeyRing()->getUserCertificateA();
+        $userExists = $client->getKeyRing()->getUserSignatureA();
         if ($userExists) {
             $this->expectException(InvalidUserOrUserStateException::class);
             $this->expectExceptionCode(91002);
@@ -103,7 +103,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $client = $this->setupClient($credentialsId, $x509Generator);
 
         // Check that keyring is empty and or wait on success or wait on exception.
-        $bankExists = $client->getKeyRing()->getUserCertificateX();
+        $bankExists = $client->getKeyRing()->getUserSignatureX();
         if ($bankExists) {
             $this->expectException(InvalidUserOrUserStateException::class);
             $this->expectExceptionCode(91002);
