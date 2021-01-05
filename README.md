@@ -37,7 +37,8 @@ $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
 $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
 $keyRing = $keyRingManager->loadKeyRing();
-$bank = new Bank(__HOST_ID__, __HOST_URL__, __IS_CERTIFIED__);
+$bank = new Bank(__HOST_ID__, __HOST_URL__);
+$bank->setIsCertified(__IS_CERTIFIED__);
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyRing);
 ```
@@ -49,7 +50,10 @@ $client = new EbicsClient($bank, $user, $keyRing);
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
+    /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->INI();
+    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
@@ -95,7 +99,7 @@ You can achieve this by creating a class which extends the `AbstractX509Generato
 
 namespace App\Factories\X509;
 
-use AndrewSvirin\Ebics\Factories\X509\AbstractX509Generator;
+use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
 
 class MyCompanyX509Generator extends AbstractX509Generator
 {
@@ -127,12 +131,10 @@ Once your class is created, call the `X509GeneratorFactory::setGeneratorClass()`
 ```php
 <?php
 
-use AndrewSvirin\Ebics\Factories\X509\X509GeneratorFactory;
-use App\Factories\X509\MyCompanyX509Generator;
-
-X509GeneratorFactory::setGeneratorClass(MyCompanyX509Generator::class);
 //...
+/* @var \AndrewSvirin\Ebics\EbicsClient $client */
 $client->INI();
+$client->setX509Generator(new MyCompanyX509Generator);
 ```
 
 ## Other examples
@@ -145,6 +147,7 @@ use AndrewSvirin\Ebics\Exceptions\NoDownloadDataAvailableException;
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
+    /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     //Fetch datas from your bank
     $response = $client->FDL('camt.xxx.cfonb120.stm');
     foreach($response->getTransactions() as $transaction) {
@@ -183,12 +186,14 @@ More methods you can find in `tests/EbicsTest`
 
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
-$client = new EbicsClient(...);
+/* @var \AndrewSvirin\Ebics\EbicsClient $client */
 // For French bank.
 $client->setX509Generator(new MyCompanyX509Generator);
 
 try {
     $client->INI();
+    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
@@ -214,15 +219,16 @@ try {
 
 ### 2. Generate a EBICS letter
 ```php
-        $ebicsBankLetter = new EbicsBankLetter();
+/* @var \AndrewSvirin\Ebics\EbicsClient $client */
+$ebicsBankLetter = new \AndrewSvirin\Ebics\EbicsBankLetter();
 
-        $bankLetter = $ebicsBankLetter->prepareBankLetter(
-            $client->getBank(),
-            $client->getUser(),
-            $client->getKeyRing()
-        );
+$bankLetter = $ebicsBankLetter->prepareBankLetter(
+    $client->getBank(),
+    $client->getUser(),
+    $client->getKeyRing()
+);
 
-        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, new BankLetterFormatterTxt());
+$txt = $ebicsBankLetter->formatBankLetter($bankLetter, new \AndrewSvirin\Ebics\Services\BankLetterFormatterTxt());
 ```
 
 ### 3. Wait for the bank validation and activation access.
@@ -231,7 +237,10 @@ try {
 ```php
 
 try {
+    /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->HPB();
+    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(

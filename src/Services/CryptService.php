@@ -2,11 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Factories\OrderDataFactory;
-use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\Crypt\AES;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\KeyRing;
@@ -97,13 +97,13 @@ class CryptService
      */
     public function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
     {
-        if (!($certificateE = $keyRing->getUserCertificateE())) {
-            throw new RuntimeException('Certificate E is not set.');
+        if (!($signatureE = $keyRing->getUserSignatureE())) {
+            throw new RuntimeException('Signature E is not set.');
         }
 
         $rsa = $this->rsaFactory->create();
         $rsa->setPassword($keyRing->getPassword());
-        $rsa->loadKey((string)$certificateE->getPrivateKey());
+        $rsa->loadKey($signatureE->getPrivateKey());
         $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
         // aes-128-cbc encrypting format.
@@ -135,9 +135,9 @@ class CryptService
     {
         $digestToSignBin = $this->filter($hash);
 
-        if (!($certificateX = $keyRing->getUserCertificateX()) || !($privateKey = $certificateX->getPrivateKey())) {
+        if (!($signatureX = $keyRing->getUserSignatureX()) || !($privateKey = $signatureX->getPrivateKey())) {
             throw new EbicsException(
-                'On this stage must persist certificate for authorization. ' .
+                'On this stage must persist Signature X for authorization. ' .
                 'Run INI and HIA requests for retrieve them.'
             );
         }
@@ -275,15 +275,15 @@ class CryptService
      * Remove leading zeros from both.
      * Calculate digest (SHA256).
      *
-     * @param Certificate $certificate
-     * @param string $algoritm
+     * @param SignatureInterface $signature
+     * @param string $algorithm
      *
      * @return string
      */
-    public function calculateDigest(Certificate $certificate, $algoritm = 'sha256'): string
+    public function calculateDigest(SignatureInterface $signature, $algorithm = 'sha256'): string
     {
         $publicKey = $this->rsaFactory->create();
-        $publicKey->loadKey($certificate->getPublicKey());
+        $publicKey->loadKey($signature->getPublicKey());
         $exponent = $publicKey->getExponent()->toHex(true);
         $modulus = $publicKey->getModulus()->toHex(true);
         // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
@@ -294,7 +294,7 @@ class CryptService
         }
         $key = $this->calculateKey($exponent, $modulus);
 
-        return $this->calculateKeyHash($key, $algoritm, true);
+        return $this->calculateKeyHash($key, $algorithm, true);
     }
 
     /**

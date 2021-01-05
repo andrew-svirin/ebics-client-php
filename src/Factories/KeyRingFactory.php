@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Models\KeyRing;
 
 /**
@@ -12,23 +13,15 @@ use AndrewSvirin\Ebics\Models\KeyRing;
  */
 class KeyRingFactory
 {
-    const USER_PREFIX = 'USER';
-    const BANK_PREFIX = 'BANK';
-    const CERTIFICATE_PREFIX_A = 'A';
-    const CERTIFICATE_PREFIX_X = 'X';
-    const CERTIFICATE_PREFIX_E = 'E';
-    const CERTIFICATE_PREFIX = 'CERTIFICATE';
-    const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
-    const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
 
     /**
-     * @var CertificateFactory
+     * @var SignatureFactory
      */
-    private $certificateFactory;
+    private $signatureFactory;
 
     public function __construct()
     {
-        $this->certificateFactory = new CertificateFactory();
+        $this->signatureFactory = new SignatureFactory();
     }
 
     /**
@@ -36,81 +29,66 @@ class KeyRingFactory
      *
      * @return KeyRing
      */
-    public function buildKeyRingFromData(array $data): KeyRing
+    public function createKeyRingFromData(array $data): KeyRing
     {
         $keyRing = new KeyRing();
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateAContent =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::CERTIFICATE_PREFIX];
-            $userCertificateAPublicKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PUBLIC_KEY_PREFIX];
-            $userCertificateAPrivateKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_A][self::PRIVATE_KEY_PREFIX];
-            $userCertificateA = $this->certificateFactory->buildCertificateA(
-                $this->decodeValue($userCertificateAPublicKey),
-                $this->decodeValue($userCertificateAPrivateKey),
-                !empty($userCertificateAContent) ? $this->decodeValue($userCertificateAContent) : null
-            );
-            $keyRing->setUserCertificateA($userCertificateA);
-        }
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateEContent =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX];
-            $userCertificateEPublicKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
-            $userCertificateEPrivateKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $userCertificateE = $this->certificateFactory->buildCertificateE(
-                $this->decodeValue($userCertificateEPublicKey),
-                $this->decodeValue($userCertificateEPrivateKey),
-                !empty($userCertificateEContent) ? $this->decodeValue($userCertificateEContent) : null
-            );
-            $keyRing->setUserCertificateE($userCertificateE);
-        }
-        if (!empty($data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX])) {
-            $userCertificateXContent =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX];
-            $userCertificateXPublicKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
-            $userCertificateXPrivateKey =
-                $data[self::USER_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $userCertificateX = $this->certificateFactory->buildCertificateX(
-                $this->decodeValue($userCertificateXPublicKey),
-                $this->decodeValue($userCertificateXPrivateKey),
-                !empty($userCertificateXContent) ? $this->decodeValue($userCertificateXContent) : null
-            );
-            $keyRing->setUserCertificateX($userCertificateX);
-        }
-        if (!empty($data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX])) {
-            $bankCertificateEContent =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::CERTIFICATE_PREFIX];
-            $bankCertificateEPublicKey =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PUBLIC_KEY_PREFIX];
-            $bankCertificateEPrivateKey =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_E][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateE = $this->certificateFactory->buildCertificateE(
-                $this->decodeValue($bankCertificateEPublicKey),
-                !empty($bankCertificateEPrivateKey) ? $this->decodeValue($bankCertificateEPrivateKey) : null,
-                !empty($bankCertificateEContent) ? $this->decodeValue($bankCertificateEContent) : null
-            );
-            $keyRing->setBankCertificateE($bankCertificateE);
-        }
-        if (!empty($data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX])) {
-            $bankCertificateXContent =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::CERTIFICATE_PREFIX];
-            $bankCertificateXPublicKey =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PUBLIC_KEY_PREFIX];
-            $bankCertificateXPrivateKey =
-                $data[self::BANK_PREFIX][self::CERTIFICATE_PREFIX_X][self::PRIVATE_KEY_PREFIX];
-            $bankCertificateX = $this->certificateFactory->buildCertificateX(
-                $this->decodeValue($bankCertificateXPublicKey),
-                !empty($bankCertificateXPrivateKey) ? $this->decodeValue($bankCertificateXPrivateKey) : null,
-                !empty($bankCertificateXContent) ? $this->decodeValue($bankCertificateXContent) : null
-            );
-            $keyRing->setBankCertificateX($bankCertificateX);
-        }
+
+        $keyRing->setUserSignatureA(
+            $this->buildKeyRingFromDataForTypeKeyRing($data, KeyRing::USER_PREFIX, KeyRing::SIGNATURE_PREFIX_A)
+        );
+
+        $keyRing->setUserSignatureE(
+            $this->buildKeyRingFromDataForTypeKeyRing($data, KeyRing::USER_PREFIX, KeyRing::SIGNATURE_PREFIX_E)
+        );
+
+        $keyRing->setUserSignatureX(
+            $this->buildKeyRingFromDataForTypeKeyRing($data, KeyRing::USER_PREFIX, KeyRing::SIGNATURE_PREFIX_X)
+        );
+
+        $keyRing->setBankSignatureE(
+            $this->buildKeyRingFromDataForTypeKeyRing($data, KeyRing::BANK_PREFIX, KeyRing::SIGNATURE_PREFIX_E)
+        );
+
+        $keyRing->setBankSignatureX(
+            $this->buildKeyRingFromDataForTypeKeyRing($data, KeyRing::BANK_PREFIX, KeyRing::SIGNATURE_PREFIX_X)
+        );
 
         return $keyRing;
+    }
+
+    /**
+     * @param array $data
+     * @param string $typePrefix
+     * @param string $signaturePrefix
+     *
+     * @return SignatureInterface|null
+     */
+    private function buildKeyRingFromDataForTypeKeyRing(
+        array $data,
+        string $typePrefix,
+        string $signaturePrefix
+    ): ?SignatureInterface {
+        if (empty($data[$typePrefix][$signaturePrefix][KeyRing::PUBLIC_KEY_PREFIX])) {
+            return null;
+        }
+        $certificateContent =
+            $data[$typePrefix][$signaturePrefix][KeyRing::CERTIFICATE_PREFIX];
+        $signaturePublicKey =
+            $data[$typePrefix][$signaturePrefix][KeyRing::PUBLIC_KEY_PREFIX];
+        $signaturePrivateKey =
+            $data[$typePrefix][$signaturePrefix][KeyRing::PRIVATE_KEY_PREFIX];
+
+        $signature = $this->signatureFactory->create(
+            $signaturePrefix,
+            $this->decodeValue($signaturePublicKey),
+            !empty($signaturePrivateKey) ? $this->decodeValue($signaturePrivateKey) : null
+        );
+
+        if (!empty($certificateContent)) {
+            $signature->setCertificateContent($this->decodeValue($certificateContent));
+        }
+
+        return $signature;
     }
 
     /**
@@ -120,75 +98,75 @@ class KeyRingFactory
      */
     public function buildDataFromKeyRing(KeyRing $keyRing): array
     {
-        if (null !== $keyRing->getUserCertificateA()) {
-            $userCertificateAB64 = $keyRing->getUserCertificateA()->getContent();
-            $userCertificateAPublicKey = $keyRing->getUserCertificateA()->getPublicKey();
-            $userCertificateAPrivateKey = $keyRing->getUserCertificateA()->getPrivateKey();
+        if (null !== $keyRing->getUserSignatureA()) {
+            $userSignatureAB64 = $keyRing->getUserSignatureA()->getCertificateContent();
+            $userSignatureAPublicKey = $keyRing->getUserSignatureA()->getPublicKey();
+            $userSignatureAPrivateKey = $keyRing->getUserSignatureA()->getPrivateKey();
         }
-        if (null !== $keyRing->getUserCertificateE()) {
-            $userCertificateEB64 = $keyRing->getUserCertificateE()->getContent();
-            $userCertificateEPublicKey = $keyRing->getUserCertificateE()->getPublicKey();
-            $userCertificateEPrivateKey = $keyRing->getUserCertificateE()->getPrivateKey();
+        if (null !== $keyRing->getUserSignatureE()) {
+            $userSignatureEB64 = $keyRing->getUserSignatureE()->getCertificateContent();
+            $userSignatureEPublicKey = $keyRing->getUserSignatureE()->getPublicKey();
+            $userSignatureEPrivateKey = $keyRing->getUserSignatureE()->getPrivateKey();
         }
-        if (null !== $keyRing->getUserCertificateX()) {
-            $userCertificateXB64 = $keyRing->getUserCertificateX()->getContent();
-            $userCertificateXPublicKey = $keyRing->getUserCertificateX()->getPublicKey();
-            $userCertificateXPrivateKey = $keyRing->getUserCertificateX()->getPrivateKey();
+        if (null !== $keyRing->getUserSignatureX()) {
+            $userSignatureXB64 = $keyRing->getUserSignatureX()->getCertificateContent();
+            $userSignatureXPublicKey = $keyRing->getUserSignatureX()->getPublicKey();
+            $userSignatureXPrivateKey = $keyRing->getUserSignatureX()->getPrivateKey();
         }
-        if (null !== $keyRing->getBankCertificateE()) {
-            $bankCertificateEB64 = $keyRing->getBankCertificateE()->getContent();
-            $bankCertificateEPublicKey = $keyRing->getBankCertificateE()->getPublicKey();
-            $bankCertificateEPrivateKey = $keyRing->getBankCertificateE()->getPrivateKey();
+        if (null !== $keyRing->getBankSignatureE()) {
+            $bankSignatureEB64 = $keyRing->getBankSignatureE()->getCertificateContent();
+            $bankSignatureEPublicKey = $keyRing->getBankSignatureE()->getPublicKey();
+            $bankSignatureEPrivateKey = $keyRing->getBankSignatureE()->getPrivateKey();
         }
-        if (null !== $keyRing->getBankCertificateX()) {
-            $bankCertificateXB64 = $keyRing->getBankCertificateX()->getContent();
-            $bankCertificateXPublicKey = $keyRing->getBankCertificateX()->getPublicKey();
-            $bankCertificateXPrivateKey = $keyRing->getBankCertificateX()->getPrivateKey();
+        if (null !== $keyRing->getBankSignatureX()) {
+            $bankSignatureXB64 = $keyRing->getBankSignatureX()->getCertificateContent();
+            $bankSignatureXPublicKey = $keyRing->getBankSignatureX()->getPublicKey();
+            $bankSignatureXPrivateKey = $keyRing->getBankSignatureX()->getPrivateKey();
         }
 
         return [
-            self::USER_PREFIX => [
-                self::CERTIFICATE_PREFIX_A => [
-                    self::CERTIFICATE_PREFIX => isset($userCertificateAB64) ?
-                        $this->encodeValue($userCertificateAB64) : null,
-                    self::PUBLIC_KEY_PREFIX => isset($userCertificateAPublicKey) ?
-                        $this->encodeValue($userCertificateAPublicKey) : null,
-                    self::PRIVATE_KEY_PREFIX => isset($userCertificateAPrivateKey) ?
-                        $this->encodeValue($userCertificateAPrivateKey) : null,
+            KeyRing::USER_PREFIX => [
+                KeyRing::SIGNATURE_PREFIX_A => [
+                    KeyRing::CERTIFICATE_PREFIX => isset($userSignatureAB64) ?
+                        $this->encodeValue($userSignatureAB64) : null,
+                    KeyRing::PUBLIC_KEY_PREFIX => isset($userSignatureAPublicKey) ?
+                        $this->encodeValue($userSignatureAPublicKey) : null,
+                    KeyRing::PRIVATE_KEY_PREFIX => isset($userSignatureAPrivateKey) ?
+                        $this->encodeValue($userSignatureAPrivateKey) : null,
                 ],
-                self::CERTIFICATE_PREFIX_E => [
-                    self::CERTIFICATE_PREFIX => isset($userCertificateEB64) ?
-                        $this->encodeValue($userCertificateEB64) : null,
-                    self::PUBLIC_KEY_PREFIX => isset($userCertificateEPublicKey) ?
-                        $this->encodeValue($userCertificateEPublicKey) : null,
-                    self::PRIVATE_KEY_PREFIX => isset($userCertificateEPrivateKey) ?
-                        $this->encodeValue($userCertificateEPrivateKey) : null,
+                KeyRing::SIGNATURE_PREFIX_E => [
+                    KeyRing::CERTIFICATE_PREFIX => isset($userSignatureEB64) ?
+                        $this->encodeValue($userSignatureEB64) : null,
+                    KeyRing::PUBLIC_KEY_PREFIX => isset($userSignatureEPublicKey) ?
+                        $this->encodeValue($userSignatureEPublicKey) : null,
+                    KeyRing::PRIVATE_KEY_PREFIX => isset($userSignatureEPrivateKey) ?
+                        $this->encodeValue($userSignatureEPrivateKey) : null,
                 ],
-                self::CERTIFICATE_PREFIX_X => [
-                    self::CERTIFICATE_PREFIX => isset($userCertificateXB64) ?
-                        $this->encodeValue($userCertificateXB64) : null,
-                    self::PUBLIC_KEY_PREFIX => isset($userCertificateXPublicKey) ?
-                        $this->encodeValue($userCertificateXPublicKey) : null,
-                    self::PRIVATE_KEY_PREFIX => isset($userCertificateXPrivateKey) ?
-                        $this->encodeValue($userCertificateXPrivateKey) : null,
+                KeyRing::SIGNATURE_PREFIX_X => [
+                    KeyRing::CERTIFICATE_PREFIX => isset($userSignatureXB64) ?
+                        $this->encodeValue($userSignatureXB64) : null,
+                    KeyRing::PUBLIC_KEY_PREFIX => isset($userSignatureXPublicKey) ?
+                        $this->encodeValue($userSignatureXPublicKey) : null,
+                    KeyRing::PRIVATE_KEY_PREFIX => isset($userSignatureXPrivateKey) ?
+                        $this->encodeValue($userSignatureXPrivateKey) : null,
                 ],
             ],
-            self::BANK_PREFIX => [
-                self::CERTIFICATE_PREFIX_E => [
-                    self::CERTIFICATE_PREFIX => isset($bankCertificateEB64) ?
-                        $this->encodeValue($bankCertificateEB64) : null,
-                    self::PUBLIC_KEY_PREFIX => isset($bankCertificateEPublicKey) ?
-                        $this->encodeValue($bankCertificateEPublicKey) : null,
-                    self::PRIVATE_KEY_PREFIX => isset($bankCertificateEPrivateKey) ?
-                        $this->encodeValue($bankCertificateEPrivateKey) : null,
+            KeyRing::BANK_PREFIX => [
+                KeyRing::SIGNATURE_PREFIX_E => [
+                    KeyRing::CERTIFICATE_PREFIX => isset($bankSignatureEB64) ?
+                        $this->encodeValue($bankSignatureEB64) : null,
+                    KeyRing::PUBLIC_KEY_PREFIX => isset($bankSignatureEPublicKey) ?
+                        $this->encodeValue($bankSignatureEPublicKey) : null,
+                    KeyRing::PRIVATE_KEY_PREFIX => isset($bankSignatureEPrivateKey) ?
+                        $this->encodeValue($bankSignatureEPrivateKey) : null,
                 ],
-                self::CERTIFICATE_PREFIX_X => [
-                    self::CERTIFICATE_PREFIX => isset($bankCertificateXB64) ?
-                        $this->encodeValue($bankCertificateXB64) : null,
-                    self::PUBLIC_KEY_PREFIX => isset($bankCertificateXPublicKey) ?
-                        $this->encodeValue($bankCertificateXPublicKey) : null,
-                    self::PRIVATE_KEY_PREFIX => isset($bankCertificateXPrivateKey) ?
-                        $this->encodeValue($bankCertificateXPrivateKey) : null,
+                KeyRing::SIGNATURE_PREFIX_X => [
+                    KeyRing::CERTIFICATE_PREFIX => isset($bankSignatureXB64) ?
+                        $this->encodeValue($bankSignatureXB64) : null,
+                    KeyRing::PUBLIC_KEY_PREFIX => isset($bankSignatureXPublicKey) ?
+                        $this->encodeValue($bankSignatureXPublicKey) : null,
+                    KeyRing::PRIVATE_KEY_PREFIX => isset($bankSignatureXPrivateKey) ?
+                        $this->encodeValue($bankSignatureXPrivateKey) : null,
                 ],
             ],
         ];

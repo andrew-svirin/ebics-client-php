@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Factories\CertificateFactory;
+use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 use DateTime;
 
@@ -27,15 +27,15 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $generator->setCertificateEndDate(new DateTime('2021-03-22'));
         $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
 
-        $certificateFactory = new CertificateFactory();
-        $certificate = $certificateFactory->generateCertificateAFromKeys([
+        $certificateFactory = new SignatureFactory();
+        $certificate = $certificateFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
         ], $generator);
 
         $this->assertEquals($certificate->getPrivateKey(), $privateKey);
         $this->assertEquals($certificate->getPublicKey(), $publicKey);
-        $this->assertCertificateEquals($certificate->getContent(), $this->getCertificateContent('legacy-signed.csr'));
+        $this->assertCertificateEquals($certificate->getCertificateContent(), $this->getCertificateContent('legacy-signed.csr'));
     }
 
     public function testGenerateSilarhiCertificateContent()
@@ -49,8 +49,8 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $generator->setCertificateEndDate(new DateTime('2021-03-22'));
         $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
 
-        $certificateFactory = new CertificateFactory();
-        $certificate = $certificateFactory->generateCertificateAFromKeys([
+        $certificateFactory = new SignatureFactory();
+        $certificate = $certificateFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
         ], $generator);
@@ -58,7 +58,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $this->assertEquals($certificate->getPrivateKey(), $privateKey);
         $this->assertEquals($certificate->getPublicKey(), $publicKey);
         $this->assertCertificateEquals(
-            $certificate->getContent(),
+            $certificate->getCertificateContent(),
             $this->getCertificateContent('silarhi-self-signed.csr')
         );
     }

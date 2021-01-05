@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\Http\Response;
 use DateTime;
 
 /**
@@ -22,8 +22,8 @@ interface EbicsClientInterface
 
     /**
      * Make INI request.
-     * Send to the bank public certificate of signature A006.
-     * Prepare A006 certificates for KeyRing.
+     * Send to the bank public signature of signature A006.
+     * Prepare A006 signature for KeyRing.
      *
      * @param DateTime|null $dateTime current date
      *
@@ -33,8 +33,8 @@ interface EbicsClientInterface
 
     /**
      * Make HIA request.
-     * Send to the bank public certificates of authentication (X002) and encryption (E002).
-     * Prepare E002 and X002 user certificates for KeyRing.
+     * Send to the bank public signatures of authentication (X002) and encryption (E002).
+     * Prepare E002 and X002 user signatures for KeyRing.
      *
      * @param DateTime|null $dateTime current date
      *
@@ -43,9 +43,9 @@ interface EbicsClientInterface
     public function HIA(DateTime $dateTime = null): Response;
 
     /**
-     * Retrieve the Bank public certificates authentication (X002) and encryption (E002).
+     * Retrieve the Bank public signatures authentication (X002) and encryption (E002).
      * Decrypt OrderData.
-     * Prepare E002 and X002 bank certificates for KeyRing.
+     * Prepare E002 and X002 bank signatures for KeyRing.
      *
      * @param DateTime|null $dateTime current date
      *

@@ -2,9 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
-use AndrewSvirin\Ebics\Factories\CertificateBankLetterFactory;
-use AndrewSvirin\Ebics\Models\Certificate;
-use AndrewSvirin\Ebics\Models\CertificateBankLetter;
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
+use AndrewSvirin\Ebics\Factories\SignatureBankLetterFactory;
+use AndrewSvirin\Ebics\Models\SignatureBankLetter;
 
 /**
  * Bank letter helper functions.
@@ -21,27 +22,33 @@ class BankLetterService
     private $cryptService;
 
     /**
-     * @var CertificateBankLetterFactory
+     * @var SignatureBankLetterFactory
      */
-    private $certificateBankLetterFactory;
+    private $signatureBankLetterFactory;
+
+    /**
+     * @var CertificateX509Factory
+     */
+    private $certificateX509Factory;
 
     public function __construct()
     {
         $this->cryptService = new CryptService();
-        $this->certificateBankLetterFactory = new CertificateBankLetterFactory();
+        $this->signatureBankLetterFactory = new SignatureBankLetterFactory();
+        $this->certificateX509Factory = new CertificateX509Factory();
     }
 
     /**
-     * @param Certificate $certificate
-     * @param string $certificateVersion
+     * @param SignatureInterface $signature
+     * @param string $version
      *
-     * @return CertificateBankLetter
+     * @return SignatureBankLetter
      */
-    public function formatCertificateForBankLetter(
-        Certificate $certificate,
-        string $certificateVersion
-    ): CertificateBankLetter {
-        $publicKeyDetails = $this->cryptService->getPublicKeyDetails($certificate->getPublicKey());
+    public function formatSignatureForBankLetter(
+        SignatureInterface $signature,
+        string $version
+    ): SignatureBankLetter {
+        $publicKeyDetails = $this->cryptService->getPublicKeyDetails($signature->getPublicKey());
 
         $exponentFormatted = $this->formatBytesForBank($publicKeyDetails['e']);
         $modulusFormatted = $this->formatBytesForBank($publicKeyDetails ['m']);
@@ -50,12 +57,24 @@ class BankLetterService
         $keyHash = $this->cryptService->calculateKeyHash($key);
         $keyHashFormatted = $this->formatKeyHashForBankLetter($keyHash);
 
-        return $this->certificateBankLetterFactory->create(
-            $certificateVersion,
+        $signatureBankLetter = $this->signatureBankLetterFactory->create(
+            $signature->getType(),
+            $version,
             $exponentFormatted,
             $modulusFormatted,
             $keyHashFormatted
         );
+
+        if (($content = $signature->getCertificateContent())) {
+            $certificateX509 = $this->certificateX509Factory->createFromContent($content);
+            $startDate = $certificateX509->getValidityStartDate();
+
+            $signatureBankLetter->setIsCertified(true);
+            $signatureBankLetter->setCertificateContent($content);
+            $signatureBankLetter->setCertificateCreatedAt($startDate);
+        }
+
+        return $signatureBankLetter;
     }
 
     /**

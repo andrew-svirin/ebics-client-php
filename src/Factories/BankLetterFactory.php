@@ -2,8 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
-use AndrewSvirin\Ebics\Models\CertificateBankLetter;
+use AndrewSvirin\Ebics\Models\SignatureBankLetter;
+use AndrewSvirin\Ebics\Models\User;
 
 /**
  * Class BankLetterFactory represents producers for the @see BankLetter.
@@ -15,21 +17,27 @@ class BankLetterFactory
 {
 
     /**
-     * @param CertificateBankLetter $certificateBankLetterA
-     * @param CertificateBankLetter $certificateBankLetterE
-     * @param CertificateBankLetter $certificateBankLetterX
+     * @param Bank $bank
+     * @param User $user
+     * @param SignatureBankLetter $signatureBankLetterA
+     * @param SignatureBankLetter $signatureBankLetterE
+     * @param SignatureBankLetter $signatureBankLetterX
      *
      * @return BankLetter
      */
     public function create(
-        CertificateBankLetter $certificateBankLetterA,
-        CertificateBankLetter $certificateBankLetterE,
-        CertificateBankLetter $certificateBankLetterX
+        Bank $bank,
+        User $user,
+        SignatureBankLetter $signatureBankLetterA,
+        SignatureBankLetter $signatureBankLetterE,
+        SignatureBankLetter $signatureBankLetterX
     ): BankLetter {
         return new BankLetter(
-            $certificateBankLetterA,
-            $certificateBankLetterE,
-            $certificateBankLetterX
+            $bank,
+            $user,
+            $signatureBankLetterA,
+            $signatureBankLetterE,
+            $signatureBankLetterX
         );
     }
 }

@@ -1,6 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace AndrewSvirin\Ebics\Models\Http;
+
+use AndrewSvirin\Ebics\Models\DOMDocument;
+use AndrewSvirin\Ebics\Models\Transaction;
 
 /**
  * Response model represents Response model.

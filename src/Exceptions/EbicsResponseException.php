@@ -3,8 +3,8 @@
 namespace AndrewSvirin\Ebics\Exceptions;
 
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
-use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\Http\Request;
+use AndrewSvirin\Ebics\Models\Http\Response;
 
 class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
 {

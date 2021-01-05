@@ -3,12 +3,13 @@
 namespace AndrewSvirin\Ebics\Models\X509;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
+use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\X509\X509GeneratorException;
+use AndrewSvirin\Ebics\Factories\Crypt\X509Factory;
 use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
 use DateTimeImmutable;
 use DateTimeInterface;
-use phpseclib\File\X509;
 
 /**
  * Default X509 certificate generator @see X509GeneratorInterface.
@@ -27,8 +28,12 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     /** @var string */
     protected $serialNumber;
 
+    /** @var X509Factory */
+    private $x509Factory;
+
     public function __construct()
     {
+        $this->x509Factory = new X509Factory();
         $this->certificateStartDate = (new DateTimeImmutable())->modify('-1 days');
         $this->certificateEndDate = (new DateTimeImmutable())->modify('+1 year');
         $this->serialNumber = $this->generateSerialNumber();
@@ -65,10 +70,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $subject = $this->generateSubject($publicKey, $options);
         $issuer = $this->generateIssuer($privateKey, $publicKey, $subject, $options);
 
-        $x509 = new X509();
-        $x509->startDate = $this->certificateStartDate->format('YmdHis');
-        $x509->endDate = $this->certificateEndDate->format('YmdHis');
-        $x509->serialNumber = $this->serialNumber;
+        $x509 = $this->x509Factory->create();
+        $x509->setStartDate($this->certificateStartDate->format('YmdHis'));
+        $x509->setEndDate($this->certificateEndDate->format('YmdHis'));
+        $x509->setSerialNumber($this->serialNumber);
 
         $result = $x509->sign($issuer, $subject, 'sha256WithRSAEncryption');
         $x509->loadX509($result);
@@ -99,11 +104,11 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      * @param RSAInterface $publicKey
      * @param array $options
      *
-     * @return X509
+     * @return X509Interface
      */
-    protected function generateSubject(RSAInterface $publicKey, array $options): X509
+    protected function generateSubject(RSAInterface $publicKey, array $options): X509Interface
     {
-        $subject = new X509();
+        $subject = $this->x509Factory->create();
         $subject->setPublicKey($publicKey); // $pubKey is Crypt_RSA object
 
         if (!empty($options['subject']['DN'])) {
@@ -111,7 +116,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         }
 
         if (!empty($options['subject']['domain'])) {
-            $subject->setDomain($options['subject']['domain']);
+            $subject->setDomain($options['subject']['domain']); // @phpstan-ignore-line
         }
         $subject->setKeyIdentifier($subject->computeKeyIdentifier($publicKey)); // id-ce-subjectKeyIdentifier
 
@@ -121,18 +126,18 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     /**
      * @param RSAInterface $privateKey
      * @param RSAInterface $publicKey
-     * @param X509 $subject
+     * @param X509Interface $subject
      * @param array $options
      *
-     * @return X509
+     * @return X509Interface
      */
     protected function generateIssuer(
         RSAInterface $privateKey,
         RSAInterface $publicKey,
-        X509 $subject,
+        X509Interface $subject,
         array $options
-    ): X509 {
-        $issuer = new X509();
+    ): X509Interface {
+        $issuer = $this->x509Factory->create();
         $issuer->setPrivateKey($privateKey); // $privKey is Crypt_RSA object
 
         if (!empty($options['issuer']['DN'])) {
