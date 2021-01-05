@@ -2,11 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsErrorCodeMapping;
 use AndrewSvirin\Ebics\Exceptions\EbicsResponseException;
-use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\Http\Request;
+use AndrewSvirin\Ebics\Models\Http\Response;
 
 /**
  * Exception factory with an EBICS response code

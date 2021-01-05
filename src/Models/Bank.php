@@ -25,22 +25,27 @@ class Bank
     private $url;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isCertified;
+
+    /**
+     * The Server Name of the bank.
+     *
+     * @var string|null
+     */
+    private $serverName;
 
     /**
      * Constructor.
      *
      * @param string $hostId
      * @param string $url
-     * @param bool $isCertified
      */
-    public function __construct(string $hostId, string $url, bool $isCertified)
+    public function __construct(string $hostId, string $url)
     {
-        $this->hostId = (string)$hostId;
-        $this->url = (string)$url;
-        $this->isCertified = $isCertified;
+        $this->hostId = $hostId;
+        $this->url = $url;
     }
 
     /**
@@ -64,10 +69,34 @@ class Bank
     }
 
     /**
+     * @param bool $isCertified
+     */
+    public function setIsCertified(bool $isCertified): void
+    {
+        $this->isCertified = $isCertified;
+    }
+
+    /**
      * @return bool
      */
-    public function isCertified(): bool
+    public function getIsCertified(): bool
     {
-        return $this->isCertified;
+        return (bool)$this->isCertified;
+    }
+
+    /**
+     * @param string|null $serverName
+     */
+    public function setServerName(?string $serverName): void
+    {
+        $this->serverName = $serverName;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getServerName(): ?string
+    {
+        return $this->serverName;
     }
 }

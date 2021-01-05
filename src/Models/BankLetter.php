@@ -11,51 +11,80 @@ namespace AndrewSvirin\Ebics\Models;
 class BankLetter
 {
     /**
-     * @var CertificateBankLetter
+     * @var Bank
      */
-    private $certificateBankLetterA;
+    private $bank;
 
     /**
-     * @var CertificateBankLetter
+     * @var User
      */
-    private $certificateBankLetterE;
+    private $user;
 
     /**
-     * @var CertificateBankLetter
+     * @var SignatureBankLetter
      */
-    private $certificateBankLetterX;
+    private $signatureBankLetterA;
+
+    /**
+     * @var SignatureBankLetter
+     */
+    private $signatureBankLetterE;
+    /**
+     * @var SignatureBankLetter
+     */
+    private $signatureBankLetterX;
 
     public function __construct(
-        CertificateBankLetter $certificateBankLetterA,
-        CertificateBankLetter $certificateBankLetterE,
-        CertificateBankLetter $certificateBankLetterX
+        Bank $bank,
+        User $user,
+        SignatureBankLetter $signatureBankLetterA,
+        SignatureBankLetter $signatureBankLetterE,
+        SignatureBankLetter $signatureBankLetterX
     ) {
-        $this->certificateBankLetterA = $certificateBankLetterA;
-        $this->certificateBankLetterE = $certificateBankLetterE;
-        $this->certificateBankLetterX = $certificateBankLetterX;
+        $this->signatureBankLetterA = $signatureBankLetterA;
+        $this->signatureBankLetterE = $signatureBankLetterE;
+        $this->signatureBankLetterX = $signatureBankLetterX;
+        $this->bank = $bank;
+        $this->user = $user;
     }
 
     /**
-     * @return CertificateBankLetter
+     * @return Bank
      */
-    public function getCertificateBankLetterA(): CertificateBankLetter
+    public function getBank(): Bank
     {
-        return $this->certificateBankLetterA;
+        return $this->bank;
     }
 
     /**
-     * @return CertificateBankLetter
+     * @return User
      */
-    public function getCertificateBankLetterE(): CertificateBankLetter
+    public function getUser(): User
     {
-        return $this->certificateBankLetterE;
+        return $this->user;
     }
 
     /**
-     * @return CertificateBankLetter
+     * @return SignatureBankLetter
      */
-    public function getCertificateBankLetterX(): CertificateBankLetter
+    public function getSignatureBankLetterA(): SignatureBankLetter
     {
-        return $this->certificateBankLetterX;
+        return $this->signatureBankLetterA;
+    }
+
+    /**
+     * @return SignatureBankLetter
+     */
+    public function getSignatureBankLetterE(): SignatureBankLetter
+    {
+        return $this->signatureBankLetterE;
+    }
+
+    /**
+     * @return SignatureBankLetter
+     */
+    public function getSignatureBankLetterX(): SignatureBankLetter
+    {
+        return $this->signatureBankLetterX;
     }
 }

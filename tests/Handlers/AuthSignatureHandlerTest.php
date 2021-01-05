@@ -5,7 +5,7 @@ namespace AndrewSvirin\Ebics\Tests\Handlers;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\Request;
+use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
@@ -28,7 +28,8 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $client = $this->setupClient(1);
+        $credentialsId = 1;
+        $client = $this->setupClient($credentialsId);
         $this->setupKeys($client->getKeyRing());
         $this->authSignatureHandler = new AuthSignatureHandler($client->getKeyRing());
     }

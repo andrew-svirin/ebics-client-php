@@ -59,7 +59,7 @@ class KeyRingManager implements KeyRingManagerInterface
         if (is_file($this->keyRingRealPath) &&
             ($content = file_get_contents($this->keyRingRealPath)) &&
             !empty($content)) {
-            $result = $this->keyRingFactory->buildKeyRingFromData(json_decode($content, true));
+            $result = $this->keyRingFactory->createKeyRingFromData(json_decode($content, true));
         } else {
             $result = new KeyRing();
         }

@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 
 /**
@@ -12,95 +13,104 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
  */
 class KeyRing
 {
-    /**
-     * @var Certificate|null
-     */
-    private $userCertificateA;
+    const USER_PREFIX = 'USER';
+    const BANK_PREFIX = 'BANK';
+    const SIGNATURE_PREFIX_A = 'A';
+    const SIGNATURE_PREFIX_X = 'X';
+    const SIGNATURE_PREFIX_E = 'E';
+    const CERTIFICATE_PREFIX = 'CERTIFICATE';
+    const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
+    const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
 
     /**
-     * @var Certificate|null
+     * @var SignatureInterface|null
      */
-    private $userCertificateX;
+    private $userSignatureA;
 
     /**
-     * @var Certificate|null
+     * @var SignatureInterface|null
      */
-    private $userCertificateE;
+    private $userSignatureX;
 
     /**
-     * @var Certificate|null
+     * @var SignatureInterface|null
      */
-    private $bankCertificateX;
+    private $userSignatureE;
 
     /**
-     * @var Certificate|null
+     * @var SignatureInterface|null
      */
-    private $bankCertificateE;
+    private $bankSignatureX;
+
+    /**
+     * @var SignatureInterface|null
+     */
+    private $bankSignatureE;
 
     /**
      * @var string|null
      */
     private $password;
 
-    public function setUserCertificateA(Certificate $certificate): void
+    public function setUserSignatureA(SignatureInterface $signature): void
     {
-        $this->userCertificateA = $certificate;
+        $this->userSignatureA = $signature;
     }
 
     /**
-     * @return Certificate|null
+     * @return SignatureInterface|null
      */
-    public function getUserCertificateA(): ?Certificate
+    public function getUserSignatureA(): ?SignatureInterface
     {
-        return $this->userCertificateA;
+        return $this->userSignatureA;
     }
 
     /**
      * @return string
      */
-    public function getUserCertificateAVersion(): string
+    public function getUserSignatureAVersion(): string
     {
         return 'A006';
     }
 
-    public function setUserCertificateX(Certificate $certificate): void
+    public function setUserSignatureX(SignatureInterface $signature): void
     {
-        $this->userCertificateX = $certificate;
+        $this->userSignatureX = $signature;
     }
 
     /**
-     * @return Certificate|null
+     * @return SignatureInterface|null
      */
-    public function getUserCertificateX(): ?Certificate
+    public function getUserSignatureX(): ?SignatureInterface
     {
-        return $this->userCertificateX;
+        return $this->userSignatureX;
     }
 
     /**
      * @return string
      */
-    public function getUserCertificateXVersion(): string
+    public function getUserSignatureXVersion(): string
     {
         return 'X002';
     }
 
-    public function setUserCertificateE(Certificate $certificate): void
+    public function setUserSignatureE(SignatureInterface $signature = null): void
     {
-        $this->userCertificateE = $certificate;
+        $this->userSignatureE = $signature;
     }
 
     /**
-     * @return Certificate|null
+     * @return SignatureInterface|null
      */
-    public function getUserCertificateE(): ?Certificate
+    public function getUserSignatureE(): ?SignatureInterface
     {
-        return $this->userCertificateE;
+        return $this->userSignatureE;
     }
 
     /**
      * @return string
      */
-    public function getUserCertificateEVersion(): string
+    public function getUserSignatureEVersion(): string
     {
         return 'E002';
     }
@@ -123,44 +133,44 @@ class KeyRing
         return $this->password;
     }
 
-    public function setBankCertificateX(Certificate $bankCertificateX): void
+    public function setBankSignatureX(SignatureInterface $bankSignatureX = null): void
     {
-        $this->bankCertificateX = $bankCertificateX;
+        $this->bankSignatureX = $bankSignatureX;
     }
 
     /**
-     * @return Certificate|null
+     * @return SignatureInterface|null
      */
-    public function getBankCertificateX(): ?Certificate
+    public function getBankSignatureX(): ?SignatureInterface
     {
-        return $this->bankCertificateX;
+        return $this->bankSignatureX;
     }
 
     /**
      * @return string
      */
-    public function getBankCertificateXVersion(): string
+    public function getBankSignatureXVersion(): string
     {
         return 'X002';
     }
 
-    public function setBankCertificateE(Certificate $bankCertificateE): void
+    public function setBankSignatureE(SignatureInterface $bankSignatureE = null): void
     {
-        $this->bankCertificateE = $bankCertificateE;
+        $this->bankSignatureE = $bankSignatureE;
     }
 
     /**
-     * @return Certificate|null
+     * @return SignatureInterface|null
      */
-    public function getBankCertificateE(): ?Certificate
+    public function getBankSignatureE(): ?SignatureInterface
     {
-        return $this->bankCertificateE;
+        return $this->bankSignatureE;
     }
 
     /**
      * @return string
      */
-    public function getBankCertificateEVersion(): string
+    public function getBankSignatureEVersion(): string
     {
         return 'E002';
     }

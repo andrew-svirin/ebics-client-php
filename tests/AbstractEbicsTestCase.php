@@ -4,8 +4,8 @@ namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\EbicsClient;
+use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\Certificate;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\KeyRingManager;
@@ -28,7 +28,9 @@ abstract class AbstractEbicsTestCase extends TestCase
     {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
-        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], $credentials['hostIsCertified']);
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
+        $bank->setIsCertified($credentials['hostIsCertified']);
+        $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
         $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
         $keyRing = $keyRingManager->loadKeyRing();
@@ -48,24 +50,22 @@ abstract class AbstractEbicsTestCase extends TestCase
     {
         $keys = json_decode(file_get_contents($this->fixtures . '/keys.json'));
         $keyRing->setPassword('mysecret');
-        $keyRing->setUserCertificateX(new Certificate(
-            $keyRing->getUserCertificateX()->getType(),
-            $keyRing->getUserCertificateX()->getPublicKey(),
-            $keys->X002,
-            $keyRing->getUserCertificateX()->getContent()
-        ));
-        $keyRing->setUserCertificateE(new Certificate(
-            $keyRing->getUserCertificateE()->getType(),
-            $keyRing->getUserCertificateE()->getPublicKey(),
-            $keys->E002,
-            $keyRing->getUserCertificateX()->getContent()
-        ));
-        $keyRing->setUserCertificateA(new Certificate(
-            $keyRing->getUserCertificateA()->getType(),
-            $keyRing->getUserCertificateA()->getPublicKey(),
-            $keys->A006,
-            $keyRing->getUserCertificateX()->getContent()
-        ));
+        $signatureFactory = new SignatureFactory();
+
+        $userSignatureA = $signatureFactory->createSignatureA($keyRing->getUserSignatureA()->getPublicKey(),
+            $keys->A006);
+        $userSignatureA->setCertificateContent($keyRing->getUserSignatureA()->getCertificateContent());
+        $keyRing->setUserSignatureA($userSignatureA);
+
+        $userSignatureE = $signatureFactory->createSignatureE($keyRing->getUserSignatureE()->getPublicKey(),
+            $keys->E002);
+        $userSignatureE->setCertificateContent($keyRing->getUserSignatureE()->getCertificateContent());
+        $keyRing->setUserSignatureE($userSignatureE);
+
+        $userSignatureX = $signatureFactory->createSignatureX($keyRing->getUserSignatureX()->getPublicKey(),
+            $keys->X002);
+        $userSignatureX->setCertificateContent($keyRing->getUserSignatureX()->getCertificateContent());
+        $keyRing->setUserSignatureX($userSignatureX);
     }
 
     /**

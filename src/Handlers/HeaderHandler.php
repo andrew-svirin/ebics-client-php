@@ -602,27 +602,27 @@ class HeaderHandler
             $xmlBankPubKeyDigests = $xml->createElement('BankPubKeyDigests');
             $xmlStatic->appendChild($xmlBankPubKeyDigests);
 
-            if (!($certificateX = $keyRing->getBankCertificateX())) {
+            if (!($signatureX = $keyRing->getBankSignatureX())) {
                 throw new EbicsException('Certificate X is empty.');
             }
 
-            if (!($certificateE = $keyRing->getBankCertificateE())) {
+            if (!($signatureE = $keyRing->getBankSignatureE())) {
                 throw new EbicsException('Certificate E is empty.');
             }
 
             // Add Authentication to BankPubKeyDigests.
             $xmlAuthentication = $xml->createElement('Authentication');
-            $xmlAuthentication->setAttribute('Version', $keyRing->getBankCertificateXVersion());
+            $xmlAuthentication->setAttribute('Version', $keyRing->getBankSignatureXVersion());
             $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateXDigest = $this->cryptService->calculateDigest($certificateX, $algorithm);
+            $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm);
             $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
             $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
             // Add Encryption to BankPubKeyDigests.
             $xmlEncryption = $xml->createElement('Encryption');
-            $xmlEncryption->setAttribute('Version', $keyRing->getBankCertificateEVersion());
+            $xmlEncryption->setAttribute('Version', $keyRing->getBankSignatureEVersion());
             $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-            $certificateEDigest = $this->cryptService->calculateDigest($certificateE, $algorithm);
+            $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm);
             $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
             $xmlBankPubKeyDigests->appendChild($xmlEncryption);
         };

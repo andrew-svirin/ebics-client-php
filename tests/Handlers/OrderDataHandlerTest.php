@@ -4,8 +4,8 @@ namespace AndrewSvirin\Ebics\Tests\Handlers;
 
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\OrderData;
-use AndrewSvirin\Ebics\Models\Request;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
