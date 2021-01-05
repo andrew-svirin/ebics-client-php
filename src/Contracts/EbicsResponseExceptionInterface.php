@@ -2,8 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\Ebics\Models\Response;
+use AndrewSvirin\Ebics\Models\Http\Request;
+use AndrewSvirin\Ebics\Models\Http\Response;
 
 /**
  * EBICS ResponseExceptionInterface representation.

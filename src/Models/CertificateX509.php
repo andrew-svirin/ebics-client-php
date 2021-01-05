@@ -4,7 +4,8 @@ namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
 use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
-use phpseclib\File\X509;
+use AndrewSvirin\Ebics\Models\Crypt\X509;
+use DateTime;
 
 /**
  * Class CertificateX509 represents Certificate model in X509 structure.
@@ -40,5 +41,20 @@ class CertificateX509 extends X509
         $certificateInsurerName = $this->getIssuerDNProp('id-at-commonName');
 
         return array_shift($certificateInsurerName);
+    }
+
+    /**
+     * Get validity start date.
+     * @return DateTime
+     */
+    public function getValidityStartDate(): DateTime
+    {
+        $notBefore = $this->currentCert['tbsCertificate']['validity']['notBefore']['utcTime'];
+        $notBeforeTimestamp = strtotime($notBefore);
+
+        $startDate = new DateTime();
+        $startDate->setTimestamp($notBeforeTimestamp);
+
+        return $startDate;
     }
 }

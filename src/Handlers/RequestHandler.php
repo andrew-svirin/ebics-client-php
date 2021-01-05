@@ -2,14 +2,13 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Contracts\TransactionInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\Certificate;
+use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
-use AndrewSvirin\Ebics\Models\Request;
-use AndrewSvirin\Ebics\Models\Transaction;
 use AndrewSvirin\Ebics\Models\User;
 use DateTime;
 
@@ -69,13 +68,13 @@ class RequestHandler
     }
 
     /**
-     * @param Certificate $certificateA
+     * @param SignatureInterface $certificateA
      * @param DateTime $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function buildINI(Certificate $certificateA, DateTime $dateTime): Request
+    public function buildINI(SignatureInterface $certificateA, DateTime $dateTime): Request
     {
         // Order data.
         $orderData = new OrderData();
@@ -103,15 +102,18 @@ class RequestHandler
     }
 
     /**
-     * @param Certificate $certificateE
-     * @param Certificate $certificateX
+     * @param SignatureInterface $certificateE
+     * @param SignatureInterface $certificateX
      * @param DateTime $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function buildHIA(Certificate $certificateE, Certificate $certificateX, DateTime $dateTime): Request
-    {
+    public function buildHIA(
+        SignatureInterface $certificateE,
+        SignatureInterface $certificateX,
+        DateTime $dateTime
+    ): Request {
         // Order data.
         $orderData = new OrderData();
         $this->orderDataHandler->handleHIA($orderData, $certificateE, $certificateX, $dateTime);

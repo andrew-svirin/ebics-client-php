@@ -49,17 +49,19 @@ final class EbicsBankLetter
     public function prepareBankLetter(Bank $bank, User $user, KeyRing $keyRing): BankLetter
     {
         $bankLetter = $this->bankLetterFactory->create(
-            $this->bankLetterService->formatCertificateForBankLetter(
-                $keyRing->getUserCertificateA(),
-                $keyRing->getUserCertificateAVersion()
+            $bank,
+            $user,
+            $this->bankLetterService->formatSignatureForBankLetter(
+                $keyRing->getUserSignatureA(),
+                $keyRing->getUserSignatureAVersion()
             ),
-            $this->bankLetterService->formatCertificateForBankLetter(
-                $keyRing->getUserCertificateE(),
-                $keyRing->getUserCertificateEVersion()
+            $this->bankLetterService->formatSignatureForBankLetter(
+                $keyRing->getUserSignatureE(),
+                $keyRing->getUserSignatureEVersion()
             ),
-            $this->bankLetterService->formatCertificateForBankLetter(
-                $keyRing->getUserCertificateX(),
-                $keyRing->getUserCertificateXVersion()
+            $this->bankLetterService->formatSignatureForBankLetter(
+                $keyRing->getUserSignatureX(),
+                $keyRing->getUserSignatureXVersion()
             )
         );
 
