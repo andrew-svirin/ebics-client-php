@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Contracts;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
+use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
 
 /**
  * X509 Factory Interface representation.
@@ -12,14 +13,34 @@ use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
  */
 interface X509GeneratorInterface
 {
+
     /**
-     * Generate a X509 certificate and returns its content
+     * Generate a X509 (Authorization) and returns its content.
      *
-     * @param RSAInterface $privateKey the private key
-     * @param RSAInterface $publicKey the public key
-     * @param array $options optional generation options (may be empty)
+     * @param RSAInterface $privateKey
+     * @param RSAInterface $publicKey
      *
-     * @return string the X509 content
+     * @return X509Interface
      */
-    public function generateX509(RSAInterface $privateKey, RSAInterface $publicKey, array $options = []): string;
+    public function generateAX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface;
+
+    /**
+     * Generate a X509 (Authorization) and returns its content.
+     *
+     * @param RSAInterface $privateKey
+     * @param RSAInterface $publicKey
+     *
+     * @return X509Interface
+     */
+    public function generateEX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface;
+
+    /**
+     * Generate a X509 (Authorization) and returns its content.
+     *
+     * @param RSAInterface $privateKey
+     * @param RSAInterface $publicKey
+     *
+     * @return X509Interface
+     */
+    public function generateXX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface;
 }
