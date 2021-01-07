@@ -196,12 +196,13 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         foreach ($options['extensions'] as $id => $extension) {
             $extension = X509ExtensionOptionsNormalizer::normalize($extension);
-            if (false === $x509->setExtension(
-                    $id,
-                    $extension['value'],
-                    $extension['critical'],
-                    $extension['replace']
-                )) {
+            $isSetExtension = $x509->setExtension(
+                $id,
+                $extension['value'],
+                $extension['critical'],
+                $extension['replace']
+            );
+            if (false === $isSetExtension) {
                 throw new X509GeneratorException(sprintf(
                     'Unable to set "%s" extension with value: %s',
                     $id,
