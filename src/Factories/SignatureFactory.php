@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\Signature;
 use LogicException;
+use RuntimeException;
 
 /**
  * Class SignatureFactory represents producers for the @see Signature.
@@ -222,10 +223,10 @@ class SignatureFactory
                 $x509 = $x509Generator->generateXX509($privateKey, $publicKey);
                 break;
             default:
-                throw new \RuntimeException('Unpredictable type.');
+                throw new RuntimeException('Unpredictable type.');
         }
 
-        return $x509->saveX509($x509->currentCert);
+        return $x509->saveX509CurrentCert();
     }
 
     /**

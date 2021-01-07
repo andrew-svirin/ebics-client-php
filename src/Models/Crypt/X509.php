@@ -15,4 +15,8 @@ use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
  */
 class X509 extends \phpseclib\File\X509 implements X509Interface
 {
+    public function saveX509CurrentCert(): string
+    {
+        return $this->saveX509($this->currentCert);
+    }
 }
