@@ -22,8 +22,8 @@ interface EbicsClientInterface
 
     /**
      * Make INI request.
-     * Send to the bank public signature of signature A006.
-     * Prepare A006 signature for KeyRing.
+     * Send to the bank public signature of signature A005.
+     * Prepare A005 signature for KeyRing.
      *
      * @param DateTime|null $dateTime current date
      *

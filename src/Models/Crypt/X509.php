@@ -15,5 +15,4 @@ use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
  */
 class X509 extends \phpseclib\File\X509 implements X509Interface
 {
-
 }

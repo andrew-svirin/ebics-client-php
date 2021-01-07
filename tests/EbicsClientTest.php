@@ -7,10 +7,6 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
-use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
-use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
  * Class EbicsClientTest.
@@ -31,11 +27,6 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @throws ClientExceptionInterface
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHEV(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -44,6 +35,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $responseHandler = new ResponseHandler();
         $code = $responseHandler->retrieveH000ReturnCode($hev);
         $reportText = $responseHandler->retrieveH000ReportText($hev);
+        $x = $hev->getContent();
         $this->assertResponseOk($code, $reportText);
     }
 
@@ -56,11 +48,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testINI(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -92,11 +80,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHIA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -130,11 +114,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHPB(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -160,11 +140,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHKD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -194,11 +170,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHTD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -227,11 +199,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHPD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -261,11 +229,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testHAA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -296,11 +260,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testVMK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -327,11 +287,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testSTA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -358,11 +314,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testZ53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -389,11 +341,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
      *
-     * @throws ClientExceptionInterface
      * @throws EbicsException
-     * @throws RedirectionExceptionInterface
-     * @throws ServerExceptionInterface
-     * @throws TransportExceptionInterface
      */
     public function testC53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -445,12 +393,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HKD' => null,
                     'HTD' => null,
                     'HAA' => '091006',
-                    'VMK' => '061099',
-                    'STA' => '061099',
-                    'Z53' => '061099',
-                    'C53' => '061099',
+                    'VMK' => '061002',
+                    'STA' => '061002',
+                    'Z53' => '061002',
+                    'C53' => '061002',
                 ],
-                new WeBankX509Generator
+                new WeBankX509Generator,
             ],
             [
                 3, // Credentials Id.

@@ -14,14 +14,11 @@ use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
  */
 class SilarhiX509Generator extends AbstractX509Generator
 {
-    /**
-     * @param array $options
-     *
-     * @return array[]
-     */
-    public function getCertificateOptions(array $options = []): array
+
+    public function __construct()
     {
-        return [
+        parent::__construct();
+        $this->setCertificateOptions([
             'subject' => [
                 'domain' => 'silarhi.fr',
                 'DN' => [
@@ -53,6 +50,6 @@ class SilarhiX509Generator extends AbstractX509Generator
                     'value' => ['id-kp-serverAuth', 'id-kp-clientAuth'],
                 ],
             ],
-        ];
+        ]);
     }
 }
