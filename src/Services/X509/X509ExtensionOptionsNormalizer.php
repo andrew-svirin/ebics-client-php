@@ -13,13 +13,13 @@ use phpseclib\File\X509;
 class X509ExtensionOptionsNormalizer
 {
     /**
-     * @param mixed|string|array $options [
+     * @param mixed|string|array $options = [
      *  'value' => '<string>',
      *  'critical' => '<bool>',
      *  'replace' => '<string>',
      * ]
      *
-     * @return array [
+     * @return array = [
      *  'value' => '<string>',
      *  'critical' => '<bool>',
      *  'replace' => '<string>',

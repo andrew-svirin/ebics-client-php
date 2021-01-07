@@ -179,14 +179,11 @@ class SignatureFactory
         string $type,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        $signature = new Signature(
-            $type,
-            $keys['publickey'],
-            $keys['privatekey']
-        );
+        $signature = new Signature($type, $keys['publickey'], $keys['privatekey']);
 
         if (null !== $x509Generator) {
-            $signature->setCertificateContent($this->generateCertificateContent($keys, $type, $x509Generator));
+            $certificateContent = $this->generateCertificateContent($keys, $type, $x509Generator);
+            $signature->setCertificateContent($certificateContent);
         }
 
         return $signature;
@@ -214,9 +211,21 @@ class SignatureFactory
         $publicKey->loadKey($keys['publickey']);
         $publicKey->setPublicKey();
 
-        return $x509Generator->generateX509($privateKey, $publicKey, [
-            'type' => $type,
-        ]);
+        switch ($type) {
+            case Signature::TYPE_A:
+                $x509 = $x509Generator->generateAX509($privateKey, $publicKey);
+                break;
+            case Signature::TYPE_E:
+                $x509 = $x509Generator->generateEX509($privateKey, $publicKey);
+                break;
+            case Signature::TYPE_X:
+                $x509 = $x509Generator->generateXX509($privateKey, $publicKey);
+                break;
+            default:
+                throw new \RuntimeException('Unpredictable type.');
+        }
+
+        return $x509->saveX509($x509->currentCert);
     }
 
     /**

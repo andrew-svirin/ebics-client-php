@@ -8,8 +8,9 @@ use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\X509\X509GeneratorException;
 use AndrewSvirin\Ebics\Factories\Crypt\X509Factory;
 use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
-use DateTimeImmutable;
+use DateTime;
 use DateTimeInterface;
+use RuntimeException;
 
 /**
  * Default X509 certificate generator @see X509GeneratorInterface.
@@ -19,74 +20,188 @@ use DateTimeInterface;
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
-    /** @var DateTimeInterface */
-    protected $certificateStartDate;
+    /**
+     * @var DateTimeInterface
+     */
+    private $x509StartDate;
 
-    /** @var DateTimeInterface */
-    protected $certificateEndDate;
+    /**
+     * @var DateTimeInterface
+     */
+    private $x509EndDate;
 
-    /** @var string */
-    protected $serialNumber;
+    /**
+     * @var string
+     */
+    private $serialNumber;
 
-    /** @var X509Factory */
+    /**
+     * @var X509Factory
+     */
     private $x509Factory;
+
+    /**
+     * @var array
+     */
+    private $certificateOptions;
 
     public function __construct()
     {
         $this->x509Factory = new X509Factory();
-        $this->certificateStartDate = (new DateTimeImmutable())->modify('-1 days');
-        $this->certificateEndDate = (new DateTimeImmutable())->modify('+1 year');
+        $this->x509StartDate = (new DateTime())->modify('-1 day');
+        $this->x509EndDate = (new DateTime())->modify('+1 year');
         $this->serialNumber = $this->generateSerialNumber();
+    }
+
+    /**
+     * @param array $certificateOptions
+     */
+    public function setCertificateOptions(array $certificateOptions): void
+    {
+        $this->certificateOptions = $certificateOptions;
     }
 
     /**
      * Get certificate options
      *
-     * @param array $options default generation options (may be empty)
-     *
      * @return array the certificate options
      *
      * @see X509 options
      */
-    abstract protected function getCertificateOptions(array $options = []): array;
+    protected function getCertificateOptions(): array
+    {
+        return $this->certificateOptions;
+    }
 
     /**
      * @inheritDoc
      * @throws X509GeneratorException
      */
-    public function generateX509(RSAInterface $privateKey, RSAInterface $publicKey, array $options = []): string
+    public function generateAX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface
     {
-        $options = array_merge([
+        return $this->generateX509($privateKey, $publicKey, [
+            'extensions' => [
+                'id-ce-keyUsage' => [
+                    'value' => ['nonRepudiation'],
+                    'critical' => true,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws X509GeneratorException
+     */
+    public function generateEX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface
+    {
+        return $this->generateX509($privateKey, $publicKey, [
+            'extensions' => [
+                'id-ce-keyUsage' => [
+                    'value' => ['keyEncipherment'],
+                    'critical' => true,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws X509GeneratorException
+     */
+    public function generateXX509(RSAInterface $privateKey, RSAInterface $publicKey): X509Interface
+    {
+        return $this->generateX509($privateKey, $publicKey, [
+            'extensions' => [
+                'id-ce-keyUsage' => [
+                    'value' => ['digitalSignature'],
+                    'critical' => true,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Merge arrays recursively by substitution not assoc arrays.
+     *
+     * @param array $options1
+     * @param array $options2
+     *
+     * @return array
+     */
+    private function mergeCertificateOptions(array $options1, array $options2): array
+    {
+        foreach ($options2 as $key => $value) {
+            if (is_string($key) && array_key_exists($key, $options1) && is_array($value)) {
+                $options1[$key] = $this->mergeCertificateOptions($options1[$key], $options2[$key]);
+            } else {
+                $options1[$key] = $value;
+            }
+        }
+
+        return $options1;
+    }
+
+    /**
+     * Generate X509.
+     *
+     * @param RSAInterface $privateKey
+     * @param RSAInterface $publicKey
+     * @param array $typeCertificateOptions
+     *
+     * @return X509Interface
+     * @throws X509GeneratorException
+     */
+    private function generateX509(
+        RSAInterface $privateKey,
+        RSAInterface $publicKey,
+        array $typeCertificateOptions = []
+    ): X509Interface {
+        $defaultCertificateOptions = [
             'subject' => [
                 'domain' => null,
-                'DN' => null,
+                'DN' => [],
             ],
             'issuer' => [
-                'DN' => null, //Same as subject, means self-signed
+                'DN' => [], // Same as subject, means self-signed.
             ],
-            'extensions' => [],
-        ], $this->getCertificateOptions($options));
+            'extensions' => [
+                'id-ce-basicConstraints' => [
+                    'value' => [
+                        'CA' => false,
+                    ],
+                ],
+                'id-ce-extKeyUsage' => [
+                    'value' => ['id-kp-serverAuth', 'id-kp-clientAuth'],
+                ],
+            ],
+        ];
 
-        $subject = $this->generateSubject($publicKey, $options);
-        $issuer = $this->generateIssuer($privateKey, $publicKey, $subject, $options);
+        $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
+
+        $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
+
+        $signatureAlgorithm = 'sha256WithRSAEncryption';
+
+        $subject = $this->generateSubject($publicKey, $options['subject']);
+        $issuer = $this->generateIssuer($privateKey, $publicKey, $subject, $options['issuer']);
 
         $x509 = $this->x509Factory->create();
-        $x509->setStartDate($this->certificateStartDate->format('YmdHis'));
-        $x509->setEndDate($this->certificateEndDate->format('YmdHis'));
+        $x509->setStartDate($this->x509StartDate->format('YmdHis'));
+        $x509->setEndDate($this->x509EndDate->format('YmdHis'));
         $x509->setSerialNumber($this->serialNumber);
 
-        $result = $x509->sign($issuer, $subject, 'sha256WithRSAEncryption');
+        $result = $x509->sign($issuer, $subject, $signatureAlgorithm);
         $x509->loadX509($result);
 
         foreach ($options['extensions'] as $id => $extension) {
             $extension = X509ExtensionOptionsNormalizer::normalize($extension);
-            $setExtension = $x509->setExtension(
-                $id,
-                $extension['value'],
-                $extension['critical'],
-                $extension['replace']
-            );
-            if (false === $setExtension) {
+            if (false === $x509->setExtension(
+                    $id,
+                    $extension['value'],
+                    $extension['critical'],
+                    $extension['replace']
+                )) {
                 throw new X509GeneratorException(sprintf(
                     'Unable to set "%s" extension with value: %s',
                     $id,
@@ -95,9 +210,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
             }
         }
 
-        $result = $x509->sign($issuer, $x509, 'sha256WithRSAEncryption');
+        $result = $x509->sign($issuer, $x509, $signatureAlgorithm);
+        $x509->loadX509($result);
 
-        return $x509->saveX509($result);
+        return $x509;
     }
 
     /**
@@ -111,12 +227,14 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $subject = $this->x509Factory->create();
         $subject->setPublicKey($publicKey); // $pubKey is Crypt_RSA object
 
-        if (!empty($options['subject']['DN'])) {
-            $subject->setDN($options['subject']['DN']);
+        if (!empty($options['DN'])) {
+            if (!$subject->setDN($options['DN'])) {
+                throw new RuntimeException('Can not set DN.');
+            }
         }
 
-        if (!empty($options['subject']['domain'])) {
-            $subject->setDomain($options['subject']['domain']); // @phpstan-ignore-line
+        if (!empty($options['domain'])) {
+            $subject->setDomain($options['domain']); // @phpstan-ignore-line
         }
         $subject->setKeyIdentifier($subject->computeKeyIdentifier($publicKey)); // id-ce-subjectKeyIdentifier
 
@@ -140,8 +258,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $issuer = $this->x509Factory->create();
         $issuer->setPrivateKey($privateKey); // $privKey is Crypt_RSA object
 
-        if (!empty($options['issuer']['DN'])) {
-            $issuer->setDN($options['issuer']['DN']);
+        if (!empty($options['DN'])) {
+            if (!$issuer->setDN($options['DN'])) {
+                throw new RuntimeException('Can not set DN.');
+            }
         } else {
             $issuer->setDN($subject->getDN());
         }
@@ -167,37 +287,19 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     }
 
     /**
-     * @return DateTimeInterface
+     * @param DateTimeInterface $x509StartDate
      */
-    public function getCertificateStartDate(): DateTimeInterface
+    public function setX509StartDate(DateTimeInterface $x509StartDate): void
     {
-        return $this->certificateStartDate;
-    }
-
-    public function setCertificateStartDate(DateTimeInterface $certificateStartDate): void
-    {
-        $this->certificateStartDate = $certificateStartDate;
+        $this->x509StartDate = $x509StartDate;
     }
 
     /**
-     * @return DateTimeInterface
+     * @param DateTimeInterface $x509EndDate
      */
-    public function getCertificateEndDate(): DateTimeInterface
+    public function setX509EndDate(DateTimeInterface $x509EndDate): void
     {
-        return $this->certificateEndDate;
-    }
-
-    public function setCertificateEndDate(DateTimeInterface $certificateEndDate): void
-    {
-        $this->certificateEndDate = $certificateEndDate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSerialNumber(): string
-    {
-        return $this->serialNumber;
+        $this->x509EndDate = $x509EndDate;
     }
 
     /**
