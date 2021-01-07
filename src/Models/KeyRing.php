@@ -52,7 +52,7 @@ class KeyRing
      */
     private $password;
 
-    public function setUserSignatureA(SignatureInterface $signature): void
+    public function setUserSignatureA(SignatureInterface $signature = null): void
     {
         $this->userSignatureA = $signature;
     }
@@ -70,10 +70,10 @@ class KeyRing
      */
     public function getUserSignatureAVersion(): string
     {
-        return 'A006';
+        return 'A005';
     }
 
-    public function setUserSignatureX(SignatureInterface $signature): void
+    public function setUserSignatureX(SignatureInterface $signature = null): void
     {
         $this->userSignatureX = $signature;
     }

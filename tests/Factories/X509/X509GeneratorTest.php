@@ -16,28 +16,38 @@ use DateTime;
  */
 class X509GeneratorTest extends AbstractEbicsTestCase
 {
-    public function testGenerateLegacyCertificateContent()
+
+    /**
+     * @group generate-webank-certificate-content
+     */
+    public function testGenerateWeBankCertificateContent()
     {
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
 
         //Certificate generated the 22/03/2020 (1 year validity)
         $generator = new WeBankX509Generator();
-        $generator->setCertificateStartDate(new DateTime('2020-03-21'));
-        $generator->setCertificateEndDate(new DateTime('2021-03-22'));
+        $generator->setX509StartDate(new DateTime('2020-03-21'));
+        $generator->setX509EndDate(new DateTime('2021-03-22'));
         $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
 
-        $certificateFactory = new SignatureFactory();
-        $certificate = $certificateFactory->createSignatureAFromKeys([
+        $signatureFactory = new SignatureFactory();
+        $signature = $signatureFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
         ], $generator);
 
-        $this->assertEquals($certificate->getPrivateKey(), $privateKey);
-        $this->assertEquals($certificate->getPublicKey(), $publicKey);
-        $this->assertCertificateEquals($certificate->getCertificateContent(), $this->getCertificateContent('legacy-signed.csr'));
+        $this->assertEquals($signature->getPrivateKey(), $privateKey);
+        $this->assertEquals($signature->getPublicKey(), $publicKey);
+        $this->assertCertificateEquals(
+            $signature->getCertificateContent(),
+            $this->getCertificateContent('webank-self-signed.csr')
+        );
     }
 
+    /**
+     * @group generate-silarhi-certificate-content
+     */
     public function testGenerateSilarhiCertificateContent()
     {
         $privateKey = $this->getPrivateKey();
@@ -45,8 +55,8 @@ class X509GeneratorTest extends AbstractEbicsTestCase
 
         //Certificate generated with https://certificatetools.com/ the 22/03/2020 (1 year validity)
         $generator = new SilarhiX509Generator();
-        $generator->setCertificateStartDate(new DateTime('2020-03-22'));
-        $generator->setCertificateEndDate(new DateTime('2021-03-22'));
+        $generator->setX509StartDate(new DateTime('2020-03-22'));
+        $generator->setX509EndDate(new DateTime('2021-03-22'));
         $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
 
         $certificateFactory = new SignatureFactory();
@@ -100,7 +110,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getCertificateContent(string $name)
     {
-        return file_get_contents($this->data . '/certificates/' . $name);
+        return file_get_contents($this->data.'/certificates/'.$name);
     }
 
     /**
@@ -108,7 +118,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPrivateKey()
     {
-        return file_get_contents($this->data . '/private_key.rsa');
+        return file_get_contents($this->data.'/private_key.rsa');
     }
 
     /**
@@ -116,6 +126,6 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPublicKey()
     {
-        return file_get_contents($this->data . '/public_key.rsa');
+        return file_get_contents($this->data.'/public_key.rsa');
     }
 }
