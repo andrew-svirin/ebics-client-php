@@ -148,4 +148,10 @@ interface X509Interface
      * @see \phpseclib\File\X509::computeKeyIdentifier()
      */
     public function computeKeyIdentifier($key = null, $method = 1);
+
+    /**
+     * Save current cert in X509.
+     * @return string
+     */
+    public function saveX509CurrentCert(): string;
 }
