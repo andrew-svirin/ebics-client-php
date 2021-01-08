@@ -172,7 +172,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
                     ],
                 ],
                 'id-ce-extKeyUsage' => [
-                    'value' => ['id-kp-serverAuth', 'id-kp-clientAuth'],
+                    'value' => ['id-kp-emailProtection'],
                 ],
             ],
         ];
@@ -191,8 +191,9 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $x509->setEndDate($this->x509EndDate->format('YmdHis'));
         $x509->setSerialNumber($this->serialNumber);
 
-        $result = $x509->sign($issuer, $subject, $signatureAlgorithm);
-        $x509->loadX509($result);
+        // Sign subject to allow add extensions.
+        $signedSubject = $x509->saveX509($x509->sign($issuer, $subject, $signatureAlgorithm));
+        $x509->loadX509($signedSubject);
 
         foreach ($options['extensions'] as $id => $extension) {
             $extension = X509ExtensionOptionsNormalizer::normalize($extension);
@@ -211,8 +212,9 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
             }
         }
 
-        $result = $x509->sign($issuer, $x509, $signatureAlgorithm);
-        $x509->loadX509($result);
+        // Sign extensions.
+        $signedX509 = $x509->saveX509($x509->sign($issuer, $x509, $signatureAlgorithm));
+        $x509->loadX509($signedX509);
 
         return $x509;
     }
@@ -272,7 +274,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     }
 
     /**
-     * Generate 74 digits serial number represented in the string.
+     * Random Number of maximum 20 Bytes if self-signed.
      *
      * @return string
      */
@@ -280,7 +282,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     {
         // prevent the first number from being 0
         $result = rand(1, 9);
-        for ($i = 0; $i < 74; ++$i) {
+        for ($i = 0; $i < 19; ++$i) {
             $result .= rand(0, 9);
         }
 
