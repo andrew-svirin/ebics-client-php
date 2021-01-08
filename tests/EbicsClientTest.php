@@ -35,7 +35,6 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $responseHandler = new ResponseHandler();
         $code = $responseHandler->retrieveH000ReturnCode($hev);
         $reportText = $responseHandler->retrieveH000ReportText($hev);
-        $x = $hev->getContent();
         $this->assertResponseOk($code, $reportText);
     }
 
