@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use AndrewSvirin\Ebics\Contracts\BankLetter\HashGeneratorInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\SignatureBankLetterFactory;
@@ -42,19 +43,21 @@ class BankLetterService
      * @param SignatureInterface $signature
      * @param string $version
      *
+     * @param HashGeneratorInterface $hashGenerator
+     *
      * @return SignatureBankLetter
      */
     public function formatSignatureForBankLetter(
         SignatureInterface $signature,
-        string $version
+        string $version,
+        HashGeneratorInterface $hashGenerator
     ): SignatureBankLetter {
         $publicKeyDetails = $this->cryptService->getPublicKeyDetails($signature->getPublicKey());
 
         $exponentFormatted = $this->formatBytesForBank($publicKeyDetails['e']);
-        $modulusFormatted = $this->formatBytesForBank($publicKeyDetails ['m']);
+        $modulusFormatted = $this->formatBytesForBank($publicKeyDetails['m']);
 
-        $key = $this->cryptService->calculateKey($exponentFormatted, $modulusFormatted);
-        $keyHash = $this->cryptService->calculateKeyHash($key);
+        $keyHash = $hashGenerator->generate($signature);
         $keyHashFormatted = $this->formatKeyHashForBankLetter($keyHash);
 
         $signatureBankLetter = $this->signatureBankLetterFactory->create(

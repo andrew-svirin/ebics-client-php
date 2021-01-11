@@ -79,7 +79,7 @@ class Bank
     /**
      * @return bool
      */
-    public function getIsCertified(): bool
+    public function isCertified(): bool
     {
         return (bool)$this->isCertified;
     }

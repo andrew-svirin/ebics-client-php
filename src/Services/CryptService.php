@@ -282,10 +282,10 @@ class CryptService
      */
     public function calculateDigest(SignatureInterface $signature, $algorithm = 'sha256'): string
     {
-        $publicKey = $this->rsaFactory->create();
-        $publicKey->loadKey($signature->getPublicKey());
-        $exponent = $publicKey->getExponent()->toHex(true);
-        $modulus = $publicKey->getModulus()->toHex(true);
+        $rsa = $this->rsaFactory->create();
+        $rsa->loadKey($signature->getPublicKey());
+        $exponent = $rsa->getExponent()->toHex(true);
+        $modulus = $rsa->getModulus()->toHex(true);
         // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
         if (strlen($exponent) > strlen($modulus)) {
             $buffer = $exponent;
