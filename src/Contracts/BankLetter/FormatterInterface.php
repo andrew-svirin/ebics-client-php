@@ -1,16 +1,16 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace AndrewSvirin\Ebics\Contracts\BankLetter;
 
 use AndrewSvirin\Ebics\Models\BankLetter;
 
 /**
- * EBICS BankLetterFormatterInterface representation.
+ * EBICS formatter for bank letter.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-interface BankLetterFormatterInterface
+interface FormatterInterface
 {
 
     /**

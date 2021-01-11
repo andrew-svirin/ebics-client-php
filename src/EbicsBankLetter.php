@@ -2,12 +2,14 @@
 
 namespace AndrewSvirin\Ebics;
 
-use AndrewSvirin\Ebics\Contracts\BankLetterFormatterInterface;
+use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
 use AndrewSvirin\Ebics\Factories\BankLetterFactory;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
+use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetterService;
 
 /**
@@ -48,20 +50,29 @@ final class EbicsBankLetter
      */
     public function prepareBankLetter(Bank $bank, User $user, KeyRing $keyRing): BankLetter
     {
+        if ($bank->isCertified()) {
+            $hashGenerator = new CertificateHashGenerator();
+        } else {
+            $hashGenerator = new PublicKeyHashGenerator();
+        }
+
         $bankLetter = $this->bankLetterFactory->create(
             $bank,
             $user,
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyRing->getUserSignatureA(),
-                $keyRing->getUserSignatureAVersion()
+                $keyRing->getUserSignatureAVersion(),
+                $hashGenerator
             ),
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyRing->getUserSignatureE(),
-                $keyRing->getUserSignatureEVersion()
+                $keyRing->getUserSignatureEVersion(),
+                $hashGenerator
             ),
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyRing->getUserSignatureX(),
-                $keyRing->getUserSignatureXVersion()
+                $keyRing->getUserSignatureXVersion(),
+                $hashGenerator
             )
         );
 
@@ -72,11 +83,11 @@ final class EbicsBankLetter
      * Format bank letter.
      *
      * @param BankLetter $bankLetter
-     * @param BankLetterFormatterInterface $formatter
+     * @param FormatterInterface $formatter
      *
      * @return mixed
      */
-    public function formatBankLetter(BankLetter $bankLetter, BankLetterFormatterInterface $formatter)
+    public function formatBankLetter(BankLetter $bankLetter, FormatterInterface $formatter)
     {
         return $formatter->format($bankLetter);
     }
