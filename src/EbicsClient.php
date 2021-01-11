@@ -127,7 +127,7 @@ final class EbicsClient implements EbicsClientInterface
         }
         $signatureA = $this->signatureFactory->createSignatureAFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->getIsCertified() ? $this->x509Generator : null
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->buildINI($signatureA, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
@@ -149,11 +149,11 @@ final class EbicsClient implements EbicsClientInterface
         }
         $signatureE = $this->signatureFactory->createSignatureEFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->getIsCertified() ? $this->x509Generator : null
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $signatureX = $this->signatureFactory->createSignatureXFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
-            $this->bank->getIsCertified() ? $this->x509Generator : null
+            $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->buildHIA($signatureE, $signatureX, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
