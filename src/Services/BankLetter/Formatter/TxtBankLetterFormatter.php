@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\BankLetterFormatter;
+namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetterFormatterInterface;
+use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
 use RuntimeException;
@@ -13,7 +13,7 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BankLetterFormatterTxt implements BankLetterFormatterInterface
+class TxtBankLetterFormatter implements FormatterInterface
 {
 
     public function format(BankLetter $bankLetter)

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\BankLetterFormatter;
+namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetterFormatterInterface;
+use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
@@ -16,7 +16,7 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BankLetterFormatterHtml implements BankLetterFormatterInterface
+class HtmlBankLetterFormatter implements FormatterInterface
 {
 
     public function format(BankLetter $bankLetter)
@@ -138,7 +138,7 @@ EOF;
     <br/><br/>
     <b>{$translations['hash']}</b>
     <br/>
-    {$signatureBankLetter->getKeyHash()}
+    {$this->formatBytes($signatureBankLetter->getKeyHash())}
 EOF;
 
         return $result;
@@ -220,10 +220,12 @@ EOF;
      */
     private function formatCertificateContent(string $certificateContent): string
     {
-        return trim(str_replace(
-            ['-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'],
+        $result = trim(str_replace(
+            ['-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----', "\n", "\r"],
             '',
             $certificateContent
         ));
+
+        return $result;
     }
 }

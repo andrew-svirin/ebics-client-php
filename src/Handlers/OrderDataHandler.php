@@ -95,7 +95,7 @@ class OrderDataHandler
         $xmlSignaturePubKeyInfo = $xml->createElement('SignaturePubKeyInfo');
         $xmlSignaturePubKeyOrderData->appendChild($xmlSignaturePubKeyInfo);
 
-        if ($this->bank->getIsCertified()) {
+        if ($this->bank->isCertified()) {
             $this->handleX509Data($xmlSignaturePubKeyInfo, $xml, $certificateA);
         }
         $this->handlePubKeyValue($xmlSignaturePubKeyInfo, $xml, $certificateA, $dateTime);
@@ -144,7 +144,7 @@ class OrderDataHandler
         $xmlAuthenticationPubKeyInfo = $xml->createElement('AuthenticationPubKeyInfo');
         $xmlHIARequestOrderData->appendChild($xmlAuthenticationPubKeyInfo);
 
-        if ($this->bank->getIsCertified()) {
+        if ($this->bank->isCertified()) {
             $this->handleX509Data($xmlAuthenticationPubKeyInfo, $xml, $certificateX);
         }
         $this->handlePubKeyValue($xmlAuthenticationPubKeyInfo, $xml, $certificateX, $dateTime);
@@ -158,7 +158,7 @@ class OrderDataHandler
         $xmlEncryptionPubKeyInfo = $xml->createElement('EncryptionPubKeyInfo');
         $xmlHIARequestOrderData->appendChild($xmlEncryptionPubKeyInfo);
 
-        if ($this->bank->getIsCertified()) {
+        if ($this->bank->isCertified()) {
             $this->handleX509Data($xmlEncryptionPubKeyInfo, $xml, $certificateE);
         }
         $this->handlePubKeyValue($xmlEncryptionPubKeyInfo, $xml, $certificateE, $dateTime);

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\BankLetterFormatter;
+namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetterFormatterInterface;
+use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
 use AndrewSvirin\Ebics\Factories\PdfFactory;
 use AndrewSvirin\Ebics\Models\BankLetter;
 
@@ -12,11 +12,11 @@ use AndrewSvirin\Ebics\Models\BankLetter;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BankLetterFormatterPdf implements BankLetterFormatterInterface
+class PdfBankLetterFormatter implements FormatterInterface
 {
 
     /**
-     * @var BankLetterFormatterHtml
+     * @var HtmlBankLetterFormatter
      */
     private $bankLetterFormatterHtml;
 
@@ -27,7 +27,7 @@ class BankLetterFormatterPdf implements BankLetterFormatterInterface
 
     public function __construct()
     {
-        $this->bankLetterFormatterHtml = new BankLetterFormatterHtml();
+        $this->bankLetterFormatterHtml = new HtmlBankLetterFormatter();
         $this->pdfFactory = new PdfFactory();
     }
 
