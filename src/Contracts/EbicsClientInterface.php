@@ -88,7 +88,7 @@ interface EbicsClientInterface
      * Send self::transferReceipt() after transaction finished.
      *
      * @param string $fileInfo
-     * @param string $format
+     * @param string $format = 'plain' ?? 'xml'
      * @param string $countryCode
      * @param DateTime|null $dateTime
      * @param DateTime|null $startDateTime
@@ -198,4 +198,11 @@ interface EbicsClientInterface
      * @param X509GeneratorInterface|null $x509Generator
      */
     public function setX509Generator(X509GeneratorInterface $x509Generator = null): void;
+
+    /**
+     * Set http client to subset later in the project.
+     *
+     * @param HttpClientInterface $httpClient
+     */
+    public function setHttpClient(HttpClientInterface $httpClient): void;
 }
