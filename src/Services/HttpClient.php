@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use RuntimeException;
@@ -12,7 +13,7 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class HttpClient
+class HttpClient implements HttpClientInterface
 {
 
     /**
