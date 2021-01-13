@@ -2,6 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use AndrewSvirin\Ebics\Contracts\KeyRingManagerInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
@@ -24,7 +26,7 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected $fixtures = __DIR__ . '/_fixtures';
 
-    protected function setupClient(int $credentialsId, X509GeneratorInterface $x509Generator = null): EbicsClient
+    protected function setupClient(int $credentialsId, X509GeneratorInterface $x509Generator = null, $fake = false): EbicsClientInterface
     {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
@@ -37,10 +39,15 @@ abstract class AbstractEbicsTestCase extends TestCase
 
         $ebicsClient = new EbicsClient($bank, $user, $keyRing);
         $ebicsClient->setX509Generator($x509Generator);
+
+        if (true === $fake) {
+            $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));
+        }
+
         return $ebicsClient;
     }
 
-    protected function setupKeyKeyRingManager($credentialsId): KeyRingManager
+    protected function setupKeyKeyRingManager($credentialsId): KeyRingManagerInterface
     {
         $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
         return new KeyRingManager($keyRingRealPath, 'test123');
