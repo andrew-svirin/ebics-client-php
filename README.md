@@ -254,6 +254,8 @@ try {
 
 ### 5. Play with other transactions!
 
+### 6. Make HKD request to see what order types allowed.
+
 # Involving in development
 First of all - thanks for involving on development.
 If you have any idea how to improve the library, this will be welcome.

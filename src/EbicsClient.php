@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
@@ -78,7 +79,7 @@ final class EbicsClient implements EbicsClientInterface
     private $x509Generator;
 
     /**
-     * @var HttpClient
+     * @var HttpClientInterface
      */
     private $httpClient;
 
@@ -99,6 +100,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->responseHandler = new ResponseHandler();
         $this->cryptService = new CryptService();
         $this->signatureFactory = new SignatureFactory();
+        // Set default http client.
         $this->httpClient = new HttpClient();
     }
 
@@ -497,5 +499,13 @@ final class EbicsClient implements EbicsClientInterface
     public function setX509Generator(X509GeneratorInterface $x509Generator = null): void
     {
         $this->x509Generator = $x509Generator;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setHttpClient(HttpClientInterface $httpClient): void
+    {
+        $this->httpClient = $httpClient;
     }
 }
