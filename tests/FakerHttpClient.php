@@ -34,7 +34,10 @@ class FakerHttpClient implements HttpClientInterface
     ): Response {
         $requestContent = $request->getContent();
         if (preg_match('/<OrderType>(?<order_type>.*)<\/OrderType>/', $requestContent, $matches) && !empty($matches)) {
-            return $this->fixtureOrderType($matches['order_type']);
+            preg_match('/<FileFormat.*>(?<file_format>.*)<\/FileFormat>/', $requestContent, $fileFormatMatches);
+            return $this->fixtureOrderType($matches['order_type'], [
+                'file_format' => $fileFormatMatches['file_format'] ?? null,
+            ]);
         } elseif (preg_match('/<TransactionPhase>(?<transaction_phase>.*)<\/TransactionPhase>/', $requestContent,
                 $matches) || empty($matches)) {
             return $this->fixtureTransactionPhase($matches['transaction_phase']);
@@ -47,14 +50,17 @@ class FakerHttpClient implements HttpClientInterface
      * Fake Order type responses.
      *
      * @param string $orderType
+     * @param array|null $options = [
+     *     'file_format' => '<string>',
+     * ]
      *
      * @return Response
      */
-    private function fixtureOrderType(string $orderType): Response
+    private function fixtureOrderType(string $orderType, array $options = null): Response
     {
         switch ($orderType) {
             case 'FDL':
-                $fileName = 'fdl.xml';
+                $fileName = sprintf('fdl.%s.xml', $options['file_format']);
                 break;
             default:
                 throw new LogicException(sprintf('Faked order type `%s` not supported.', $orderType));

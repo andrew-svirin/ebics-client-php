@@ -7,7 +7,7 @@ use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
-use Silarhi\Cfonb\Cfonb120Reader;
+use Silarhi\Cfonb\CfonbParser;
 
 /**
  * Class EbicsClientTest.
@@ -298,36 +298,46 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
-        $client = $this->setupClient($credentialsId, $x509Generator, $codes['FDL']['fake']);
+        foreach ($codes['FDL'] as $format => $code) {
+            $client = $this->setupClient($credentialsId, $x509Generator, $code['fake']);
 
-        $this->assertExceptionCode($codes['FDL']['code']);
+            $this->assertExceptionCode($code['code']);
 
-        $fdl = $client->FDL(
-            'camt.xxx.cfonb120.stm',
-            'plain',
-            'FR',
-            new DateTime(),
-            (new DateTime())->modify('-100 day'),
-            (new DateTime())->modify('-1 day')
-        );
+            $fdl = $client->FDL(
+                $format,
+                'plain',
+                'FR',
+                new DateTime(),
+                (new DateTime())->modify('-100 day'),
+                (new DateTime())->modify('-1 day')
+            );
 
-        $reader = new Cfonb120Reader();
+            $content = '';
+            foreach ($fdl->getTransactions() as $transaction) {
+                //Plain format (like CFONB)
+                $content .= $transaction->getPlainOrderData();
+            }
 
-        foreach ($fdl->getTransactions() as $transaction) {
-            //Plain format (like CFONB)
-            $content = $transaction->getPlainOrderData();
+            $parser = new CfonbParser();
+            switch ($format) {
+                case 'camt.xxx.cfonb120.stm':
+                    $statements = $parser->read120C($content);
+                    $this->assertNotEmpty($statements);
+                    break;
+                case 'camt.xxx.cfonb240.act':
+                    $statements = $parser->read240C($content);
+                    $this->assertNotEmpty($statements);
+                    break;
+            }
 
-            $statements = $reader->parse($content);
-            $this->assertNotEmpty($statements);
+            $fdlReceipt = $client->transferReceipt($fdl);
+
+            $responseHandler = new ResponseHandler();
+            $code = $responseHandler->retrieveH004ReturnCode($fdlReceipt);
+            $reportText = $responseHandler->retrieveH004ReportText($fdlReceipt);
+
+            $this->assertResponseDone($code, $reportText);
         }
-
-        $responseHandler = new ResponseHandler();
-
-        $fdlReceipt = $client->transferReceipt($fdl);
-        $code = $responseHandler->retrieveH004ReturnCode($fdlReceipt);
-        $reportText = $responseHandler->retrieveH004ReportText($fdlReceipt);
-
-        $this->assertResponseDone($code, $reportText);
     }
 
     /**
@@ -418,9 +428,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'STA' => ['code' => '061002', 'fake' => false],
                     'Z53' => ['code' => '061002', 'fake' => false],
                     'C53' => ['code' => '061002', 'fake' => false],
-                    'FDL' => ['code' => '091010', 'fake' => false],
+                    'FDL' => [
+                        'camt.xxx.cfonb120.stm' => ['code' => '091010', 'fake' => false],
+                        'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
+                    ],
                 ],
-                new WeBankX509Generator,
+                new WeBankX509Generator(),
             ],
             [
                 3, // Credentials Id.
@@ -437,7 +450,10 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'STA' => ['code' => '091005', 'fake' => false],
                     'Z53' => ['code' => '090005', 'fake' => false],
                     'C53' => ['code' => '091005', 'fake' => false],
-                    'FDL' => ['code' => '091112', 'fake' => false],
+                    'FDL' => [
+                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
+                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
+                    ],
                 ],
             ],
         ];
