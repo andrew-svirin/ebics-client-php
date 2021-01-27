@@ -6,10 +6,13 @@
     "ebics",
     "PHP",
     "client",
-    "symfony",
     "openssl",
     "rsa",
-    "x509"
+    "x509",
+    "cfonb.120",
+    "cfonb.240",
+    "mt940",
+    "mt942"
   ],
   "authors": [
     {
@@ -30,7 +33,8 @@
     "mpdf/mpdf": "^8.0",
     "phpstan/phpstan": "^0.12.29",
     "phpunit/phpunit": "^8.5",
-    "silarhi/cfonb-parser": "^2.0",
+    "andrew-svirin/cfonb-parser": "dev-master",
+    "andrew-svirin/mt942-php": "dev-master",
     "squizlabs/php_codesniffer": "^3.3"
   },
   "autoload": {
