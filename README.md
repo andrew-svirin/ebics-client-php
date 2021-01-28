@@ -182,7 +182,7 @@ More methods you can find in `tests/EbicsTest`
 
 
 ## Global process and interaction with Bank Department
-### 1. Create an store your 3 certificates
+### 1. Create and store your 3 certificates
 ```php
 <?php
 
