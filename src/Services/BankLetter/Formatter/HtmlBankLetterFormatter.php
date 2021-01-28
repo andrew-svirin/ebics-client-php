@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
 use AndrewSvirin\Ebics\Models\User;
+use LogicException;
 use RuntimeException;
 
 /**
@@ -15,6 +16,8 @@ use RuntimeException;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @internal
  */
 class HtmlBankLetterFormatter implements FormatterInterface
 {
@@ -95,7 +98,7 @@ EOF;
                 $signatureName = $translations['authentication_signature'];
                 break;
             default:
-                throw new \LogicException('Signature type unpredictable.');
+                throw new LogicException('Signature type unpredictable.');
         }
 
         if (($certificateCreatedAt = $signatureBankLetter->getCertificateCreatedAt())) {

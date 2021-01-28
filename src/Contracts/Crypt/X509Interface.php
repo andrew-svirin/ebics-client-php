@@ -115,7 +115,7 @@ interface X509Interface
 
     /**
      * @param mixed $format optional
-     * @param array $dn optional
+     * @param array|null $dn optional
      *
      * @return bool
      *
