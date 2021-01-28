@@ -16,6 +16,8 @@ andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENS
 ```bash
 $ composer require andrew-svirin/ebics-client-php
 ```
+If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://github.com/andrew-svirin/cfonb-php)
+If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)
 
 ## Initialize client
 You will need to have this information from your Bank: 
@@ -255,9 +257,3 @@ try {
 ### 5. Play with other transactions!
 
 ### 6. Make HKD request to see what order types allowed.
-
-# Involving in development
-First of all - thanks for involving on development.
-If you have any idea how to improve the library, this will be welcome.
-!!! For example library require in Mocker for server responses. That will
-locally simulate from responses on client requests by reading static files.

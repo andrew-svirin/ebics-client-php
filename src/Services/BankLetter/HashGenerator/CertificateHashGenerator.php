@@ -10,6 +10,8 @@ use AndrewSvirin\Ebics\Services\CryptService;
  * Generate hash for certificate.
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @internal
  */
 class CertificateHashGenerator implements HashGeneratorInterface
 {

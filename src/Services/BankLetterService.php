@@ -13,6 +13,8 @@ use AndrewSvirin\Ebics\Models\SignatureBankLetter;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ *
+ * @internal
  */
 class BankLetterService
 {

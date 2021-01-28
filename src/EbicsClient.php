@@ -7,10 +7,10 @@ use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
+use AndrewSvirin\Ebics\Factories\RequestFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
-use AndrewSvirin\Ebics\Handlers\RequestHandler;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Http\Request;
@@ -59,7 +59,7 @@ final class EbicsClient implements EbicsClientInterface
     private $responseHandler;
 
     /**
-     * @var RequestHandler
+     * @var RequestFactory
      */
     private $requestFactory;
 
@@ -95,7 +95,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
-        $this->requestFactory = new RequestHandler($bank, $user, $keyRing);
+        $this->requestFactory = new RequestFactory($bank, $user, $keyRing);
         $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
         $this->responseHandler = new ResponseHandler();
         $this->cryptService = new CryptService();
@@ -109,7 +109,7 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function HEV(): Response
     {
-        $request = $this->requestFactory->buildHEV();
+        $request = $this->requestFactory->createHEV();
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH000ReturnCode($request, $response);
@@ -131,7 +131,7 @@ final class EbicsClient implements EbicsClientInterface
             $this->cryptService->generateKeys($this->keyRing),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
-        $request = $this->requestFactory->buildINI($signatureA, $dateTime);
+        $request = $this->requestFactory->createINI($signatureA, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -157,7 +157,7 @@ final class EbicsClient implements EbicsClientInterface
             $this->cryptService->generateKeys($this->keyRing),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
-        $request = $this->requestFactory->buildHIA($signatureE, $signatureX, $dateTime);
+        $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -176,7 +176,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildHPB($dateTime);
+        $request = $this->requestFactory->createHPB($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -201,7 +201,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildHPD($dateTime);
+        $request = $this->requestFactory->createHPD($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -224,7 +224,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildHKD($dateTime);
+        $request = $this->requestFactory->createHKD($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -248,7 +248,7 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $request = $this->requestFactory->buildHTD($dateTime);
+        $request = $this->requestFactory->createHTD($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -278,7 +278,7 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $request = $this->requestFactory->buildFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -313,7 +313,7 @@ final class EbicsClient implements EbicsClientInterface
             throw new EbicsException('There is no transactions to mark as received');
         }
 
-        $request = $this->requestFactory->buildTransferReceipt($lastTransaction->getId(), $acknowledged);
+        $request = $this->requestFactory->createTransferReceipt($lastTransaction->getId(), $acknowledged);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -330,7 +330,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildHAA($dateTime);
+        $request = $this->requestFactory->createHAA($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -356,7 +356,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildVMK($dateTime, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createVMK($dateTime, $startDateTime, $endDateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -376,7 +376,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildSTA($dateTime, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createSTA($dateTime, $startDateTime, $endDateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -398,7 +398,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildC53($dateTime, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createC53($dateTime, $startDateTime, $endDateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
@@ -420,7 +420,7 @@ final class EbicsClient implements EbicsClientInterface
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->buildZ53($dateTime, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createZ53($dateTime, $startDateTime, $endDateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
