@@ -13,7 +13,7 @@ use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
-use DateTime;
+use DateTimeInterface;
 use DOMDocument;
 use DOMNode;
 use DOMNodeList;
@@ -73,11 +73,11 @@ class OrderDataHandler
      *
      * @param DOMDocument $xml
      * @param SignatureInterface $certificateA
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @throws EbicsException
      */
-    public function handleINI(DOMDocument $xml, SignatureInterface $certificateA, DateTime $dateTime): void
+    public function handleINI(DOMDocument $xml, SignatureInterface $certificateA, DateTimeInterface $dateTime): void
     {
         // Add SignaturePubKeyOrderData to root.
         $xmlSignaturePubKeyOrderData = $xml->createElementNS(
@@ -118,7 +118,7 @@ class OrderDataHandler
      * @param DOMDocument $xml
      * @param SignatureInterface $certificateE
      * @param SignatureInterface $certificateX
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @throws EbicsException
      */
@@ -126,7 +126,7 @@ class OrderDataHandler
         DOMDocument $xml,
         SignatureInterface $certificateE,
         SignatureInterface $certificateX,
-        DateTime $dateTime
+        DateTimeInterface $dateTime
     ): void {
         // Add HIARequestOrderData to root.
         $xmlHIARequestOrderData = $xml->createElementNS(
@@ -221,13 +221,13 @@ class OrderDataHandler
      * @param DOMNode $xmlPublicKeyInfo
      * @param DOMDocument $xml
      * @param SignatureInterface $certificate
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      */
     private function handlePubKeyValue(
         DOMNode $xmlPublicKeyInfo,
         DOMDocument $xml,
         SignatureInterface $certificate,
-        DateTime $dateTime
+        DateTimeInterface $dateTime
     ): void {
         $publicKeyDetails = $this->cryptService->getPublicKeyDetails($certificate->getPublicKey());
 
