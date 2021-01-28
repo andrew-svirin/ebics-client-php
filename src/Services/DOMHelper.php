@@ -6,6 +6,9 @@ namespace AndrewSvirin\Ebics\Services;
 use DOMNodeList;
 use RuntimeException;
 
+/**
+ * @internal
+ */
 class DOMHelper
 {
     /**
