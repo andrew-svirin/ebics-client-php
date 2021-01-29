@@ -3,8 +3,10 @@
 [![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 
+![EBICS](https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png)
+
 PHP library to communicate with a bank through EBICS protocol.
-Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4
+Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4 & PHP 8.0
 
 ## License
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
@@ -255,5 +257,20 @@ try {
 ```
 
 ### 5. Play with other transactions!
+|Transaction| Description |
+| --------- | --------- |
+| HEV | Supported protocol version for the Bank. |
+| INI | Send to the bank public signature of signature A005. |
+| HIA | Send to the bank public signatures of authentication (X002) and encryption (E002). |
+| HPB | Retrieve the Bank public signatures authentication (X002) and encryption (E002). |
+| HPD | Retrieve the bank server parameters. |
+| HKD | Retrieve customer's customer and subscriber information. |
+| HTD | Retrieve subscriber's customer and subscriber information. |
+| FDL | Retrieve subscriber's customer and subscriber information. |
+| HAA | Downloads the interim transaction report in SWIFT format (MT942). |
+| VMK | Downloads the interim transaction report in SWIFT format (MT942). |
+| STA | Retrieve the bank account statement. |
+| C53 | Retrieve the bank account statement in Camt.053 format. |
+| Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 
 ### 6. Make HKD request to see what order types allowed.
