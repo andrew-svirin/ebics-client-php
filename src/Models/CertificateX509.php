@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Models\Crypt\X509;
 use DateTime;
 
@@ -12,8 +10,6 @@ use DateTime;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
- *
- * @method RSAInterface getPublicKey()
  */
 class CertificateX509 extends X509
 {
@@ -24,9 +20,7 @@ class CertificateX509 extends X509
      */
     public function getSerialNumber(): string
     {
-        $certificateSerialNumber = BigIntegerFactory::createFromPhpSecLib(
-            $this->currentCert['tbsCertificate']['serialNumber']
-        );
+        $certificateSerialNumber = $this->currentCert['tbsCertificate']['serialNumber'];
 
         return $certificateSerialNumber->toString();
     }

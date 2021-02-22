@@ -43,6 +43,11 @@ class SignatureBankLetter
     private $keyHash;
 
     /**
+     * @var int
+     */
+    private $modulusSize;
+
+    /**
      * @var string|null
      */
     private $certificateContent;
@@ -62,13 +67,15 @@ class SignatureBankLetter
         string $version,
         string $exponent,
         string $modulus,
-        string $keyHash
+        string $keyHash,
+        int $modulusSize
     ) {
         $this->type = $type;
         $this->version = $version;
         $this->exponent = $exponent;
         $this->modulus = $modulus;
         $this->keyHash = $keyHash;
+        $this->modulusSize = $modulusSize;
     }
 
     /**
@@ -109,6 +116,14 @@ class SignatureBankLetter
     public function getKeyHash(): string
     {
         return $this->keyHash;
+    }
+
+    /**
+     * @return int
+     */
+    public function getModulusSize(): int
+    {
+        return $this->modulusSize;
     }
 
     /**

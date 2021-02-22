@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Contracts\Crypt;
 
-use phpseclib\File\X509;
+use AndrewSvirin\Ebics\Models\Crypt\X509;
 
 /**
  * Crypt X509 representation.
@@ -14,144 +14,207 @@ interface X509Interface
 {
 
     /**
+     * Set certificate start date.
+     *
      * @param string $date
      *
      * @return void
-     *
-     * @see \phpseclib\File\X509::setStartDate()
      */
-    public function setStartDate($date);
+    public function setStartDate(string $date);
 
     /**
+     * Set certificate end date.
+     *
      * @param string $date
      *
      * @return void
-     * @see \phpseclib\File\X509::setEndDate()
-     *
      */
-    public function setEndDate($date);
+    public function setEndDate(string $date);
 
     /**
+     * Set Serial Number.
+     *
      * @param string $serial
      * @param int $base optional
      *
      * @return void
-     *
-     * @@see \phpseclib\File\X509::setSerialNumber()
      */
-    public function setSerialNumber($serial, $base = -256);
+    public function setSerialNumber(string $serial, int $base = -256);
 
     /**
+     * Sign an X.509 certificate.
+     *
+     * $issuer's private key needs to be loaded.
+     * $subject can be either an existing X.509 cert (if you want to resign it),
+     * a CSR or something with the DN and public key explicitly set.
+     *
      * @param X509Interface $issuer
      * @param X509Interface $subject
      * @param string $signatureAlgorithm optional
      *
      * @return mixed
-     *
-     * @see \phpseclib\File\X509::sign()
      */
-    public function sign($issuer, $subject, $signatureAlgorithm = 'sha1WithRSAEncryption');
+    public function sign(
+        X509Interface $issuer,
+        X509Interface $subject,
+        string $signatureAlgorithm = 'sha1WithRSAEncryption'
+    );
 
     /**
-     * @param string $cert
-     * @param int $mode
+     * Load X.509 certificate.
+     *
+     * Returns an associative array describing the X.509 cert or a false if the cert failed to load.
+     *
+     * @param string|false $cert
      *
      * @return mixed
-     *
-     * @see \phpseclib\File\X509::loadX509()
      */
-    public function loadX509($cert, $mode = X509::FORMAT_AUTO_DETECT);
+    public function loadX509($cert);
 
     /**
+     * Set a certificate, CSR or CRL Extension.
+     *
      * @param string $id
      * @param mixed $value
      * @param bool $critical optional
      * @param bool $replace optional
+     * @param string|null $path optional
      *
      * @return bool
-     *
-     * @see \phpseclib\File\X509::setExtension()
      */
-    public function setExtension($id, $value, $critical = false, $replace = true);
+    public function setExtension(
+        string $id,
+        $value,
+        bool $critical = false,
+        bool $replace = true,
+        string $path = null
+    );
 
     /**
-     * @param array $cert
-     * @param int $format optional
+     * Save X.509 certificate.
      *
-     * @return string
+     * @param array|false $cert
      *
-     * @see \phpseclib\File\X509::saveX509()
+     * @return string|false
      */
-    public function saveX509($cert, $format = X509::FORMAT_PEM);
+    public function saveX509($cert);
 
     /**
-     * @param object $key
+     * Set public key.
      *
-     * @return bool
-     *
-     * @see \phpseclib\File\X509::setPublicKey()
-     */
-    public function setPublicKey($key);
-
-    /**
-     * @param object $key
+     * @param RSAInterface $key
      *
      * @return void
-     *
-     * @see \phpseclib\File\X509::setPrivateKey()
      */
-    public function setPrivateKey($key);
+    public function setPublicKey(RSAInterface $key);
 
     /**
+     * Gets the public key.
+     *
+     * @return RSAInterface|null
+     */
+    public function getPublicKey(): ?RSAInterface;
+
+    /**
+     * Set private key.
+     *
+     * @param RSAInterface $key
+     *
+     * @return void
+     */
+    public function setPrivateKey(RSAInterface $key);
+
+    /**
+     * Returns the private key.
+     *
+     * The private key is only returned if the currently loaded key contains the constituent prime numbers.
+     *
+     * @return RSAInterface|null
+     */
+    public function getPrivateKey(): ?RSAInterface;
+
+    /**
+     * Set a Distinguished Name.
+     *
      * @param mixed $dn
-     * @param bool $merge optional
      * @param string $type optional
      *
      * @return bool
-     *
-     * @see \phpseclib\File\X509::setDN()
      */
-    public function setDN($dn, $merge = false, $type = 'utf8String');
+    public function setDN($dn, string $type = 'utf8String');
 
     /**
-     * @param mixed $format optional
-     * @param array|null $dn optional
+     * Get the Distinguished Name for a certificates subject.
      *
-     * @return bool
-     *
-     * @see \phpseclib\File\X509::getDN()
+     * @return mixed
      */
-    public function getDN($format = X509::DN_ARRAY, $dn = null);
+    public function getDN();
 
     /**
+     * Set the domain name's which the cert is to be valid for.
+     *
      * @return void
-     *
-     * @see \phpseclib\File\X509::setDomain()
      */
     public function setDomain();
 
     /**
+     * Sets the subject key identifier
+     *
+     * This is used by the id-ce-authorityKeyIdentifier and the id-ce-subjectKeyIdentifier extensions.
+     *
      * @param string $value
      *
      * @return void
-     *
-     * @see \phpseclib\File\X509::setKeyIdentifier()
      */
-    public function setKeyIdentifier($value);
+    public function setKeyIdentifier(string $value);
 
     /**
+     * Compute a public key identifier.
+     *
+     * Although key identifiers may be set to any unique value, this function
+     * computes key identifiers from public key according to the two
+     * recommended methods (4.2.1.2 RFC 3280).
+     *
      * @param mixed $key optional
-     * @param int $method optional
      *
      * @return string binary key identifier
-     *
-     * @see \phpseclib\File\X509::computeKeyIdentifier()
      */
-    public function computeKeyIdentifier($key = null, $method = 1);
+    public function computeKeyIdentifier($key = null);
+
+    /**
+     * Format a public key as appropriate.
+     *
+     * @return array|null
+     */
+    public function formatSubjectPublicKey(): ?array;
 
     /**
      * Save current cert in X509.
-     * @return string
+     *
+     * @return string|false
      */
-    public function saveX509CurrentCert(): string;
+    public function saveX509CurrentCert();
+
+    /**
+     * Get an individual Distinguished Name property for a certificate/crl issuer.
+     *
+     * @param string $propName
+     * @param bool $withType optional
+     *
+     * @return mixed
+     */
+    public function getIssuerDNProp(string $propName, bool $withType = false);
+
+    /**
+     * Get a CSR attribute.
+     *
+     * Returns the attribute if it exists and false if not
+     *
+     * @param string $id
+     * @param int $disposition optional
+     * @param array|null $csr optional
+     *
+     * @return mixed
+     */
+    public function getAttribute(string $id, int $disposition = X509::ATTR_ALL, array $csr = null);
 }

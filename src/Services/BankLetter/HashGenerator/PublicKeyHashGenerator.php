@@ -34,11 +34,33 @@ class PublicKeyHashGenerator implements HashGeneratorInterface
     {
         $publicKeyDetails = $this->cryptService->getPublicKeyDetails($signature->getPublicKey());
 
-        $key = $this->cryptService->calculateKey(
-            $publicKeyDetails['e'],
-            $publicKeyDetails['m']
-        );
+        $e = $this->formatBytesToHex($publicKeyDetails['e']);
+        $m = $this->formatBytesToHex($publicKeyDetails['m']);
 
-        return $this->cryptService->calculateKeyHash($key);
+        $key = $this->cryptService->calculateKey($e, $m);
+
+        $hash = $this->cryptService->calculateKeyHash($key);
+
+        return $hash;
+    }
+
+    /**
+     * Convert bytes to hex.
+     *
+     * @param string $bytes Bytes
+     *
+     * @return string
+     */
+    private function formatBytesToHex(string $bytes): string
+    {
+        $out = '';
+
+        // Go over pairs of bytes.
+        foreach ($this->cryptService->binToArray($bytes) as $byte) {
+            // Convert to lover case hexadecimal number.
+            $out .= sprintf("%02x", $byte);
+        }
+
+        return trim($out);
     }
 }

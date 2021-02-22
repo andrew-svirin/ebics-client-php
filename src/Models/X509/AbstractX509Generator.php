@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\X509\X509GeneratorException;
 use AndrewSvirin\Ebics\Factories\Crypt\X509Factory;
+use AndrewSvirin\Ebics\Services\RandomService;
 use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
 use DateTime;
 use DateTimeInterface;
@@ -45,11 +46,17 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      */
     private $certificateOptions;
 
+    /**
+     * @var RandomService
+     */
+    private $randomService;
+
     public function __construct()
     {
         $this->x509Factory = new X509Factory();
         $this->x509StartDate = (new DateTime())->modify('-1 day');
         $this->x509EndDate = (new DateTime())->modify('+1 year');
+        $this->randomService = new RandomService();
         $this->serialNumber = $this->generateSerialNumber();
     }
 
@@ -192,7 +199,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $x509->setSerialNumber($this->serialNumber);
 
         // Sign subject to allow add extensions.
-        $signedSubject = $x509->saveX509($x509->sign($issuer, $subject, $signatureAlgorithm));
+        if (!($x509Signed = $x509->sign($issuer, $subject, $signatureAlgorithm))) {
+            throw new RuntimeException('X509 was not signed.');
+        }
+        $signedSubject = $x509->saveX509($x509Signed);
         $x509->loadX509($signedSubject);
 
         foreach ($options['extensions'] as $id => $extension) {
@@ -280,13 +290,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      */
     protected function generateSerialNumber(): string
     {
-        // prevent the first number from being 0
-        $result = rand(1, 9);
-        for ($i = 0; $i < 19; ++$i) {
-            $result .= rand(0, 9);
-        }
-
-        return (string)$result;
+        return (string)$this->randomService->digits(20);
     }
 
     /**
