@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Models\Crypt;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\ASN1Interface;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use LogicException;
 
@@ -746,7 +747,8 @@ class ASN1 implements ASN1Interface
                 if (!is_object($decoded['content'])) {
                     $decoded['content'] = $this->decodeTime($decoded['content'], $decoded['type']);
                 }
-                return $decoded['content'] ? $decoded['content']->format($this->format) : false;
+                return $decoded['content'] && $decoded['content'] instanceof DateTimeInterface ?
+                    $decoded['content']->format($this->format) : false;
             case self::TYPE_BIT_STRING:
                 if (isset($mapping['mapping'])) {
                     $offset = ord($decoded['content'][0]);
