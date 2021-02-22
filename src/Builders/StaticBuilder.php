@@ -138,7 +138,7 @@ class StaticBuilder
         $xmlAuthentication = $this->dom->createElement('Authentication');
         $xmlAuthentication->setAttribute('Version', $keyRing->getBankSignatureXVersion());
         $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm);
+        $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
         $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
         $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
@@ -146,7 +146,7 @@ class StaticBuilder
         $xmlEncryption = $this->dom->createElement('Encryption');
         $xmlEncryption->setAttribute('Version', $keyRing->getBankSignatureEVersion());
         $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm);
+        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
         $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
         $xmlBankPubKeyDigests->appendChild($xmlEncryption);
 

@@ -100,15 +100,17 @@ class SignatureFactory
      *      'publickey' => '<string>',
      *      'privatekey' => '<string>',
      *  ]
+     * @param string $password
      * @param X509GeneratorInterface|null $x509Generator
      *
      * @return SignatureInterface
      */
     public function createSignatureAFromKeys(
         array $keys,
+        string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, Signature::TYPE_A, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_A, $x509Generator);
     }
 
     /**
@@ -116,15 +118,17 @@ class SignatureFactory
      *      'publickey' => '<string>',
      *      'privatekey' => '<string>',
      *  ]
+     * @param string $password
      * @param X509GeneratorInterface|null $x509Generator
      *
      * @return SignatureInterface
      */
     public function createSignatureEFromKeys(
         array $keys,
+        string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, Signature::TYPE_E, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_E, $x509Generator);
     }
 
     /**
@@ -132,15 +136,17 @@ class SignatureFactory
      *      'publickey' => '<string>',
      *      'privatekey' => '<string>',
      *  ]
+     * @param string $password
      * @param X509GeneratorInterface|null $x509Generator
      *
      * @return SignatureInterface
      */
     public function createSignatureXFromKeys(
         array $keys,
+        string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, Signature::TYPE_X, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_X, $x509Generator);
     }
 
     /**
@@ -170,6 +176,7 @@ class SignatureFactory
      *      'publickey' => '<string>',
      *      'privatekey' => '<string>',
      *  ]
+     * @param string $password
      * @param string $type
      * @param X509GeneratorInterface|null $x509Generator
      *
@@ -177,13 +184,14 @@ class SignatureFactory
      */
     private function createSignatureFromKeys(
         array $keys,
+        string $password,
         string $type,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
         $signature = new Signature($type, $keys['publickey'], $keys['privatekey']);
 
         if (null !== $x509Generator) {
-            $certificateContent = $this->generateCertificateContent($keys, $type, $x509Generator);
+            $certificateContent = $this->generateCertificateContent($keys, $password, $type, $x509Generator);
             $signature->setCertificateContent($certificateContent);
         }
 
@@ -195,6 +203,7 @@ class SignatureFactory
      *      'publickey' => '<string>',
      *      'privatekey' => '<string>',
      *  ]
+     * @param string $password
      * @param string $type
      * @param X509GeneratorInterface $x509Generator
      *
@@ -202,10 +211,12 @@ class SignatureFactory
      */
     private function generateCertificateContent(
         array $keys,
+        string $password,
         string $type,
         X509GeneratorInterface $x509Generator
     ): string {
         $privateKey = $this->rsaFactory->create();
+        $privateKey->setPassword($password);
         $privateKey->loadKey($keys['privatekey']);
 
         $publicKey = $this->rsaFactory->create();
@@ -226,7 +237,11 @@ class SignatureFactory
                 throw new RuntimeException('Unpredictable type.');
         }
 
-        return $x509->saveX509CurrentCert();
+        if (!($currentCert = $x509->saveX509CurrentCert())) {
+            throw new RuntimeException('Can not save current certificate.');
+        }
+
+        return $currentCert;
     }
 
     /**

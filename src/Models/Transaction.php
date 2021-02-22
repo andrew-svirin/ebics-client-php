@@ -33,11 +33,11 @@ class Transaction implements TransactionInterface
     private $numSegments;
 
     /**
-     * Uses for encrypted OrderData.
+     * Uses for decoded OrderData Items.
      *
-     * @var OrderData
+     * @var array
      */
-    private $orderData;
+    private $orderDataItems;
 
     /**
      * Uses for encrypted OrderData.
@@ -131,11 +131,24 @@ class Transaction implements TransactionInterface
      */
     public function getOrderData(): OrderData
     {
-        return $this->orderData;
+        return $this->orderDataItems[0];
     }
 
     public function setOrderData(OrderData $orderData): void
     {
-        $this->orderData = $orderData;
+        $this->orderDataItems[0] = $orderData;
+    }
+
+    /**
+     * @return OrderData[]
+     */
+    public function getOrderDataItems(): array
+    {
+        return $this->orderDataItems;
+    }
+
+    public function setOrderDataItems(array $orderDataItems): void
+    {
+        $this->orderDataItems = $orderDataItems;
     }
 }

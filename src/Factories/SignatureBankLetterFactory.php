@@ -19,6 +19,7 @@ class SignatureBankLetterFactory
      * @param string $exponent
      * @param string $modulus
      * @param string $keyHash
+     * @param int $modulusSize
      *
      * @return SignatureBankLetter
      */
@@ -27,14 +28,16 @@ class SignatureBankLetterFactory
         string $version,
         string $exponent,
         string $modulus,
-        string $keyHash
+        string $keyHash,
+        int $modulusSize
     ): SignatureBankLetter {
         return new SignatureBankLetter(
             $type,
             $version,
             $exponent,
             $modulus,
-            $keyHash
+            $keyHash,
+            $modulusSize
         );
     }
 }

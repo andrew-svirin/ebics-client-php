@@ -12,6 +12,7 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\KeyRingManager;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 /**
  * Class TestCase extends basic TestCase for add extra setups.
@@ -26,8 +27,11 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected $fixtures = __DIR__ . '/_fixtures';
 
-    protected function setupClient(int $credentialsId, X509GeneratorInterface $x509Generator = null, $fake = false): EbicsClientInterface
-    {
+    protected function setupClient(
+        int $credentialsId,
+        X509GeneratorInterface $x509Generator = null,
+        $fake = false
+    ): EbicsClientInterface {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
         $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
@@ -118,6 +122,11 @@ abstract class AbstractEbicsTestCase extends TestCase
     public function credentialsDataProvider(int $credentialsId): array
     {
         $path = sprintf('%s/credentials/credentials_%d.json', $this->data, $credentialsId);
+
+        if (!file_exists($path)) {
+            throw new RuntimeException('Credentials missing');
+        }
+
         $credentialsEnc = json_decode(file_get_contents($path), true);
 
         return [

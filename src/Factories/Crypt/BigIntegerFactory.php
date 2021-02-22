@@ -15,7 +15,7 @@ class BigIntegerFactory
 {
 
     /**
-     * @param int|string|resource $x base-10 number or base-$base number if $base set.
+     * @param int|string $x base-10 number or base-$base number if $base set.
      * @param int $base
      *
      * @return BigIntegerInterface
@@ -23,21 +23,5 @@ class BigIntegerFactory
     public function create($x = 0, int $base = 10): BigIntegerInterface
     {
         return new BigInteger($x, $base);
-    }
-
-    /**
-     * Cast Big integer from phpseclib.
-     *
-     * @param \phpseclib\Math\BigInteger $bigInteger
-     *
-     * @return BigIntegerInterface
-     */
-    public static function createFromPhpSecLib(\phpseclib\Math\BigInteger $bigInteger): BigIntegerInterface
-    {
-        $obj = new BigInteger();
-        foreach (get_object_vars($bigInteger) as $key => $name) {
-            $obj->$key = $name;
-        }
-        return $obj;
     }
 }

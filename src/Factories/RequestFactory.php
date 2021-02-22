@@ -21,7 +21,7 @@ use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
-use DateTime;
+use DateTimeInterface;
 
 /**
  * Class RequestFactory represents producers for the @see Request.
@@ -79,7 +79,7 @@ class RequestFactory
         $this->keyRing = $keyRing;
     }
 
-    public function createINI(SignatureInterface $certificateA, DateTime $dateTime): Request
+    public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -138,7 +138,7 @@ class RequestFactory
     public function createHIA(
         SignatureInterface $certificateE,
         SignatureInterface $certificateX,
-        DateTime $dateTime
+        DateTimeInterface $dateTime
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -183,12 +183,12 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createHPB(DateTime $dateTime): Request
+    public function createHPB(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -224,12 +224,12 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createHPD(DateTime $dateTime): Request
+    public function createHPD(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -270,12 +270,12 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createHKD(DateTime $dateTime): Request
+    public function createHKD(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -316,12 +316,12 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createHTD(DateTime $dateTime): Request
+    public function createHTD(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -362,21 +362,21 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      * @param string $fileFormat
      * @param string $countryCode
-     * @param DateTime|null $startDateTime
-     * @param DateTime|null $endDateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
      *
      * @return Request
      * @throws EbicsException
      */
     public function createFDL(
-        DateTime $dateTime,
+        DateTimeInterface $dateTime,
         string $fileFormat,
         string $countryCode = 'FR',
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -426,12 +426,12 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
+     * @param DateTimeInterface $dateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createHAA(DateTime $dateTime): Request
+    public function createHAA(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -511,15 +511,60 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
-     * @param DateTime|null $startDateTime
-     * @param DateTime|null $endDateTime
+     * @param string $transactionId
+     * @param int $segmentNumber
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createVMK(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
+    public function createTransferTransfer(string $transactionId, int $segmentNumber): Request
     {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setTransactionId($transactionId)
+            ->setSegmentNumber($segmentNumber);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addTransactionId($context->getTransactionId());
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_TRANSFER)
+                            ->addSegmentNumber($context->getSegmentNumber());
+                    });
+                })->addBody(function (BodyBuilder $builder) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) {
+                        $orderData = new OrderData();
+                        // TODO: Add order data.
+                        $builder->addOrderData($orderData->getContent());
+                    });
+                });
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
+    public function createVMK(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
@@ -561,15 +606,18 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
-     * @param DateTime|null $startDateTime
-     * @param DateTime|null $endDateTime
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createSTA(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-    {
+    public function createSTA(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
@@ -611,15 +659,18 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
-     * @param DateTime|null $startDateTime
-     * @param DateTime|null $endDateTime
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createC53(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-    {
+    public function createC53(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
@@ -661,15 +712,18 @@ class RequestFactory
     }
 
     /**
-     * @param DateTime $dateTime
-     * @param DateTime|null $startDateTime
-     * @param DateTime|null $endDateTime
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createZ53(DateTime $dateTime, DateTime $startDateTime = null, DateTime $endDateTime = null): Request
-    {
+    public function createZ53(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
@@ -695,6 +749,86 @@ class RequestFactory
                                     ->addOrderType('Z53')
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
+                            })
+                            ->addBank($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    public function createCCT(DateTimeInterface $dateTime): Request
+    {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $orderDetailsBuilder
+                                    ->addOrderType('CCT')
+                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
+                                    ->addStandardOrderParams();
+                            })
+                            ->addBank($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    public function createCDD(DateTimeInterface $dateTime): Request
+    {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $orderDetailsBuilder
+                                    ->addOrderType('CDD')
+                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
+                                    ->addStandardOrderParams();
                             })
                             ->addBank($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
