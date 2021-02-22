@@ -139,9 +139,9 @@ EOF;
     <h3 style="color: #FFFFFF; background-color: #333333">{$signatureName}</h3>
     {$certificateSection}
     <br/><br/>
-    <b>{$translations['hash']}</b>
+    <b>{$translations['hash']} (SHA-256)</b>
     <br/>
-    {$this->formatBytes($signatureBankLetter->getKeyHash())}
+    <code>{$this->formatBytes($signatureBankLetter->getKeyHash())}</code>
 EOF;
 
         return $result;
@@ -172,11 +172,11 @@ EOF;
         $result = <<<EOF
     <b>{$translations['exponent']}</b>
     <br/>
-    {$this->formatBytes($certificateBankLetter->getExponent())}
+    <code>{$this->formatBytes($certificateBankLetter->getExponent())}</code>
     <br/>
-    <b>{$translations['modulus']}</b>
+    <b>{$translations['modulus']} ({$certificateBankLetter->getModulusSize()} bits)</b>
     <br/>
-    {$this->formatBytes($certificateBankLetter->getModulus())}
+    <code>{$this->formatBytes($certificateBankLetter->getModulus())}</code>
 EOF;
 
         return $result;

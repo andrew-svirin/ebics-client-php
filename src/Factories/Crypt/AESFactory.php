@@ -15,12 +15,10 @@ class AESFactory
 {
 
     /**
-     * @param int $mode
-     *
      * @return AESInterface
      */
-    public function create($mode = AES::MODE_CBC): AESInterface
+    public function create(): AESInterface
     {
-        return new AES($mode);
+        return new AES();
     }
 }

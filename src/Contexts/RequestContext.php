@@ -77,6 +77,11 @@ class RequestContext
     private $receiptCode;
 
     /**
+     * @var int
+     */
+    private $segmentNumber;
+
+    /**
      * @var string
      */
     private $transactionId;
@@ -223,6 +228,18 @@ class RequestContext
     public function getReceiptCode(): string
     {
         return $this->receiptCode;
+    }
+
+    public function setSegmentNumber(int $segmentNumber): RequestContext
+    {
+        $this->segmentNumber = $segmentNumber;
+
+        return $this;
+    }
+
+    public function getSegmentNumber(): int
+    {
+        return $this->segmentNumber;
     }
 
     public function setTransactionId(string $transactionId): RequestContext

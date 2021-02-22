@@ -5,8 +5,4 @@
 composer.lock
 vendor
 
-# Testing env variables.
-envs.local.php
-
-.php_cs.cache
 .phpunit.result.cache

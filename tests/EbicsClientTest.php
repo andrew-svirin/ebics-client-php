@@ -28,6 +28,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHEV(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -47,6 +49,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testINI(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -77,6 +81,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHIA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -109,6 +115,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHPB(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -133,6 +141,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHKD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -161,6 +171,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHTD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -188,6 +200,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHPD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -216,6 +230,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testHAA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -245,6 +261,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testVMK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -270,6 +288,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testSTA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -295,6 +315,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
@@ -348,13 +370,19 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testZ53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
         $client = $this->setupClient($credentialsId, $x509Generator, $codes['Z53']['fake']);
 
         $this->assertExceptionCode($codes['Z53']['code']);
-        $z53 = $client->Z53();
+        $z53 = $client->Z53(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
 
         $responseHandler = new ResponseHandler();
 
@@ -373,13 +401,73 @@ class EbicsClientTest extends AbstractEbicsTestCase
      * @param int $credentialsId
      * @param array $codes
      * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
      */
     public function testC53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
         $client = $this->setupClient($credentialsId, $x509Generator, $codes['C53']['fake']);
 
         $this->assertExceptionCode($codes['C53']['code']);
-        $c53 = $client->C53();
+        $c53 = $client->C53(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
+
+        $responseHandler = new ResponseHandler();
+
+        $c53Receipt = $client->transferReceipt($c53);
+        $code = $responseHandler->retrieveH004ReturnCode($c53Receipt);
+        $reportText = $responseHandler->retrieveH004ReportText($c53Receipt);
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group CCT
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testCCT(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['CCT']['fake']);
+
+        $this->assertExceptionCode($codes['CCT']['code']);
+        $c53 = $client->CCT(new DateTime());
+
+        $responseHandler = new ResponseHandler();
+
+        $c53Receipt = $client->transferReceipt($c53);
+        $code = $responseHandler->retrieveH004ReturnCode($c53Receipt);
+        $reportText = $responseHandler->retrieveH004ReportText($c53Receipt);
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group CDD
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testCDD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['CDD']['fake']);
+
+        $this->assertExceptionCode($codes['CDD']['code']);
+        $c53 = $client->CDD(new DateTime());
 
         $responseHandler = new ResponseHandler();
 
@@ -432,6 +520,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091010', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
                     ],
+                    'CCT' => ['code' => '061002', 'fake' => false],
+                    'CDD' => ['code' => '061002', 'fake' => false],
                 ],
                 new WeBankX509Generator(),
             ],
@@ -454,6 +544,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
+                    'CCT' => ['code' => '091005', 'fake' => false],
+                    'CDD' => ['code' => '091005', 'fake' => false],
                 ],
             ],
         ];

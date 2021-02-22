@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Services\X509;
 
-use phpseclib\File\X509;
-
 /**
  * X509 extensions options normalizer.
  *
@@ -27,7 +25,7 @@ class X509ExtensionOptionsNormalizer
      *  'replace' => '<string>',
      * ]
      *
-     * @see X509::setExtension()
+     * @see \AndrewSvirin\Ebics\Models\Crypt\X509::setExtension()
      */
     public static function normalize($options): array
     {

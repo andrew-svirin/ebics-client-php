@@ -55,6 +55,17 @@ class MutableBuilder
         return $this;
     }
 
+    public function addSegmentNumber(int $segmentNumber): MutableBuilder
+    {
+        $xmlSegmentNumber = $this->dom->createElement('SegmentNumber');
+        $xmlSegmentNumber->setAttribute('lastSegment', 'true');
+        $xmlSegmentNumber->nodeValue = (string)$segmentNumber;
+
+        $this->instance->appendChild($xmlSegmentNumber);
+
+        return $this;
+    }
+
     public function getInstance(): DOMElement
     {
         return $this->instance;
