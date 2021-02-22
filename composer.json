@@ -22,9 +22,11 @@
   "license": "MIT",
   "require": {
     "php": "^7.2 || ^8",
+    "ext-bcmath": "*",
     "ext-curl": "*",
     "ext-dom": "*",
     "ext-openssl": "*",
+    "ext-zip": "*",
     "ext-zlib": "*",
     "ext-json": "*",
     "phpseclib/phpseclib": "~2.0"

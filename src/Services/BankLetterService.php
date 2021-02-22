@@ -62,12 +62,14 @@ class BankLetterService
         $keyHash = $hashGenerator->generate($signature);
         $keyHashFormatted = $this->formatKeyHashForBankLetter($keyHash);
 
+        $modulusSize = strlen($publicKeyDetails['m']) * 8; // 8 bits in byte.
         $signatureBankLetter = $this->signatureBankLetterFactory->create(
             $signature->getType(),
             $version,
             $exponentFormatted,
             $modulusFormatted,
-            $keyHashFormatted
+            $keyHashFormatted,
+            $modulusSize
         );
 
         if (($content = $signature->getCertificateContent())) {
@@ -108,7 +110,7 @@ class BankLetterService
 
         // Go over pairs of bytes.
         foreach ($this->cryptService->binToArray($bytes) as $byte) {
-            // Convert to lover case hexadecimal number.
+            // Convert to lover case hexadecimal number and add a space.
             $result .= sprintf('%02x ', $byte);
         }
 

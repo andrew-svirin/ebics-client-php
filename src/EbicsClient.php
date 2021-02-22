@@ -20,6 +20,7 @@ use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\HttpClient;
 use DateTime;
+use DateTimeInterface;
 
 /**
  * EBICS client representation.
@@ -122,13 +123,14 @@ final class EbicsClient implements EbicsClientInterface
      *
      * @throws EbicsException
      */
-    public function INI(DateTime $dateTime = null): Response
+    public function INI(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
         $signatureA = $this->signatureFactory->createSignatureAFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
+            $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->createINI($signatureA, $dateTime);
@@ -144,17 +146,19 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function HIA(DateTime $dateTime = null): Response
+    public function HIA(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
         $signatureE = $this->signatureFactory->createSignatureEFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
+            $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
         $signatureX = $this->signatureFactory->createSignatureXFromKeys(
             $this->cryptService->generateKeys($this->keyRing),
+            $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
         $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
@@ -171,7 +175,7 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPB(DateTime $dateTime = null): Response
+    public function HPB(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -196,7 +200,7 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPD(DateTime $dateTime = null): Response
+    public function HPD(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -219,7 +223,7 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HKD(DateTime $dateTime = null): Response
+    public function HKD(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -242,7 +246,7 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HTD(DateTime $dateTime = null): Response
+    public function HTD(DateTimeInterface $dateTime = null): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -270,9 +274,9 @@ final class EbicsClient implements EbicsClientInterface
         $fileInfo,
         $format = 'plain',
         $countryCode = 'FR',
-        DateTime $dateTime = null,
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -286,7 +290,7 @@ final class EbicsClient implements EbicsClientInterface
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
-        // Prepare decrypted datas.
+        // Prepare decrypted data.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
         switch ($format) {
             case 'plain':
@@ -310,7 +314,7 @@ final class EbicsClient implements EbicsClientInterface
     {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
-            throw new EbicsException('There is no transactions to mark as received');
+            throw new EbicsException('There is no transactions to mark as received.');
         }
 
         $request = $this->requestFactory->createTransferReceipt($lastTransaction->getId(), $acknowledged);
@@ -323,10 +327,32 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
+     */
+    public function transferTransfer(Response $response, int $segmentNumber = 1): Response
+    {
+        $lastTransaction = $response->getLastTransaction();
+        if (null === $lastTransaction) {
+            throw new EbicsException('There is no transactions to mark as transferred.');
+        }
+
+        // TODO: Add order data.
+        $request = $this->requestFactory->createTransferTransfer($lastTransaction->getId(), $segmentNumber);
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH004ReturnCode($request, $response);
+
+        return $response;
+    }
+
+    /**
+     * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HAA(DateTime $dateTime = null, string $phase = null, string $transactionId = null): Response
-    {
+    public function HAA(
+        DateTimeInterface $dateTime = null,
+        string $phase = null,
+        string $transactionId = null
+    ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
@@ -349,9 +375,9 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function VMK(
-        DateTime $dateTime = null,
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -360,6 +386,12 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderDataContent = $this->cryptService->decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
+        $transaction->setPlainOrderData($orderDataContent);
 
         return $response;
     }
@@ -369,9 +401,9 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function STA(
-        DateTime $dateTime = null,
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -380,6 +412,12 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        // Prepare decrypted OrderData.
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderDataContent = $this->cryptService->decryptOrderDataContent($this->keyRing, $orderDataEncrypted);
+        $transaction->setPlainOrderData($orderDataContent);
 
         return $response;
     }
@@ -390,9 +428,9 @@ final class EbicsClient implements EbicsClientInterface
      */
     // @codingStandardsIgnoreStart
     public function C53(
-        DateTime $dateTime = null,
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Response {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
@@ -403,6 +441,12 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+        $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
+        $orderDataItems = $this->cryptService->decryptOrderDataItems($this->keyRing, $orderDataEncrypted);
+        $transaction->setOrderDataItems($orderDataItems);
+
         return $response;
     }
 
@@ -412,9 +456,9 @@ final class EbicsClient implements EbicsClientInterface
      */
     // @codingStandardsIgnoreStart
     public function Z53(
-        DateTime $dateTime = null,
-        DateTime $startDateTime = null,
-        DateTime $endDateTime = null
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
     ): Response {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
@@ -424,6 +468,36 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
+
+        return $response;
+    }
+
+    public function CCT(DateTimeInterface $dateTime = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->createCCT($dateTime);
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH004ReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
+
+        return $response;
+    }
+
+    public function CDD(DateTimeInterface $dateTime = null): Response
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->createCDD($dateTime);
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH004ReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $response->addTransaction($transaction);
 
         return $response;
     }

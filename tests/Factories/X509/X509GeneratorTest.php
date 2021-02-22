@@ -35,7 +35,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $signature = $signatureFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
-        ], $generator);
+        ], 'test123', $generator);
 
         $this->assertEquals($signature->getPrivateKey(), $privateKey);
         $this->assertEquals($signature->getPublicKey(), $publicKey);
@@ -63,7 +63,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $certificate = $certificateFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
-        ], $generator);
+        ], 'test123', $generator);
 
         $this->assertEquals($certificate->getPrivateKey(), $privateKey);
         $this->assertEquals($certificate->getPublicKey(), $publicKey);
@@ -110,7 +110,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getCertificateContent(string $name)
     {
-        return file_get_contents($this->data.'/certificates/'.$name);
+        return file_get_contents($this->data . '/certificates/' . $name);
     }
 
     /**
@@ -118,7 +118,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPrivateKey()
     {
-        return file_get_contents($this->data.'/private_key.rsa');
+        return file_get_contents($this->data . '/private_key.rsa');
     }
 
     /**
@@ -126,6 +126,6 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPublicKey()
     {
-        return file_get_contents($this->data.'/public_key.rsa');
+        return file_get_contents($this->data . '/public_key.rsa');
     }
 }

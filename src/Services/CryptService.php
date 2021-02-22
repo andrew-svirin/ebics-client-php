@@ -7,17 +7,11 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Factories\OrderDataFactory;
-use AndrewSvirin\Ebics\Models\Crypt\AES;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use RuntimeException;
-
-use function call_user_func_array;
-use function strlen;
-
-use const OPENSSL_ZERO_PADDING;
 
 /**
  * EBICS crypt/decrypt encode/decode hash functions.
@@ -50,12 +44,18 @@ class CryptService
      */
     private $orderDataFactory;
 
+    /**
+     * @var ZipReader
+     */
+    private $zipReader;
+
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
         $this->aesFactory = new AESFactory();
         $this->randomService = new RandomService();
         $this->orderDataFactory = new OrderDataFactory();
+        $this->zipReader = new ZipReader();
     }
 
     /**
@@ -82,10 +82,34 @@ class CryptService
      */
     public function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderData): OrderData
     {
-        $content = $this->decryptOrderDataContent($keyRing, $orderData);
-        $orderData = $this->orderDataFactory->buildOrderDataFromContent($content);
+        $orderDataContent = $this->decryptOrderDataContent($keyRing, $orderData);
+        $orderData = $this->orderDataFactory->buildOrderDataFromContent($orderDataContent);
 
         return $orderData;
+    }
+
+    /**
+     * Decrypt encrypted OrderData items.
+     * Unzip order data items.
+     *
+     * @param KeyRing $keyRing
+     * @param OrderDataEncrypted $orderData
+     *
+     * @return OrderData[]
+     * @throws EbicsException
+     */
+    public function decryptOrderDataItems(KeyRing $keyRing, OrderDataEncrypted $orderData): array
+    {
+        $orderDataContent = $this->decryptOrderDataContent($keyRing, $orderData);
+
+        $orderDataXmlItems = $this->zipReader->extractFilesFromString($orderDataContent);
+
+        $orderDataItems = [];
+        foreach ($orderDataXmlItems as $orderDataXmlItem) {
+            $orderDataItems[] = $this->orderDataFactory->buildOrderDataFromContent($orderDataXmlItem);
+        }
+
+        return $orderDataItems;
     }
 
     /**
@@ -97,8 +121,10 @@ class CryptService
      * @return string
      * @throws EbicsException
      */
-    public function decryptOrderDataContent(KeyRing $keyRing, OrderDataEncrypted $orderData): string
-    {
+    public function decryptOrderDataContent(
+        KeyRing $keyRing,
+        OrderDataEncrypted $orderData
+    ): string {
         if (!($signatureE = $keyRing->getUserSignatureE())) {
             throw new RuntimeException('Signature E is not set.');
         }
@@ -106,10 +132,9 @@ class CryptService
         $rsa = $this->rsaFactory->create();
         $rsa->setPassword($keyRing->getPassword());
         $rsa->loadKey($signatureE->getPrivateKey());
-        $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
         // aes-128-cbc encrypting format.
-        $aes = $this->aesFactory->create(AES::MODE_CBC);
+        $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($transactionKeyDecrypted);
         // Force openssl_options.
@@ -118,7 +143,7 @@ class CryptService
 
         // Try to uncompress from gz order data.
         if (!($orderData = gzuncompress($decrypted))) {
-            throw new EbicsException('Order Data were uncompressed wrongly.');
+            throw new RuntimeException('Order Data were uncompressed wrongly.');
         }
         return $orderData;
     }
@@ -133,8 +158,10 @@ class CryptService
      *
      * @throws EbicsException
      */
-    public function cryptSignatureValue(KeyRing $keyRing, string $hash): string
-    {
+    public function cryptSignatureValue(
+        KeyRing $keyRing,
+        string $hash
+    ): string {
         $digestToSignBin = $this->filter($hash);
 
         if (!($signatureX = $keyRing->getUserSignatureX()) || !($privateKey = $signatureX->getPrivateKey())) {
@@ -151,7 +178,6 @@ class CryptService
         if (!defined('CRYPT_RSA_PKCS15_COMPAT')) {
             define('CRYPT_RSA_PKCS15_COMPAT', true);
         }
-        $rsa->setEncryptionMode(RSA::ENCRYPTION_PKCS1);
         $encrypted = $rsa->encrypt($digestToSignBin);
         if (empty($encrypted)) {
             throw new EbicsException('Incorrect authorization.');
@@ -173,13 +199,15 @@ class CryptService
      *  ]
      * @throws EbicsException
      */
-    public function generateKeys(KeyRing $keyRing, string $algorithm = 'sha256', int $length = 2048): array
-    {
+    public function generateKeys(
+        KeyRing $keyRing,
+        string $algorithm = 'sha256',
+        int $length = 2048
+    ): array {
         $rsa = $this->rsaFactory->create();
         $rsa->setPublicKeyFormat(RSA::PRIVATE_FORMAT_PKCS1);
         $rsa->setPrivateKeyFormat(RSA::PUBLIC_FORMAT_PKCS1);
         $rsa->setHash($algorithm);
-        $rsa->setMGFHash($algorithm);
         $rsa->setPassword($keyRing->getPassword());
 
         return $rsa->createKey($length);
@@ -192,8 +220,9 @@ class CryptService
      *
      * @return string
      */
-    private function filter(string $hash): string
-    {
+    private function filter(
+        string $hash
+    ): string {
         $RSA_SHA256prefix = [
             0x30,
             0x31,
@@ -233,8 +262,13 @@ class CryptService
      * @param int $d
      * @param int $length
      */
-    private function systemArrayCopy(array $a, int $c, array &$b, int $d, int $length): void
-    {
+    private function systemArrayCopy(
+        array $a,
+        int $c,
+        array &$b,
+        int $d,
+        int $length
+    ): void {
         for ($i = 0; $i < $length; ++$i) {
             $b[$i + $d] = $a[$i + $c];
         }
@@ -247,8 +281,9 @@ class CryptService
      *
      * @return string (bytes)
      */
-    private function arrayToBin(array $bytes): string
-    {
+    private function arrayToBin(
+        array $bytes
+    ): string {
         return call_user_func_array('pack', array_merge(['c*'], $bytes));
     }
 
@@ -259,8 +294,9 @@ class CryptService
      *
      * @return array
      */
-    public function binToArray(string $bytes): array
-    {
+    public function binToArray(
+        string $bytes
+    ): array {
         $result = unpack('C*', $bytes);
         if (false === $result) {
             throw new RuntimeException('Can not convert bytes to array.');
@@ -279,16 +315,23 @@ class CryptService
      *
      * @param SignatureInterface $signature
      * @param string $algorithm
+     * @param bool $rawOutput
      *
      * @return string
      */
-    public function calculateDigest(SignatureInterface $signature, $algorithm = 'sha256'): string
-    {
+    public function calculateDigest(
+        SignatureInterface $signature,
+        $algorithm = 'sha256',
+        $rawOutput = false
+    ): string {
         $rsa = $this->rsaFactory->create();
         $rsa->loadKey($signature->getPublicKey());
+
+
         $exponent = $rsa->getExponent()->toHex(true);
         $modulus = $rsa->getModulus()->toHex(true);
-        // If key was formed incorrect with Modulus and Exponent mismatch, then change the place of key parts.
+        // If key was formed with switched Modulus and Exponent, then change the place of key parts.
+        // It can happens for Bank.
         if (strlen($exponent) > strlen($modulus)) {
             $buffer = $exponent;
             $exponent = $modulus;
@@ -296,7 +339,7 @@ class CryptService
         }
         $key = $this->calculateKey($exponent, $modulus);
 
-        return $this->calculateKeyHash($key, $algorithm, true);
+        return $this->calculateKeyHash($key, $algorithm, $rawOutput);
     }
 
     /**
@@ -307,8 +350,10 @@ class CryptService
      *
      * @return string
      */
-    public function calculateKey(string $exponent, string $modulus): string
-    {
+    public function calculateKey(
+        string $exponent,
+        string $modulus
+    ): string {
         // Remove leading 0.
         $exponent = ltrim($exponent, '0');
         $modulus = ltrim($modulus, '0');
@@ -325,8 +370,11 @@ class CryptService
      *
      * @return string
      */
-    public function calculateKeyHash(string $key, string $algorithm = 'sha256', bool $rawOutput = false): string
-    {
+    public function calculateKeyHash(
+        string $key,
+        string $algorithm = 'sha256',
+        bool $rawOutput = false
+    ): string {
         return hash($algorithm, $key, $rawOutput);
     }
 
@@ -337,10 +385,9 @@ class CryptService
      */
     public function generateNonce(): string
     {
-        $bytes = $this->randomService->string(16);
-        $nonce = bin2hex($bytes);
+        $nonce = $this->randomService->hex(32);
 
-        return strtoupper($nonce);
+        return $nonce;
     }
 
     /**
@@ -353,8 +400,9 @@ class CryptService
      *   'm' => '<bytes>',
      * ]
      */
-    public function getPublicKeyDetails(string $publicKey): array
-    {
+    public function getPublicKeyDetails(
+        string $publicKey
+    ): array {
         $rsa = $this->rsaFactory->create();
         $rsa->setPublicKey($publicKey);
 
