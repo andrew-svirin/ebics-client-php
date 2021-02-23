@@ -623,10 +623,7 @@ class RSA implements RSAInterface
                     if (!($ivLen = openssl_cipher_iv_length($method))) {
                         throw new LogicException('Can no determinate cipher length.');
                     }
-                    $iv = openssl_random_pseudo_bytes($ivLen);
-                    if (is_bool($iv) && false === $iv) {
-                        throw new LogicException('Can no generate random bytes.');
-                    }
+                    $iv = (string)openssl_random_pseudo_bytes($ivLen);
 
                     $symkey = pack('H*', md5($this->password . $iv)); // symkey is short for symmetric key
                     $symkey .= substr(pack('H*', md5($symkey . $this->password . $iv)), 0, 8);
@@ -1149,10 +1146,7 @@ class RSA implements RSAInterface
         $ps = '';
         while (strlen($ps) != $psLen) {
             $length = $psLen - strlen($ps);
-            $temp = openssl_random_pseudo_bytes($length);
-            if (is_bool($temp) && false === $temp) {
-                throw new LogicException('Can not generate random bytes.');
-            }
+            $temp = (string)openssl_random_pseudo_bytes($length);
             $temp = str_replace("\x00", '', $temp);
             $ps .= $temp;
         }
