@@ -21,6 +21,16 @@ class ResponseHandler
     use XPathTrait;
 
     /**
+     * @var TransactionFactory
+     */
+    private $transactionFactory;
+
+    public function __construct()
+    {
+        $this->transactionFactory = new TransactionFactory();
+    }
+
+    /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
      *
      * @param DOMDocument $xml
@@ -148,20 +158,22 @@ class ResponseHandler
     public function retrieveTransaction(DOMDocument $xml): Transaction
     {
         $xpath = $this->prepareH004XPath($xml);
-        $transactionId = $xpath->query('//H004:header/H004:static/H004:TransactionID');
-        $transactionIdValue = DOMHelper::safeItemValue($transactionId);
-        $numSegments = $xpath->query('//H004:header/H004:static/H004:NumSegments');
-        $numSegmentsValue = DOMHelper::safeItemValue($numSegments);
-        $transactionPhase = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
-        $transactionPhaseValue = DOMHelper::safeItemValue($transactionPhase);
-        $segmentNumber = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
-        $segmentNumberValue = DOMHelper::safeItemValue($segmentNumber);
+        $transactionIdPath = $xpath->query('//H004:header/H004:static/H004:TransactionID');
+        $transactionId = DOMHelper::safeItemValue($transactionIdPath);
+        $transactionPhasePath = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
+        $transactionPhase = DOMHelper::safeItemValue($transactionPhasePath);
+        $numSegmentsPath = $xpath->query('//H004:header/H004:static/H004:NumSegments');
+        $numSegments = DOMHelper::safeItemValueOrNull($numSegmentsPath);
+        $orderIdPath = $xpath->query('//H004:header/H004:mutable/H004:OrderID');
+        $orderId = DOMHelper::safeItemValueOrNull($orderIdPath);
+        $segmentNumberPath = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
+        $segmentNumber = DOMHelper::safeItemValueOrNull($segmentNumberPath);
 
-        return TransactionFactory::buildTransaction(
-            $transactionIdValue,
-            $transactionPhaseValue,
-            $numSegmentsValue,
-            $segmentNumberValue
-        );
+        $transaction = $this->transactionFactory->create($transactionId, $transactionPhase);
+        $transaction->setNumSegments(null !== $numSegments ? (int)$numSegments : null);
+        $transaction->setOrderId($orderId);
+        $transaction->setSegmentNumber(null !== $segmentNumber ? (int)$segmentNumber : null);
+
+        return $transaction;
     }
 }

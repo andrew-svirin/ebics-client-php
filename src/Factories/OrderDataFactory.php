@@ -18,7 +18,7 @@ class OrderDataFactory
      *
      * @return OrderData
      */
-    public function buildOrderDataFromContent(string $content): OrderData
+    public function createOrderDataFromContent(string $content): OrderData
     {
         $orderData = new OrderData();
         $orderData->loadXML($content);

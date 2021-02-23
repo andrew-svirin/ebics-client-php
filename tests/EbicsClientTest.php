@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics\Tests;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
+use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
@@ -440,15 +441,19 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $client = $this->setupClient($credentialsId, $x509Generator, $codes['CCT']['fake']);
 
         $this->assertExceptionCode($codes['CCT']['code']);
-        $c53 = $client->CCT(new DateTime());
+        $cct = $client->CCT(new DateTime(), 1);
+
+        $customerCreditTransfer = new CustomerCreditTransfer();
+        $customerCreditTransfer->loadXML(file_get_contents($this->fixtures . '/pain.001.001.03.xml'));
 
         $responseHandler = new ResponseHandler();
 
-        $c53Receipt = $client->transferReceipt($c53);
-        $code = $responseHandler->retrieveH004ReturnCode($c53Receipt);
-        $reportText = $responseHandler->retrieveH004ReportText($c53Receipt);
+        $cctTransfer = $client->transferTransfer($cct, $customerCreditTransfer, 1);
 
-        $this->assertResponseDone($code, $reportText);
+        $code = $responseHandler->retrieveH004ReturnCode($cctTransfer);
+        $reportText = $responseHandler->retrieveH004ReportText($cctTransfer);
+
+        $this->assertResponseOk($code, $reportText);
     }
 
     /**
@@ -467,15 +472,19 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $client = $this->setupClient($credentialsId, $x509Generator, $codes['CDD']['fake']);
 
         $this->assertExceptionCode($codes['CDD']['code']);
-        $c53 = $client->CDD(new DateTime());
+        $cdd = $client->CDD(new DateTime(), 1);
+
+        $customerCreditTransfer = new CustomerCreditTransfer();
+        $customerCreditTransfer->loadXML(file_get_contents($this->fixtures . '/pain.008.001.02.xml'));
 
         $responseHandler = new ResponseHandler();
 
-        $c53Receipt = $client->transferReceipt($c53);
-        $code = $responseHandler->retrieveH004ReturnCode($c53Receipt);
-        $reportText = $responseHandler->retrieveH004ReportText($c53Receipt);
+        $cddTransfer = $client->transferTransfer($cdd, $customerCreditTransfer, 1);
 
-        $this->assertResponseDone($code, $reportText);
+        $code = $responseHandler->retrieveH004ReturnCode($cddTransfer);
+        $reportText = $responseHandler->retrieveH004ReportText($cddTransfer);
+
+        $this->assertResponseOk($code, $reportText);
     }
 
     /**
@@ -520,8 +529,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091010', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
                     ],
-                    'CCT' => ['code' => '061002', 'fake' => false],
-                    'CDD' => ['code' => '061002', 'fake' => false],
+                    'CCT' => ['code' => null, 'fake' => false],
+                    'CDD' => ['code' => null, 'fake' => false],
                 ],
                 new WeBankX509Generator(),
             ],
@@ -544,8 +553,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
-                    'CCT' => ['code' => '091005', 'fake' => false],
-                    'CDD' => ['code' => '091005', 'fake' => false],
+                    'CCT' => ['code' => '090004', 'fake' => false],
+                    'CDD' => ['code' => '090004', 'fake' => false],
                 ],
             ],
         ];

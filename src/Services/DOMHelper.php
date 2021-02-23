@@ -30,4 +30,24 @@ class DOMHelper
 
         return $domNode->nodeValue;
     }
+
+    /**
+     * @param DOMNodeList|false $domNodeList
+     *
+     * @return string
+     */
+    public static function safeItemValueOrNull($domNodeList): ?string
+    {
+        if ($domNodeList === false) {
+            throw new RuntimeException('DOM Node List should not be empty.');
+        }
+
+        $domNode = $domNodeList->item(0);
+
+        if ($domNode === null) {
+            return null;
+        }
+
+        return $domNode->nodeValue;
+    }
 }

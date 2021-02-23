@@ -121,7 +121,16 @@ class StaticBuilder
         return $this;
     }
 
-    public function addBank(KeyRing $keyRing, string $algorithm = 'sha256'): StaticBuilder
+    public function addNumSegments(int $numSegments): StaticBuilder
+    {
+        $xmlNumSegments = $this->dom->createElement('NumSegments');
+        $xmlNumSegments->nodeValue = (string)$numSegments;
+        $this->instance->appendChild($xmlNumSegments);
+
+        return $this;
+    }
+
+    public function addBankPubKeyDigests(KeyRing $keyRing, string $algorithm = 'sha256'): StaticBuilder
     {
         $xmlBankPubKeyDigests = $this->dom->createElement('BankPubKeyDigests');
         $this->instance->appendChild($xmlBankPubKeyDigests);

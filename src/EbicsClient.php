@@ -4,12 +4,12 @@ namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
+use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\RequestFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -129,7 +129,7 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
         $signatureA = $this->signatureFactory->createSignatureAFromKeys(
-            $this->cryptService->generateKeys($this->keyRing),
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
             $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
@@ -152,12 +152,12 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
         $signatureE = $this->signatureFactory->createSignatureEFromKeys(
-            $this->cryptService->generateKeys($this->keyRing),
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
             $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
         $signatureX = $this->signatureFactory->createSignatureXFromKeys(
-            $this->cryptService->generateKeys($this->keyRing),
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
             $this->keyRing->getPassword(),
             $this->bank->isCertified() ? $this->x509Generator : null
         );
@@ -187,7 +187,6 @@ final class EbicsClient implements EbicsClientInterface
         // Prepare decrypted OrderData.
         $orderDataEncrypted = $this->responseHandler->retrieveOrderData($response);
         $orderData = $this->cryptService->decryptOrderData($this->keyRing, $orderDataEncrypted);
-        $response->addTransaction(TransactionFactory::buildTransactionFromOrderData($orderData));
         $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderData);
         $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderData);
         $this->keyRing->setBankSignatureX($signatureX);
@@ -328,17 +327,19 @@ final class EbicsClient implements EbicsClientInterface
     /**
      * @inheritDoc
      */
-    public function transferTransfer(Response $response, int $segmentNumber = 1): Response
-    {
+    public function transferTransfer(
+        Response $response,
+        OrderDataInterface $orderData,
+        int $segmentNumber = 1
+    ): Response {
         $lastTransaction = $response->getLastTransaction();
         if (null === $lastTransaction) {
             throw new EbicsException('There is no transactions to mark as transferred.');
         }
 
-        // TODO: Add order data.
-        $request = $this->requestFactory->createTransferTransfer($lastTransaction->getId(), $segmentNumber);
+        $lastTransaction->setSegmentNumber(1);
+        $request = $this->requestFactory->createTransferTransfer($lastTransaction->getId(), $orderData, $segmentNumber);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
-
         $this->checkH004ReturnCode($request, $response);
 
         return $response;
@@ -472,31 +473,37 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    public function CCT(DateTimeInterface $dateTime = null): Response
+    public function CCT(DateTimeInterface $dateTime = null, int $numSegments = 1): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createCCT($dateTime);
+
+        $request = $this->requestFactory->createCCT($dateTime, $numSegments);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH004ReturnCode($request, $response);
         $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction->setNumSegments($numSegments);
         $response->addTransaction($transaction);
 
         return $response;
     }
 
-    public function CDD(DateTimeInterface $dateTime = null): Response
+    public function CDD(DateTimeInterface $dateTime = null, int $numSegments = 1): Response
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createCDD($dateTime);
+        $request = $this->requestFactory->createCDD($dateTime, $numSegments);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $re = $request->getContent();
+        $res = $response->getContent();
 
         $this->checkH004ReturnCode($request, $response);
         $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction->setNumSegments($numSegments);
         $response->addTransaction($transaction);
 
         return $response;
