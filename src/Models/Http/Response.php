@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models\Http;
 
-use AndrewSvirin\Ebics\Models\DOMDocument;
+use AndrewSvirin\Ebics\Models\Data;
 use AndrewSvirin\Ebics\Models\Transaction;
 
 /**
@@ -11,7 +11,7 @@ use AndrewSvirin\Ebics\Models\Transaction;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Response extends DOMDocument
+class Response extends Data
 {
     /**
      * @var Transaction[]

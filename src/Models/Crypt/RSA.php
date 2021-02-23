@@ -623,7 +623,8 @@ class RSA implements RSAInterface
                     if (!($ivLen = openssl_cipher_iv_length($method))) {
                         throw new LogicException('Can no determinate cipher length.');
                     }
-                    if (!($iv = openssl_random_pseudo_bytes($ivLen))) {
+                    $iv = openssl_random_pseudo_bytes($ivLen);
+                    if (false === $iv) {
                         throw new LogicException('Can no generate random bytes.');
                     }
 
@@ -789,6 +790,15 @@ class RSA implements RSAInterface
             throw new LogicException('Components must be an array.');
         }
 
+        // If key was formed with switched Modulus and Exponent, then change the place of key parts.
+        // It can happens for Bank.
+        if (isset($components['privateExponent']) && isset($components['modulus']) &&
+            strlen($components['privateExponent']) > strlen($components['modulus'])) {
+            $buffer = $components['privateExponent'];
+            $components['privateExponent'] = $components['modulus'];
+            $components['modulus'] = $buffer;
+        }
+
         $this->modulus = $components['modulus'];
         $this->k = strlen($this->modulus->toBytes());
         $this->exponent = isset($components['privateExponent']) ?
@@ -855,6 +865,11 @@ class RSA implements RSAInterface
 
     public function encrypt($plaintext)
     {
+        // see the comments of _rsaes_pkcs1_v1_5_decrypt() to understand why this is being done
+        if (!defined('CRYPT_RSA_PKCS15_COMPAT')) {
+            define('CRYPT_RSA_PKCS15_COMPAT', true);
+        }
+
         $length = $this->k - 11;
         if ($length <= 0) {
             throw new LogicException('Length must be more 0.');
@@ -1133,8 +1148,10 @@ class RSA implements RSAInterface
         $psLen = $this->k - $mLen - 3;
         $ps = '';
         while (strlen($ps) != $psLen) {
-            if (!($temp = openssl_random_pseudo_bytes($psLen - strlen($ps)))) {
-                throw new LogicException('Can no generate random bytes.');
+            $length = $psLen - strlen($ps);
+            $temp = openssl_random_pseudo_bytes($length);
+            if (false === $temp) {
+                throw new LogicException('Can not generate random bytes.');
             }
             $temp = str_replace("\x00", '', $temp);
             $ps .= $temp;

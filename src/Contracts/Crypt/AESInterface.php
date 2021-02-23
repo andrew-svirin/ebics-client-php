@@ -47,6 +47,27 @@ interface AESInterface
     public function setIV(string $iv);
 
     /**
+     * Encrypts a message.
+     *
+     * $plaintext will be padded with additional bytes such that it's length is a multiple of
+     * the block size. Other cipher implementations may or may not pad in the same manner.
+     * Other common approaches to padding and the reasons why it's necessary are discussed in
+     * the following URL:
+     *
+     * {@link http://www.di-mgt.com.au/cryptopad.html http://www.di-mgt.com.au/cryptopad.html}
+     *
+     * An alternative to padding is to, separately, send the length of the file.  This is what
+     * SSH, in fact, does. strlen($plaintext) will still need to be a multiple of the block size,
+     * however, arbitrary values can be added to make it that length.
+     *
+     * @param string $plaintext
+     *
+     * @return string $ciphertext
+     * @internal Could, but not must, extend by the child Crypt_* class
+     */
+    public function encrypt(string $plaintext);
+
+    /**
      * Decrypts a message.
      *
      * If strlen($ciphertext) is not a multiple of the block size, null bytes will be added

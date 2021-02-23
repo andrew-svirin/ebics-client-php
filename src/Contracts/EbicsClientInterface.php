@@ -191,10 +191,11 @@ interface EbicsClientInterface
      * FileFormat pain.001.001.03
      *
      * @param DateTimeInterface|null $dateTime
+     * @param int $numSegments
      *
      * @return Response
      */
-    public function CCT(DateTimeInterface $dateTime = null): Response;
+    public function CCT(DateTimeInterface $dateTime = null, int $numSegments = 1): Response;
 
     /**
      * Using the CDD order type the user can initiate a direct debit transaction.
@@ -204,10 +205,11 @@ interface EbicsClientInterface
      * FileFormat pain.008.001.02
      *
      * @param DateTimeInterface|null $dateTime
+     * @param int $numSegments
      *
      * @return Response
      */
-    public function CDD(DateTimeInterface $dateTime = null): Response;
+    public function CDD(DateTimeInterface $dateTime = null, int $numSegments = 1): Response;
 
     /**
      * Mark transactions as received.
@@ -223,11 +225,16 @@ interface EbicsClientInterface
      * Mark transactions as transferred.
      *
      * @param Response $response
+     * @param OrderDataInterface $orderData
      * @param int $segmentNumber
      *
      * @return Response
      */
-    public function transferTransfer(Response $response, int $segmentNumber = 1): Response;
+    public function transferTransfer(
+        Response $response,
+        OrderDataInterface $orderData,
+        int $segmentNumber = 1
+    ): Response;
 
     /**
      * Set certificate X509 Generator for French bank.

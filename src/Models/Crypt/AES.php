@@ -7,6 +7,7 @@ use LogicException;
 
 /**
  * Pure-PHP implementation of AES.
+ * Able only CBC mode.
  */
 class AES implements AESInterface
 {
@@ -190,6 +191,66 @@ class AES implements AESInterface
     {
         $this->iv = $iv;
         $this->changed = true;
+    }
+
+    public function encrypt($plaintext)
+    {
+        if ($this->paddable) {
+            $plaintext = $this->pad($plaintext);
+        }
+
+        if ($this->changed) {
+            $this->clearBuffers();
+            $this->changed = false;
+        }
+
+        if (!($result = openssl_encrypt(
+            $plaintext,
+            $this->cipherNameOpenssl,
+            $this->key,
+            $this->opensslOptions,
+            $this->encryptIV
+        ))) {
+            throw new LogicException('Encryption failed.');
+        }
+        if (!defined('OPENSSL_RAW_DATA')) {
+            $result = substr($result, 0, -$this->block_size);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Pads a string
+     *
+     * Pads a string using the RSA PKCS padding standards so that its length is a multiple of the blocksize.
+     * $this->block_size - (strlen($text) % $this->block_size) bytes are added, each of which is equal to
+     * chr($this->block_size - (strlen($text) % $this->block_size)
+     *
+     * If padding is disabled and $text is not a multiple of the blocksize, the string will be padded regardless
+     * and padding will, hence forth, be enabled.
+     *
+     * @param string $text
+     *
+     * @return string
+     */
+    private function pad(string $text)
+    {
+        $length = strlen($text);
+
+        if (!$this->padding) {
+            if ($length % $this->block_size == 0) {
+                return $text;
+            } else {
+                throw new LogicException(
+                    "The plaintext's length ($length) is not a multiple of the block size ({$this->block_size})"
+                );
+            }
+        }
+
+        $pad = $this->block_size - ($length % $this->block_size);
+
+        return str_pad($text, $length + $pad, chr($pad));
     }
 
     public function decrypt($ciphertext)

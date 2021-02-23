@@ -215,23 +215,19 @@ class SignatureFactory
         string $type,
         X509GeneratorInterface $x509Generator
     ): string {
-        $privateKey = $this->rsaFactory->create();
-        $privateKey->setPassword($password);
-        $privateKey->loadKey($keys['privatekey']);
+        $rsaPrivateKey = $this->rsaFactory->createPrivate($keys['privatekey'], $password);
 
-        $publicKey = $this->rsaFactory->create();
-        $publicKey->loadKey($keys['publickey']);
-        $publicKey->setPublicKey();
+        $rsaPublicKey = $this->rsaFactory->createPublic($keys['publickey']);
 
         switch ($type) {
             case Signature::TYPE_A:
-                $x509 = $x509Generator->generateAX509($privateKey, $publicKey);
+                $x509 = $x509Generator->generateAX509($rsaPrivateKey, $rsaPublicKey);
                 break;
             case Signature::TYPE_E:
-                $x509 = $x509Generator->generateEX509($privateKey, $publicKey);
+                $x509 = $x509Generator->generateEX509($rsaPrivateKey, $rsaPublicKey);
                 break;
             case Signature::TYPE_X:
-                $x509 = $x509Generator->generateXX509($privateKey, $publicKey);
+                $x509 = $x509Generator->generateXX509($rsaPrivateKey, $rsaPublicKey);
                 break;
             default:
                 throw new RuntimeException('Unpredictable type.');
@@ -256,14 +252,12 @@ class SignatureFactory
         string $exponent,
         string $modulus
     ): SignatureInterface {
-        $rsa = $this->rsaFactory->create();
-        $rsa->loadKey([
-            'n' => $this->bigIntegerFactory->create($modulus, 256),
-            'e' => $this->bigIntegerFactory->create($exponent, 256),
+        $rsa = $this->rsaFactory->createPublic([
+            'modulus' => $this->bigIntegerFactory->create($modulus, 256),
+            'exponent' => $this->bigIntegerFactory->create($exponent, 256),
         ]);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
-        $privateKey = $rsa->getPrivateKey(RSA::PUBLIC_FORMAT_PKCS1);
 
-        return new Signature($type, $publicKey, $privateKey);
+        return new Signature($type, $publicKey, null);
     }
 }
