@@ -17,6 +17,7 @@ class OrderDetailsBuilder
 
     const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
+    const ORDER_ATTRIBUTE_UZHNN = 'UZHNN';
     const ORDER_ATTRIBUTE_OZHNN = 'OZHNN';
 
     /**

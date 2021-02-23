@@ -44,7 +44,20 @@ class RandomService
     }
 
     /**
+     * Generate random bytes.
+     *
+     * @param int $length
+     *
+     * @return string
+     */
+    public function bytes(int $length): string
+    {
+        return random_bytes($length);
+    }
+
+    /**
      * Generate random characters where first character not 0.
+     *
      * @param string $characters
      * @param int $length
      *

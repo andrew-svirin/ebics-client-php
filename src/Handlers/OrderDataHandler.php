@@ -8,6 +8,8 @@ use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerHIA;
+use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
@@ -73,13 +75,13 @@ class OrderDataHandler
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
      *
-     * @param DOMDocument $xml
+     * @param CustomerINI $xml
      * @param SignatureInterface $certificateA
      * @param DateTimeInterface $dateTime
      *
      * @throws EbicsException
      */
-    public function handleINI(DOMDocument $xml, SignatureInterface $certificateA, DateTimeInterface $dateTime): void
+    public function handleINI(CustomerINI $xml, SignatureInterface $certificateA, DateTimeInterface $dateTime): void
     {
         // Add SignaturePubKeyOrderData to root.
         $xmlSignaturePubKeyOrderData = $xml->createElementNS(
@@ -117,7 +119,7 @@ class OrderDataHandler
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
      *
-     * @param DOMDocument $xml
+     * @param CustomerHIA $xml
      * @param SignatureInterface $certificateE
      * @param SignatureInterface $certificateX
      * @param DateTimeInterface $dateTime
@@ -125,7 +127,7 @@ class OrderDataHandler
      * @throws EbicsException
      */
     public function handleHIA(
-        DOMDocument $xml,
+        CustomerHIA $xml,
         SignatureInterface $certificateE,
         SignatureInterface $certificateX,
         DateTimeInterface $dateTime

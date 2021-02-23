@@ -25,7 +25,7 @@ interface TripleDESInterface
      *
      * @return void
      */
-    public function setKey($key);
+    public function setKey(string $key);
 
     /**
      * Sets the initialization vector. (optional)
@@ -37,7 +37,7 @@ interface TripleDESInterface
      *
      * @return void
      */
-    public function setIV($iv);
+    public function setIV(string $iv);
 
     /**
      * Decrypts a message.
@@ -46,7 +46,7 @@ interface TripleDESInterface
      *
      * @return string $plaintext
      */
-    public function decrypt($ciphertext);
+    public function decrypt(string $ciphertext);
 
     /**
      * Encrypts a message.
@@ -55,5 +55,5 @@ interface TripleDESInterface
      *
      * @return string $cipertext
      */
-    public function encrypt($plaintext);
+    public function encrypt(string $plaintext);
 }

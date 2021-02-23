@@ -3,11 +3,11 @@
 namespace AndrewSvirin\Ebics\Models;
 
 /**
- * Class CustomerDirectDebit represents CustomerDirectDebit model.
+ * Class UserSignature represents UserSignature model.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class CustomerDirectDebit extends OrderData
+class UserSignature extends SignatureData
 {
 }

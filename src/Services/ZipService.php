@@ -13,7 +13,7 @@ use ZipArchive;
  *
  * @internal
  */
-class ZipReader
+class ZipService
 {
 
     /**
@@ -58,5 +58,37 @@ class ZipReader
         unlink($tempFile);
 
         return $fileContentItems;
+    }
+
+    /**
+     * Uncompress from gz.
+     *
+     * @param string $compressed
+     *
+     * @return string
+     */
+    public function uncompress(string $compressed)
+    {
+        if (!($uncompressed = gzuncompress($compressed))) {
+            throw new RuntimeException('Data can not be uncompressed.');
+        }
+
+        return $uncompressed;
+    }
+
+    /**
+     * Compress to gz.
+     *
+     * @param string $uncompressed
+     *
+     * @return string
+     */
+    public function compress(string $uncompressed)
+    {
+        if (!($compressed = gzcompress($uncompressed))) {
+            throw new RuntimeException('Data can not be compressed.');
+        }
+
+        return $compressed;
     }
 }

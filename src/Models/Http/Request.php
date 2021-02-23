@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models\Http;
 
-use AndrewSvirin\Ebics\Models\DOMDocument;
+use AndrewSvirin\Ebics\Models\Data;
 
 /**
  * Class Request represents Request model.
@@ -10,6 +10,6 @@ use AndrewSvirin\Ebics\Models\DOMDocument;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Request extends DOMDocument
+class Request extends Data
 {
 }
