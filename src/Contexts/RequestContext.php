@@ -2,7 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
+use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
@@ -32,20 +33,6 @@ class RequestContext
      */
     private $keyRing;
 
-    /**
-     * @var SignatureInterface
-     */
-    private $certificateA;
-
-    /**
-     * @var SignatureInterface
-     */
-    private $certificateE;
-
-    /**
-     * @var SignatureInterface
-     */
-    private $certificateX;
     /**
      * @var DateTimeInterface
      */
@@ -86,6 +73,26 @@ class RequestContext
      */
     private $transactionId;
 
+    /**
+     * @var string
+     */
+    private $transactionKey;
+
+    /**
+     * @var int
+     */
+    private $numSegments;
+
+    /**
+     * @var OrderDataInterface
+     */
+    private $orderData;
+
+    /**
+     * @var SignatureDataInterface
+     */
+    private $signatureData;
+
     public function setBank(Bank $bank): RequestContext
     {
         $this->bank = $bank;
@@ -120,42 +127,6 @@ class RequestContext
     public function getKeyRing(): KeyRing
     {
         return $this->keyRing;
-    }
-
-    public function setCertificateA(SignatureInterface $certificateA): RequestContext
-    {
-        $this->certificateA = $certificateA;
-
-        return $this;
-    }
-
-    public function getCertificateA(): SignatureInterface
-    {
-        return $this->certificateA;
-    }
-
-    public function setCertificateE(SignatureInterface $certificateE): RequestContext
-    {
-        $this->certificateE = $certificateE;
-
-        return $this;
-    }
-
-    public function getCertificateE(): SignatureInterface
-    {
-        return $this->certificateE;
-    }
-
-    public function setCertificateX(SignatureInterface $certificateX): RequestContext
-    {
-        $this->certificateX = $certificateX;
-
-        return $this;
-    }
-
-    public function getCertificateX(): SignatureInterface
-    {
-        return $this->certificateX;
     }
 
     public function setDateTime(DateTimeInterface $dateTime): RequestContext
@@ -252,5 +223,53 @@ class RequestContext
     public function getTransactionId(): string
     {
         return $this->transactionId;
+    }
+
+    public function setTransactionKey(string $transactionKey): RequestContext
+    {
+        $this->transactionKey = $transactionKey;
+
+        return $this;
+    }
+
+    public function getTransactionKey(): string
+    {
+        return $this->transactionKey;
+    }
+
+    public function setNumSegments(int $numSegments): RequestContext
+    {
+        $this->numSegments = $numSegments;
+
+        return $this;
+    }
+
+    public function getNumSegments(): int
+    {
+        return $this->numSegments;
+    }
+
+    public function setOrderData(OrderDataInterface $orderData): RequestContext
+    {
+        $this->orderData = $orderData;
+
+        return $this;
+    }
+
+    public function getOrderData(): OrderDataInterface
+    {
+        return $this->orderData;
+    }
+
+    public function setSignatureData(SignatureDataInterface $signatureData): RequestContext
+    {
+        $this->signatureData = $signatureData;
+
+        return $this;
+    }
+
+    public function getSignatureData(): SignatureDataInterface
+    {
+        return $this->signatureData;
     }
 }

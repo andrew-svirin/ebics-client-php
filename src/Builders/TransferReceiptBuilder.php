@@ -16,7 +16,7 @@ class TransferReceiptBuilder
 
     // The value of the acknowledgement is 0 (“positive acknowledgement”)
     // if download and processing of the order data was successful
-    const CODE_RECEIPT_POSITIVE ='0';
+    const CODE_RECEIPT_POSITIVE = '0';
 
     // Otherwise the value of the acknowledgement is 1 (“negative acknowledgement”).
     const CODE_RECEIPT_NEGATIVE = '1';

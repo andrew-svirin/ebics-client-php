@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Factories;
 
 use AndrewSvirin\Ebics\Builders\BodyBuilder;
+use AndrewSvirin\Ebics\Builders\DataEncryptionInfoBuilder;
 use AndrewSvirin\Ebics\Builders\DataTransferBuilder;
 use AndrewSvirin\Ebics\Builders\HeaderBuilder;
 use AndrewSvirin\Ebics\Builders\MutableBuilder;
@@ -12,15 +13,20 @@ use AndrewSvirin\Ebics\Builders\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\XmlBuilder;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
+use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
+use AndrewSvirin\Ebics\Handlers\UserSignatureHandler;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerHIA;
+use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
-use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Models\UserSignature;
+use AndrewSvirin\Ebics\Services\RandomService;
 use DateTimeInterface;
 
 /**
@@ -47,6 +53,11 @@ class RequestFactory
     private $authSignatureHandler;
 
     /**
+     * @var UserSignatureHandler
+     */
+    private $userSignatureHandler;
+
+    /**
      * @var Bank
      */
     private $bank;
@@ -62,6 +73,11 @@ class RequestFactory
     private $keyRing;
 
     /**
+     * @var RandomService
+     */
+    private $randomService;
+
+    /**
      * Constructor.
      *
      * @param Bank $bank
@@ -73,19 +89,28 @@ class RequestFactory
         $this->requestBuilder = new RequestBuilder();
         $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
         $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
+        $this->userSignatureHandler = new UserSignatureHandler($user, $keyRing);
 
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
+        $this->randomService = new RandomService();
     }
 
     public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request
     {
+        $orderData = new CustomerINI();
+        $this->orderDataHandler->handleINI(
+            $orderData,
+            $certificateA,
+            $dateTime
+        );
+
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setCertificateA($certificateA)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime)
+            ->setOrderData($orderData);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -106,13 +131,7 @@ class RequestFactory
                     })->addMutable();
                 })->addBody(function (BodyBuilder $builder) use ($context) {
                     $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
-                        $orderData = new OrderData();
-                        $this->orderDataHandler->handleINI(
-                            $orderData,
-                            $context->getCertificateA(),
-                            $context->getDateTime()
-                        );
-                        $builder->addOrderData($orderData->getContent());
+                        $builder->addOrderData($context->getOrderData());
                     });
                 });
             })
@@ -140,12 +159,19 @@ class RequestFactory
         SignatureInterface $certificateX,
         DateTimeInterface $dateTime
     ): Request {
+        $orderData = new CustomerHIA();
+        $this->orderDataHandler->handleHIA(
+            $orderData,
+            $certificateE,
+            $certificateX,
+            $dateTime
+        );
+
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setCertificateE($certificateE)
-            ->setCertificateX($certificateX)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime)
+            ->setOrderData($orderData);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -166,14 +192,7 @@ class RequestFactory
                     })->addMutable();
                 })->addBody(function (BodyBuilder $builder) use ($context) {
                     $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
-                        $orderData = new OrderData();
-                        $this->orderDataHandler->handleHIA(
-                            $orderData,
-                            $context->getCertificateE(),
-                            $context->getCertificateX(),
-                            $context->getDateTime()
-                        );
-                        $builder->addOrderData($orderData->getContent());
+                        $builder->addOrderData($context->getOrderData());
                     });
                 });
             })
@@ -255,7 +274,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -301,7 +320,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -347,7 +366,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -411,7 +430,7 @@ class RequestFactory
                                         $context->getEndDateTime()
                                     );
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -457,7 +476,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -513,16 +532,21 @@ class RequestFactory
     /**
      * @param string $transactionId
      * @param int $segmentNumber
+     * @param OrderDataInterface $orderData
      *
      * @return Request
      * @throws EbicsException
      */
-    public function createTransferTransfer(string $transactionId, int $segmentNumber): Request
-    {
+    public function createTransferTransfer(
+        string $transactionId,
+        OrderDataInterface $orderData,
+        int $segmentNumber
+    ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setTransactionId($transactionId)
-            ->setSegmentNumber($segmentNumber);
+            ->setSegmentNumber($segmentNumber)
+            ->setOrderData($orderData);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -537,11 +561,9 @@ class RequestFactory
                             ->addTransactionPhase(MutableBuilder::PHASE_TRANSFER)
                             ->addSegmentNumber($context->getSegmentNumber());
                     });
-                })->addBody(function (BodyBuilder $builder) {
-                    $builder->addDataTransfer(function (DataTransferBuilder $builder) {
-                        $orderData = new OrderData();
-                        // TODO: Add order data.
-                        $builder->addOrderData($orderData->getContent());
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder->addOrderData($context->getOrderData());
                     });
                 });
             })
@@ -591,7 +613,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -644,7 +666,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -697,7 +719,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -750,7 +772,7 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBank($context->getKeyRing())
+                            ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -764,13 +786,19 @@ class RequestFactory
         return $request;
     }
 
-    public function createCCT(DateTimeInterface $dateTime): Request
+    public function createCCT(DateTimeInterface $dateTime, int $numSegments): Request
     {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData);
+
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyRing($this->keyRing)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime)
+            ->setTransactionKey($this->randomService->bytes(16))
+            ->setNumSegments($numSegments)
+            ->setSignatureData($signatureData);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -790,12 +818,23 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
-                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
-                })->addBody();
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
+                    });
+                });
             })
             ->popInstance();
 
@@ -804,13 +843,19 @@ class RequestFactory
         return $request;
     }
 
-    public function createCDD(DateTimeInterface $dateTime): Request
+    public function createCDD(DateTimeInterface $dateTime, int $numSegments): Request
     {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData);
+
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyRing($this->keyRing)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime)
+            ->setTransactionKey($this->randomService->bytes(16))
+            ->setNumSegments($numSegments)
+            ->setSignatureData($signatureData);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -830,12 +875,23 @@ class RequestFactory
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
                                     ->addStandardOrderParams();
                             })
-                            ->addBank($context->getKeyRing())
-                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
-                })->addBody();
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
+                    });
+                });
             })
             ->popInstance();
 

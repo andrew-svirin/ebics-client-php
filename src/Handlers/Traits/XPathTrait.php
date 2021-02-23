@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Handlers\Traits;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
-use Exception;
 
 /**
  * Class XPathTrait manage XPath building.
@@ -69,9 +68,10 @@ trait XPathTrait
      */
     private function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
     {
-        try {
-            $afterNode->parentNode->insertBefore($newNode, $afterNode->nextSibling);
-        } catch (Exception $e) {
+        $nextSibling = $afterNode->nextSibling;
+        if ($newNode !== $nextSibling) {
+            $afterNode->parentNode->insertBefore($newNode, $nextSibling);
+        } else {
             $afterNode->parentNode->appendChild($newNode);
         }
     }

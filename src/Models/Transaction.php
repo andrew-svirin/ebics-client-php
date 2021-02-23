@@ -23,14 +23,19 @@ class Transaction implements TransactionInterface
     private $phase;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $segmentNumber;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $numSegments;
+
+    /**
+     * @var string|null
+     */
+    private $orderId;
 
     /**
      * Uses for decoded OrderData Items.
@@ -46,89 +51,66 @@ class Transaction implements TransactionInterface
      */
     private $plainOrderData;
 
-    /**
-     * @return string
-     */
     public function getPhase(): string
     {
         return $this->phase;
     }
 
-    /**
-     * @param string $phase
-     */
     public function setPhase(string $phase): void
     {
         $this->phase = $phase;
     }
 
-    /**
-     * @return string
-     */
     public function getId(): string
     {
         return $this->id;
     }
 
-    /**
-     * @param string $id
-     */
     public function setId(string $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getSegmentNumber(): int
+    public function getSegmentNumber(): ?int
     {
         return $this->segmentNumber;
     }
 
-    /**
-     * @param int $segmentNumber
-     */
-    public function setSegmentNumber(int $segmentNumber): void
+    public function setSegmentNumber(int $segmentNumber = null): void
     {
         $this->segmentNumber = $segmentNumber;
     }
 
-    /**
-     * @return int
-     */
-    public function getNumSegments(): int
+    public function getNumSegments(): ?int
     {
         return $this->numSegments;
     }
 
-    /**
-     * @param int $numSegments
-     */
-    public function setNumSegments(int $numSegments): void
+    public function setNumSegments(int $numSegments = null): void
     {
         $this->numSegments = $numSegments;
     }
 
-    /**
-     * @return string
-     */
+    public function setOrderId(string $orderId = null): void
+    {
+        $this->orderId = $orderId;
+    }
+
+    public function getOrderId(): ?string
+    {
+        return $this->orderId;
+    }
+
     public function getPlainOrderData(): string
     {
         return $this->plainOrderData;
     }
 
-    /**
-     * @param string $plainOrderData
-     */
     public function setPlainOrderData(string $plainOrderData): void
     {
         $this->plainOrderData = $plainOrderData;
     }
 
-    /**
-     * @return OrderData
-     */
     public function getOrderData(): OrderData
     {
         return $this->orderDataItems[0];

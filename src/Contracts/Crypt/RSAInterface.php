@@ -142,7 +142,7 @@ interface RSAInterface
      *   'partialkey' => '<bool>',
      * ]
      */
-    public function createKey($bits = 1024, $timeout = false, $partial = array());
+    public function createKey(int $bits = 1024, $timeout = false, array $partial = []);
 
     /**
      * Returns the public key
@@ -156,7 +156,7 @@ interface RSAInterface
      *
      * @return string|null
      */
-    public function getPublicKey($type = RSA::PUBLIC_FORMAT_PKCS8);
+    public function getPublicKey(int $type = RSA::PUBLIC_FORMAT_PKCS8);
 
     /**
      * Returns the private key
@@ -167,7 +167,7 @@ interface RSAInterface
      *
      * @return mixed
      */
-    public function getPrivateKey($type = RSA::PUBLIC_FORMAT_PKCS1);
+    public function getPrivateKey(int $type = RSA::PUBLIC_FORMAT_PKCS1);
 
     /**
      * Create a signature

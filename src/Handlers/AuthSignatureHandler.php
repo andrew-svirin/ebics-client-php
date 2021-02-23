@@ -139,12 +139,13 @@ class AuthSignatureHandler
             $canonicalizedSignedInfo,
             $signatureMethodAlgorithm
         );
-        $canonicalizedSignedInfoHashSigned = $this->cryptService->cryptSignatureValue(
-            $this->keyRing,
+        $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encryptSignatureValue(
+            $this->keyRing->getUserSignatureX()->getPrivateKey(),
+            $this->keyRing->getPassword(),
             $canonicalizedSignedInfoHash
         );
-        $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
-        $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
+        $canonicalizedSignedInfoHashEncryptedEncoded = base64_encode($canonicalizedSignedInfoHashEncrypted);
+        $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashEncryptedEncoded;
         $xmlAuthSignature->appendChild($xmlSignatureValue);
     }
 }

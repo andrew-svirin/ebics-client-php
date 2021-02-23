@@ -4,8 +4,8 @@ namespace AndrewSvirin\Ebics\Tests\Handlers;
 
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
@@ -44,7 +44,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         $iniXPath = $this->prepareH004XPath($iniXML);
         $orderData = $iniXPath->query('//H004:body/H004:DataTransfer/H004:OrderData')->item(0)->nodeValue;
         $orderDataDeUn = gzuncompress(base64_decode($orderData));
-        $orderDataXML = new OrderData();
+        $orderDataXML = new CustomerINI();
         $orderDataXML->loadXML($orderDataDeUn);
         $orderDataXPath = $this->prepareS001XPath($orderDataXML);
         $iniDatetime = $orderDataXPath->query('//S001:SignaturePubKeyInfo/S001:PubKeyValue/S001:TimeStamp')->item(0)->nodeValue;

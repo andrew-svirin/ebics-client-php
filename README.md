@@ -272,5 +272,7 @@ try {
 | STA | Retrieve the bank account statement. |
 | C53 | Retrieve the bank account statement in Camt.053 format. |
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
+| CCT | Initiate the credit transfer per Single Euro Payments Area. |
+| CDD | Initiate a direct debit transaction. |
 
 ### 6. Make HKD request to see what order types allowed.
