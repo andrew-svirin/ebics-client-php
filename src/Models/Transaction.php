@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
+use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\TransactionInterface;
 
 /**
@@ -13,14 +14,19 @@ use AndrewSvirin\Ebics\Contracts\TransactionInterface;
 class Transaction implements TransactionInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     private $id;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $phase;
+
+    /**
+     * @var string|null
+     */
+    private $key;
 
     /**
      * @var int|null
@@ -40,35 +46,44 @@ class Transaction implements TransactionInterface
     /**
      * Uses for decoded OrderData Items.
      *
-     * @var array
+     * @var array|null
      */
     private $orderDataItems;
-
     /**
      * Uses for encrypted OrderData.
      *
-     * @var string
+     * @var string|null
      */
     private $plainOrderData;
 
-    public function getPhase(): string
-    {
-        return $this->phase;
-    }
-
-    public function setPhase(string $phase): void
-    {
-        $this->phase = $phase;
-    }
-
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(string $id): void
+    public function setId(string $id = null): void
     {
         $this->id = $id;
+    }
+
+    public function getPhase(): ?string
+    {
+        return $this->phase;
+    }
+
+    public function setPhase(string $phase = null): void
+    {
+        $this->phase = $phase;
+    }
+
+    public function getKey(): ?string
+    {
+        return $this->key;
+    }
+
+    public function setKey(string $key = null): void
+    {
+        $this->key = $key;
     }
 
     public function getSegmentNumber(): ?int
@@ -111,12 +126,12 @@ class Transaction implements TransactionInterface
         $this->plainOrderData = $plainOrderData;
     }
 
-    public function getOrderData(): OrderData
+    public function getOrderData(): OrderDataInterface
     {
         return $this->orderDataItems[0];
     }
 
-    public function setOrderData(OrderData $orderData): void
+    public function setOrderData(OrderDataInterface $orderData): void
     {
         $this->orderDataItems[0] = $orderData;
     }

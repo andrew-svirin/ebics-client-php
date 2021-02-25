@@ -53,13 +53,22 @@ class DataTransferBuilder
         return $this;
     }
 
-    public function addOrderData(OrderDataInterface $orderData): DataTransferBuilder
+    public function addOrderData(OrderDataInterface $orderData, string $transactionKey = null): DataTransferBuilder
     {
         $orderDataCompressed = $this->zipService->compress($orderData->getContent());
-        $orderDataCompressedEncoded = base64_encode($orderDataCompressed);
+
+        if (null !== $transactionKey) {
+            $orderDataCompressedEncrypted = $this->cryptService->encryptByKey(
+                $transactionKey,
+                $orderDataCompressed
+            );
+            $orderDataNodeValue = base64_encode($orderDataCompressedEncrypted);
+        } else {
+            $orderDataNodeValue = base64_encode($orderDataCompressed);
+        }
 
         $xmlDataTransfer = $this->dom->createElement('OrderData');
-        $xmlDataTransfer->nodeValue = $orderDataCompressedEncoded;
+        $xmlDataTransfer->nodeValue = $orderDataNodeValue;
         $this->instance->appendChild($xmlDataTransfer);
 
         return $this;
@@ -82,11 +91,11 @@ class DataTransferBuilder
             $transactionKey,
             $userSignatureCompressed
         );
-        $userSignatureCompressedEncryptedEncoded = base64_encode($userSignatureCompressedEncrypted);
+        $signatureDataNodeValue = base64_encode($userSignatureCompressedEncrypted);
 
         $xmlSignatureData = $this->dom->createElement('SignatureData');
         $xmlSignatureData->setAttribute('authenticate', 'true');
-        $xmlSignatureData->nodeValue = $userSignatureCompressedEncryptedEncoded;
+        $xmlSignatureData->nodeValue = $signatureDataNodeValue;
         $this->instance->appendChild($xmlSignatureData);
 
         return $this;

@@ -65,6 +65,8 @@ class DataEncryptionInfoBuilder
         if (!($signatureE = $keyRing->getBankSignatureE())) {
             throw new EbicsException('Bank Certificate E is empty.');
         }
+        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
+        $encryptionPubKeyDigestNodeValue =  base64_encode($certificateEDigest);
 
         $xmlEncryptionPubKeyDigest = $this->dom->createElement('EncryptionPubKeyDigest');
         $xmlEncryptionPubKeyDigest->setAttribute('Version', $keyRing->getBankSignatureEVersion());
@@ -72,8 +74,7 @@ class DataEncryptionInfoBuilder
             'Algorithm',
             sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm)
         );
-        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
-        $xmlEncryptionPubKeyDigest->nodeValue = base64_encode($certificateEDigest);
+        $xmlEncryptionPubKeyDigest->nodeValue = $encryptionPubKeyDigestNodeValue;
         $this->instance->appendChild($xmlEncryptionPubKeyDigest);
 
         return $this;
@@ -85,9 +86,10 @@ class DataEncryptionInfoBuilder
             $keyRing->getBankSignatureE()->getPublicKey(),
             $transactionKey
         );
+        $transactionKeyNodeValue = base64_encode($transactionKeyEncrypted);
 
         $xmlTransactionKey = $this->dom->createElement('TransactionKey');
-        $xmlTransactionKey->nodeValue = base64_encode($transactionKeyEncrypted);
+        $xmlTransactionKey->nodeValue = $transactionKeyNodeValue;
         $this->instance->appendChild($xmlTransactionKey);
 
         return $this;
