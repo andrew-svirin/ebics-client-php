@@ -8,8 +8,6 @@ use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Models\KeyRing;
-use AndrewSvirin\Ebics\Models\OrderData;
-use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
 use RuntimeException;
 
 /**
@@ -43,18 +41,12 @@ class CryptService
      */
     private $orderDataFactory;
 
-    /**
-     * @var ZipService
-     */
-    private $zipService;
-
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
         $this->aesFactory = new AESFactory();
         $this->randomService = new RandomService();
         $this->orderDataFactory = new OrderDataFactory();
-        $this->zipService = new ZipService();
     }
 
     /**
@@ -74,66 +66,26 @@ class CryptService
      * Decrypt encrypted OrderData.
      *
      * @param KeyRing $keyRing
-     * @param OrderDataEncrypted $orderDataEncrypted
-     *
-     * @return OrderData
-     * @throws EbicsException
-     */
-    public function decryptOrderData(KeyRing $keyRing, OrderDataEncrypted $orderDataEncrypted): OrderData
-    {
-        $orderDataContent = $this->decryptOrderDataContent($keyRing, $orderDataEncrypted);
-        $orderData = $this->orderDataFactory->createOrderDataFromContent($orderDataContent);
-
-        return $orderData;
-    }
-
-    /**
-     * Decrypt encrypted OrderData items.
-     * Unzip order data items.
-     *
-     * @param KeyRing $keyRing
-     * @param OrderDataEncrypted $orderData
-     *
-     * @return OrderData[]
-     * @throws EbicsException
-     */
-    public function decryptOrderDataItems(KeyRing $keyRing, OrderDataEncrypted $orderData): array
-    {
-        $orderDataContent = $this->decryptOrderDataContent($keyRing, $orderData);
-
-        $orderDataXmlItems = $this->zipService->extractFilesFromString($orderDataContent);
-
-        $orderDataItems = [];
-        foreach ($orderDataXmlItems as $orderDataXmlItem) {
-            $orderDataItems[] = $this->orderDataFactory->createOrderDataFromContent($orderDataXmlItem);
-        }
-
-        return $orderDataItems;
-    }
-
-    /**
-     * Decrypt encrypted OrderData.
-     *
-     * @param KeyRing $keyRing
-     * @param OrderDataEncrypted $orderData
+     * @param string $orderDataEncrypted
+     * @param string $transactionKey
      *
      * @return string
      * @throws EbicsException
      */
-    public function decryptOrderDataContent(
+    public function decryptPlainOrderDataCompressed(
         KeyRing $keyRing,
-        OrderDataEncrypted $orderData
+        string $orderDataEncrypted,
+        string $transactionKey
     ): string {
         if (!($signatureE = $keyRing->getUserSignatureE())) {
             throw new RuntimeException('Signature E is not set.');
         }
 
         $rsa = $this->rsaFactory->createPrivate($signatureE->getPrivateKey(), $keyRing->getPassword());
-        $transactionKeyDecrypted = $rsa->decrypt($orderData->getTransactionKey());
-        $decrypted = $this->decryptByKey($transactionKeyDecrypted, $orderData->getOrderData());
-        $orderData = $this->zipService->uncompress($decrypted);
+        $transactionKeyDecrypted = $rsa->decrypt($transactionKey);
+        $orderDataCompressed = $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted);
 
-        return $orderData;
+        return $orderDataCompressed;
     }
 
     /**
@@ -169,6 +121,7 @@ class CryptService
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($key);
+        $aes->setOpenSSLOptions(OPENSSL_RAW_DATA);
         $encrypted = $aes->encrypt($decrypted);
 
         return $encrypted;
@@ -391,7 +344,7 @@ class CryptService
     }
 
     /**
-     * Make key from  exponent and modulus.
+     * Make key from exponent and modulus.
      *
      * @param string $exponent
      * @param string $modulus
@@ -427,7 +380,7 @@ class CryptService
     }
 
     /**
-     * generate 16 pseudo bytes.
+     * Generate nonce from 32 HEX digits.
      *
      * @return string
      */
@@ -436,6 +389,18 @@ class CryptService
         $nonce = $this->randomService->hex(32);
 
         return $nonce;
+    }
+
+    /**
+     * Generate transaction key from 16 pseudo bytes.
+     *
+     * @return string
+     */
+    public function generateTransactionKey(): string
+    {
+        $transactionKey = $this->randomService->bytes(16);
+
+        return $transactionKey;
     }
 
     /**

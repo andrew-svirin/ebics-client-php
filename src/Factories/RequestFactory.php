@@ -340,6 +340,52 @@ class RequestFactory
      * @return Request
      * @throws EbicsException
      */
+    public function createPTK(DateTimeInterface $dateTime): Request
+    {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $orderDetailsBuilder
+                                    ->addOrderType('PTK')
+                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                    ->addStandardOrderParams();
+                            })
+                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
     public function createHTD(DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
@@ -531,22 +577,25 @@ class RequestFactory
 
     /**
      * @param string $transactionId
-     * @param int $segmentNumber
+     * @param string $transactionKey
      * @param OrderDataInterface $orderData
+     * @param int $segmentNumber
      *
      * @return Request
      * @throws EbicsException
      */
     public function createTransferTransfer(
         string $transactionId,
+        string $transactionKey,
         OrderDataInterface $orderData,
         int $segmentNumber
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setTransactionId($transactionId)
-            ->setSegmentNumber($segmentNumber)
-            ->setOrderData($orderData);
+            ->setTransactionKey($transactionKey)
+            ->setOrderData($orderData)
+            ->setSegmentNumber($segmentNumber);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -563,7 +612,7 @@ class RequestFactory
                     });
                 })->addBody(function (BodyBuilder $builder) use ($context) {
                     $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
-                        $builder->addOrderData($context->getOrderData());
+                        $builder->addOrderData($context->getOrderData(), $context->getTransactionKey());
                     });
                 });
             })
@@ -786,17 +835,21 @@ class RequestFactory
         return $request;
     }
 
-    public function createCCT(DateTimeInterface $dateTime, int $numSegments): Request
-    {
+    public function createCCT(
+        DateTimeInterface $dateTime,
+        int $numSegments,
+        string $transactionKey,
+        OrderDataInterface $orderData
+    ): Request {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData);
+        $this->userSignatureHandler->handle($signatureData, $orderData);
 
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime)
-            ->setTransactionKey($this->randomService->bytes(16))
+            ->setTransactionKey($transactionKey)
             ->setNumSegments($numSegments)
             ->setSignatureData($signatureData);
 
@@ -843,17 +896,21 @@ class RequestFactory
         return $request;
     }
 
-    public function createCDD(DateTimeInterface $dateTime, int $numSegments): Request
-    {
+    public function createCDD(
+        DateTimeInterface $dateTime,
+        int $numSegments,
+        string $transactionKey,
+        OrderDataInterface $orderData
+    ): Request {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData);
+        $this->userSignatureHandler->handle($signatureData, $orderData);
 
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime)
-            ->setTransactionKey($this->randomService->bytes(16))
+            ->setTransactionKey($transactionKey)
             ->setNumSegments($numSegments)
             ->setSignatureData($signatureData);
 

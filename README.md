@@ -266,6 +266,7 @@ try {
 | HPD | Retrieve the bank server parameters. |
 | HKD | Retrieve customer's customer and subscriber information. |
 | HTD | Retrieve subscriber's customer and subscriber information. |
+| PTK | Downloads transaction status. |
 | FDL | Retrieve subscriber's customer and subscriber information. |
 | HAA | Downloads the interim transaction report in SWIFT format (MT942). |
 | VMK | Downloads the interim transaction report in SWIFT format (MT942). |
