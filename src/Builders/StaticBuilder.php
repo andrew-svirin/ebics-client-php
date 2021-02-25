@@ -138,25 +138,27 @@ class StaticBuilder
         if (!($signatureX = $keyRing->getBankSignatureX())) {
             throw new EbicsException('Certificate X is empty.');
         }
+        $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
+        $authenticationNodeValue = base64_encode($certificateXDigest);
 
         if (!($signatureE = $keyRing->getBankSignatureE())) {
             throw new EbicsException('Certificate E is empty.');
         }
+        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
+        $encryptionNodeValue = base64_encode($certificateEDigest);
 
         // Add Authentication to BankPubKeyDigests.
         $xmlAuthentication = $this->dom->createElement('Authentication');
         $xmlAuthentication->setAttribute('Version', $keyRing->getBankSignatureXVersion());
         $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
-        $xmlAuthentication->nodeValue = base64_encode($certificateXDigest);
+        $xmlAuthentication->nodeValue = $authenticationNodeValue;
         $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
         // Add Encryption to BankPubKeyDigests.
         $xmlEncryption = $this->dom->createElement('Encryption');
         $xmlEncryption->setAttribute('Version', $keyRing->getBankSignatureEVersion());
         $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
-        $xmlEncryption->nodeValue = base64_encode($certificateEDigest);
+        $xmlEncryption->nodeValue = $encryptionNodeValue;
         $xmlBankPubKeyDigests->appendChild($xmlEncryption);
 
         return $this;

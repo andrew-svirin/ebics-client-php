@@ -43,7 +43,7 @@ class ZipService
 
         $zip = new ZipArchive();
         if (true !== $zip->open($tempFile)) {
-            throw new RuntimeException('Zip archive wa not opened.');
+            throw new RuntimeException('Zip archive was not opened.');
         }
 
         // Read zipped order data items.
