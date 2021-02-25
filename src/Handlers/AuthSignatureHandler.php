@@ -125,7 +125,9 @@ class AuthSignatureHandler
             $canonicalizationMethodAlgorithm
         );
         $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
-        $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
+        $digestValueNodeValue = base64_encode($canonicalizedHeaderHash);
+
+        $xmlDigestValue->nodeValue = $digestValueNodeValue;
         $xmlReference->appendChild($xmlDigestValue);
 
         // Add ds:SignatureValue to AuthSignature.
@@ -144,8 +146,9 @@ class AuthSignatureHandler
             $this->keyRing->getPassword(),
             $canonicalizedSignedInfoHash
         );
-        $canonicalizedSignedInfoHashEncryptedEncoded = base64_encode($canonicalizedSignedInfoHashEncrypted);
-        $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashEncryptedEncoded;
+        $signatureValueNodeValue = base64_encode($canonicalizedSignedInfoHashEncrypted);
+
+        $xmlSignatureValue->nodeValue = $signatureValueNodeValue;
         $xmlAuthSignature->appendChild($xmlSignatureValue);
     }
 }

@@ -15,16 +15,11 @@ class TransactionFactory
     /**
      * Build Transactions from arguments.
      *
-     * @param string $transactionId
-     * @param string $transactionPhase
-     *
      * @return Transaction
      */
-    public function create(string $transactionId, string $transactionPhase): Transaction
+    public function create(): Transaction
     {
         $transaction = new Transaction();
-        $transaction->setId($transactionId);
-        $transaction->setPhase($transactionPhase);
 
         return $transaction;
     }

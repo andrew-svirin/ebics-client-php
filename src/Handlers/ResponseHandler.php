@@ -3,11 +3,15 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\OrderDataEncrypted;
+use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
+use AndrewSvirin\Ebics\Services\ZipService;
 use DOMDocument;
 
 /**
@@ -21,13 +25,31 @@ class ResponseHandler
     use XPathTrait;
 
     /**
+     * @var OrderDataFactory
+     */
+    private $orderDataFactory;
+
+    /**
      * @var TransactionFactory
      */
     private $transactionFactory;
 
+    /**
+     * @var CryptService
+     */
+    private $cryptService;
+
+    /**
+     * @var ZipService
+     */
+    private $zipService;
+
     public function __construct()
     {
+        $this->orderDataFactory = new OrderDataFactory();
         $this->transactionFactory = new TransactionFactory();
+        $this->cryptService = new CryptService();
+        $this->zipService = new ZipService();
     }
 
     /**
@@ -126,26 +148,76 @@ class ResponseHandler
     }
 
     /**
-     * Retrieve encoded Order data.
+     * Retrieve OrderData.
      *
      * @param DOMDocument $xml
+     * @param string $transactionKey
+     * @param KeyRing $keyRing
      *
-     * @return OrderDataEncrypted
+     * @return OrderData
      * @throws EbicsException
      */
-    public function retrieveOrderData(DOMDocument $xml): OrderDataEncrypted
+    public function retrieveOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): OrderData
+    {
+        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
+        $orderData = $this->orderDataFactory->createOrderDataFromContent($plainOrderData);
+
+        return $orderData;
+    }
+
+    /**
+     * Retrieve OrderData items.
+     * Unzip order data items.
+     *
+     * @param DOMDocument $xml
+     * @param string $transactionKey
+     * @param KeyRing $keyRing
+     *
+     * @return OrderData[]
+     * @throws EbicsException
+     */
+    public function retrieveOrderDataItems(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): array
+    {
+        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
+
+        $orderDataXmlItems = $this->zipService->extractFilesFromString($plainOrderData);
+
+        $orderDataItems = [];
+        foreach ($orderDataXmlItems as $orderDataXmlItem) {
+            $orderDataItems[] = $this->orderDataFactory->createOrderDataFromContent($orderDataXmlItem);
+        }
+
+        return $orderDataItems;
+    }
+
+    /**
+     * Retrieve plain OrderData.
+     *
+     * @param DOMDocument $xml
+     * @param string $transactionKey
+     * @param KeyRing $keyRing
+     *
+     * @return string
+     * @throws EbicsException
+     */
+    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing)
     {
         $xpath = $this->prepareH004XPath($xml);
-        $orderData = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
-        $transactionKey = $xpath->query('//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey');
-        if (!$orderData || 0 === $orderData->length || !$transactionKey || 0 === $transactionKey->length) {
+        $orderDataPath = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
+        if (!$orderDataPath || 0 === $orderDataPath->length) {
             throw new EbicsException('EBICS response empty result.');
         }
-        $orderDataValue = DOMHelper::safeItemValue($orderData);
-        $transactionKeyValue = DOMHelper::safeItemValue($transactionKey);
-        $transactionKeyValueDe = base64_decode($transactionKeyValue);
+        $plainOrderDataEncrypted = DOMHelper::safeItemValue($orderDataPath);
 
-        return new OrderDataEncrypted($orderDataValue, $transactionKeyValueDe);
+        $plainOrderDataCompressed = $this->cryptService->decryptPlainOrderDataCompressed(
+            $keyRing,
+            $plainOrderDataEncrypted,
+            $transactionKey
+        );
+
+        $plainOrderData = $this->zipService->uncompress($plainOrderDataCompressed);
+
+        return $plainOrderData;
     }
 
     /**
@@ -159,20 +231,28 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $transactionIdPath = $xpath->query('//H004:header/H004:static/H004:TransactionID');
-        $transactionId = DOMHelper::safeItemValue($transactionIdPath);
+        $transactionId = DOMHelper::safeItemValueOrNull($transactionIdPath);
         $transactionPhasePath = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
-        $transactionPhase = DOMHelper::safeItemValue($transactionPhasePath);
+        $transactionPhase = DOMHelper::safeItemValueOrNull($transactionPhasePath);
         $numSegmentsPath = $xpath->query('//H004:header/H004:static/H004:NumSegments');
         $numSegments = DOMHelper::safeItemValueOrNull($numSegmentsPath);
         $orderIdPath = $xpath->query('//H004:header/H004:mutable/H004:OrderID');
         $orderId = DOMHelper::safeItemValueOrNull($orderIdPath);
         $segmentNumberPath = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
         $segmentNumber = DOMHelper::safeItemValueOrNull($segmentNumberPath);
+        $transactionKeyPath = $xpath->query(
+            '//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey'
+        );
+        $transactionKeyEncoded = DOMHelper::safeItemValueOrNull($transactionKeyPath);
+        $transactionKey = base64_decode($transactionKeyEncoded);
 
-        $transaction = $this->transactionFactory->create($transactionId, $transactionPhase);
+        $transaction = $this->transactionFactory->create();
+        $transaction->setId($transactionId);
+        $transaction->setPhase($transactionPhase);
         $transaction->setNumSegments(null !== $numSegments ? (int)$numSegments : null);
         $transaction->setOrderId($orderId);
         $transaction->setSegmentNumber(null !== $segmentNumber ? (int)$segmentNumber : null);
+        $transaction->setKey($transactionKey);
 
         return $transaction;
     }
