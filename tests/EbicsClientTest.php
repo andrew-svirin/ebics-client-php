@@ -2,11 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
+use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
-use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
-use AndrewSvirin\Ebics\Models\CustomerDirectDebit;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
@@ -475,8 +475,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CCT']['code']);
 
-        $customerCreditTransfer = new CustomerCreditTransfer();
-        $customerCreditTransfer->loadXML(file_get_contents($this->fixtures . '/pain.001.001.03.xml'));
+        $builder = new CustomerCreditTransferBuilder();
+        $customerCreditTransfer = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
+            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Creditor Name 1', 100.10, 'EUR', 'Test payment  1')
+            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Creditor Name 2', 200.02, 'EUR', 'Test payment  2')
+            ->popInstance();
 
         $cct = $client->CCT($customerCreditTransfer);
 
@@ -506,8 +510,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CDD']['code']);
 
-        $customerDirectDebit = new CustomerDirectDebit();
-        $customerDirectDebit->loadXML(file_get_contents($this->fixtures . '/pain.008.001.02.xml'));
+        $builder = new CustomerDirectDebitBuilder();
+        $customerDirectDebit = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
+            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR', 'Test payment  1')
+            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
+            ->popInstance();
 
         $cdd = $client->CDD($customerDirectDebit);
 
@@ -623,30 +631,30 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CDD' => ['code' => '090003', 'fake' => false],
                 ],
             ],
-            [
-                5, // Credentials Id.
-                [
-                    'HEV' => ['code' => null, 'fake' => false],
-                    'INI' => ['code' => null, 'fake' => false],
-                    'HIA' => ['code' => null, 'fake' => false],
-                    'HPB' => ['code' => null, 'fake' => false],
-                    'HPD' => ['code' => null, 'fake' => false],
-                    'HKD' => ['code' => null, 'fake' => false],
-                    'HTD' => ['code' => null, 'fake' => false],
-                    'HAA' => ['code' => null, 'fake' => false],
-                    'PTK' => ['code' => null, 'fake' => false],
-                    'VMK' => ['code' => '091005', 'fake' => false],
-                    'STA' => ['code' => '091005', 'fake' => false],
-                    'Z53' => ['code' => '090005', 'fake' => false],
-                    'C53' => ['code' => '091005', 'fake' => false],
-                    'FDL' => [
-                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
-                    ],
-                    'CCT' => ['code' => null, 'fake' => false],
-                    'CDD' => ['code' => null, 'fake' => false],
-                ],
-            ],
+//            [
+//                5, // Credentials Id.
+//                [
+//                    'HEV' => ['code' => null, 'fake' => false],
+//                    'INI' => ['code' => null, 'fake' => false],
+//                    'HIA' => ['code' => null, 'fake' => false],
+//                    'HPB' => ['code' => null, 'fake' => false],
+//                    'HPD' => ['code' => null, 'fake' => false],
+//                    'HKD' => ['code' => null, 'fake' => false],
+//                    'HTD' => ['code' => null, 'fake' => false],
+//                    'HAA' => ['code' => null, 'fake' => false],
+//                    'PTK' => ['code' => null, 'fake' => false],
+//                    'VMK' => ['code' => '091005', 'fake' => false],
+//                    'STA' => ['code' => '091005', 'fake' => false],
+//                    'Z53' => ['code' => '090005', 'fake' => false],
+//                    'C53' => ['code' => '091005', 'fake' => false],
+//                    'FDL' => [
+//                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
+//                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
+//                    ],
+//                    'CCT' => ['code' => null, 'fake' => false],
+//                    'CDD' => ['code' => null, 'fake' => false],
+//                ],
+//            ],
         ];
     }
 }

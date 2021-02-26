@@ -2,16 +2,16 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Builders\BodyBuilder;
-use AndrewSvirin\Ebics\Builders\DataEncryptionInfoBuilder;
-use AndrewSvirin\Ebics\Builders\DataTransferBuilder;
-use AndrewSvirin\Ebics\Builders\HeaderBuilder;
-use AndrewSvirin\Ebics\Builders\MutableBuilder;
-use AndrewSvirin\Ebics\Builders\OrderDetailsBuilder;
-use AndrewSvirin\Ebics\Builders\RequestBuilder;
-use AndrewSvirin\Ebics\Builders\StaticBuilder;
-use AndrewSvirin\Ebics\Builders\TransferReceiptBuilder;
-use AndrewSvirin\Ebics\Builders\XmlBuilder;
+use AndrewSvirin\Ebics\Builders\Request\BodyBuilder;
+use AndrewSvirin\Ebics\Builders\Request\DataEncryptionInfoBuilder;
+use AndrewSvirin\Ebics\Builders\Request\DataTransferBuilder;
+use AndrewSvirin\Ebics\Builders\Request\HeaderBuilder;
+use AndrewSvirin\Ebics\Builders\Request\MutableBuilder;
+use AndrewSvirin\Ebics\Builders\Request\OrderDetailsBuilder;
+use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
+use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
+use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
+use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
