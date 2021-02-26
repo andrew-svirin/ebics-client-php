@@ -68,6 +68,12 @@ class FakerHttpClient implements HttpClientInterface
             case 'STA':
                 $fileName = sprintf('sta.xml', $options['file_format']);
                 break;
+            case 'CCT':
+                $fileName = sprintf('cct.xml', $options['file_format']);
+                break;
+            case 'CDD':
+                $fileName = sprintf('cdd.xml', $options['file_format']);
+                break;
             default:
                 throw new LogicException(sprintf('Faked order type `%s` not supported.', $orderType));
         }
@@ -100,6 +106,9 @@ class FakerHttpClient implements HttpClientInterface
             case 'Receipt':
                 $fileName = 'receipt.xml';
                 break;
+            case 'Transfer':
+                $fileName = 'transfer.xml';
+                break;
             default:
                 throw new LogicException(sprintf('Faked transaction phase `%s` not supported.', $transactionPhase));
         }
@@ -107,7 +116,7 @@ class FakerHttpClient implements HttpClientInterface
         $fixturePath = $this->fixturesDir . '/' . $fileName;
 
         if (!is_file($fixturePath)) {
-            throw new LogicException('Fixtures file doe not exists.');
+            throw new LogicException('Fixtures file does not exists.');
         }
 
         $response = new Response();
