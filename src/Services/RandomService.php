@@ -2,6 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use DateTime;
+
 /**
  * Random function.
  *
@@ -78,5 +80,18 @@ class RandomService
         }
 
         return $random;
+    }
+
+    /**
+     * Generate unique id with current date time prefix.
+     *
+     * @return string
+     */
+    public function uniqueIdWithDate(string $prefix = null): string
+    {
+        $now = new DateTime();
+
+        $uniqid = $prefix . uniqid($now->format('YmdHisv'));
+        return substr($uniqid, 0, 35);
     }
 }

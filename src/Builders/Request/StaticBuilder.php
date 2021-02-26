@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders;
+namespace AndrewSvirin\Ebics\Builders\Request;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\KeyRing;

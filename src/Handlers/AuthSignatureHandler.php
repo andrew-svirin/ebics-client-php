@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
+use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
 use DOMXpath;
@@ -65,12 +66,9 @@ class AuthSignatureHandler
 
         // Find Header element to insert after.
         if (null === $xmlRequestHeader) {
-            $xpath = new DOMXpath($request);
+            $xpath = $this->prepareXPath($request);
             $headerList = $xpath->query('//header');
-            if (false === $headerList) {
-                throw new RuntimeException('Header element not found.');
-            }
-            $xmlRequestHeader = $headerList->item(0);
+            $xmlRequestHeader = DOMHelper::safeItem($headerList);
         }
 
         $this->insertAfter($xmlAuthSignature, $xmlRequestHeader);
