@@ -14,6 +14,21 @@ use DOMXPath;
  */
 trait XPathTrait
 {
+
+    /**
+     * Setup XPath for DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return DOMXPath
+     */
+    private function prepareXPath(DOMDocument $xml): DOMXPath
+    {
+        $xpath = new DOMXpath($xml);
+
+        return $xpath;
+    }
+
     /**
      * Setup H004 XPath for DOM XML.
      *
@@ -23,7 +38,7 @@ trait XPathTrait
      */
     private function prepareH004XPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
+        $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H004', 'urn:org:ebics:H004');
         $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
@@ -39,7 +54,7 @@ trait XPathTrait
      */
     private function prepareH000XPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
+        $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H000', 'http://www.ebics.org/H000');
 
         return $xpath;
@@ -54,7 +69,7 @@ trait XPathTrait
      */
     private function prepareS001XPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
+        $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('S001', 'http://www.ebics.org/S001');
 
         return $xpath;
