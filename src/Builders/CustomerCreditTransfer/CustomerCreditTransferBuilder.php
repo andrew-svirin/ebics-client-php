@@ -73,11 +73,11 @@ class CustomerCreditTransferBuilder
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
-        $xmlNbOfTxs->nodeValue = 0;
+        $xmlNbOfTxs->nodeValue = '0';
         $xmlGrpHdr->appendChild($xmlNbOfTxs);
 
         $xmlCtrlSum = $this->instance->createElement('CtrlSum');
-        $xmlCtrlSum->nodeValue = 0;
+        $xmlCtrlSum->nodeValue = '0';
         $xmlGrpHdr->appendChild($xmlCtrlSum);
 
         $xmlInitgPty = $this->instance->createElement('InitgPty');
@@ -99,11 +99,11 @@ class CustomerCreditTransferBuilder
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
-        $xmlNbOfTxs->nodeValue = 0;
+        $xmlNbOfTxs->nodeValue = '0';
         $xmlPmtInf->appendChild($xmlNbOfTxs);
 
         $xmlCtrlSum = $this->instance->createElement('CtrlSum');
-        $xmlCtrlSum->nodeValue = 0;
+        $xmlCtrlSum->nodeValue = '0';
         $xmlPmtInf->appendChild($xmlCtrlSum);
 
         $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
@@ -177,11 +177,15 @@ class CustomerCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate('pii' . str_pad($nbOfTxs, 2, '0'));
+        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
+            'pii' . str_pad((string)$nbOfTxs, 2, '0')
+        );
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate('pete' . str_pad($nbOfTxs, 2, '0'));
+        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
+            'pete' . str_pad((string)$nbOfTxs, 2, '0')
+        );
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlAmt = $this->instance->createElement('Amt');
@@ -227,11 +231,11 @@ class CustomerCreditTransferBuilder
         $xmlRmtInf->appendChild($xmlUstrd);
 
         $xmlNbOfTxs = DOMHelper::safeItem($nbOfTxsList);
-        $xmlNbOfTxs->nodeValue = $nbOfTxs;
+        $xmlNbOfTxs->nodeValue = (string)$nbOfTxs;
 
         $nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/GrpHdr/NbOfTxs');
         $xmlNbOfTxs = DOMHelper::safeItem($nbOfTxsList);
-        $xmlNbOfTxs->nodeValue = $nbOfTxs;
+        $xmlNbOfTxs->nodeValue = (string)$nbOfTxs;
 
         $ctrlSumList = $xpath->query('//CstmrCdtTrfInitn/GrpHdr/CtrlSum');
         $ctrlSum = (float)DOMHelper::safeItemValue($ctrlSumList);

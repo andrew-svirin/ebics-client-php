@@ -73,11 +73,11 @@ class CustomerDirectDebitBuilder
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
-        $xmlNbOfTxs->nodeValue = 0;
+        $xmlNbOfTxs->nodeValue = '0';
         $xmlGrpHdr->appendChild($xmlNbOfTxs);
 
         $xmlCtrlSum = $this->instance->createElement('CtrlSum');
-        $xmlCtrlSum->nodeValue = 0;
+        $xmlCtrlSum->nodeValue = '0';
         $xmlGrpHdr->appendChild($xmlCtrlSum);
 
         $xmlInitgPty = $this->instance->createElement('InitgPty');
@@ -99,11 +99,11 @@ class CustomerDirectDebitBuilder
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
-        $xmlNbOfTxs->nodeValue = 0;
+        $xmlNbOfTxs->nodeValue = '0';
         $xmlPmtInf->appendChild($xmlNbOfTxs);
 
         $xmlCtrlSum = $this->instance->createElement('CtrlSum');
-        $xmlCtrlSum->nodeValue = 0;
+        $xmlCtrlSum->nodeValue = '0';
         $xmlPmtInf->appendChild($xmlCtrlSum);
 
         $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
@@ -182,7 +182,7 @@ class CustomerDirectDebitBuilder
         $xmlPmtInf = DOMHelper::safeItem($pmtInfList);
 
         $reqdColltnDtList = $xpath->query('//CstmrDrctDbtInitn/PmtInf/ReqdColltnDt');
-        $reqdColltnDt = (int)DOMHelper::safeItemValue($reqdColltnDtList);
+        $reqdColltnDt = DOMHelper::safeItemValue($reqdColltnDtList);
 
 
         $xmlDrctDbtTxInf = $this->instance->createElement('DrctDbtTxInf');
@@ -192,11 +192,15 @@ class CustomerDirectDebitBuilder
         $xmlDrctDbtTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate('pii' . str_pad($nbOfTxs, 2, '0'));
+        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
+            'pii' . str_pad((string)$nbOfTxs, 2, '0')
+        );
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate('pete' . str_pad($nbOfTxs, 2, '0'));
+        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
+            'pete' . str_pad((string)$nbOfTxs, 2, '0')
+        );
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlInstdAmt = $this->instance->createElement('InstdAmt');
@@ -211,7 +215,7 @@ class CustomerDirectDebitBuilder
         $xmlDrctDbtTx->appendChild($xmlMndtRltdInf);
 
         $xmlMndtId = $this->instance->createElement('MndtId');
-        $xmlMndtId->nodeValue = 1;
+        $xmlMndtId->nodeValue = '1';
         $xmlMndtRltdInf->appendChild($xmlMndtId);
 
         $xmlDtOfSgntr = $this->instance->createElement('DtOfSgntr');
@@ -253,11 +257,11 @@ class CustomerDirectDebitBuilder
         $xmlRmtInf->appendChild($xmlUstrd);
 
         $xmlNbOfTxs = DOMHelper::safeItem($nbOfTxsList);
-        $xmlNbOfTxs->nodeValue = $nbOfTxs;
+        $xmlNbOfTxs->nodeValue = (string)$nbOfTxs;
 
         $nbOfTxsList = $xpath->query('//CstmrDrctDbtInitn/GrpHdr/NbOfTxs');
         $xmlNbOfTxs = DOMHelper::safeItem($nbOfTxsList);
-        $xmlNbOfTxs->nodeValue = $nbOfTxs;
+        $xmlNbOfTxs->nodeValue = (string)$nbOfTxs;
 
         $ctrlSumList = $xpath->query('//CstmrDrctDbtInitn/GrpHdr/CtrlSum');
         $ctrlSum = (float)DOMHelper::safeItemValue($ctrlSumList);
