@@ -296,12 +296,13 @@ final class EbicsClient implements EbicsClientInterface
     public function STA(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        $sequenceNumber = null
     ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createSTA($dateTime, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createSTA($dateTime, $startDateTime, $endDateTime, $sequenceNumber);
         $response = $this->retrievePlainOrderData($request);
 
         return $response;

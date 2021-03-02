@@ -201,7 +201,7 @@ class RequestContext
         return $this->receiptCode;
     }
 
-    public function setSegmentNumber(int $segmentNumber): RequestContext
+    public function setSegmentNumber(?int $segmentNumber): RequestContext
     {
         $this->segmentNumber = $segmentNumber;
 

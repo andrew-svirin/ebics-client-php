@@ -680,6 +680,7 @@ class RequestFactory
      * @param DateTimeInterface $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
+     * @param int|null $sequenceNumber
      *
      * @return Request
      * @throws EbicsException
@@ -687,7 +688,8 @@ class RequestFactory
     public function createSTA(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        $sequenceNumber = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -695,7 +697,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime);
+            ->setEndDateTime($endDateTime)
+            ->setSegmentNumber($sequenceNumber);
 
         $request = $this->requestBuilder
             ->createInstance()
@@ -717,8 +720,10 @@ class RequestFactory
                             })
                             ->addBankPubKeyDigests($context->getKeyRing())
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) {
-                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
+                            ->addSegmentNumber($context->getSegmentNumber());
                     });
                 })->addBody();
             })
