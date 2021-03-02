@@ -680,7 +680,7 @@ class RequestFactory
      * @param DateTimeInterface $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
-     * @param int|null $sequenceNumber
+     * @param int|null $segmentNumber
      *
      * @return Request
      * @throws EbicsException
@@ -689,7 +689,7 @@ class RequestFactory
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        $sequenceNumber = null
+        $segmentNumber = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -698,7 +698,7 @@ class RequestFactory
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($sequenceNumber);
+            ->setSegmentNumber($segmentNumber);
 
         $request = $this->requestBuilder
             ->createInstance()
