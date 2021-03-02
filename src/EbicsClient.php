@@ -297,7 +297,7 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        $segmentNumber = null
+        int $segmentNumber = null
     ): Response {
         if (null === $dateTime) {
             $dateTime = new DateTime();
