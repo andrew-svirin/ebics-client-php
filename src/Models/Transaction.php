@@ -34,6 +34,11 @@ class Transaction implements TransactionInterface
     private $segmentNumber;
 
     /**
+     * @var bool|null
+     */
+    private $lastSegment;
+
+    /**
      * @var int|null
      */
     private $numSegments;
@@ -95,6 +100,17 @@ class Transaction implements TransactionInterface
     {
         $this->segmentNumber = $segmentNumber;
     }
+
+    public function getLastSegment(): ?bool
+    {
+        return $this->lastSegment;
+    }
+
+    public function setLastSegment(bool $lastSegment): void
+    {
+        $this->lastSegment = $lastSegment;
+    }
+
 
     public function getNumSegments(): ?int
     {

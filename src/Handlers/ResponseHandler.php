@@ -239,7 +239,14 @@ class ResponseHandler
         $orderIdPath = $xpath->query('//H004:header/H004:mutable/H004:OrderID');
         $orderId = DOMHelper::safeItemValueOrNull($orderIdPath);
         $segmentNumberPath = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
-        $segmentNumber = DOMHelper::safeItemValueOrNull($segmentNumberPath);
+
+        // is segment number required? otherwise "safeItemOrNull" is needed
+        $segmentNumberDom = DOMHelper::safeItem($segmentNumberPath);
+
+        $lastSegment = $segmentNumberDom->getAttribute('lastSegment');
+        $segmentNumber = $segmentNumberDom->nodeValue;
+
+
         $transactionKeyPath = $xpath->query(
             '//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey'
         );
@@ -252,6 +259,7 @@ class ResponseHandler
         $transaction->setNumSegments(null !== $numSegments ? (int)$numSegments : null);
         $transaction->setOrderId($orderId);
         $transaction->setSegmentNumber(null !== $segmentNumber ? (int)$segmentNumber : null);
+        $transaction->setLastSegment((bool)$lastSegment ?? null);
         $transaction->setKey($transactionKey);
 
         return $transaction;
