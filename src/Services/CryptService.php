@@ -36,17 +36,11 @@ class CryptService
      */
     private $randomService;
 
-    /**
-     * @var OrderDataFactory
-     */
-    private $orderDataFactory;
-
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
         $this->aesFactory = new AESFactory();
         $this->randomService = new RandomService();
-        $this->orderDataFactory = new OrderDataFactory();
     }
 
     /**
