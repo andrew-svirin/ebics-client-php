@@ -290,7 +290,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      */
     protected function generateSerialNumber(): string
     {
-        return (string)$this->randomService->digits(20);
+        return $this->randomService->digits(20);
     }
 
     /**
