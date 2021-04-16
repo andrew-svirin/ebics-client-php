@@ -48,7 +48,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         $orderDataXML->loadXML($orderDataDeUn);
         $orderDataXPath = $this->prepareS001XPath($orderDataXML);
         $iniDatetime = $orderDataXPath->query('//S001:SignaturePubKeyInfo/S001:PubKeyValue/S001:TimeStamp')->item(0)->nodeValue;
-        $this->assertNotEmpty($iniDatetime);
+        self::assertNotEmpty($iniDatetime);
 
         // TODO: Extract public key.
 //      $ini2XML = clone $iniXML;
