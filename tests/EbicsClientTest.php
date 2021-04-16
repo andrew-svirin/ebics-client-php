@@ -378,11 +378,11 @@ class EbicsClientTest extends AbstractEbicsTestCase
             switch ($format) {
                 case 'camt.xxx.cfonb120.stm':
                     $statements = $parser->read120C($content);
-                    $this->assertNotEmpty($statements);
+                    self::assertNotEmpty($statements);
                     break;
                 case 'camt.xxx.cfonb240.act':
                     $statements = $parser->read240C($content);
-                    $this->assertNotEmpty($statements);
+                    self::assertNotEmpty($statements);
                     break;
             }
 

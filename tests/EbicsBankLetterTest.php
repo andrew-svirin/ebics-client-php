@@ -40,7 +40,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
 
         $txt = $ebicsBankLetter->formatBankLetter($bankLetter, new TxtBankLetterFormatter());
 
-        $this->assertIsString($txt);
+        self::assertIsString($txt);
     }
 
     /**
@@ -65,7 +65,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
 
         $html = $ebicsBankLetter->formatBankLetter($bankLetter, new HtmlBankLetterFormatter());
 
-        $this->assertIsString($html);
+        self::assertIsString($html);
     }
 
     /**
@@ -90,7 +90,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
 
         $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, new PdfBankLetterFormatter());
 
-        $this->assertIsString($pdf);
+        self::assertIsString($pdf);
     }
 
     /**

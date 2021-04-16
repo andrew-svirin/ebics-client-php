@@ -89,7 +89,7 @@ abstract class AbstractEbicsTestCase extends TestCase
      */
     protected function assertResponseOk(string $code, string $reportText)
     {
-        $this->assertEquals('000000', $code, $reportText);
+        self::assertEquals('000000', $code, $reportText);
     }
 
     /**
@@ -102,7 +102,7 @@ abstract class AbstractEbicsTestCase extends TestCase
      */
     protected function assertResponseDone(string $code, string $reportText)
     {
-        $this->assertEquals('011000', $code, $reportText);
+        self::assertEquals('011000', $code, $reportText);
     }
 
     protected function assertExceptionCode(string $code = null)
