@@ -73,11 +73,6 @@ class RequestFactory
     private $keyRing;
 
     /**
-     * @var RandomService
-     */
-    private $randomService;
-
-    /**
      * Constructor.
      *
      * @param Bank $bank
@@ -94,7 +89,6 @@ class RequestFactory
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
-        $this->randomService = new RandomService();
     }
 
     public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request
