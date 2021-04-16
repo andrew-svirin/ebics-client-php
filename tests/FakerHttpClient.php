@@ -63,16 +63,16 @@ class FakerHttpClient implements HttpClientInterface
                 $fileName = sprintf('fdl.%s.xml', $options['file_format']);
                 break;
             case 'C53':
-                $fileName = sprintf('c53.xml', $options['file_format']);
+                $fileName = 'c53.xml';
                 break;
             case 'STA':
-                $fileName = sprintf('sta.xml', $options['file_format']);
+                $fileName = 'sta.xml';
                 break;
             case 'CCT':
-                $fileName = sprintf('cct.xml', $options['file_format']);
+                $fileName ='cct.xml';
                 break;
             case 'CDD':
-                $fileName = sprintf('cdd.xml', $options['file_format']);
+                $fileName = 'cdd.xml';
                 break;
             default:
                 throw new LogicException(sprintf('Faked order type `%s` not supported.', $orderType));
