@@ -1316,7 +1316,7 @@ class X509 implements X509Interface
             return false;
         }
 
-        foreach ($attributes as $key => $attribute) {
+        foreach ($attributes as $attribute) {
             if ($attribute['type'] == $id) {
                 $n = count($attribute['value']);
                 switch (true) {
@@ -1758,7 +1758,7 @@ class X509 implements X509Interface
             return false;
         }
 
-        foreach ($extensions as $key => $value) {
+        foreach ($extensions as $value) {
             if ($value['extnId'] == $id) {
                 return $value['extnValue'];
             }
