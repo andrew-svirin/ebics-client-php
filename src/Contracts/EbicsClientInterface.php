@@ -43,6 +43,19 @@ interface EbicsClientInterface
     public function HIA(DateTimeInterface $dateTime = null): Response;
 
     /**
+     * Make HCS request.
+     * Send to the bank new user signatures (X002, E002, A005)
+     * The HCS order type uses the protocol version H004.
+     *
+     * @param DateTimeInterface|null $dateTime
+     *
+     * @return Response
+     */
+    public function HCS(
+        DateTimeInterface $dateTime = null
+    ): Response;
+
+    /**
      * Retrieve the Bank public signatures authentication (X002) and encryption (E002).
      * Decrypt OrderData.
      * Prepare E002 and X002 bank signatures for KeyRing.

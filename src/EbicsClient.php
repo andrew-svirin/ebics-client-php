@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
+use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
@@ -422,6 +423,52 @@ final class EbicsClient implements EbicsClientInterface
 
         $request = $this->requestFactory->createCDD($dateTime, $numSegments, $transactionKey, $orderData);
         $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
+
+        return $response;
+    }
+
+    /**
+     * WARNING: THIS IS ACTUALLY NOT WORKING - USE AT YOUR OWN RISKS
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     */
+    public function HCS(DateTimeInterface $dateTime = null): Response {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $newSignatureA = $this->signatureFactory->createSignatureAFromKeys(
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
+            $this->keyRing->getPassword(),
+            $this->bank->isCertified() ? $this->x509Generator : null
+        );
+        $newSignatureE = $this->signatureFactory->createSignatureEFromKeys(
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
+            $this->keyRing->getPassword(),
+            $this->bank->isCertified() ? $this->x509Generator : null
+        );
+        $newSignatureX = $this->signatureFactory->createSignatureXFromKeys(
+            $this->cryptService->generateKeys($this->keyRing->getPassword()),
+            $this->keyRing->getPassword(),
+            $this->bank->isCertified() ? $this->x509Generator : null
+        );
+
+        $transactionKey = $this->cryptService->generateTransactionKey();
+
+        $request = $this->requestFactory->createHCS(
+            $newSignatureA,
+            $newSignatureE,
+            $newSignatureX,
+            $dateTime,
+            $transactionKey
+        );
+
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH004ReturnCode($request, $response);
+        $this->keyRing->setUserSignatureA($newSignatureA);
+        $this->keyRing->setUserSignatureE($newSignatureE);
+        $this->keyRing->setUserSignatureX($newSignatureX);
 
         return $response;
     }

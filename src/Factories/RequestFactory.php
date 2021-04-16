@@ -20,6 +20,7 @@ use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\UserSignatureHandler;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerHCS;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Http\Request;
@@ -197,6 +198,64 @@ class RequestFactory
                 });
             })
             ->popInstance();
+
+        return $request;
+    }
+
+    /**
+     * WARNING: THIS IS ACTUALLY NOT WORKING - USE AT YOUR OWN RISKS
+     */
+    public function createHCS(
+        SignatureInterface $newCertificateA,
+        SignatureInterface $newCertificateE,
+        SignatureInterface $newCertificateX,
+        DateTimeInterface $dateTime,
+        string $transactionKey
+    ): Request
+    {
+        $orderData = new CustomerHCS();
+        $this->orderDataHandler->handleHCS(
+            $orderData,
+            $newCertificateA,
+            $newCertificateE,
+            $newCertificateX,
+            $dateTime
+        );
+
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setOrderData($orderData);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $orderDetailsBuilder
+                                    ->addOrderType('HCS')
+                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN);
+                            })
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addBankPubKeyDigests($context->getKeyRing());
+                    })->addMutable();
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder->addOrderData($context->getOrderData());
+                    });
+                });
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }

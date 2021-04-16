@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerHCS;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\KeyRing;
@@ -177,6 +178,84 @@ class OrderDataHandler
 
         // Add UserID to HIARequestOrderData.
         $this->handleUserId($xmlHIARequestOrderData, $xml);
+    }
+
+    /**
+     * Adds OrderData DOM elements to XML DOM for INI request.
+     *
+     * @param CustomerHCS $xml
+     * @param SignatureInterface $certificateA
+     * @param DateTimeInterface $dateTime
+     *
+     * @throws EbicsException
+     */
+    public function handleHCS(
+        CustomerHCS $xml,
+        SignatureInterface $certificateA,
+        SignatureInterface $certificateE,
+        SignatureInterface $certificateX,
+        DateTimeInterface $dateTime
+    ): void
+    {
+        // Add SignaturePubKeyOrderData to root.
+        $xmlHCSRequestOrderData = $xml->createElementNS(
+            'urn:org:ebics:H004',
+            'HCSRequestOrderData'
+        );
+        $xmlHCSRequestOrderData->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ds',
+            'http://www.w3.org/2000/09/xmldsig#'
+        );
+        $xml->appendChild($xmlHCSRequestOrderData);
+
+        // Add AuthenticationPubKeyInfo to HIARequestOrderData.
+        $xmlAuthenticationPubKeyInfo = $xml->createElement('AuthenticationPubKeyInfo');
+        $xmlHCSRequestOrderData->appendChild($xmlAuthenticationPubKeyInfo);
+
+        if ($this->bank->isCertified()) {
+            $this->handleX509Data($xmlAuthenticationPubKeyInfo, $xml, $certificateX);
+        }
+        $this->handlePubKeyValue($xmlAuthenticationPubKeyInfo, $xml, $certificateX, $dateTime);
+
+        // Add AuthenticationVersion to AuthenticationPubKeyInfo.
+        $xmlAuthenticationVersion = $xml->createElement('AuthenticationVersion');
+        $xmlAuthenticationVersion->nodeValue = $this->keyRing->getUserSignatureXVersion();
+        $xmlAuthenticationPubKeyInfo->appendChild($xmlAuthenticationVersion);
+
+        // Add EncryptionPubKeyInfo to HIARequestOrderData.
+        $xmlEncryptionPubKeyInfo = $xml->createElement('EncryptionPubKeyInfo');
+        $xmlHCSRequestOrderData->appendChild($xmlEncryptionPubKeyInfo);
+
+        if ($this->bank->isCertified()) {
+            $this->handleX509Data($xmlEncryptionPubKeyInfo, $xml, $certificateE);
+        }
+        $this->handlePubKeyValue($xmlEncryptionPubKeyInfo, $xml, $certificateE, $dateTime);
+
+        // Add EncryptionVersion to EncryptionPubKeyInfo.
+        $xmlEncryptionVersion = $xml->createElement('EncryptionVersion');
+        $xmlEncryptionVersion->nodeValue = $this->keyRing->getUserSignatureEVersion();
+        $xmlEncryptionPubKeyInfo->appendChild($xmlEncryptionVersion);
+
+        // Add SignaturePubKeyInfo to SignaturePubKeyOrderData.
+        $xmlSignaturePubKeyInfo = $xml->createElement('SignaturePubKeyInfo');
+        $xmlHCSRequestOrderData->appendChild($xmlSignaturePubKeyInfo);
+
+        if ($this->bank->isCertified()) {
+            $this->handleX509Data($xmlSignaturePubKeyInfo, $xml, $certificateA);
+        }
+        $this->handlePubKeyValue($xmlSignaturePubKeyInfo, $xml, $certificateA, $dateTime);
+
+        // Add SignatureVersion to SignaturePubKeyInfo.
+        $xmlSignatureVersion = $xml->createElement('SignatureVersion');
+        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
+        $xmlSignaturePubKeyInfo->appendChild($xmlSignatureVersion);
+
+        // Add PartnerID to SignaturePubKeyOrderData.
+        $this->handlePartnerId($xmlHCSRequestOrderData, $xml);
+
+        // Add UserID to SignaturePubKeyOrderData.
+        $this->handleUserId($xmlHCSRequestOrderData, $xml);
     }
 
     /**

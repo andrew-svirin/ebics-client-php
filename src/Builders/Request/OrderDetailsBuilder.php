@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use AndrewSvirin\Ebics\Models\CustomerHCS;
 use DateTimeInterface;
 use DOMDocument;
 use DOMElement;
@@ -81,6 +82,13 @@ class OrderDetailsBuilder
         return $this;
     }
 
+    public function addGenericOrderParams(): OrderDetailsBuilder {
+        $xmlStandardOrderParams = $this->dom->createElement('GenericOrderParams');
+        $this->instance->appendChild($xmlStandardOrderParams);
+
+        return $this;
+    }
+
     public function addFDLOrderParams(
         string $fileFormat,
         string $countryCode,
@@ -102,6 +110,12 @@ class OrderDetailsBuilder
             $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
             $xmlFDLOrderParams->appendChild($xmlDateRange);
         }
+
+        return $this;
+    }
+
+    public function addHCSRequestOrderParams(CustomerHCS $order): OrderDetailsBuilder {
+        $this->instance->appendChild($order);
 
         return $this;
     }
