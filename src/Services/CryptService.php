@@ -386,7 +386,9 @@ class CryptService
      */
     public function generateNonce(): string
     {
-        $nonce = $this->randomService->hex(32);
+        $nonce = $this->randomService->bytes(16);
+        $nonce = bin2hex($nonce);
+        $nonce = strtoupper($nonce);
 
         return $nonce;
     }
