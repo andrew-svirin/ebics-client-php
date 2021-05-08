@@ -44,7 +44,7 @@ class TripleDES implements TripleDESInterface
             $ciphertext,
             $this->method,
             $this->key,
-            $options = OPENSSL_RAW_DATA,
+            OPENSSL_RAW_DATA,
             $this->iv
         ))) {
             throw new LogicException('Decryption failed.');
@@ -58,7 +58,7 @@ class TripleDES implements TripleDESInterface
             $plaintext,
             $this->method,
             $this->key,
-            $options = OPENSSL_RAW_DATA,
+            OPENSSL_RAW_DATA,
             $this->iv
         ))) {
             throw new LogicException('Encryption failed.');

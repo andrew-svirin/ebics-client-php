@@ -23,7 +23,7 @@ class X509ExtensionOptionsNormalizerTest extends AbstractEbicsTestCase
     {
         $actualValue = X509ExtensionOptionsNormalizer::normalize($value);
 
-        $this->assertEquals($expected, $actualValue);
+        self::assertEquals($expected, $actualValue);
     }
 
     public function getOptions()

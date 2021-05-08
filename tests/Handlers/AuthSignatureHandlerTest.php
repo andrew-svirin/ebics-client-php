@@ -62,7 +62,7 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 
         $digestValue = $hpbXPath->query('//H004:AuthSignature/ds:SignedInfo/ds:Reference/ds:DigestValue')->item(0)->nodeValue;
         $digestValue2 = $hpb2XPath->query('//H004:AuthSignature/ds:SignedInfo/ds:Reference/ds:DigestValue')->item(0)->nodeValue;
-        $this->assertEquals($digestValue, $digestValue2);
+        self::assertEquals($digestValue, $digestValue2);
     }
 
     /**
@@ -102,7 +102,7 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 
         $digestValue2 = $request2XPath->query('//H004:AuthSignature/ds:SignatureValue')->item(0)->nodeValue;
 
-        $this->assertEquals($digestValue, $digestValue2);
+        self::assertEquals($digestValue, $digestValue2);
 
 //      $hostResponse = $this->client->post($request2);
 //      $hostResponseContent = $hostResponse->getContent();
