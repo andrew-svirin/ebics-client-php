@@ -609,7 +609,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HKD' => ['code' => null, 'fake' => false],
                     'HTD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
-                    'PTK' => ['code' => '091116', 'fake' => false],
+                    'PTK' => ['code' => null, 'fake' => false],
                     'VMK' => ['code' => '090003', 'fake' => false],
                     'STA' => ['code' => '090003', 'fake' => false],
                     'Z53' => ['code' => '090005', 'fake' => false],
