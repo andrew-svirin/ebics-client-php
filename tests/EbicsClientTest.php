@@ -478,10 +478,22 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $builder = new CustomerCreditTransferBuilder();
         $customerCreditTransfer = $builder
             ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
-            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Creditor Name 1', 100.10, 'EUR',
-                'Test payment  1')
-            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Creditor Name 2', 200.02, 'EUR',
-                'Test payment  2')
+            ->addTransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                'Creditor Name 1',
+                100.10,
+                'EUR',
+                'Test payment  1'
+            )
+            ->addTransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Creditor Name 2',
+                200.02,
+                'EUR',
+                'Test payment  2'
+            )
             ->popInstance();
 
         $cct = $client->CCT($customerCreditTransfer);
