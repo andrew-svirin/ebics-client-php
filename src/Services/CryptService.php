@@ -380,13 +380,14 @@ class CryptService
     }
 
     /**
-     * Generate nonce from 32 HEX digits.
+     * Generate nonce from 16 bytes (32 characters) in HEX format in uppercase.
      *
      * @return string
      */
     public function generateNonce(): string
     {
-        $nonce = $this->randomService->hex(32);
+        $hex = $this->randomService->hexBytes(16);
+        $nonce = strtoupper($hex);
 
         return $nonce;
     }
