@@ -6,7 +6,6 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
-use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use RuntimeException;
 
@@ -36,17 +35,11 @@ class CryptService
      */
     private $randomService;
 
-    /**
-     * @var OrderDataFactory
-     */
-    private $orderDataFactory;
-
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
         $this->aesFactory = new AESFactory();
         $this->randomService = new RandomService();
-        $this->orderDataFactory = new OrderDataFactory();
     }
 
     /**

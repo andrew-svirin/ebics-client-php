@@ -37,8 +37,8 @@ class X509GeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123', $generator);
 
-        $this->assertEquals($signature->getPrivateKey(), $privateKey);
-        $this->assertEquals($signature->getPublicKey(), $publicKey);
+        self::assertEquals($signature->getPrivateKey(), $privateKey);
+        self::assertEquals($signature->getPublicKey(), $publicKey);
         $this->assertCertificateEquals(
             $signature->getCertificateContent(),
             $this->getCertificateContent('webank-self-signed.csr')
@@ -65,8 +65,8 @@ class X509GeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123', $generator);
 
-        $this->assertEquals($certificate->getPrivateKey(), $privateKey);
-        $this->assertEquals($certificate->getPublicKey(), $publicKey);
+        self::assertEquals($certificate->getPrivateKey(), $privateKey);
+        self::assertEquals($certificate->getPublicKey(), $publicKey);
         $this->assertCertificateEquals(
             $certificate->getCertificateContent(),
             $this->getCertificateContent('silarhi-self-signed.csr')
@@ -82,16 +82,16 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $generatedInfos = openssl_x509_parse($generatedContent);
         $certificateInfos = openssl_x509_parse($fileContent);
 
-        $this->assertEquals($generatedInfos['subject'], $certificateInfos['subject']);
-        $this->assertEquals($generatedInfos['issuer'], $certificateInfos['issuer']);
-        $this->assertEquals(
+        self::assertEquals($generatedInfos['subject'], $certificateInfos['subject']);
+        self::assertEquals($generatedInfos['issuer'], $certificateInfos['issuer']);
+        self::assertEquals(
             DateTime::createFromFormat(
                 'U',
                 $generatedInfos['validFrom_time_t']
             )->format('d/m/Y'),
             DateTime::createFromFormat('U', $certificateInfos['validFrom_time_t'])->format('d/m/Y')
         );
-        $this->assertEquals(
+        self::assertEquals(
             DateTime::createFromFormat(
                 'U',
                 $generatedInfos['validTo_time_t']
@@ -100,7 +100,7 @@ class X509GeneratorTest extends AbstractEbicsTestCase
                 'U',
                 $certificateInfos['validTo_time_t']
             )->format('d/m/Y'));
-        $this->assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
+        self::assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
     }
 
     /**

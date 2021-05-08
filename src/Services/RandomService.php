@@ -65,7 +65,7 @@ class RandomService
      *
      * @return string
      */
-    private function random(string $characters, int $length)
+    private function random(string $characters, int $length): string
     {
         $charactersLength = strlen($characters);
 

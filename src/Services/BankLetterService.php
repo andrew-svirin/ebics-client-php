@@ -92,7 +92,7 @@ class BankLetterService
     private function formatKeyHashForBankLetter(string $hash): string
     {
         // Split hash by 2 bytes in array and join by space character.
-        $hash = join(' ', str_split($hash, 2));
+        $hash = implode(' ', str_split($hash, 2));
 
         return $hash;
     }

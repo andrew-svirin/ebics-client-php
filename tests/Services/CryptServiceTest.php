@@ -27,8 +27,8 @@ class CryptServiceTest extends AbstractEbicsTestCase
 
         $keys = $cryptService->generateKeys($client->getKeyRing()->getPassword());
 
-        $this->assertArrayHasKey('privatekey', $keys);
-        $this->assertArrayHasKey('publickey', $keys);
-        $this->assertArrayHasKey('partialkey', $keys);
+        self::assertArrayHasKey('privatekey', $keys);
+        self::assertArrayHasKey('publickey', $keys);
+        self::assertArrayHasKey('partialkey', $keys);
     }
 }

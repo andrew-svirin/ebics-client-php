@@ -26,7 +26,6 @@ use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
-use AndrewSvirin\Ebics\Services\RandomService;
 use DateTimeInterface;
 
 /**
@@ -73,11 +72,6 @@ class RequestFactory
     private $keyRing;
 
     /**
-     * @var RandomService
-     */
-    private $randomService;
-
-    /**
      * Constructor.
      *
      * @param Bank $bank
@@ -94,7 +88,6 @@ class RequestFactory
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
-        $this->randomService = new RandomService();
     }
 
     public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request

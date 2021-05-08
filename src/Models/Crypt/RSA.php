@@ -756,6 +756,7 @@ class RSA implements RSAInterface
 
     public function loadKey($key, $type = false)
     {
+        $components = false;
         if ($type === false) {
             $types = [
                 self::PUBLIC_FORMAT_RAW,

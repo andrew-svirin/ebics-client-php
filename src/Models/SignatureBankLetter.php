@@ -171,6 +171,6 @@ class SignatureBankLetter
      */
     public function isCertified(): bool
     {
-        return (bool)$this->isCertified;
+        return $this->isCertified ?? false;
     }
 }

@@ -1247,7 +1247,6 @@ class ASN1 implements ASN1Interface
                     $c = ($c << 8) | ord($in[$i++]);
                 // no break
                 case $insize == 1:
-                    break;
                 case ($c & 0x80) == 0x00:
                     break;
                 case ($c & 0x40) == 0x00:

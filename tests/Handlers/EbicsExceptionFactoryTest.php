@@ -26,9 +26,9 @@ class EbicsExceptionFactoryTest extends AbstractEbicsTestCase
         try{
             EbicsExceptionFactory::buildExceptionFromCode($errorCode, $errorText);
         } catch (EbicsResponseException $exception){
-            $this->assertInstanceOf($expectedExceptionClass, $exception);
-            $this->assertEquals($exception->getResponseCode(), $errorCode);
-            $this->assertEquals($exception->getMeaning(), $meaning);
+            self::assertInstanceOf($expectedExceptionClass, $exception);
+            self::assertEquals($exception->getResponseCode(), $errorCode);
+            self::assertEquals($exception->getMeaning(), $meaning);
         }
 
     }
