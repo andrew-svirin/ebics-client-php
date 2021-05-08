@@ -16,18 +16,18 @@ class RandomService
 {
 
     /**
-     * Generate random string form HEX characters in upper register.
+     * Generate random bytes in hex presentation in upper register.
      *
-     * @param int $length
+     * @param int $length Bytes amount
      *
      * @return string
      */
-    public function hex(int $length): string
+    public function hexBytes(int $length): string
     {
-        $characters = '0123456789ABCDEF';
-        $randomHex = $this->random($characters, $length);
+        $randomBytes = $this->bytes($length);
+        $randomHexBytes = bin2hex($randomBytes);
 
-        return $randomHex;
+        return $randomHexBytes;
     }
 
     /**
@@ -84,6 +84,8 @@ class RandomService
 
     /**
      * Generate unique id with current date time prefix.
+     *
+     * @param string|null $prefix
      *
      * @return string
      */
