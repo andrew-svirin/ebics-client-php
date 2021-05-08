@@ -10,7 +10,6 @@ use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
-use DOMXpath;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.

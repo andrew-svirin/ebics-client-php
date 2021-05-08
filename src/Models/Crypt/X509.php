@@ -1758,9 +1758,9 @@ class X509 implements X509Interface
             return false;
         }
 
-        foreach ($extensions as $value) {
-            if ($value['extnId'] == $id) {
-                return $value['extnValue'];
+        foreach ($extensions as $extension) {
+            if ($extension['extnId'] == $id) {
+                return $extension['extnValue'];
             }
         }
 
