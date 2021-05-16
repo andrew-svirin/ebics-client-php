@@ -364,13 +364,6 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $request = $this->requestFactory->createFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
-
-        $this->checkH004ReturnCode($request, $response);
-
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
-
         switch ($format) {
             case 'plain':
                 $response = $this->retrievePlainOrderData($request);
