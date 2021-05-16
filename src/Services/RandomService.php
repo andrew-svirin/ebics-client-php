@@ -16,9 +16,9 @@ class RandomService
 {
 
     /**
-     * Generate random string form HEX characters in upper register.
+     * Generate random string from HEX characters in upper register.
      *
-     * @param int $length
+     * @param int $length Amount of characters.
      *
      * @return string
      */
