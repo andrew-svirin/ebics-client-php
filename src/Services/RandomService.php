@@ -16,18 +16,18 @@ class RandomService
 {
 
     /**
-     * Generate random bytes in hex presentation in upper register.
+     * Generate random string from HEX characters in upper register.
      *
-     * @param int $length Bytes amount
+     * @param int $length Amount of characters.
      *
      * @return string
      */
-    public function hexBytes(int $length): string
+    public function hex(int $length): string
     {
-        $randomBytes = $this->bytes($length);
-        $randomHexBytes = bin2hex($randomBytes);
+        $characters = '0123456789ABCDEF';
+        $randomHex = $this->random($characters, $length);
 
-        return $randomHexBytes;
+        return $randomHex;
     }
 
     /**
