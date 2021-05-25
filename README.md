@@ -273,7 +273,30 @@ try {
 | STA | Retrieve the bank account statement. |
 | C53 | Retrieve the bank account statement in Camt.053 format. |
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
+| Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
 | CCT | Initiate the credit transfer per Single Euro Payments Area. |
 | CDD | Initiate a direct debit transaction. |
+
+#### Unzipping EBICS response.
+
+Some responses are zipped content which requires unzipping them first to use the XML content.
+In this example, we use PHP's ZipArchive which requires `ext-zip` extension to unzip a camt.054 response.
+
+```php
+$zip = new \ZipArchive();
+
+/* @var \AndrewSvirin\Ebics\EbicsClient $client */
+$z54 = $client->Z54();
+
+// ... write $z54 content into a file (zip)
+
+$inputPath = 'zip-file-path';
+$outputDir = 'your-output-directory';
+
+$zip->extractTo($outputDir, $inputPath);
+
+```
+
+You'll find one or many XML files in your output directory.
 
 ### 6. Make HKD request to see what order types allowed.

@@ -193,6 +193,24 @@ interface EbicsClientInterface
     // @codingStandardsIgnoreEnd
 
     /**
+     * Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland)
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     *
+     * @return Response zipped camt.054 XML files.
+     */
+    // @codingStandardsIgnoreStart
+    public function Z54(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Response;
+    // @codingStandardsIgnoreEnd
+
+    /**
      * Using the CCT order type, the user can initiate the credit transfer per Single Euro Payments Area (SEPA)
      * specification set by the European Payment Council or Die Deutsche Kreditwirtschaft (DK (German)).
      *
