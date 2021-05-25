@@ -279,7 +279,7 @@ try {
 
 #### Unzipping EBICS response.
 
-Some responses are zipped content which requires unzipping them first to use the XML content.
+Some responses are sent as zipped content and therefore require unzipping them first to access the XML content.
 In this example, we use PHP's ZipArchive which requires `ext-zip` extension to unzip a camt.054 response.
 
 ```php
