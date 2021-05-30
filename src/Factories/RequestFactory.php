@@ -828,6 +828,59 @@ class RequestFactory
         return $request;
     }
 
+    /**
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
+    public function createZ54(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
+        $request = $this->requestBuilder
+            ->createInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $orderDetailsBuilder
+                                    ->addOrderType('Z54')
+                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                    ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
+                            })
+                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
     public function createCCT(
         DateTimeInterface $dateTime,
         int $numSegments,

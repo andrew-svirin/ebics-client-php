@@ -351,6 +351,26 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
+    // @codingStandardsIgnoreStart
+    public function Z54(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Response {
+        // @codingStandardsIgnoreEnd
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->createZ54($dateTime, $startDateTime, $endDateTime);
+        $response = $this->retrievePlainOrderData($request);
+
+        return $response;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
     public function FDL(
         $fileInfo,
         $format = 'plain',
