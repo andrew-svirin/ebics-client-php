@@ -232,7 +232,7 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
     $client->getKeyRing()
 );
 
-$txt = $ebicsBankLetter->formatBankLetter($bankLetter, new \AndrewSvirin\Ebics\Services\BankLetterFormatterTxt());
+$txt = $ebicsBankLetter->formatBankLetter($bankLetter, new \AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter());
 ```
 
 ### 3. Wait for the bank validation and activation access.
