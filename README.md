@@ -22,7 +22,21 @@ If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://g
 If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)
 
 ## Initialize client
-You will need to have this information from your Bank: 
+First you will need a keyring JSON file. In it the public/private keys and certificates of the user and the bank will be saved.
+```php
+<?php
+
+use AndrewSvirin\Ebics\Services\KeyRingManager;
+
+// Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
+$keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
+$keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
+$keyRing = $keyRingManager->loadKeyRing();
+$keyRingManager->saveKeyRing($keyRing);
+```
+This will create the JSON file at the given path, now you can add the banks public keys in it.
+
+You will also need to have this information from your bank: 
 - HostID
 - HostURL
 - PartnerID
@@ -36,13 +50,12 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\EbicsClient;
 
-// Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-// Use __IS_CERTIFIED__ true for French banks, otherwise use false.
 $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
 $keyRing = $keyRingManager->loadKeyRing();
 $bank = new Bank(__HOST_ID__, __HOST_URL__);
-$bank->setIsCertified(__IS_CERTIFIED__);
+// Use __IS_CERTIFIED__ true for French banks, otherwise use false.
+//$bank->setIsCertified(true);
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyRing);
 ```
