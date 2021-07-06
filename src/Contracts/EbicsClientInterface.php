@@ -14,6 +14,11 @@ use DateTimeInterface;
 interface EbicsClientInterface
 {
     /**
+     * Create user signatures A, E and X
+     */
+    public function createUserSignatures(): void;
+
+    /**
      * Supported protocol version for the Bank.
      *
      * @return Response
