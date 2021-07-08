@@ -14,7 +14,7 @@ use DateTimeInterface;
 interface EbicsClientInterface
 {
     /**
-     * Create user signatures A, E and X
+     * Create user signatures A, E and X on first launch.
      */
     public function createUserSignatures(): void;
 
