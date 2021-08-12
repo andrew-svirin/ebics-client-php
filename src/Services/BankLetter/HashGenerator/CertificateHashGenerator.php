@@ -33,6 +33,6 @@ class CertificateHashGenerator implements HashGeneratorInterface
     {
         $key = $signature->getCertificateContent();
 
-        return $this->cryptService->calculateKeyHash($key);
+        return $this->cryptService->calculateCertificateFingerprint($key);
     }
 }

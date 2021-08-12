@@ -46,7 +46,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
 
         $hash = $hashGenerator->generate($signature);
 
-        self::assertEquals('fc3f5d1340438d9603697be274c6f807e4faa5b6a566cf56b4651bde9159ae80', $hash);
+        self::assertEquals('0f281204606dba89ca8121879edff827fb76fa16b722bb8dee6b5cbfb85c0ec2', $hash);
     }
 
     /**
