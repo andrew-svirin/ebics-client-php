@@ -161,7 +161,7 @@ class CryptService
      *
      * @return string
      */
-    private function encryptByRsaPrivateKey(string $privateKey, string $password, string $data)
+    private function encryptByRsaPrivateKey(string $privateKey, string $password, string $data): string
     {
         $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
 
@@ -323,8 +323,8 @@ class CryptService
      */
     public function calculateDigest(
         SignatureInterface $signature,
-        $algorithm = 'sha256',
-        $rawOutput = false
+        string $algorithm = 'sha256',
+        bool $rawOutput = false
     ): string {
         $rsa = $this->rsaFactory->createPublic($signature->getPublicKey());
 
@@ -371,6 +371,28 @@ class CryptService
     ): string {
         return hash($algorithm, $key, $rawOutput);
     }
+
+    /**
+     * Make certificate fingerprint.
+     *
+     * @param string $key
+     * @param string $algorithm
+     * @param bool $rawOutput
+     * @return string
+     */
+    public function calculateCertificateFingerprint(
+        string $key,
+        string $algorithm = 'sha256',
+        bool $rawOutput = false
+    ): string {
+        $fingerprint = openssl_x509_fingerprint($key, $algorithm, $rawOutput);
+        if (false === $fingerprint) {
+            throw new RuntimeException('Can not calculate fingerprint for certificate.');
+        }
+
+        return $fingerprint;
+    }
+
 
     /**
      * Generate nonce from 32 HEX digits.
