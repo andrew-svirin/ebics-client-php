@@ -223,9 +223,9 @@ class ResponseHandler
      * @return OrderData
      * @throws EbicsException
      */
-    public function retrieveOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): OrderData
+    public function retrieveOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing, string $ebicsVersion): OrderData
     {
-        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
+        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing, $ebicsVersion);
         $orderData = $this->orderDataFactory->createOrderDataFromContent($plainOrderData);
 
         return $orderData;
@@ -242,9 +242,9 @@ class ResponseHandler
      * @return OrderData[]
      * @throws EbicsException
      */
-    public function retrieveOrderDataItems(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): array
+    public function retrieveOrderDataItems(DOMDocument $xml, string $transactionKey, KeyRing $keyRing, string $ebicsVersion): array
     {
-        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
+        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing, $ebicsVersion);
 
         $orderDataXmlItems = $this->zipService->extractFilesFromString($plainOrderData);
 
@@ -267,7 +267,7 @@ class ResponseHandler
      * @return string
      * @throws EbicsException
      */
-    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing, string $ebicsVersion = EbicsClient::VERSION_25)
+    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing, string $ebicsVersion)
     {
         switch ($ebicsVersion) {
             case EbicsClient::VERSION_30:
@@ -276,7 +276,6 @@ class ResponseHandler
                 break;
             
             case EbicsClient::VERSION_25:
-            default:
                 $ebicsSchema = "H004";
                 $xpath = $this->prepareH004XPath($xml);
                 break;
@@ -307,7 +306,7 @@ class ResponseHandler
      *
      * @return Transaction
      */
-    public function retrieveTransaction(DOMDocument $xml, string $ebicsVersion = EbicsClient::VERSION_25): Transaction
+    public function retrieveTransaction(DOMDocument $xml, string $ebicsVersion): Transaction
     {
         switch ($ebicsVersion) {
             case EbicsClient::VERSION_30:
@@ -316,7 +315,6 @@ class ResponseHandler
                 break;
             
             case EbicsClient::VERSION_25:
-            default:
                 $ebicsSchema = "H004";
                 $xpath = $this->prepareH004XPath($xml);
                 break;
