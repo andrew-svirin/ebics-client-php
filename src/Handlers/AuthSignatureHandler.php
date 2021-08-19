@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
@@ -30,13 +31,19 @@ class AuthSignatureHandler
     private $keyRing;
 
     /**
+     * @var string
+     */
+    private $ebicsVersion;
+
+    /**
      * @var CryptService
      */
     private $cryptService;
 
-    public function __construct(KeyRing $keyRing)
+    public function __construct(KeyRing $keyRing, string $ebicsVersion)
     {
         $this->keyRing = $keyRing;
+        $this->ebicsVersion = $ebicsVersion;
         $this->cryptService = new CryptService();
     }
 
@@ -115,11 +122,24 @@ class AuthSignatureHandler
 
         // Add ds:DigestValue to ds:Reference.
         $xmlDigestValue = $request->createElement('ds:DigestValue');
-        $canonicalizedHeader = $this->calculateC14N(
-            $this->prepareH004XPath($request),
-            $signaturePath,
-            $canonicalizationMethodAlgorithm
-        );
+        switch ($this->ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $canonicalizedHeader = $this->calculateC14N(
+                    $this->prepareH005XPath($request),
+                    $signaturePath,
+                    $canonicalizationMethodAlgorithm
+                );
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $canonicalizedHeader = $this->calculateC14N(
+                    $this->prepareH004XPath($request),
+                    $signaturePath,
+                    $canonicalizationMethodAlgorithm
+                );
+                break;
+        }
         $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
         $digestValueNodeValue = base64_encode($canonicalizedHeaderHash);
 
@@ -128,11 +148,24 @@ class AuthSignatureHandler
 
         // Add ds:SignatureValue to AuthSignature.
         $xmlSignatureValue = $request->createElement('ds:SignatureValue');
-        $canonicalizedSignedInfo = $this->calculateC14N(
-            $this->prepareH004XPath($request),
-            $canonicalizationPath,
-            $canonicalizationMethodAlgorithm
-        );
+        switch ($this->ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $canonicalizedSignedInfo = $this->calculateC14N(
+                    $this->prepareH005XPath($request),
+                    $canonicalizationPath,
+                    $canonicalizationMethodAlgorithm
+                );
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $canonicalizedSignedInfo = $this->calculateC14N(
+                    $this->prepareH004XPath($request),
+                    $canonicalizationPath,
+                    $canonicalizationMethodAlgorithm
+                );
+                break;
+        }
         $canonicalizedSignedInfoHash = $this->cryptService->calculateHash(
             $canonicalizedSignedInfo,
             $signatureMethodAlgorithm

@@ -34,7 +34,7 @@ use LogicException;
 final class EbicsClient implements EbicsClientInterface
 {
     public const VERSION_25 = "VERSION_25";
-    public const VERSION_30 = "VERSION_25";
+    public const VERSION_30 = "VERSION_30";
 
     /**
      * An EbicsBank instance.
@@ -110,8 +110,8 @@ final class EbicsClient implements EbicsClientInterface
         $this->version = $version;
         $this->user = $user;
         $this->keyRing = $keyRing;
-        $this->requestFactory = new RequestFactory($bank, $user, $keyRing);
-        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
+        $this->requestFactory = new RequestFactory($bank, $user, $keyRing, $version);
+        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing, $version);
         $this->responseHandler = new ResponseHandler();
         $this->cryptService = new CryptService();
         $this->signatureFactory = new SignatureFactory();
@@ -163,7 +163,15 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createINI($signatureA, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        switch ($this->version) {
+            case self::VERSION_30:
+                $this->checkH005ReturnCode($request, $response);
+                break;
+                
+            case self::VERSION_25:
+                $this->checkH004ReturnCode($request, $response);
+                break;
+        }
         $this->keyRing->setUserSignatureA($signatureA);
 
         return $response;
@@ -185,11 +193,46 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        switch ($this->version) {
+            case self::VERSION_30:
+                $this->checkH005ReturnCode($request, $response);
+                break;
+                
+            case self::VERSION_25:
+                $this->checkH004ReturnCode($request, $response);
+                break;
+        }
         $this->keyRing->setUserSignatureE($signatureE);
         $this->keyRing->setUserSignatureX($signatureX);
 
         return $response;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    public function BTD(
+        string $serviceName, 
+        string $scope, 
+        string $msgName, 
+        DateTimeInterface $dateTime = null, 
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): string {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->createBTD($dateTime, $serviceName, $scope, $msgName, $startDateTime, $endDateTime);
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH005ReturnCode($request, $response);
+        
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $response->addTransaction($transaction);
+        $orderData = $this->responseHandler->retrievePlainOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
+
+        return $orderData;
     }
 
     /**
@@ -204,10 +247,18 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createHPB($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
-        $transaction = $this->responseHandler->retrieveTransaction($response);
+        switch ($this->version) {
+            case self::VERSION_30:
+                $this->checkH005ReturnCode($request, $response);
+                break;
+                
+            case self::VERSION_25:
+                $this->checkH004ReturnCode($request, $response);
+                break;
+        }
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
         $response->addTransaction($transaction);
-        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing);
+        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
         $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderData);
         $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderData);
         $this->keyRing->setBankSignatureX($signatureX);
@@ -533,6 +584,29 @@ final class EbicsClient implements EbicsClientInterface
      *
      * @throws Exceptions\EbicsResponseException
      */
+    private function checkH005ReturnCode(Request $request, Response $response): void
+    {
+        $errorCode = $this->responseHandler->retrieveH005BodyOrHeaderReturnCode($response);
+
+        if ('000000' === $errorCode) {
+            return;
+        }
+
+        // For Transaction Done.
+        if ('011000' === $errorCode) {
+            return;
+        }
+
+        $reportText = $this->responseHandler->retrieveH005ReportText($response);
+        EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     *
+     * @throws Exceptions\EbicsResponseException
+     */
     private function checkH000ReturnCode(Request $request, Response $response): void
     {
         $errorCode = $this->responseHandler->retrieveH000ReturnCode($response);
@@ -558,10 +632,10 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
         $response->addTransaction($transaction);
 
-        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing);
+        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -580,13 +654,14 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
         $response->addTransaction($transaction);
 
         $plainOrderData = $this->responseHandler->retrievePlainOrderData(
             $response,
             $transaction->getKey(),
-            $this->keyRing
+            $this->keyRing,
+            $this->version
         );
         $transaction->setPlainOrderData($plainOrderData);
 
@@ -606,13 +681,14 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
         $response->addTransaction($transaction);
 
         $plainOrderData = $this->responseHandler->retrieveOrderDataItems(
             $response,
             $transaction->getKey(),
-            $this->keyRing
+            $this->keyRing,
+            $this->version
         );
         $transaction->setOrderDataItems($plainOrderData);
 
@@ -638,7 +714,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH004ReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
+        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
         $transaction->setOrderData($orderData);
         $transaction->setNumSegments($numSegments);
         $transaction->setKey($transactionKey);

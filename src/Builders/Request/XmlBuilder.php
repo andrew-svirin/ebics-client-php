@@ -35,7 +35,7 @@ class XmlBuilder
         $this->dom = $dom;
     }
 
-    public function createUnsecured(string $ebicsVersion = EbicsClient::VERSION_25): XmlBuilder
+    public function createUnsecured(string $ebicsVersion): XmlBuilder
     {
         switch ($ebicsVersion) {
             case EbicsClient::VERSION_30:
@@ -43,7 +43,6 @@ class XmlBuilder
                 break;
             
             case EbicsClient::VERSION_25:
-            default:
                 $this->createH004(self::EBICS_UNSECURED_REQUEST);
                 break;
         }
@@ -51,33 +50,29 @@ class XmlBuilder
         return $this;
     }
 
-    public function createSecuredNoPubKeyDigests(string $ebicsVersion = EbicsClient::VERSION_25): XmlBuilder
+    public function createSecuredNoPubKeyDigests(string $ebicsVersion): XmlBuilder
     {
-        $this->createH005(self::EBICS_NO_PUB_KEY_DIGESTS, true);
         switch ($ebicsVersion) {
             case EbicsClient::VERSION_30:
                 $this->createH005(self::EBICS_NO_PUB_KEY_DIGESTS, true);
                 break;
             
             case EbicsClient::VERSION_25:
-            default:
-            $this->createH004(self::EBICS_NO_PUB_KEY_DIGESTS, true);
+                $this->createH004(self::EBICS_NO_PUB_KEY_DIGESTS, true);
                 break;
         }
 
         return $this;
     }
 
-    public function createSecured(string $ebicsVersion = EbicsClient::VERSION_25): XmlBuilder
+    public function createSecured(string $ebicsVersion): XmlBuilder
     {
-        $this->createH005(self::EBICS_REQUEST, true);
         switch ($ebicsVersion) {
             case EbicsClient::VERSION_30:
                 $this->createH005(self::EBICS_REQUEST, true);
                 break;
             
             case EbicsClient::VERSION_25:
-            default:
                 $this->createH004(self::EBICS_REQUEST, true);
                 break;
         }
