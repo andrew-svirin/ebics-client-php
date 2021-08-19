@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use AndrewSvirin\Ebics\EbicsClient;
 use Closure;
 use DOMDocument;
 use DOMElement;
@@ -34,23 +35,47 @@ class XmlBuilder
         $this->dom = $dom;
     }
 
-    public function createUnsecured(): XmlBuilder
+    public function createUnsecured(string $ebicsVersion): XmlBuilder
     {
-        $this->createH004(self::EBICS_UNSECURED_REQUEST);
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $this->createH005(self::EBICS_UNSECURED_REQUEST);
+                break;
+            
+            case EbicsClient::VERSION_25:
+                $this->createH004(self::EBICS_UNSECURED_REQUEST);
+                break;
+        }
 
         return $this;
     }
 
-    public function createSecuredNoPubKeyDigests(): XmlBuilder
+    public function createSecuredNoPubKeyDigests(string $ebicsVersion): XmlBuilder
     {
-        $this->createH004(self::EBICS_NO_PUB_KEY_DIGESTS, true);
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $this->createH005(self::EBICS_NO_PUB_KEY_DIGESTS, true);
+                break;
+            
+            case EbicsClient::VERSION_25:
+                $this->createH004(self::EBICS_NO_PUB_KEY_DIGESTS, true);
+                break;
+        }
 
         return $this;
     }
 
-    public function createSecured(): XmlBuilder
+    public function createSecured(string $ebicsVersion): XmlBuilder
     {
-        $this->createH004(self::EBICS_REQUEST, true);
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $this->createH005(self::EBICS_REQUEST, true);
+                break;
+            
+            case EbicsClient::VERSION_25:
+                $this->createH004(self::EBICS_REQUEST, true);
+                break;
+        }
 
         return $this;
     }
@@ -66,6 +91,22 @@ class XmlBuilder
             );
         }
         $this->instance->setAttribute('Version', 'H004');
+        $this->instance->setAttribute('Revision', '1');
+
+        return $this;
+    }
+
+    private function createH005(string $container, bool $secured = false): XmlBuilder
+    {
+        $this->instance = $this->dom->createElementNS('urn:org:ebics:H005', $container);
+        if ($secured) {
+            $this->instance->setAttributeNS(
+                'http://www.w3.org/2000/xmlns/',
+                'xmlns:ds',
+                'http://www.w3.org/2000/09/xmldsig#'
+            );
+        }
+        $this->instance->setAttribute('Version', 'H005');
         $this->instance->setAttribute('Revision', '1');
 
         return $this;
