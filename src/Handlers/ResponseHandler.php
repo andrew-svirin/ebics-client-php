@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\OrderDataFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
@@ -53,6 +54,21 @@ class ResponseHandler
     }
 
     /**
+     * Extract H005 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
+     */
+    public function retrieveH005ReturnCode(DOMDocument $xml): string
+    {
+        $xpath = $this->prepareH005XPath($xml);
+        $returnCode = $xpath->query('//H005:header/H005:mutable/H005:ReturnCode');
+
+        return DOMHelper::safeItemValue($returnCode);
+    }
+
+    /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReturnCode value from the DOM XML.
      *
      * @param DOMDocument $xml
@@ -83,6 +99,21 @@ class ResponseHandler
     }
 
     /**
+     * Extract H005 > KeyManagementResponse > body > ReturnCode value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
+     */
+    public function retrieveH005BodyReturnCode(DOMDocument $xml): string
+    {
+        $xpath = $this->prepareH005XPath($xml);
+        $returnCode = $xpath->query('//H005:body/H005:ReturnCode');
+
+        return DOMHelper::safeItemValue($returnCode);
+    }
+
+    /**
      * Extract H004 > ReturnCode value from both header and body.
      * Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
      *
@@ -103,6 +134,26 @@ class ResponseHandler
     }
 
     /**
+     * Extract H005 > ReturnCode value from both header and body.
+     * Sometimes (FrenchBank) header code is 00000 whereas body return isn't...
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
+     */
+    public function retrieveH005BodyOrHeaderReturnCode(DOMDocument $xml): string
+    {
+        $headerReturnCode = $this->retrieveH005ReturnCode($xml);
+        $bodyReturnCode = $this->retrieveH005BodyReturnCode($xml);
+
+        if ('000000' !== $headerReturnCode) {
+            return $headerReturnCode;
+        }
+
+        return $bodyReturnCode;
+    }
+
+    /**
      * Extract H004 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
      *
      * @param DOMDocument $xml
@@ -113,6 +164,21 @@ class ResponseHandler
     {
         $xpath = $this->prepareH004XPath($xml);
         $reportText = $xpath->query('//H004:header/H004:mutable/H004:ReportText');
+
+        return DOMHelper::safeItemValue($reportText);
+    }
+
+    /**
+     * Extract H005 > KeyManagementResponse > header > mutable > ReportText value from the DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return string
+     */
+    public function retrieveH005ReportText(DOMDocument $xml): string
+    {
+        $xpath = $this->prepareH005XPath($xml);
+        $reportText = $xpath->query('//H005:header/H005:mutable/H005:ReportText');
 
         return DOMHelper::safeItemValue($reportText);
     }
@@ -196,14 +262,27 @@ class ResponseHandler
      * @param DOMDocument $xml
      * @param string $transactionKey
      * @param KeyRing $keyRing
+     * @param string $ebicsVersion
      *
      * @return string
      * @throws EbicsException
      */
-    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing)
+    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing, string $ebicsVersion = EbicsClient::VERSION_25)
     {
-        $xpath = $this->prepareH004XPath($xml);
-        $orderDataPath = $xpath->query('//H004:body/H004:DataTransfer/H004:OrderData');
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $ebicsSchema = "H005";
+                $xpath = $this->prepareH005XPath($xml);
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $ebicsSchema = "H004";
+                $xpath = $this->prepareH004XPath($xml);
+                break;
+        }
+
+        $orderDataPath = $xpath->query("//$ebicsSchema:body/$ebicsSchema:DataTransfer/$ebicsSchema:OrderData");
         if (!$orderDataPath || 0 === $orderDataPath->length) {
             throw new EbicsException('EBICS response empty result.');
         }
@@ -224,24 +303,37 @@ class ResponseHandler
      * Extract Transaction from the DOM XML.
      *
      * @param DOMDocument $xml
+     * @param string $ebicsVersion
      *
      * @return Transaction
      */
-    public function retrieveTransaction(DOMDocument $xml): Transaction
+    public function retrieveTransaction(DOMDocument $xml, string $ebicsVersion = EbicsClient::VERSION_25): Transaction
     {
-        $xpath = $this->prepareH004XPath($xml);
-        $transactionIdPath = $xpath->query('//H004:header/H004:static/H004:TransactionID');
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $ebicsSchema = "H005";
+                $xpath = $this->prepareH005XPath($xml);
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $ebicsSchema = "H004";
+                $xpath = $this->prepareH004XPath($xml);
+                break;
+        }
+
+        $transactionIdPath = $xpath->query("//$ebicsSchema:header/$ebicsSchema:static/$ebicsSchema:TransactionID");
         $transactionId = DOMHelper::safeItemValueOrNull($transactionIdPath);
-        $transactionPhasePath = $xpath->query('//H004:header/H004:mutable/H004:TransactionPhase');
+        $transactionPhasePath = $xpath->query("//$ebicsSchema:header/$ebicsSchema:mutable/$ebicsSchema:TransactionPhase");
         $transactionPhase = DOMHelper::safeItemValueOrNull($transactionPhasePath);
-        $numSegmentsPath = $xpath->query('//H004:header/H004:static/H004:NumSegments');
+        $numSegmentsPath = $xpath->query("//$ebicsSchema:header/$ebicsSchema:static/$ebicsSchema:NumSegments");
         $numSegments = DOMHelper::safeItemValueOrNull($numSegmentsPath);
-        $orderIdPath = $xpath->query('//H004:header/H004:mutable/H004:OrderID');
+        $orderIdPath = $xpath->query("//$ebicsSchema:header/$ebicsSchema:mutable/$ebicsSchema:OrderID");
         $orderId = DOMHelper::safeItemValueOrNull($orderIdPath);
-        $segmentNumberPath = $xpath->query('//H004:header/H004:mutable/H004:SegmentNumber');
+        $segmentNumberPath = $xpath->query("//$ebicsSchema:header/$ebicsSchema:mutable/$ebicsSchema:SegmentNumber");
         $segmentNumber = DOMHelper::safeItemValueOrNull($segmentNumberPath);
         $transactionKeyPath = $xpath->query(
-            '//H004:body/H004:DataTransfer/H004:DataEncryptionInfo/H004:TransactionKey'
+            "//$ebicsSchema:body/$ebicsSchema:DataTransfer/$ebicsSchema:DataEncryptionInfo/$ebicsSchema:TransactionKey"
         );
         $transactionKeyEncoded = DOMHelper::safeItemValueOrNull($transactionKeyPath);
         $transactionKey = base64_decode($transactionKeyEncoded);
