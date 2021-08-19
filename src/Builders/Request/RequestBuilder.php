@@ -26,30 +26,30 @@ class RequestBuilder
         return $this;
     }
 
-    public function addContainerUnsecured(Closure $callback): RequestBuilder
+    public function addContainerUnsecured(Closure $callback, string $ebicsVersion): RequestBuilder
     {
         $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createUnsecured()->getInstance());
+        $this->instance->appendChild($xmlBuilder->createUnsecured($ebicsVersion)->getInstance());
 
         call_user_func($callback, $xmlBuilder);
 
         return $this;
     }
 
-    public function addContainerSecuredNoPubKeyDigests(Closure $callback): RequestBuilder
+    public function addContainerSecuredNoPubKeyDigests(Closure $callback, string $ebicsVersion): RequestBuilder
     {
         $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createSecuredNoPubKeyDigests()->getInstance());
+        $this->instance->appendChild($xmlBuilder->createSecuredNoPubKeyDigests($ebicsVersion)->getInstance());
 
         call_user_func($callback, $xmlBuilder);
 
         return $this;
     }
 
-    public function addContainerSecured(Closure $callback): RequestBuilder
+    public function addContainerSecured(Closure $callback, string $ebicsVersion): RequestBuilder
     {
         $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createSecured()->getInstance());
+        $this->instance->appendChild($xmlBuilder->createSecured($ebicsVersion)->getInstance());
 
         call_user_func($callback, $xmlBuilder);
 

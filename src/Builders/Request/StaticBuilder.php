@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
@@ -130,7 +131,7 @@ class StaticBuilder
         return $this;
     }
 
-    public function addBankPubKeyDigests(KeyRing $keyRing, string $algorithm = 'sha256'): StaticBuilder
+    public function addBankPubKeyDigests(KeyRing $keyRing, string $ebicsVersion, string $algorithm = 'sha256'): StaticBuilder
     {
         $xmlBankPubKeyDigests = $this->dom->createElement('BankPubKeyDigests');
         $this->instance->appendChild($xmlBankPubKeyDigests);
@@ -138,13 +139,33 @@ class StaticBuilder
         if (!($signatureX = $keyRing->getBankSignatureX())) {
             throw new EbicsException('Certificate X is empty.');
         }
-        $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $certificateXDigest = $this->cryptService->calculateCertificateFingerprint($signatureX->getCertificateContent(), $algorithm, true);
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
+                break;
+        }
+        
         $authenticationNodeValue = base64_encode($certificateXDigest);
 
         if (!($signatureE = $keyRing->getBankSignatureE())) {
             throw new EbicsException('Certificate E is empty.');
         }
-        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
+        switch ($ebicsVersion) {
+            case EbicsClient::VERSION_30:
+                $certificateEDigest = $this->cryptService->calculateCertificateFingerprint($signatureE->getCertificateContent(), $algorithm, true);
+                break;
+            
+            case EbicsClient::VERSION_25:
+            default:
+                $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
+                break;
+        }
+
         $encryptionNodeValue = base64_encode($certificateEDigest);
 
         // Add Authentication to BankPubKeyDigests.

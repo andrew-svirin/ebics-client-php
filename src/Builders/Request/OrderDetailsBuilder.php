@@ -56,6 +56,52 @@ class OrderDetailsBuilder
         return $this;
     }
 
+    public function addAdminOrderType(string $orderType): OrderDetailsBuilder
+    {
+        $xmlOrderType = $this->dom->createElement('AdminOrderType');
+        $xmlOrderType->nodeValue = $orderType;
+        $this->instance->appendChild($xmlOrderType);
+
+        return $this;
+    }
+
+    public function addBTDOrderParams(
+        string $serviceName, 
+        string $scope, 
+        string $msgName, 
+        ?DateTimeInterface $startDateTime = null, 
+        ?DateTimeInterface $endDateTime = null
+    ): OrderDetailsBuilder {
+        $xmlBTDOrderParams = $this->dom->createElement('BTDOrderParams');
+
+        $xmlService = $this->dom->createElement('Service');
+        
+        $xmlServiceName = $this->dom->createElement('ServiceName');
+        $xmlServiceName->nodeValue = $serviceName;
+
+        $xmlScope = $this->dom->createElement('Scope');
+        $xmlScope->nodeValue = $scope;
+
+        $xmlMsgName = $this->dom->createElement('MsgName');
+        $xmlMsgName->nodeValue = $msgName;
+
+        $xmlService->appendChild($xmlServiceName);
+        $xmlService->appendChild($xmlScope);
+        $xmlService->appendChild($xmlMsgName);
+
+
+        $xmlBTDOrderParams->appendChild($xmlService);
+
+        if ($startDateTime && $endDateTime) {
+            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
+            $xmlBTDOrderParams->appendChild($xmlDateRange);
+        }
+
+        $this->instance->appendChild($xmlBTDOrderParams);
+
+        return $this;
+    }
+
     public function addOrderAttribute(string $orderAttribute): OrderDetailsBuilder
     {
         $xmlOrderAttribute = $this->dom->createElement('OrderAttribute');
