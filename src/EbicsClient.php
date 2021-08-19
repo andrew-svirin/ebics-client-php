@@ -33,12 +33,22 @@ use LogicException;
  */
 final class EbicsClient implements EbicsClientInterface
 {
+    public const VERSION_25 = "VERSION_25";
+    public const VERSION_30 = "VERSION_25";
+
     /**
      * An EbicsBank instance.
      *
      * @var Bank
      */
     private $bank;
+
+    /**
+     * EBICS protocol version
+     *
+     * @var string
+     */
+    private $version;
 
     /**
      * An EbicsUser instance.
@@ -94,9 +104,10 @@ final class EbicsClient implements EbicsClientInterface
      * @param User $user
      * @param KeyRing $keyRing
      */
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, KeyRing $keyRing, string $version = self::VERSION_25)
     {
         $this->bank = $bank;
+        $this->version = $version;
         $this->user = $user;
         $this->keyRing = $keyRing;
         $this->requestFactory = new RequestFactory($bank, $user, $keyRing);
@@ -658,6 +669,14 @@ final class EbicsClient implements EbicsClientInterface
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
     }
 
     /**
