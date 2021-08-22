@@ -5,6 +5,8 @@ namespace AndrewSvirin\Ebics\Tests\Services\BankLetter;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
+use AndrewSvirin\Ebics\Services\DigestResolverV2;
+use AndrewSvirin\Ebics\Services\DigestResolverV3;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
@@ -21,12 +23,43 @@ class HashGeneratorTest extends AbstractEbicsTestCase
 {
 
     /**
-     * @group hash-generator-certificate
+     * @group hash-generator-certificate-v2
      * @covers
      */
-    public function testGenerateCertificateHash()
+    public function testGenerateCertificateHashV2()
     {
-        $hashGenerator = new CertificateHashGenerator();
+        $digestResolver = new DigestResolverV2();
+        $hashGenerator = new CertificateHashGenerator($digestResolver);
+
+        $privateKey = $this->getPrivateKey();
+        $publicKey = $this->getPublicKey();
+
+        //Certificate generated with https://certificatetools.com/ the 22/03/2020 (1 year validity)
+        $certificateGenerator = new WeBankX509Generator();
+        $certificateGenerator->setX509StartDate(new DateTime('2020-03-22'));
+        $certificateGenerator->setX509EndDate(new DateTime('2021-03-22'));
+        $certificateGenerator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
+
+        $certificateFactory = new SignatureFactory();
+
+        $signature = $certificateFactory->createSignatureAFromKeys([
+            'publickey' => $publicKey,
+            'privatekey' => $privateKey,
+        ], 'test123', $certificateGenerator);
+
+        $hash = $hashGenerator->generate($signature);
+
+        self::assertEquals('e1955c3873327e1791aca42e350cea48196f7934648d48b60228eaf5d10ee0c4', $hash);
+    }
+
+    /**
+     * @group hash-generator-certificate-v3
+     * @covers
+     */
+    public function testGenerateCertificateHashV3()
+    {
+        $digestResolver = new DigestResolverV3();
+        $hashGenerator = new CertificateHashGenerator($digestResolver);
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();

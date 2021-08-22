@@ -26,6 +26,8 @@ use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
+use AndrewSvirin\Ebics\Services\CryptService;
+use AndrewSvirin\Ebics\Services\DigestResolver;
 use DateTimeInterface;
 
 /**
@@ -34,27 +36,37 @@ use DateTimeInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class RequestFactory
+abstract class RequestFactory
 {
     /**
      * @var RequestBuilder
      */
-    private $requestBuilder;
+    protected $requestBuilder;
 
     /**
      * @var OrderDataHandler
      */
-    private $orderDataHandler;
+    protected $orderDataHandler;
+
+    /**
+     * @var DigestResolver
+     */
+    protected $digestResolver;
 
     /**
      * @var AuthSignatureHandler
      */
-    private $authSignatureHandler;
+    protected $authSignatureHandler;
 
     /**
      * @var UserSignatureHandler
      */
-    private $userSignatureHandler;
+    protected $userSignatureHandler;
+
+    /**
+     * @var CryptService
+     */
+    protected $cryptService;
 
     /**
      * @var Bank
@@ -81,13 +93,32 @@ class RequestFactory
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->requestBuilder = new RequestBuilder();
-        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing);
-        $this->authSignatureHandler = new AuthSignatureHandler($keyRing);
-        $this->userSignatureHandler = new UserSignatureHandler($user, $keyRing);
-
+        $this->cryptService = new CryptService();
         $this->bank = $bank;
         $this->user = $user;
         $this->keyRing = $keyRing;
+    }
+
+    abstract protected function createRequestBuilderInstance(): RequestBuilder;
+
+    abstract protected function addOrderType(
+        OrderDetailsBuilder $orderDetailsBuilder,
+        string $orderType
+    ): OrderDetailsBuilder;
+
+    public function createHEV(): Request
+    {
+        $context = (new RequestContext())
+            ->setBank($this->bank);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerHEV(function (XmlBuilder $builder) use ($context) {
+                $builder->addHostId($context->getBank()->getHostId());
+            })
+            ->popInstance();
+
+        return $request;
     }
 
     public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request
@@ -105,8 +136,8 @@ class RequestFactory
             ->setDateTime($dateTime)
             ->setOrderData($orderData);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerUnsecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -116,9 +147,7 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('INI')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN);
+                                $this->addOrderType($orderDetailsBuilder, 'INI');
                             })
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable();
@@ -127,20 +156,6 @@ class RequestFactory
                         $builder->addOrderData($context->getOrderData());
                     });
                 });
-            })
-            ->popInstance();
-
-        return $request;
-    }
-
-    public function createHEV(): Request
-    {
-        $context = (new RequestContext())
-            ->setBank($this->bank);
-
-        $request = $this->requestBuilder->createInstance()
-            ->addContainerHEV(function (XmlBuilder $builder) use ($context) {
-                $builder->addHostId($context->getBank()->getHostId());
             })
             ->popInstance();
 
@@ -166,8 +181,8 @@ class RequestFactory
             ->setDateTime($dateTime)
             ->setOrderData($orderData);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerUnsecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -177,9 +192,7 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HIA')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN);
+                                $this->addOrderType($orderDetailsBuilder, 'HIA');
                             })
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable();
@@ -207,8 +220,8 @@ class RequestFactory
             ->setUser($this->user)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecuredNoPubKeyDigests(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -220,9 +233,7 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HPB')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN);
+                                $this->addOrderType($orderDetailsBuilder, 'HPB');
                             })
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable();
@@ -249,8 +260,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -262,12 +273,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HPD')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HPD')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -295,8 +310,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -308,12 +323,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HKD')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HKD')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -341,8 +360,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -354,12 +373,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('PTK')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'PTK')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -387,8 +410,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -400,12 +423,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HTD')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HTD')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -446,8 +473,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -459,8 +486,8 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('FDL')
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'FDL')
                                     ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addFDLOrderParams(
                                         $context->getFileFormat(),
@@ -469,7 +496,12 @@ class RequestFactory
                                         $context->getEndDateTime()
                                     );
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -497,8 +529,8 @@ class RequestFactory
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -510,12 +542,88 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('HAA')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HAA')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     * @param string $serviceName
+     * @param string $scope
+     * @param string $msgName
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
+    public function createBTD(
+        DateTimeInterface $dateTime,
+        string $serviceName,
+        string $scope,
+        string $msgName,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setServiceName($serviceName)
+            ->setScope($scope)
+            ->setMsgName($msgName)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'BTD')
+                                    ->addBTDOrderParams(
+                                        $context->getServiceName(),
+                                        $context->getScope(),
+                                        $context->getMsgName(),
+                                        $context->getStartDateTime(),
+                                        $context->getEndDateTime()
+                                    );
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -544,8 +652,8 @@ class RequestFactory
             ->setReceiptCode(true === $acknowledged ?
                 TransferReceiptBuilder::CODE_RECEIPT_POSITIVE : TransferReceiptBuilder::CODE_RECEIPT_NEGATIVE);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -590,8 +698,8 @@ class RequestFactory
             ->setOrderData($orderData)
             ->setSegmentNumber($segmentNumber);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -637,8 +745,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -650,12 +758,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('VMK')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'VMK')
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -690,8 +802,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -703,12 +815,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('STA')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'STA')
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -743,8 +859,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -756,12 +872,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('C53')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'C53')
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -796,8 +916,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -809,12 +929,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('Z53')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'Z53')
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -849,8 +973,8 @@ class RequestFactory
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -862,12 +986,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('Z54')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'Z54')
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
                         $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
@@ -899,8 +1027,8 @@ class RequestFactory
             ->setNumSegments($numSegments)
             ->setSignatureData($signatureData);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -912,12 +1040,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('CCT')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'CCT')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
                     })->addMutable(function (MutableBuilder $builder) {
@@ -960,8 +1092,8 @@ class RequestFactory
             ->setNumSegments($numSegments)
             ->setSignatureData($signatureData);
 
-        $request = $this->requestBuilder
-            ->createInstance()
+        $request = $this
+            ->createRequestBuilderInstance()
             ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
@@ -973,12 +1105,16 @@ class RequestFactory
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-                                $orderDetailsBuilder
-                                    ->addOrderType('CDD')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN)
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'CDD')
                                     ->addStandardOrderParams();
                             })
-                            ->addBankPubKeyDigests($context->getKeyRing())
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
                     })->addMutable(function (MutableBuilder $builder) {

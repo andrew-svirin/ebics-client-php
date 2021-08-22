@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use AndrewSvirin\Ebics\EbicsClient;
 use Closure;
 use DOMDocument;
 use DOMElement;
@@ -12,7 +13,7 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class XmlBuilder
+abstract class XmlBuilder
 {
     const EBICS_REQUEST = 'ebicsRequest';
     const EBICS_UNSECURED_REQUEST = 'ebicsUnsecuredRequest';
@@ -22,54 +23,23 @@ class XmlBuilder
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     public function __construct(DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }
 
-    public function createUnsecured(): XmlBuilder
-    {
-        $this->createH004(self::EBICS_UNSECURED_REQUEST);
+    abstract public function createUnsecured(): XmlBuilder;
 
-        return $this;
-    }
+    abstract public function createSecuredNoPubKeyDigests(): XmlBuilder;
 
-    public function createSecuredNoPubKeyDigests(): XmlBuilder
-    {
-        $this->createH004(self::EBICS_NO_PUB_KEY_DIGESTS, true);
-
-        return $this;
-    }
-
-    public function createSecured(): XmlBuilder
-    {
-        $this->createH004(self::EBICS_REQUEST, true);
-
-        return $this;
-    }
-
-    private function createH004(string $container, bool $secured = false): XmlBuilder
-    {
-        $this->instance = $this->dom->createElementNS('urn:org:ebics:H004', $container);
-        if ($secured) {
-            $this->instance->setAttributeNS(
-                'http://www.w3.org/2000/xmlns/',
-                'xmlns:ds',
-                'http://www.w3.org/2000/09/xmldsig#'
-            );
-        }
-        $this->instance->setAttribute('Version', 'H004');
-        $this->instance->setAttribute('Revision', '1');
-
-        return $this;
-    }
+    abstract public function createSecured(): XmlBuilder;
 
     public function createHEV(): XmlBuilder
     {

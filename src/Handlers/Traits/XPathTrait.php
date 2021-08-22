@@ -46,6 +46,22 @@ trait XPathTrait
     }
 
     /**
+     * Setup H005 XPath for DOM XML.
+     *
+     * @param DOMDocument $xml
+     *
+     * @return DOMXPath
+     */
+    private function prepareH005XPath(DOMDocument $xml): DOMXPath
+    {
+        $xpath = $this->prepareXPath($xml);
+        $xpath->registerNamespace('H005', 'urn:org:ebics:H005');
+        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
+
+        return $xpath;
+    }
+
+    /**
      * Setup H000 XPath for DOM XML.
      *
      * @param DOMDocument $xml

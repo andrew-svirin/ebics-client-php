@@ -10,6 +10,7 @@ use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
+use DOMXPath;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -19,7 +20,7 @@ use DOMNode;
  *
  * @internal
  */
-class AuthSignatureHandler
+abstract class AuthSignatureHandler
 {
     use C14NTrait;
     use XPathTrait;
@@ -39,6 +40,8 @@ class AuthSignatureHandler
         $this->keyRing = $keyRing;
         $this->cryptService = new CryptService();
     }
+
+    abstract protected function prepareH00XXPath(DOMDocument $request): DOMXPath;
 
     /**
      * Add body and children elements to request.
@@ -116,7 +119,7 @@ class AuthSignatureHandler
         // Add ds:DigestValue to ds:Reference.
         $xmlDigestValue = $request->createElement('ds:DigestValue');
         $canonicalizedHeader = $this->calculateC14N(
-            $this->prepareH004XPath($request),
+            $this->prepareH00XXPath($request),
             $signaturePath,
             $canonicalizationMethodAlgorithm
         );
@@ -129,7 +132,7 @@ class AuthSignatureHandler
         // Add ds:SignatureValue to AuthSignature.
         $xmlSignatureValue = $request->createElement('ds:SignatureValue');
         $canonicalizedSignedInfo = $this->calculateC14N(
-            $this->prepareH004XPath($request),
+            $this->prepareH00XXPath($request),
             $canonicalizationPath,
             $canonicalizationMethodAlgorithm
         );

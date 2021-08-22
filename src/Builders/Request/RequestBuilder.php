@@ -13,55 +13,57 @@ use Closure;
  */
 class RequestBuilder
 {
-
     /**
      * @var Request|null
      */
     private $instance;
 
-    public function createInstance(): RequestBuilder
+    /**
+     * @var XmlBuilder
+     */
+    private $xmlBuilder;
+
+    public function createInstance(Closure $callback): RequestBuilder
     {
         $this->instance = new Request();
+
+        $this->xmlBuilder = call_user_func($callback, $this->instance);
 
         return $this;
     }
 
     public function addContainerUnsecured(Closure $callback): RequestBuilder
     {
-        $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createUnsecured()->getInstance());
+        $this->instance->appendChild($this->xmlBuilder->createUnsecured()->getInstance());
 
-        call_user_func($callback, $xmlBuilder);
+        call_user_func($callback, $this->xmlBuilder);
 
         return $this;
     }
 
     public function addContainerSecuredNoPubKeyDigests(Closure $callback): RequestBuilder
     {
-        $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createSecuredNoPubKeyDigests()->getInstance());
+        $this->instance->appendChild($this->xmlBuilder->createSecuredNoPubKeyDigests()->getInstance());
 
-        call_user_func($callback, $xmlBuilder);
+        call_user_func($callback, $this->xmlBuilder);
 
         return $this;
     }
 
     public function addContainerSecured(Closure $callback): RequestBuilder
     {
-        $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createSecured()->getInstance());
+        $this->instance->appendChild($this->xmlBuilder->createSecured()->getInstance());
 
-        call_user_func($callback, $xmlBuilder);
+        call_user_func($callback, $this->xmlBuilder);
 
         return $this;
     }
 
     public function addContainerHEV(Closure $callback): RequestBuilder
     {
-        $xmlBuilder = new XmlBuilder($this->instance);
-        $this->instance->appendChild($xmlBuilder->createHEV()->getInstance());
+        $this->instance->appendChild($this->xmlBuilder->createHEV()->getInstance());
 
-        call_user_func($callback, $xmlBuilder);
+        call_user_func($callback, $this->xmlBuilder);
 
         return $this;
     }
