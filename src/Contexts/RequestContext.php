@@ -93,6 +93,21 @@ class RequestContext
      */
     private $signatureData;
 
+    /**
+     * @var string
+     */
+    private $serviceName;
+
+    /**
+     * @var string
+     */
+    private $scope;
+
+    /**
+     * @var string
+     */
+    private $msgName;
+
     public function setBank(Bank $bank): RequestContext
     {
         $this->bank = $bank;
@@ -271,5 +286,41 @@ class RequestContext
     public function getSignatureData(): SignatureDataInterface
     {
         return $this->signatureData;
+    }
+
+    public function setServiceName(string $serviceName): RequestContext
+    {
+        $this->serviceName = $serviceName;
+
+        return $this;
+    }
+
+    public function getServiceName(): string
+    {
+        return $this->serviceName;
+    }
+
+    public function setScope(string $scope): RequestContext
+    {
+        $this->scope = $scope;
+
+        return $this;
+    }
+
+    public function getScope(): string
+    {
+        return $this->scope;
+    }
+
+    public function setMsgName(string $msgName): RequestContext
+    {
+        $this->msgName = $msgName;
+
+        return $this;
+    }
+
+    public function getMsgName(): string
+    {
+        return $this->msgName;
     }
 }

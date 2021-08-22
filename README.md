@@ -5,11 +5,15 @@
 
 ![EBICS](https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png)
 
-PHP library to communicate with a bank through EBICS protocol.
-Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4 & PHP 8.0
+PHP library to communicate with a bank through EBICS protocol.  
+Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4 & PHP 8.0  
+Support Ebics server versions: 2.5 (default), 3.0  
 
 ## License
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+
+## Donation
+[![Donate](https://static.liqpay.ua/userfiles/checkout/4731829.1629653516940239)](https://www.liqpay.ua/api/3/checkout?data=eyJ2ZXJzaW9uIjozLCJhY3Rpb24iOiJwYXlkb25hdGUiLCJhbW91bnQiOiI1IiwiY3VycmVuY3kiOiJFVVIiLCJkZXNjcmlwdGlvbiI6IkVCSUNTIGltcHJvdmVtZW50IiwicHVibGljX2tleSI6ImkzNDU2MTE2MTEwMSIsImxhbmd1YWdlIjoicnUifQ==&signature=+8pjPKeC5/XLOztq5Mq7RWAVos8=)
 
 ## Development and integration Ebics for your project and other development
 👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
@@ -41,7 +45,7 @@ $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
 $keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
 $keyRing = $keyRingManager->loadKeyRing();
-$bank = new Bank(__HOST_ID__, __HOST_URL__);
+$bank = new Bank(__HOST_ID__, __HOST_URL__, __EBICS_SERVER_VERSION___);
 $bank->setIsCertified(__IS_CERTIFIED__);
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyRing);
@@ -276,6 +280,7 @@ try {
 | Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
 | CCT | Initiate the credit transfer per Single Euro Payments Area. |
 | CDD | Initiate a direct debit transaction. |
+| BTD | Download request (FETCH request). |
 
 #### Unzipping EBICS response.
 

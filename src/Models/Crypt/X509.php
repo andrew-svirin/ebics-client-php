@@ -1031,7 +1031,7 @@ class X509 implements X509Interface
 
         $key = &$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey'];
         $key = $this->reformatKey($x509['tbsCertificate']['subjectPublicKeyInfo']['algorithm']['algorithm'], $key);
-
+        
         $this->currentCert = $x509;
         $this->dn = $x509['tbsCertificate']['subject'];
 

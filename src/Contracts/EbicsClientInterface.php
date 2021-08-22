@@ -48,6 +48,20 @@ interface EbicsClientInterface
     public function HIA(DateTimeInterface $dateTime = null): Response;
 
     /**
+     * Make BTD request.
+     * Download request (FETCH request)
+     * @requires Ebics 3.0
+     */
+    public function BTD(
+        string $serviceName,
+        string $scope,
+        string $msgName,
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): string;
+
+    /**
      * Retrieve the Bank public signatures authentication (X002) and encryption (E002).
      * Decrypt OrderData.
      * Prepare E002 and X002 bank signatures for KeyRing.
@@ -219,7 +233,7 @@ interface EbicsClientInterface
      * Using the CCT order type, the user can initiate the credit transfer per Single Euro Payments Area (SEPA)
      * specification set by the European Payment Council or Die Deutsche Kreditwirtschaft (DK (German)).
      *
-     * CCT is an upload order type that uses the protocol version H004.
+     * CCT is an upload order type that uses the protocol version H00X.
      *
      * FileFormat pain.001.001.03
      *
@@ -238,7 +252,7 @@ interface EbicsClientInterface
     /**
      * Using the CDD order type the user can initiate a direct debit transaction.
      *
-     * The CDD order type uses the protocol version H004.
+     * The CDD order type uses the protocol version H00X.
      *
      * FileFormat pain.008.001.02
      *
