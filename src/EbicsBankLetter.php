@@ -11,6 +11,9 @@ use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetterService;
+use AndrewSvirin\Ebics\Services\DigestResolverV2;
+use AndrewSvirin\Ebics\Services\DigestResolverV3;
+use LogicException;
 
 /**
  * EBICS bank letter prepare.
@@ -21,7 +24,6 @@ use AndrewSvirin\Ebics\Services\BankLetterService;
  */
 final class EbicsBankLetter
 {
-
     /**
      * @var BankLetterService
      */
@@ -51,7 +53,14 @@ final class EbicsBankLetter
     public function prepareBankLetter(Bank $bank, User $user, KeyRing $keyRing): BankLetter
     {
         if ($bank->isCertified()) {
-            $hashGenerator = new CertificateHashGenerator();
+            if (Bank::VERSION_25 === $bank->getVersion()) {
+                $digestResolver = new DigestResolverV2();
+            } elseif (Bank::VERSION_30 === $bank->getVersion()) {
+                $digestResolver = new DigestResolverV3();
+            } else {
+                throw new LogicException(sprintf('Version "%s" is not implemented', $bank->getVersion()));
+            }
+            $hashGenerator = new CertificateHashGenerator($digestResolver);
         } else {
             $hashGenerator = new PublicKeyHashGenerator();
         }
