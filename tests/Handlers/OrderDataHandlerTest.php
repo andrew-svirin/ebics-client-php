@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Tests\Handlers;
 
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV2;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Http\Request;
@@ -30,7 +31,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         parent::setUp();
         $client = $this->setupClient(3);
         $this->setupKeys($client->getKeyRing());
-        $this->orderDataHandler = new OrderDataHandler($client->getBank(), $client->getUser(), $client->getKeyRing());
+        $this->orderDataHandler = new OrderDataHandlerV2($client->getBank(), $client->getUser(), $client->getKeyRing());
     }
 
     /**

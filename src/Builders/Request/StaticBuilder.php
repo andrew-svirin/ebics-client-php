@@ -2,9 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\EbicsClient;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use Closure;
 use DateTimeInterface;
@@ -131,53 +128,30 @@ class StaticBuilder
         return $this;
     }
 
-    public function addBankPubKeyDigests(KeyRing $keyRing, string $ebicsVersion, string $algorithm = 'sha256'): StaticBuilder
-    {
+    public function addBankPubKeyDigests(
+        string $versionX,
+        string $certificateXDigest,
+        string $versionE,
+        string $certificateEDigest,
+        string $algorithm = 'sha256'
+    ): StaticBuilder {
         $xmlBankPubKeyDigests = $this->dom->createElement('BankPubKeyDigests');
         $this->instance->appendChild($xmlBankPubKeyDigests);
 
-        if (!($signatureX = $keyRing->getBankSignatureX())) {
-            throw new EbicsException('Certificate X is empty.');
-        }
-        switch ($ebicsVersion) {
-            case EbicsClient::VERSION_30:
-                $certificateXDigest = $this->cryptService->calculateCertificateFingerprint($signatureX->getCertificateContent(), $algorithm, true);
-                break;
-            
-            case EbicsClient::VERSION_25:
-            default:
-                $certificateXDigest = $this->cryptService->calculateDigest($signatureX, $algorithm, true);
-                break;
-        }
-        
         $authenticationNodeValue = base64_encode($certificateXDigest);
-
-        if (!($signatureE = $keyRing->getBankSignatureE())) {
-            throw new EbicsException('Certificate E is empty.');
-        }
-        switch ($ebicsVersion) {
-            case EbicsClient::VERSION_30:
-                $certificateEDigest = $this->cryptService->calculateCertificateFingerprint($signatureE->getCertificateContent(), $algorithm, true);
-                break;
-            
-            case EbicsClient::VERSION_25:
-            default:
-                $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
-                break;
-        }
 
         $encryptionNodeValue = base64_encode($certificateEDigest);
 
         // Add Authentication to BankPubKeyDigests.
         $xmlAuthentication = $this->dom->createElement('Authentication');
-        $xmlAuthentication->setAttribute('Version', $keyRing->getBankSignatureXVersion());
+        $xmlAuthentication->setAttribute('Version', $versionX);
         $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
         $xmlAuthentication->nodeValue = $authenticationNodeValue;
         $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
         // Add Encryption to BankPubKeyDigests.
         $xmlEncryption = $this->dom->createElement('Encryption');
-        $xmlEncryption->setAttribute('Version', $keyRing->getBankSignatureEVersion());
+        $xmlEncryption->setAttribute('Version', $versionE);
         $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
         $xmlEncryption->nodeValue = $encryptionNodeValue;
         $xmlBankPubKeyDigests->appendChild($xmlEncryption);

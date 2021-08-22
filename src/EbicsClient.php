@@ -10,9 +10,15 @@ use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\RequestFactory;
+use AndrewSvirin\Ebics\Factories\RequestFactoryV2;
+use AndrewSvirin\Ebics\Factories\RequestFactoryV3;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV2;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV3;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
+use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
+use AndrewSvirin\Ebics\Handlers\ResponseHandlerV3;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
@@ -33,22 +39,12 @@ use LogicException;
  */
 final class EbicsClient implements EbicsClientInterface
 {
-    public const VERSION_25 = "VERSION_25";
-    public const VERSION_30 = "VERSION_30";
-
     /**
      * An EbicsBank instance.
      *
      * @var Bank
      */
     private $bank;
-
-    /**
-     * EBICS protocol version
-     *
-     * @var string
-     */
-    private $version;
 
     /**
      * An EbicsUser instance.
@@ -104,15 +100,24 @@ final class EbicsClient implements EbicsClientInterface
      * @param User $user
      * @param KeyRing $keyRing
      */
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing, string $version = self::VERSION_25)
+    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->bank = $bank;
-        $this->version = $version;
         $this->user = $user;
         $this->keyRing = $keyRing;
-        $this->requestFactory = new RequestFactory($bank, $user, $keyRing, $version);
-        $this->orderDataHandler = new OrderDataHandler($bank, $user, $keyRing, $version);
-        $this->responseHandler = new ResponseHandler();
+
+        if (Bank::VERSION_25 === $bank->getVersion()) {
+            $this->requestFactory = new RequestFactoryV2($bank, $user, $keyRing);
+            $this->orderDataHandler = new OrderDataHandlerV2($bank, $user, $keyRing);
+            $this->responseHandler = new ResponseHandlerV2();
+        } elseif (Bank::VERSION_30 === $bank->getVersion()) {
+            $this->requestFactory = new RequestFactoryV3($bank, $user, $keyRing);
+            $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyRing);
+            $this->responseHandler = new ResponseHandlerV3();
+        } else {
+            throw new LogicException(sprintf('Version "%s" is not implemented', $bank->getVersion()));
+        }
+
         $this->cryptService = new CryptService();
         $this->signatureFactory = new SignatureFactory();
         // Set default http client.
@@ -163,15 +168,7 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createINI($signatureA, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        switch ($this->version) {
-            case self::VERSION_30:
-                $this->checkH005ReturnCode($request, $response);
-                break;
-                
-            case self::VERSION_25:
-                $this->checkH004ReturnCode($request, $response);
-                break;
-        }
+        $this->checkH00XReturnCode($request, $response);
         $this->keyRing->setUserSignatureA($signatureA);
 
         return $response;
@@ -193,15 +190,7 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        switch ($this->version) {
-            case self::VERSION_30:
-                $this->checkH005ReturnCode($request, $response);
-                break;
-                
-            case self::VERSION_25:
-                $this->checkH004ReturnCode($request, $response);
-                break;
-        }
+        $this->checkH00XReturnCode($request, $response);
         $this->keyRing->setUserSignatureE($signatureE);
         $this->keyRing->setUserSignatureX($signatureX);
 
@@ -213,24 +202,35 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function BTD(
-        string $serviceName, 
-        string $scope, 
-        string $msgName, 
-        DateTimeInterface $dateTime = null, 
+        string $serviceName,
+        string $scope,
+        string $msgName,
+        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): string {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createBTD($dateTime, $serviceName, $scope, $msgName, $startDateTime, $endDateTime);
+        $request = $this->requestFactory->createBTD(
+            $dateTime,
+            $serviceName,
+            $scope,
+            $msgName,
+            $startDateTime,
+            $endDateTime
+        );
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH005ReturnCode($request, $response);
-        
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $this->checkH00XReturnCode($request, $response);
+
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
-        $orderData = $this->responseHandler->retrievePlainOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
+        $orderData = $this->responseHandler->retrievePlainOrderData(
+            $response,
+            $transaction->getKey(),
+            $this->keyRing
+        );
 
         return $orderData;
     }
@@ -247,18 +247,14 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createHPB($dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        switch ($this->version) {
-            case self::VERSION_30:
-                $this->checkH005ReturnCode($request, $response);
-                break;
-                
-            case self::VERSION_25:
-                $this->checkH004ReturnCode($request, $response);
-                break;
-        }
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $this->checkH00XReturnCode($request, $response);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
-        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
+        $orderData = $this->responseHandler->retrieveOrderData(
+            $response,
+            $transaction->getKey(),
+            $this->keyRing
+        );
         $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderData);
         $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderData);
         $this->keyRing->setBankSignatureX($signatureX);
@@ -525,7 +521,7 @@ final class EbicsClient implements EbicsClientInterface
         $request = $this->requestFactory->createTransferReceipt($lastTransaction->getId(), $acknowledged);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
         return $response;
     }
@@ -550,7 +546,7 @@ final class EbicsClient implements EbicsClientInterface
         );
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
         return $response;
     }
@@ -561,9 +557,9 @@ final class EbicsClient implements EbicsClientInterface
      *
      * @throws Exceptions\EbicsResponseException
      */
-    private function checkH004ReturnCode(Request $request, Response $response): void
+    private function checkH00XReturnCode(Request $request, Response $response): void
     {
-        $errorCode = $this->responseHandler->retrieveH004BodyOrHeaderReturnCode($response);
+        $errorCode = $this->responseHandler->retrieveH00XBodyOrHeaderReturnCode($response);
 
         if ('000000' === $errorCode) {
             return;
@@ -574,30 +570,7 @@ final class EbicsClient implements EbicsClientInterface
             return;
         }
 
-        $reportText = $this->responseHandler->retrieveH004ReportText($response);
-        EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
-    }
-
-    /**
-     * @param Request $request
-     * @param Response $response
-     *
-     * @throws Exceptions\EbicsResponseException
-     */
-    private function checkH005ReturnCode(Request $request, Response $response): void
-    {
-        $errorCode = $this->responseHandler->retrieveH005BodyOrHeaderReturnCode($response);
-
-        if ('000000' === $errorCode) {
-            return;
-        }
-
-        // For Transaction Done.
-        if ('011000' === $errorCode) {
-            return;
-        }
-
-        $reportText = $this->responseHandler->retrieveH005ReportText($response);
+        $reportText = $this->responseHandler->retrieveH00XReportText($response);
         EbicsExceptionFactory::buildExceptionFromCode($errorCode, $reportText, $request, $response);
     }
 
@@ -630,12 +603,16 @@ final class EbicsClient implements EbicsClientInterface
     {
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
-        $orderData = $this->responseHandler->retrieveOrderData($response, $transaction->getKey(), $this->keyRing, $this->version);
+        $orderData = $this->responseHandler->retrieveOrderData(
+            $response,
+            $transaction->getKey(),
+            $this->keyRing
+        );
         $transaction->setOrderData($orderData);
 
         return $response;
@@ -652,16 +629,15 @@ final class EbicsClient implements EbicsClientInterface
     {
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
         $plainOrderData = $this->responseHandler->retrievePlainOrderData(
             $response,
             $transaction->getKey(),
-            $this->keyRing,
-            $this->version
+            $this->keyRing
         );
         $transaction->setPlainOrderData($plainOrderData);
 
@@ -679,16 +655,15 @@ final class EbicsClient implements EbicsClientInterface
     {
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
         $plainOrderData = $this->responseHandler->retrieveOrderDataItems(
             $response,
             $transaction->getKey(),
-            $this->keyRing,
-            $this->version
+            $this->keyRing
         );
         $transaction->setOrderDataItems($plainOrderData);
 
@@ -712,9 +687,9 @@ final class EbicsClient implements EbicsClientInterface
     ) {
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH004ReturnCode($request, $response);
+        $this->checkH00XReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response, $this->version);
+        $transaction = $this->responseHandler->retrieveTransaction($response);
         $transaction->setOrderData($orderData);
         $transaction->setNumSegments($numSegments);
         $transaction->setKey($transactionKey);
@@ -745,14 +720,6 @@ final class EbicsClient implements EbicsClientInterface
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVersion(): string
-    {
-        return $this->version;
     }
 
     /**

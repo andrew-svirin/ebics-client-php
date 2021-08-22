@@ -24,11 +24,6 @@ class RequestContext
     private $bank;
 
     /**
-     * @var string
-     */
-    private $ebicsVersion;
-
-    /**
      * @var User
      */
     private $user;
@@ -123,18 +118,6 @@ class RequestContext
     public function getBank(): Bank
     {
         return $this->bank;
-    }
-
-    public function setEbicsVersion(string $ebicsVersion): RequestContext
-    {
-        $this->ebicsVersion = $ebicsVersion;
-
-        return $this;
-    }
-
-    public function getEbicsVersion(): string
-    {
-        return $this->ebicsVersion;
     }
 
     public function setUser(User $user): RequestContext

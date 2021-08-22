@@ -56,48 +56,17 @@ class OrderDetailsBuilder
         return $this;
     }
 
+    /**
+     * Since EBICS 3.0 the AdminOrderType is mandatory inside the OrderDetails element.
+     * For EBICS 2.x it is ignored and the OrderType is used instead.
+     * @param string $orderType
+     * @return $this
+     */
     public function addAdminOrderType(string $orderType): OrderDetailsBuilder
     {
         $xmlOrderType = $this->dom->createElement('AdminOrderType');
         $xmlOrderType->nodeValue = $orderType;
         $this->instance->appendChild($xmlOrderType);
-
-        return $this;
-    }
-
-    public function addBTDOrderParams(
-        string $serviceName, 
-        string $scope, 
-        string $msgName, 
-        ?DateTimeInterface $startDateTime = null, 
-        ?DateTimeInterface $endDateTime = null
-    ): OrderDetailsBuilder {
-        $xmlBTDOrderParams = $this->dom->createElement('BTDOrderParams');
-
-        $xmlService = $this->dom->createElement('Service');
-        
-        $xmlServiceName = $this->dom->createElement('ServiceName');
-        $xmlServiceName->nodeValue = $serviceName;
-
-        $xmlScope = $this->dom->createElement('Scope');
-        $xmlScope->nodeValue = $scope;
-
-        $xmlMsgName = $this->dom->createElement('MsgName');
-        $xmlMsgName->nodeValue = $msgName;
-
-        $xmlService->appendChild($xmlServiceName);
-        $xmlService->appendChild($xmlScope);
-        $xmlService->appendChild($xmlMsgName);
-
-
-        $xmlBTDOrderParams->appendChild($xmlService);
-
-        if ($startDateTime && $endDateTime) {
-            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
-            $xmlBTDOrderParams->appendChild($xmlDateRange);
-        }
-
-        $this->instance->appendChild($xmlBTDOrderParams);
 
         return $this;
     }
@@ -147,6 +116,45 @@ class OrderDetailsBuilder
             // Add DateRange to FDLOrderParams.
             $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
             $xmlFDLOrderParams->appendChild($xmlDateRange);
+        }
+
+        return $this;
+    }
+
+    public function addBTDOrderParams(
+        string $serviceName,
+        string $scope,
+        string $msgName,
+        ?DateTimeInterface $startDateTime = null,
+        ?DateTimeInterface $endDateTime = null
+    ): OrderDetailsBuilder {
+        // Add BTDOrderParams to OrderDetails.
+        $xmlBTDOrderParams = $this->dom->createElement('BTDOrderParams');
+        $this->instance->appendChild($xmlBTDOrderParams);
+
+        // Add Service to BTDOrderParams.
+        $xmlService = $this->dom->createElement('Service');
+        $xmlBTDOrderParams->appendChild($xmlService);
+
+        // Add ServiceName to Service.
+        $xmlServiceName = $this->dom->createElement('ServiceName');
+        $xmlServiceName->nodeValue = $serviceName;
+        $xmlService->appendChild($xmlServiceName);
+
+        // Add Scope to Service.
+        $xmlScope = $this->dom->createElement('Scope');
+        $xmlScope->nodeValue = $scope;
+        $xmlService->appendChild($xmlScope);
+
+        // Add MsgName to Service.
+        $xmlMsgName = $this->dom->createElement('MsgName');
+        $xmlMsgName->nodeValue = $msgName;
+        $xmlService->appendChild($xmlMsgName);
+
+        if (null !== $startDateTime && null !== $endDateTime) {
+            // Add DateRange to BTDOrderParams.
+            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
+            $xmlBTDOrderParams->appendChild($xmlDateRange);
         }
 
         return $this;
