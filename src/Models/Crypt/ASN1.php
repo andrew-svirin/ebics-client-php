@@ -762,10 +762,8 @@ class ASN1 implements ASN1Interface
                         ensure that different semantics are not associated with such values which differ
                         only in the number of trailing 0 bits."
                     */
-                    if (count($mapping['mapping']) - $size < 0) {
-                        throw new LogicException('Size can not be more than count mapping.');
-                    }
-                    $bits = count($mapping['mapping']) == $size ? [] :
+                    $fillSize = count($mapping['mapping']) - $size;
+                    $bits = $fillSize <= 0 ? [] :
                         array_fill(0, count($mapping['mapping']) - $size, false);
                     for ($i = strlen($decoded['content']) - 1; $i > 0; $i--) {
                         $current = ord($decoded['content'][$i]);
