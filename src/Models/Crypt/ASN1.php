@@ -764,7 +764,7 @@ class ASN1 implements ASN1Interface
                     */
                     $fillSize = count($mapping['mapping']) - $size;
                     $bits = $fillSize <= 0 ? [] :
-                        array_fill(0, count($mapping['mapping']) - $size, false);
+                        array_fill(0, $fillSize, false);
                     for ($i = strlen($decoded['content']) - 1; $i > 0; $i--) {
                         $current = ord($decoded['content'][$i]);
                         for ($j = $offset; $j < 8; $j++) {
