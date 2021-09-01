@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics;
 
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
@@ -202,9 +203,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function BTD(
-        string $serviceName,
-        string $scope,
-        string $msgName,
+        BTFContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
@@ -214,9 +213,7 @@ final class EbicsClient implements EbicsClientInterface
         }
         $request = $this->requestFactory->createBTD(
             $dateTime,
-            $serviceName,
-            $scope,
-            $msgName,
+            $btfContext,
             $startDateTime,
             $endDateTime
         );

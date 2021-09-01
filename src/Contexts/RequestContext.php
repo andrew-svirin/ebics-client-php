@@ -94,19 +94,9 @@ class RequestContext
     private $signatureData;
 
     /**
-     * @var string
+     * @var BTFContext
      */
-    private $serviceName;
-
-    /**
-     * @var string
-     */
-    private $scope;
-
-    /**
-     * @var string
-     */
-    private $msgName;
+    private $btfContext;
 
     public function setBank(Bank $bank): RequestContext
     {
@@ -288,39 +278,15 @@ class RequestContext
         return $this->signatureData;
     }
 
-    public function setServiceName(string $serviceName): RequestContext
+    public function setBTFContext(BTFContext $btfContext): RequestContext
     {
-        $this->serviceName = $serviceName;
+        $this->btfContext = $btfContext;
 
         return $this;
     }
 
-    public function getServiceName(): string
+    public function getBTFContext(): BTFContext
     {
-        return $this->serviceName;
-    }
-
-    public function setScope(string $scope): RequestContext
-    {
-        $this->scope = $scope;
-
-        return $this;
-    }
-
-    public function getScope(): string
-    {
-        return $this->scope;
-    }
-
-    public function setMsgName(string $msgName): RequestContext
-    {
-        $this->msgName = $msgName;
-
-        return $this;
-    }
-
-    public function getMsgName(): string
-    {
-        return $this->msgName;
+        return $this->btfContext;
     }
 }
