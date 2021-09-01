@@ -12,6 +12,7 @@ use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
@@ -578,9 +579,7 @@ abstract class RequestFactory
      */
     public function createBTD(
         DateTimeInterface $dateTime,
-        string $serviceName,
-        string $scope,
-        string $msgName,
+        BTFContext $btfContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): Request {
@@ -589,9 +588,7 @@ abstract class RequestFactory
             ->setUser($this->user)
             ->setKeyRing($this->keyRing)
             ->setDateTime($dateTime)
-            ->setServiceName($serviceName)
-            ->setScope($scope)
-            ->setMsgName($msgName)
+            ->setBTFContext($btfContext)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime);
 
@@ -611,9 +608,7 @@ abstract class RequestFactory
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'BTD')
                                     ->addBTDOrderParams(
-                                        $context->getServiceName(),
-                                        $context->getScope(),
-                                        $context->getMsgName(),
+                                        $context->getBTFContext(),
                                         $context->getStartDateTime(),
                                         $context->getEndDateTime()
                                     );

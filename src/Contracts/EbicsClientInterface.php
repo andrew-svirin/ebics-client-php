@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use DateTimeInterface;
 
@@ -53,9 +54,7 @@ interface EbicsClientInterface
      * @requires Ebics 3.0
      */
     public function BTD(
-        string $serviceName,
-        string $scope,
-        string $msgName,
+        BTFContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
