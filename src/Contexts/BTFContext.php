@@ -57,7 +57,7 @@ class BTFContext
         return $this;
     }
 
-    public function getServiceName(): ?string
+    public function getServiceName(): string
     {
         return $this->serviceName;
     }
