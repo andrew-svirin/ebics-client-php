@@ -3,10 +3,11 @@
 namespace AndrewSvirin\Ebics\Contexts;
 
 /**
+ * Business Transaction Format (BTF).
  * Class BTFContext context container for BTD orders - requires EBICS 3.0
- * 
+ *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author Geoffroy de Corbiac
  */
 class BTFContext
 {
@@ -145,5 +146,4 @@ class BTFContext
     {
         return $this->msgNameFormat;
     }
-
 }
