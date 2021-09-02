@@ -140,21 +140,21 @@ class OrderDetailsBuilder
         $xmlServiceName->nodeValue = $btfContext->getServiceName();
         $xmlService->appendChild($xmlServiceName);
 
-        // Add optionnal ServiceOption to Service.
+        // Add optional ServiceOption to Service.
         if (null !== $btfContext->getServiceOption()) {
             $xmlServiceOption = $this->dom->createElement('ServiceOption');
             $xmlServiceOption->nodeValue = $btfContext->getServiceOption();
             $xmlService->appendChild($xmlServiceOption);
         }
 
-        // Add optionnal ContainerFlag to Service.
+        // Add optional ContainerFlag to Service.
         if (null !== $btfContext->getContainerFlag()) {
             $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
             $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
             $xmlService->appendChild($xmlContainerFlag);
         }
 
-        // Add optionnal Scope to Service.
+        // Add optional Scope to Service.
         if (null !== $btfContext->getScope()) {
             $xmlScope = $this->dom->createElement('Scope');
             $xmlScope->nodeValue = $btfContext->getScope();
@@ -166,17 +166,17 @@ class OrderDetailsBuilder
         $xmlMsgName->nodeValue = $btfContext->getMsgName();
         $xmlService->appendChild($xmlMsgName);
 
-        // Add optionnal MsgName version attribute
+        // Add optional MsgName version attribute
         if (null !== $btfContext->getMsgNameVersion()) {
             $xmlMsgName->setAttribute('version', $btfContext->getMsgNameVersion());
         }
 
-        // Add optionnal MsgName variant attribute
+        // Add optional MsgName variant attribute
         if (null !== $btfContext->getMsgNameVariant()) {
             $xmlMsgName->setAttribute('variant', $btfContext->getMsgNameVariant());
         }
 
-        // Add optionnal MsgName format attribute
+        // Add optional MsgName format attribute
         if (null !== $btfContext->getMsgNameFormat()) {
             $xmlMsgName->setAttribute('format', $btfContext->getMsgNameFormat());
         }

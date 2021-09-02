@@ -568,9 +568,7 @@ abstract class RequestFactory
 
     /**
      * @param DateTimeInterface $dateTime
-     * @param string $serviceName
-     * @param string $scope
-     * @param string $msgName
+     * @param BTFContext $btfContext
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
      *
