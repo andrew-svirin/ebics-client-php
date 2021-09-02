@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics;
 
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
@@ -129,13 +130,13 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function createUserSignatures(): void
     {
-        $signatureA = $this->getUserSignature(Signature::TYPE_A, true);
+        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, true);
         $this->keyRing->setUserSignatureA($signatureA);
 
-        $signatureE = $this->getUserSignature(Signature::TYPE_E, true);
+        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, true);
         $this->keyRing->setUserSignatureE($signatureE);
 
-        $signatureX = $this->getUserSignature(Signature::TYPE_X, true);
+        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, true);
         $this->keyRing->setUserSignatureX($signatureX);
     }
 
@@ -163,7 +164,7 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $signatureA = $this->getUserSignature(Signature::TYPE_A, $createSignature);
+        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, $createSignature);
 
         $request = $this->requestFactory->createINI($signatureA, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
@@ -184,8 +185,8 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $signatureE = $this->getUserSignature(Signature::TYPE_E, $createSignature);
-        $signatureX = $this->getUserSignature(Signature::TYPE_X, $createSignature);
+        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, $createSignature);
+        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, $createSignature);
 
         $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
@@ -202,9 +203,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function BTD(
-        string $serviceName,
-        string $scope,
-        string $msgName,
+        BTFContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
@@ -214,9 +213,7 @@ final class EbicsClient implements EbicsClientInterface
         }
         $request = $this->requestFactory->createBTD(
             $dateTime,
-            $serviceName,
-            $scope,
-            $msgName,
+            $btfContext,
             $startDateTime,
             $endDateTime
         );
@@ -749,13 +746,13 @@ final class EbicsClient implements EbicsClientInterface
     private function getUserSignature(string $type, bool $createNew = false): SignatureInterface
     {
         switch ($type) {
-            case Signature::TYPE_A:
+            case SignatureInterface::TYPE_A:
                 $signature = $this->keyRing->getUserSignatureA();
                 break;
-            case Signature::TYPE_E:
+            case SignatureInterface::TYPE_E:
                 $signature = $this->keyRing->getUserSignatureE();
                 break;
-            case Signature::TYPE_X:
+            case SignatureInterface::TYPE_X:
                 $signature = $this->keyRing->getUserSignatureX();
                 break;
             default:
@@ -778,21 +775,21 @@ final class EbicsClient implements EbicsClientInterface
     private function createUserSignature(string $type): SignatureInterface
     {
         switch ($type) {
-            case Signature::TYPE_A:
+            case SignatureInterface::TYPE_A:
                 $signature = $this->signatureFactory->createSignatureAFromKeys(
                     $this->cryptService->generateKeys($this->keyRing->getPassword()),
                     $this->keyRing->getPassword(),
                     $this->bank->isCertified() ? $this->x509Generator : null
                 );
                 break;
-            case Signature::TYPE_E:
+            case SignatureInterface::TYPE_E:
                 $signature = $this->signatureFactory->createSignatureEFromKeys(
                     $this->cryptService->generateKeys($this->keyRing->getPassword()),
                     $this->keyRing->getPassword(),
                     $this->bank->isCertified() ? $this->x509Generator : null
                 );
                 break;
-            case Signature::TYPE_X:
+            case SignatureInterface::TYPE_X:
                 $signature = $this->signatureFactory->createSignatureXFromKeys(
                     $this->cryptService->generateKeys($this->keyRing->getPassword()),
                     $this->keyRing->getPassword(),
