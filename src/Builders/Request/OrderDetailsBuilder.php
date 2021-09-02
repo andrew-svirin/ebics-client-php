@@ -135,12 +135,10 @@ class OrderDetailsBuilder
         $xmlService = $this->dom->createElement('Service');
         $xmlBTDOrderParams->appendChild($xmlService);
 
-        // Add optionnal ServiceName to Service.
-        if (null !== $btfContext->getServiceName()) {
-            $xmlServiceName = $this->dom->createElement('ServiceName');
-            $xmlServiceName->nodeValue = $btfContext->getServiceName();
-            $xmlService->appendChild($xmlServiceName);
-        }
+        // Add ServiceName to Service.
+        $xmlServiceName = $this->dom->createElement('ServiceName');
+        $xmlServiceName->nodeValue = $btfContext->getServiceName();
+        $xmlService->appendChild($xmlServiceName);
 
         // Add optionnal ServiceOption to Service.
         if (null !== $btfContext->getServiceOption()) {
