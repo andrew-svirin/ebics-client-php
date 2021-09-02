@@ -840,7 +840,8 @@ class RSA implements RSAInterface
             throw new LogicException('K can not be less than 0.');
         }
 
-        if (!($ciphertext = str_split($ciphertext, $this->k))) {
+        $ciphertext = str_split($ciphertext, $this->k);
+        if (empty($ciphertext)) {
             throw new LogicException('Ciphertext was not split.');
         }
         $ciphertext[count($ciphertext) - 1] = str_pad(
@@ -873,7 +874,8 @@ class RSA implements RSAInterface
             throw new LogicException('Length must be more 0.');
         }
 
-        if (!($plaintext = str_split($plaintext, $length))) {
+        $plaintext = str_split($plaintext, $length);
+        if (empty($plaintext)) {
             throw new LogicException('Plaintext was not split.');
         }
         $ciphertext = '';
