@@ -13,7 +13,7 @@ Support Ebics server versions: 2.5 (default), 3.0
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ## Donation
-[![Donate](https://wise.com/send/#/enterpayment?recipient=189936743)](https://www.liqpay.ua/api/3/checkout?data=eyJ2ZXJzaW9uIjozLCJhY3Rpb24iOiJwYXlkb25hdGUiLCJhbW91bnQiOiI1IiwiY3VycmVuY3kiOiJFVVIiLCJkZXNjcmlwdGlvbiI6IkVCSUNTIGltcHJvdmVtZW50IiwicHVibGljX2tleSI6ImkzNDU2MTE2MTEwMSIsImxhbmd1YWdlIjoicnUifQ==&signature=+8pjPKeC5/XLOztq5Mq7RWAVos8=)
+[![Donate](https://static.liqpay.ua/userfiles/checkout/4731829.1629653516940239)](https://wise.com/send/#/enterpayment?recipient=189936743)
 
 ## Development and integration Ebics for your project and other development
 👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
