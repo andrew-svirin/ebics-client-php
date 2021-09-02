@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use DateTimeInterface;
 use DOMDocument;
 use DOMElement;
@@ -122,9 +123,7 @@ class OrderDetailsBuilder
     }
 
     public function addBTDOrderParams(
-        string $serviceName,
-        string $scope,
-        string $msgName,
+        BTFContext $btfContext,
         ?DateTimeInterface $startDateTime = null,
         ?DateTimeInterface $endDateTime = null
     ): OrderDetailsBuilder {
@@ -138,18 +137,49 @@ class OrderDetailsBuilder
 
         // Add ServiceName to Service.
         $xmlServiceName = $this->dom->createElement('ServiceName');
-        $xmlServiceName->nodeValue = $serviceName;
+        $xmlServiceName->nodeValue = $btfContext->getServiceName();
         $xmlService->appendChild($xmlServiceName);
 
-        // Add Scope to Service.
-        $xmlScope = $this->dom->createElement('Scope');
-        $xmlScope->nodeValue = $scope;
-        $xmlService->appendChild($xmlScope);
+        // Add optional ServiceOption to Service.
+        if (null !== $btfContext->getServiceOption()) {
+            $xmlServiceOption = $this->dom->createElement('ServiceOption');
+            $xmlServiceOption->nodeValue = $btfContext->getServiceOption();
+            $xmlService->appendChild($xmlServiceOption);
+        }
+
+        // Add optional ContainerFlag to Service.
+        if (null !== $btfContext->getContainerFlag()) {
+            $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
+            $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
+            $xmlService->appendChild($xmlContainerFlag);
+        }
+
+        // Add optional Scope to Service.
+        if (null !== $btfContext->getScope()) {
+            $xmlScope = $this->dom->createElement('Scope');
+            $xmlScope->nodeValue = $btfContext->getScope();
+            $xmlService->appendChild($xmlScope);
+        }
 
         // Add MsgName to Service.
         $xmlMsgName = $this->dom->createElement('MsgName');
-        $xmlMsgName->nodeValue = $msgName;
+        $xmlMsgName->nodeValue = $btfContext->getMsgName();
         $xmlService->appendChild($xmlMsgName);
+
+        // Add optional MsgName version attribute
+        if (null !== $btfContext->getMsgNameVersion()) {
+            $xmlMsgName->setAttribute('version', $btfContext->getMsgNameVersion());
+        }
+
+        // Add optional MsgName variant attribute
+        if (null !== $btfContext->getMsgNameVariant()) {
+            $xmlMsgName->setAttribute('variant', $btfContext->getMsgNameVariant());
+        }
+
+        // Add optional MsgName format attribute
+        if (null !== $btfContext->getMsgNameFormat()) {
+            $xmlMsgName->setAttribute('format', $btfContext->getMsgNameFormat());
+        }
 
         if (null !== $startDateTime && null !== $endDateTime) {
             // Add DateRange to BTDOrderParams.

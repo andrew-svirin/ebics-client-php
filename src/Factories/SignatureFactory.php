@@ -46,13 +46,13 @@ class SignatureFactory
     public function create(string $type, string $publicKey, string $privateKey = null): SignatureInterface
     {
         switch ($type) {
-            case Signature::TYPE_A:
+            case SignatureInterface::TYPE_A:
                 $signature = $this->createSignatureA($publicKey, $privateKey);
                 break;
-            case Signature::TYPE_E:
+            case SignatureInterface::TYPE_E:
                 $signature = $this->createSignatureE($publicKey, $privateKey);
                 break;
-            case Signature::TYPE_X:
+            case SignatureInterface::TYPE_X:
                 $signature = $this->createSignatureX($publicKey, $privateKey);
                 break;
             default:
@@ -70,7 +70,7 @@ class SignatureFactory
      */
     public function createSignatureA(string $publicKey, string $privateKey): SignatureInterface
     {
-        return new Signature(Signature::TYPE_A, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_A, $publicKey, $privateKey);
     }
 
     /**
@@ -81,7 +81,7 @@ class SignatureFactory
      */
     public function createSignatureE(string $publicKey, string $privateKey = null): SignatureInterface
     {
-        return new Signature(Signature::TYPE_E, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_E, $publicKey, $privateKey);
     }
 
     /**
@@ -92,7 +92,7 @@ class SignatureFactory
      */
     public function createSignatureX(string $publicKey, string $privateKey = null): SignatureInterface
     {
-        return new Signature(Signature::TYPE_X, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_X, $publicKey, $privateKey);
     }
 
     /**
@@ -110,7 +110,7 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_A, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_A, $x509Generator);
     }
 
     /**
@@ -128,7 +128,7 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_E, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_E, $x509Generator);
     }
 
     /**
@@ -146,7 +146,7 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_X, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_X, $x509Generator);
     }
 
     /**
@@ -157,7 +157,7 @@ class SignatureFactory
      */
     public function createCertificateEFromDetails(string $exponent, string $modulus): SignatureInterface
     {
-        return $this->createCertificateFromDetails(Signature::TYPE_E, $exponent, $modulus);
+        return $this->createCertificateFromDetails(SignatureInterface::TYPE_E, $exponent, $modulus);
     }
 
     /**
@@ -168,7 +168,7 @@ class SignatureFactory
      */
     public function createCertificateXFromDetails(string $exponent, string $modulus): SignatureInterface
     {
-        return $this->createCertificateFromDetails(Signature::TYPE_X, $exponent, $modulus);
+        return $this->createCertificateFromDetails(SignatureInterface::TYPE_X, $exponent, $modulus);
     }
 
     /**
@@ -220,13 +220,13 @@ class SignatureFactory
         $rsaPublicKey = $this->rsaFactory->createPublic($keys['publickey']);
 
         switch ($type) {
-            case Signature::TYPE_A:
+            case SignatureInterface::TYPE_A:
                 $x509 = $x509Generator->generateAX509($rsaPrivateKey, $rsaPublicKey);
                 break;
-            case Signature::TYPE_E:
+            case SignatureInterface::TYPE_E:
                 $x509 = $x509Generator->generateEX509($rsaPrivateKey, $rsaPublicKey);
                 break;
-            case Signature::TYPE_X:
+            case SignatureInterface::TYPE_X:
                 $x509 = $x509Generator->generateXX509($rsaPrivateKey, $rsaPublicKey);
                 break;
             default:
