@@ -176,6 +176,24 @@ interface EbicsClientInterface
     ): Response;
 
     /**
+     * Retrieve the bank account statement in Camt.052 format.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     *
+     * @return Response
+     */
+    // @codingStandardsIgnoreStart
+    public function C52(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Response;
+    // @codingStandardsIgnoreEnd
+
+    /**
      * Retrieve the bank account statement in Camt.053 format.
      * Send self::transferReceipt() after transaction finished.
      *
