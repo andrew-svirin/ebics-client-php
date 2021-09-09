@@ -839,6 +839,63 @@ abstract class RequestFactory
      * @return Request
      * @throws EbicsException
      */
+    public function createC52(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'C52')
+                                    ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @param DateTimeInterface $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return Request
+     * @throws EbicsException
+     */
     public function createC53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
