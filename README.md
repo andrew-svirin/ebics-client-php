@@ -275,6 +275,7 @@ try {
 | HAA | Downloads the interim transaction report in SWIFT format (MT942). |
 | VMK | Downloads the interim transaction report in SWIFT format (MT942). |
 | STA | Retrieve the bank account statement. |
+| C52 | Retrieve the bank account report in Camt.052 format. |
 | C53 | Retrieve the bank account statement in Camt.053 format. |
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 | Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
