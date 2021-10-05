@@ -524,6 +524,27 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
+	/**
+	 * @inheritDoc
+	 * @throws Exceptions\EbicsResponseException
+	 */
+	public function XE2(
+		OrderDataInterface $orderData,
+		DateTimeInterface $dateTime = null,
+		int $numSegments = 1
+	): Response {
+		if (null === $dateTime) {
+			$dateTime = new DateTime();
+		}
+
+		$transactionKey = $this->cryptService->generateTransactionKey();
+
+		$request = $this->requestFactory->createXE2($dateTime, $numSegments, $transactionKey, $orderData);
+		$response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
+
+		return $response;
+	}
+
     /**
      * @inheritDoc
      * @throws EbicsException
