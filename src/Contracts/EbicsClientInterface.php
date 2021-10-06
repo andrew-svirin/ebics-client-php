@@ -266,25 +266,25 @@ interface EbicsClientInterface
         int $numSegments = 1
     ): Response;
 
-	/**
-	 * Using the XE2 order type, the user can initiate the credit transfer per Swiss Payments
-	 * specification set by Six banking services.
-	 *
-	 * XE2 is an upload order type that uses the protocol version H00X.
-	 *
-	 * FileFormat pain.001.001.03.ch.02
-	 *
-	 * @param OrderDataInterface $orderData
-	 * @param DateTimeInterface|null $dateTime
-	 * @param int $numSegments
-	 *
-	 * @return Response
-	 */
-	public function XE2(
-		OrderDataInterface $orderData,
-		DateTimeInterface $dateTime = null,
-		int $numSegments = 1
-	): Response;
+    /**
+     * Using the XE2 order type, the user can initiate the credit transfer per Swiss Payments
+     * specification set by Six banking services.
+     *
+     * XE2 is an upload order type that uses the protocol version H00X.
+     *
+     * FileFormat pain.001.001.03.ch.02
+     *
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     * @param int $numSegments
+     *
+     * @return Response
+     */
+    public function XE2(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        int $numSegments = 1
+    ): Response;
 
     /**
      * Using the CDD order type the user can initiate a direct debit transaction.
