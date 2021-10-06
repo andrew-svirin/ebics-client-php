@@ -8,9 +8,14 @@ use AndrewSvirin\Ebics\Models\PostalAddressInterface;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use AndrewSvirin\Ebics\Services\RandomService;
 use DateTime;
+use DateTimeZone;
+use Exception;
 
 /**
  * Class CustomerSwissCreditTransferBuilder builder for model @see \AndrewSvirin\Ebics\Models\CustomerCreditTransfer
+ *
+ * https://www.six-group.com/dam/download/banking-services/interbank-clearing/en/standardization/iso/swiss-recommendations/implementation-guidelines-ct.pdf
+ * https://www.six-group.com/dam/download/banking-services/interbank-clearing/de/standardization/iso/swiss-recommendations/archives/implementation-guidelines-ct/implementation-guidelines-ct_v1_6_1.pdf
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Jonathan Luthi
@@ -38,11 +43,33 @@ class CustomerSwissCreditTransferBuilder
     public function createInstance(
         string $debitorFinInstBIC,
         string $debitorIBAN,
-        string $debitorName
+        string $debitorName,
+        ?PostalAddressInterface $postalAddress
     ): CustomerSwissCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
-        $now = new DateTime();
+        try {
+            $now = new DateTime('now', new DateTimeZone('Europe/Zurich'));
+            $nowFormat1 = $now->format('Y-m-d\TH:i:s');
+            $nowFormat2 = $now->format('Y-m-d');
+        } catch (Exception $exception) {
+            $nowFormat1 = '1900-01-01T00:00:00';
+            $nowFormat2 = '1900-01-01';
+        }
 
+        /*$xmDocument = $this->instance->createElementNS(
+            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03.ch.02',
+            'Document'
+        );
+        $xmDocument->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:xsi',
+            'http://www.w3.org/2001/XMLSchema-instance'
+        );
+        $xmDocument->setAttributeNS(
+            'http://www.w3.org/2001/XMLSchema-instance',
+            'xsi:schemaLocation',
+            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03.ch.02.xsd'
+        );*/
         $xmDocument = $this->instance->createElementNS(
             'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd',
             'Document'
@@ -55,7 +82,7 @@ class CustomerSwissCreditTransferBuilder
         $xmDocument->setAttributeNS(
             'http://www.w3.org/2001/XMLSchema-instance',
             'xsi:schemaLocation',
-            'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd pain.001.001.03.ch.02.xsd'
+            'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd  pain.001.001.03.ch.02.xsd'
         );
         $this->instance->appendChild($xmDocument);
 
@@ -67,11 +94,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = substr($this->randomService->uniqueIdWithDate('msg'), 0, 35); // example: MSGID-9214-170502115114-00
+        $xmlMsgId->nodeValue = 'MSG-' . time(); // substr($this->randomService->uniqueIdWithDate('msg'), 0, 35); // example: MSGID-9214-170502115114-00
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
-        $xmlMsgId->nodeValue = $now->format('Y-m-d\TH:i:s');
+        $xmlMsgId->nodeValue = $nowFormat1;
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
@@ -89,7 +116,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm->nodeValue = $debitorName;
         $xmlInitgPty->appendChild($xmlNm);
 
-        $xmlCtctDtls = $this->instance->createElement('CtctDtls');
+        /*$xmlCtctDtls = $this->instance->createElement('CtctDtls');
         $xmlInitgPty->appendChild($xmlCtctDtls);
 
         $xmlNm = $this->instance->createElement('Nm');
@@ -98,25 +125,25 @@ class CustomerSwissCreditTransferBuilder
 
         $xmlOthr = $this->instance->createElement('Othr');
         $xmlOthr->nodeValue = '1.9';
-        $xmlCtctDtls->appendChild($xmlOthr);
+        $xmlCtctDtls->appendChild($xmlOthr);*/
 
         //payment information
         $xmlPmtInf = $this->instance->createElement('PmtInf');
         $xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = substr($this->randomService->uniqueIdWithDate('pmt'), 0, 35); // example PmtInfId-BP01-POS-01
+        $xmlPmtInfId->nodeValue = 'PMTINF-' . time(); // substr($this->randomService->uniqueIdWithDate('pmt'), 0, 35); // example PmtInfId-BP01-POS-01
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
         $xmlPmtMtd->nodeValue = 'TRF';
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
-        /*$xmlBtchBookg = $this->instance->createElement('BtchBookg');
+        $xmlBtchBookg = $this->instance->createElement('BtchBookg');
         $xmlBtchBookg->nodeValue = 'true';
         $xmlPmtInf->appendChild($xmlBtchBookg);
 
-        $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
+        /*$xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
         $xmlNbOfTxs->nodeValue = '0';
         $xmlPmtInf->appendChild($xmlNbOfTxs);
 
@@ -135,7 +162,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlSvcLvl->appendChild($xmlCd);*/
 
         $xmlReqdExctnDt = $this->instance->createElement('ReqdExctnDt');
-        $xmlReqdExctnDt->nodeValue = $now->format('Y-m-d');
+        $xmlReqdExctnDt->nodeValue = $nowFormat2;
         $xmlPmtInf->appendChild($xmlReqdExctnDt);
 
         $xmlDbtr = $this->instance->createElement('Dbtr');
@@ -144,6 +171,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm = $this->instance->createElement('Nm');
         $xmlNm->nodeValue = $debitorName;
         $xmlDbtr->appendChild($xmlNm);
+
+        if ($postalAddress !== null) {
+            $xmlDbtr->appendChild($postalAddress->toDomElement($this->instance));
+        }
 
         $xmlDbtrAcct = $this->instance->createElement('DbtrAcct');
         $xmlPmtInf->appendChild($xmlDbtrAcct);
@@ -197,11 +228,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlInstrId->nodeValue = 'INSTRID-' . time(); // substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlEndToEndId->nodeValue = 'ENDTOENDID-' . time(); // substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlAmt = $this->instance->createElement('Amt');
@@ -304,11 +335,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlInstrId->nodeValue = 'INSTRID-' . time(); // substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlEndToEndId->nodeValue = 'ENDTOENDID-' . time(); // substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
