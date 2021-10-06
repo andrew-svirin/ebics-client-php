@@ -264,10 +264,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlCtrlSum = DOMHelper::safeItem($ctrlSumList);
         $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');
 
-        $ctrlSumList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/CtrlSum');
+        /*$ctrlSumList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/CtrlSum');
         $ctrlSum = (float)DOMHelper::safeItemValue($ctrlSumList);
         $xmlCtrlSum = DOMHelper::safeItem($ctrlSumList);
-        $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');
+        $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');*/
 
         return $this;
     }
@@ -385,10 +385,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlCtrlSum = DOMHelper::safeItem($ctrlSumList);
         $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');
 
-        $ctrlSumList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/CtrlSum');
+        /*$ctrlSumList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/CtrlSum');
         $ctrlSum = (float)DOMHelper::safeItemValue($ctrlSumList);
         $xmlCtrlSum = DOMHelper::safeItem($ctrlSumList);
-        $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');
+        $xmlCtrlSum->nodeValue = number_format($ctrlSum + $amount, 2, '.', '');*/
 
         return $this;
     }
