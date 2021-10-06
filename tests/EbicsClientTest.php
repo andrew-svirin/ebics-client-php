@@ -590,6 +590,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'MARKDEF1820',
                 'DE09820000000083001503',
                 'Creditor Name 1',
+                null,
                 100.10,
                 'EUR',
                 'Test payment  1'
@@ -598,6 +599,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'GIBASKBX',
                 'SK4209000000000331819272',
                 'Creditor Name 2',
+                null,
                 200.02,
                 'CHF',
                 'Test payment  2'
@@ -606,6 +608,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'MARKDEF1820',
                 'DE09820000000083001503',
                 'Creditor Name 3',
+                null,
                 100.10,
                 'EUR',
                 'Test payment  3'
@@ -614,6 +617,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'GIBASKBX',
                 'SK4209000000000331819272',
                 'Creditor Name 4',
+                null,
                 200.02,
                 'CHF',
                 'Test payment  4'
