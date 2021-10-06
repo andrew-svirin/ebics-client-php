@@ -61,6 +61,7 @@ class CustomerSwissCreditTransferBuilder
 		$xmlCstmrCdtTrfInitn = $this->instance->createElement('CstmrCdtTrfInitn');
 		$xmDocument->appendChild($xmlCstmrCdtTrfInitn);
 
+		//header
 		$xmlGrpHdr = $this->instance->createElement('GrpHdr');
 		$xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
@@ -87,6 +88,18 @@ class CustomerSwissCreditTransferBuilder
 		$xmlNm->nodeValue = $debitorName;
 		$xmlInitgPty->appendChild($xmlNm);
 
+		$xmlCtctDtls = $this->instance->createElement('CtctDtls');
+		$xmlInitgPty->appendChild($xmlCtctDtls);
+
+		$xmlNm = $this->instance->createElement('Nm');
+		$xmlNm->nodeValue = 'Ebics client PHP';
+		$xmlCtctDtls->appendChild($xmlNm);
+
+		$xmlOthr = $this->instance->createElement('Othr');
+		$xmlOthr->nodeValue = '1.9';
+		$xmlCtctDtls->appendChild($xmlOthr);
+
+		//payment information
 		$xmlPmtInf = $this->instance->createElement('PmtInf');
 		$xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
@@ -147,14 +160,10 @@ class CustomerSwissCreditTransferBuilder
 		$xmlBIC->nodeValue = $debitorFinInstBIC;
 		$xmlFinInstnId->appendChild($xmlBIC);
 
-		$xmlChrgBr = $this->instance->createElement('ChrgBr');
-		$xmlChrgBr->nodeValue = 'SLEV';
-		$xmlPmtInf->appendChild($xmlChrgBr);
-
 		return $this;
 	}
 
-	public function addTransaction(
+	public function addBankCreditTransfer(
 		string $creditorFinInstBIC,
 		string $creditorIBAN,
 		string $creditorName,
@@ -162,6 +171,10 @@ class CustomerSwissCreditTransferBuilder
 		string $currency,
 		string $purpose
 	): CustomerSwissCreditTransferBuilder {
+		if(!in_array($currency, ['CHF', 'EUR'], true)) {
+			return $this;
+		}
+
 		$xpath = $this->prepareXPath($this->instance);
 		$nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/NbOfTxs');
 		$nbOfTxs = (int)DOMHelper::safeItemValue($nbOfTxsList);
