@@ -503,27 +503,6 @@ final class EbicsClient implements EbicsClientInterface
         return $response;
     }
 
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     */
-    public function CDD(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transactionKey = $this->cryptService->generateTransactionKey();
-
-        $request = $this->requestFactory->createCDD($dateTime, $numSegments, $transactionKey, $orderData);
-        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
-
-        return $response;
-    }
-
 	/**
 	 * @inheritDoc
 	 * @throws Exceptions\EbicsResponseException
@@ -544,6 +523,27 @@ final class EbicsClient implements EbicsClientInterface
 
 		return $response;
 	}
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     */
+    public function CDD(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        int $numSegments = 1
+    ): Response {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transactionKey = $this->cryptService->generateTransactionKey();
+
+        $request = $this->requestFactory->createCDD($dateTime, $numSegments, $transactionKey, $orderData);
+        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
+
+        return $response;
+    }
 
     /**
      * @inheritDoc

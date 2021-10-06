@@ -281,6 +281,7 @@ try {
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 | Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
 | CCT | Initiate the credit transfer per Single Euro Payments Area. |
+| XE2 | Initiate the Swiss credit transfer (i.e available in Switzerland). |
 | CDD | Initiate a direct debit transaction. |
 | BTD | Download request (FETCH request). |
 
