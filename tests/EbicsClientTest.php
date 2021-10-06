@@ -566,54 +566,54 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $this->assertResponseOk($code, $reportText);
     }
 
-	/**
-	 * @dataProvider serversDataProvider
-	 *
-	 * @group XE2
-	 *
-	 * @param int $credentialsId
-	 * @param array $codes
-	 * @param X509GeneratorInterface|null $x509Generator
-	 *
-	 * @covers
-	 */
-	public function testXE2(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-	{
-		$client = $this->setupClient($credentialsId, $x509Generator, $codes['XE2']['fake']);
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group XE2
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testXE2(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['XE2']['fake']);
 
-		$this->assertExceptionCode($codes['XE2']['code']);
+        $this->assertExceptionCode($codes['XE2']['code']);
 
-		$builder = new CustomerSwissCreditTransferBuilder();
-		$customerCreditTransfer = $builder
-			->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
-			->addBankCreditTransfer(
-				'MARKDEF1820',
-				'DE09820000000083001503',
-				'Creditor Name 1',
-				100.10,
-				'EUR',
-				'Test payment  1'
-			)
-			->addBankCreditTransfer(
-				'GIBASKBX',
-				'SK4209000000000331819272',
-				'Creditor Name 2',
-				200.02,
-				'CHF',
-				'Test payment  2'
-			)
-			->popInstance();
+        $builder = new CustomerSwissCreditTransferBuilder();
+        $customerCreditTransfer = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
+            ->addBankTransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                'Creditor Name 1',
+                100.10,
+                'EUR',
+                'Test payment  1'
+            )
+            ->addBankTransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Creditor Name 2',
+                200.02,
+                'CHF',
+                'Test payment  2'
+            )
+            ->popInstance();
 
-		$xe2 = $client->XE2($customerCreditTransfer);
+        $xe2 = $client->XE2($customerCreditTransfer);
 
-		$xe2Transfer = $client->transferTransfer($xe2);
+        $xe2Transfer = $client->transferTransfer($xe2);
 
-		$responseHandler = new ResponseHandlerV2();
-		$code = $responseHandler->retrieveH00XReturnCode($xe2Transfer);
-		$reportText = $responseHandler->retrieveH00XReportText($xe2Transfer);
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($xe2Transfer);
+        $reportText = $responseHandler->retrieveH00XReportText($xe2Transfer);
 
-		$this->assertResponseOk($code, $reportText);
-	}
+        $this->assertResponseOk($code, $reportText);
+    }
 
     /**
      * @dataProvider serversDataProvider

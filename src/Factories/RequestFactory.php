@@ -1124,70 +1124,70 @@ abstract class RequestFactory
         return $request;
     }
 
-	public function createXE2(
-		DateTimeInterface $dateTime,
-		int $numSegments,
-		string $transactionKey,
-		OrderDataInterface $orderData
-	): Request {
-		$signatureData = new UserSignature();
-		$this->userSignatureHandler->handle($signatureData, $orderData);
+    public function createXE2(
+        DateTimeInterface $dateTime,
+        int $numSegments,
+        string $transactionKey,
+        OrderDataInterface $orderData
+    ): Request {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData, $orderData);
 
-		$context = (new RequestContext())
-			->setBank($this->bank)
-			->setUser($this->user)
-			->setKeyRing($this->keyRing)
-			->setDateTime($dateTime)
-			->setTransactionKey($transactionKey)
-			->setNumSegments($numSegments)
-			->setSignatureData($signatureData);
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setTransactionKey($transactionKey)
+            ->setNumSegments($numSegments)
+            ->setSignatureData($signatureData);
 
-		$request = $this
-			->createRequestBuilderInstance()
-			->addContainerSecured(function (XmlBuilder $builder) use ($context) {
-				$builder->addHeader(function (HeaderBuilder $builder) use ($context) {
-					$builder->addStatic(function (StaticBuilder $builder) use ($context) {
-						$builder
-							->addHostId($context->getBank()->getHostId())
-							->addRandomNonce()
-							->addTimestamp($context->getDateTime())
-							->addPartnerId($context->getUser()->getPartnerId())
-							->addUserId($context->getUser()->getUserId())
-							->addProduct('Ebics client PHP', 'de')
-							->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
-								$this
-									->addOrderType($orderDetailsBuilder, 'XE2')
-									->addStandardOrderParams();
-							})
-							->addBankPubKeyDigests(
-								$context->getKeyRing()->getBankSignatureXVersion(),
-								$this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-								$context->getKeyRing()->getBankSignatureEVersion(),
-								$this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
-							)
-							->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
-							->addNumSegments($context->getNumSegments());
-					})->addMutable(function (MutableBuilder $builder) {
-						$builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
-					});
-				})->addBody(function (BodyBuilder $builder) use ($context) {
-					$builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
-						$builder
-							->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
-								$builder
-									->addEncryptionPubKeyDigest($context->getKeyRing())
-									->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
-							})
-							->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
-					});
-				});
-			})
-			->popInstance();
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'XE2')
+                                    ->addStandardOrderParams();
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
+                    });
+                });
+            })
+            ->popInstance();
 
-		$this->authSignatureHandler->handle($request);
+        $this->authSignatureHandler->handle($request);
 
-		return $request;
-	}
+        return $request;
+    }
 
     public function createCDD(
         DateTimeInterface $dateTime,
