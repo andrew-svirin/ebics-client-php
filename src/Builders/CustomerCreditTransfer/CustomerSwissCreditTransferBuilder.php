@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Builders\CustomerCreditTransfer;
 
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
+use AndrewSvirin\Ebics\Models\PostalAddressInterface;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use AndrewSvirin\Ebics\Services\RandomService;
 use DateTime;
@@ -167,11 +168,13 @@ class CustomerSwissCreditTransferBuilder
         string $creditorFinInstBIC,
         string $creditorIBAN,
         string $creditorName,
+        ?PostalAddressInterface $postalAddress,
         float $amount,
         string $currency,
         string $purpose = null
     ): CustomerSwissCreditTransferBuilder {
         if (!in_array($currency, ['CHF', 'EUR'], true)) {
+            //throw new InvalidArgumentException('The SEPA transaction is restricted to CHF and EUR currency.');
             return $this;
         }
 
@@ -226,6 +229,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm->nodeValue = $creditorName;
         $xmlCdtr->appendChild($xmlNm);
 
+        if ($postalAddress !== null) {
+            $xmlCdtr->appendChild($postalAddress->toDomElement($this->instance));
+        }
+
         $xmlCdtrAcct = $this->instance->createElement('CdtrAcct');
         $xmlCdtTrfTxInf->appendChild($xmlCdtrAcct);
 
@@ -272,11 +279,13 @@ class CustomerSwissCreditTransferBuilder
         string $creditorFinInstBIC,
         string $creditorIBAN,
         string $creditorName,
+        ?PostalAddressInterface $postalAddress,
         float $amount,
         string $currency,
         string $purpose = null
     ): CustomerSwissCreditTransferBuilder {
         if ($currency !== 'EUR') {
+            //throw new InvalidArgumentException('The SEPA transaction is restricted to EUR currency.');
             return $this;
         }
 
@@ -344,6 +353,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm = $this->instance->createElement('Nm');
         $xmlNm->nodeValue = $creditorName;
         $xmlCdtr->appendChild($xmlNm);
+
+        if ($postalAddress !== null) {
+            $xmlCdtr->appendChild($postalAddress->toDomElement($this->instance));
+        }
 
         $xmlCdtrAcct = $this->instance->createElement('CdtrAcct');
         $xmlCdtTrfTxInf->appendChild($xmlCdtrAcct);
