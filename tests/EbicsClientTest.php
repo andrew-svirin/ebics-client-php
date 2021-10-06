@@ -8,6 +8,8 @@ use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
+use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
+use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
@@ -590,7 +592,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'MARKDEF1820',
                 'DE09820000000083001503',
                 'Creditor Name 1',
-                null,
+                null, // new StructuredPostalAddress(),
                 100.10,
                 'EUR',
                 'Test payment  1'
@@ -599,7 +601,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'GIBASKBX',
                 'SK4209000000000331819272',
                 'Creditor Name 2',
-                null,
+                null, // new UnstructuredPostalAddress(),
                 200.02,
                 'CHF',
                 'Test payment  2'
@@ -608,7 +610,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'MARKDEF1820',
                 'DE09820000000083001503',
                 'Creditor Name 3',
-                null,
+                null, // new StructuredPostalAddress(),
                 100.10,
                 'EUR',
                 'Test payment  3'
@@ -617,7 +619,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'GIBASKBX',
                 'SK4209000000000331819272',
                 'Creditor Name 4',
-                null,
+                null, // new UnstructuredPostalAddress(),
                 200.02,
                 'CHF',
                 'Test payment  4'

@@ -67,11 +67,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        $xmlMsgId->nodeValue = substr($this->randomService->uniqueIdWithDate('msg'), 0, 35); // example: MSGID-9214-170502115114-00
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
-        $xmlMsgId->nodeValue = $now->format('Y-m-d\TH:i:s\.vP');
+        $xmlMsgId->nodeValue = $now->format('Y-m-d\TH:i:s');
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
@@ -105,12 +105,16 @@ class CustomerSwissCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        $xmlPmtInfId->nodeValue = substr($this->randomService->uniqueIdWithDate('pmt'), 0, 35); // example PmtInfId-BP01-POS-01
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
         $xmlPmtMtd->nodeValue = 'TRF';
         $xmlPmtInf->appendChild($xmlPmtMtd);
+
+        /*$xmlBtchBookg = $this->instance->createElement('BtchBookg');
+        $xmlBtchBookg->nodeValue = 'true';
+        $xmlPmtInf->appendChild($xmlBtchBookg);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
         $xmlNbOfTxs->nodeValue = '0';
@@ -128,7 +132,7 @@ class CustomerSwissCreditTransferBuilder
 
         $xmlCd = $this->instance->createElement('Cd');
         $xmlCd->nodeValue = 'SEPA';
-        $xmlSvcLvl->appendChild($xmlCd);
+        $xmlSvcLvl->appendChild($xmlCd);*/
 
         $xmlReqdExctnDt = $this->instance->createElement('ReqdExctnDt');
         $xmlReqdExctnDt->nodeValue = $now->format('Y-m-d');
@@ -193,15 +197,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pii' . str_pad((string)$nbOfTxs, 2, '0')
-        );
+        $xmlInstrId->nodeValue = substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pete' . str_pad((string)$nbOfTxs, 2, '0')
-        );
+        $xmlEndToEndId->nodeValue = substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlAmt = $this->instance->createElement('Amt');
@@ -304,15 +304,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pii' . str_pad((string)$nbOfTxs, 2, '0')
-        );
+        $xmlInstrId->nodeValue = substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pete' . str_pad((string)$nbOfTxs, 2, '0')
-        );
+        $xmlEndToEndId->nodeValue = substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
