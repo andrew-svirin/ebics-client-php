@@ -307,7 +307,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
-        $xmlPmtInf->appendChild($xmlPmtTpInf);
+        $xmlCdtTrfTxInf->appendChild($xmlPmtTpInf);
 
         $xmlSvcLvl = $this->instance->createElement('SvcLvl');
         $xmlPmtTpInf->appendChild($xmlSvcLvl);
@@ -326,7 +326,7 @@ class CustomerSwissCreditTransferBuilder
 
         $xmlChrgBr = $this->instance->createElement('ChrgBr');
         $xmlChrgBr->nodeValue = 'SLEV';
-        $xmlPmtInf->appendChild($xmlChrgBr);
+        $xmlCdtTrfTxInf->appendChild($xmlChrgBr);
 
         $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
         $xmlCdtTrfTxInf->appendChild($xmlCdtrAgt);
