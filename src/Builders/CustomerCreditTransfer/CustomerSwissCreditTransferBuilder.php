@@ -183,7 +183,7 @@ class CustomerSwissCreditTransferBuilder
         }
 
         $xpath = $this->prepareXPath($this->instance);
-        $nbOfTxsList = $xpath->query(/*'//CstmrCdtTrfInitn/PmtInf/NbOfTxs'*/'//CstmrCdtTrfInitn//GrpHeader/NbOfTxs');
+        $nbOfTxsList = $xpath->query(/*'//CstmrCdtTrfInitn/PmtInf/NbOfTxs'*/'//CstmrCdtTrfInitn//GrpHdr/NbOfTxs');
         $nbOfTxs = (int)DOMHelper::safeItemValue($nbOfTxsList);
         $nbOfTxs++;
 
@@ -290,7 +290,7 @@ class CustomerSwissCreditTransferBuilder
         }
 
         $xpath = $this->prepareXPath($this->instance);
-        $nbOfTxsList = $xpath->query(/*'//CstmrCdtTrfInitn/PmtInf/NbOfTxs'*/'//CstmrCdtTrfInitn//GrpHeader/NbOfTxs');
+        $nbOfTxsList = $xpath->query(/*'//CstmrCdtTrfInitn/PmtInf/NbOfTxs'*/'//CstmrCdtTrfInitn//GrpHdr/NbOfTxs');
         $nbOfTxs = (int)DOMHelper::safeItemValue($nbOfTxsList);
         $nbOfTxs++;
 
