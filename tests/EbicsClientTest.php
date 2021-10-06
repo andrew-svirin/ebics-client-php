@@ -602,6 +602,22 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'CHF',
                 'Test payment  2'
             )
+            ->addSEPATransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                'Creditor Name 3',
+                100.10,
+                'EUR',
+                'Test payment  3'
+            )
+            ->addSEPATransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Creditor Name 4',
+                200.02,
+                'CHF',
+                'Test payment  4'
+            )
             ->popInstance();
 
         $xe2 = $client->XE2($customerCreditTransfer);

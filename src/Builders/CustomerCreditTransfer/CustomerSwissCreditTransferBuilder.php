@@ -306,6 +306,16 @@ class CustomerSwissCreditTransferBuilder
         );
         $xmlPmtId->appendChild($xmlEndToEndId);
 
+        $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
+        $xmlPmtInf->appendChild($xmlPmtTpInf);
+
+        $xmlSvcLvl = $this->instance->createElement('SvcLvl');
+        $xmlPmtTpInf->appendChild($xmlSvcLvl);
+
+        $xmlCd = $this->instance->createElement('Cd');
+        $xmlCd->nodeValue = 'SEPA';
+        $xmlSvcLvl->appendChild($xmlCd);
+
         $xmlAmt = $this->instance->createElement('Amt');
         $xmlCdtTrfTxInf->appendChild($xmlAmt);
 
@@ -313,6 +323,10 @@ class CustomerSwissCreditTransferBuilder
         $xmlInstdAmt->setAttribute('Ccy', $currency);
         $xmlInstdAmt->nodeValue = number_format($amount, 2, '.', '');
         $xmlAmt->appendChild($xmlInstdAmt);
+
+        $xmlChrgBr = $this->instance->createElement('ChrgBr');
+        $xmlChrgBr->nodeValue = 'SLEV';
+        $xmlPmtInf->appendChild($xmlChrgBr);
 
         $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
         $xmlCdtTrfTxInf->appendChild($xmlCdtrAgt);
@@ -338,7 +352,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtrAcct->appendChild($xmlId);
 
         $xmlIBAN = $this->instance->createElement('IBAN');
-        $xmlIBAN->nodeValue = $creditorIBAN;
+        $xmlIBAN->nodeValue = str_replace(' ', '', $creditorIBAN);
         $xmlId->appendChild($xmlIBAN);
 
         if ($purpose !== null && trim($purpose) !== '') {
