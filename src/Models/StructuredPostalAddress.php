@@ -56,7 +56,7 @@ class StructuredPostalAddress implements PostalAddressInterface
         $this->street = $street !== null && trim($street) !== '' ? substr(trim($street), 0, 70) : null;
         $this->buildingNo = $buildingNo !== null && trim($buildingNo) !== '' ? substr(trim($buildingNo), 0, 16) : null;
         $this->postCode = substr(trim($postCode), 0, 16);
-        $this->town = substr(trim($town), 0, 16);
+        $this->town = substr(trim($town), 0, 35);
         $this->country = strtoupper(substr(trim($country), 0, 2));
     }
 
