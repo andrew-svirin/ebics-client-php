@@ -266,25 +266,6 @@ interface EbicsClientInterface
         int $numSegments = 1
     ): Response;
 
-    /**
-     * Using the CDD order type the user can initiate a direct debit transaction.
-     *
-     * The CDD order type uses the protocol version H00X.
-     *
-     * FileFormat pain.008.001.02
-     *
-     * @param OrderDataInterface $orderData
-     * @param DateTimeInterface|null $dateTime
-     * @param int $numSegments
-     *
-     * @return Response
-     */
-    public function CDD(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response;
-
 	/**
 	 * Using the XE2 order type, the user can initiate the credit transfer per Swiss Payments
 	 * specification set by Six banking services.
@@ -304,6 +285,25 @@ interface EbicsClientInterface
 		DateTimeInterface $dateTime = null,
 		int $numSegments = 1
 	): Response;
+
+    /**
+     * Using the CDD order type the user can initiate a direct debit transaction.
+     *
+     * The CDD order type uses the protocol version H00X.
+     *
+     * FileFormat pain.008.001.02
+     *
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     * @param int $numSegments
+     *
+     * @return Response
+     */
+    public function CDD(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        int $numSegments = 1
+    ): Response;
 
     /**
      * Mark transactions as received.
