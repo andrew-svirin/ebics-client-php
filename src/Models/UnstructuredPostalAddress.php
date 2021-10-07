@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models;
 
+use AndrewSvirin\Ebics\Contracts\PostalAddressInterface;
 use DOMElement;
 
 /**
