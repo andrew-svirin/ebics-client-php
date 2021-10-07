@@ -591,29 +591,10 @@ class EbicsClientTest extends AbstractEbicsTestCase
             ->addBankTransaction(
                 'MARKDEF1820',
                 'DE09820000000083001503',
-                'Creditor Name 1',
                 null, // new StructuredPostalAddress(),
                 100.10,
                 'EUR',
                 'Test payment  1'
-            )
-            ->addBankTransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 2',
-                null, // new UnstructuredPostalAddress(),
-                200.02,
-                'CHF',
-                'Test payment  2'
-            )
-            ->addSEPATransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                'Creditor Name 3',
-                null, // new StructuredPostalAddress(),
-                100.10,
-                'EUR',
-                'Test payment  3'
             )
             ->addSEPATransaction(
                 'GIBASKBX',
@@ -622,7 +603,16 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 null, // new UnstructuredPostalAddress(),
                 200.02,
                 'CHF',
-                'Test payment  4'
+                'Test payment  2'
+            )
+            ->addForeignTransaction(
+                'NWBKGB2L',
+                'GB29 NWBK 6016 1331 9268 19',
+                'United Development Ltd',
+                new UnstructuredPostalAddress('George Street', 'BA1 2FJ Bath', 'GB'),
+                65.10,
+                'GBP',
+                'Test payment 3'
             )
             ->popInstance();
 

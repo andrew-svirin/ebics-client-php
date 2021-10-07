@@ -2,9 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Builders\CustomerCreditTransfer;
 
+use AndrewSvirin\Ebics\Contracts\PostalAddressInterface;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
-use AndrewSvirin\Ebics\Models\PostalAddressInterface;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use AndrewSvirin\Ebics\Services\RandomService;
 use DateTime;
@@ -44,8 +44,7 @@ class CustomerSwissCreditTransferBuilder
     public function createInstance(
         string $debitorFinInstBIC,
         string $debitorIBAN,
-        string $debitorName,
-        ?PostalAddressInterface $postalAddress
+        string $debitorName
     ): CustomerSwissCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         try {
@@ -103,7 +102,8 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm->nodeValue = $debitorName;
         $xmlInitgPty->appendChild($xmlNm);
 
-        /*$xmlCtctDtls = $this->instance->createElement('CtctDtls');
+        //software info
+        $xmlCtctDtls = $this->instance->createElement('CtctDtls');
         $xmlInitgPty->appendChild($xmlCtctDtls);
 
         $xmlNm = $this->instance->createElement('Nm');
@@ -112,7 +112,7 @@ class CustomerSwissCreditTransferBuilder
 
         $xmlOthr = $this->instance->createElement('Othr');
         $xmlOthr->nodeValue = '1.9';
-        $xmlCtctDtls->appendChild($xmlOthr);*/
+        $xmlCtctDtls->appendChild($xmlOthr);
 
         //payment information
         $xmlPmtInf = $this->instance->createElement('PmtInf');
@@ -158,10 +158,6 @@ class CustomerSwissCreditTransferBuilder
         $xmlNm = $this->instance->createElement('Nm');
         $xmlNm->nodeValue = $debitorName;
         $xmlDbtr->appendChild($xmlNm);
-
-        if ($postalAddress !== null) {
-            $xmlDbtr->appendChild($postalAddress->toDomElement($this->instance));
-        }
 
         $xmlDbtrAcct = $this->instance->createElement('DbtrAcct');
         $xmlPmtInf->appendChild($xmlDbtrAcct);
@@ -244,21 +240,23 @@ class CustomerSwissCreditTransferBuilder
 
     private function addCreditor(
         DOMElement $xmlCdtTrfTxInf,
-        string $creditorFinInstBIC,
+        ?string $creditorFinInstBIC,
         string $creditorIBAN,
         string $creditorName,
         ?PostalAddressInterface $postalAddress,
         string $purpose = null): void {
-        /*//agent
-        $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
-        $xmlCdtTrfTxInf->appendChild($xmlCdtrAgt);
+        //agent
+        if($creditorFinInstBIC !== null) {
+            $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
+            $xmlCdtTrfTxInf->appendChild($xmlCdtrAgt);
 
-        $xmlFinInstnId = $this->instance->createElement('FinInstnId');
-        $xmlCdtrAgt->appendChild($xmlFinInstnId);
+            $xmlFinInstnId = $this->instance->createElement('FinInstnId');
+            $xmlCdtrAgt->appendChild($xmlFinInstnId);
 
-        $xmlBIC = $this->instance->createElement('BIC');
-        $xmlBIC->nodeValue = $creditorFinInstBIC;
-        $xmlFinInstnId->appendChild($xmlBIC);*/
+            $xmlBIC = $this->instance->createElement('BIC');
+            $xmlBIC->nodeValue = $creditorFinInstBIC;
+            $xmlFinInstnId->appendChild($xmlBIC);
+        }
 
         //creditor
         $xmlCdtr = $this->instance->createElement('Cdtr');
@@ -283,6 +281,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlIBAN->nodeValue = str_replace(' ', '', $creditorIBAN);
         $xmlId->appendChild($xmlIBAN);
 
+        //purpose
         if ($purpose !== null && trim($purpose) !== '') {
             $xmlRmtInf = $this->instance->createElement('RmtInf');
             $xmlCdtTrfTxInf->appendChild($xmlRmtInf);
@@ -294,7 +293,6 @@ class CustomerSwissCreditTransferBuilder
     }
 
     public function addBankTransaction(
-        string $creditorFinInstBIC,
         string $creditorIBAN,
         string $creditorName,
         ?PostalAddressInterface $postalAddress,
@@ -313,7 +311,7 @@ class CustomerSwissCreditTransferBuilder
         $this->addAmountElement($xmlCdtTrfTxInf, $amount, $currency);
 
         //creditor
-        $this->addCreditor($xmlCdtTrfTxInf, $creditorFinInstBIC, $creditorIBAN, $creditorName, $postalAddress, $purpose);
+        $this->addCreditor($xmlCdtTrfTxInf, null, $creditorIBAN, $creditorName, $postalAddress, $purpose);
 
         return $this;
     }
@@ -362,8 +360,79 @@ class CustomerSwissCreditTransferBuilder
         return $this;
     }
 
-    //todo: public function addForeignTransaction
-    //todo: public function addISRTransaction
+    public function addForeignTransaction(
+        string $creditorFinInstBIC,
+        string $creditorIBAN,
+        string $creditorName,
+        ?PostalAddressInterface $postalAddress,
+        float $amount,
+        string $currency,
+        string $purpose = null
+    ): CustomerSwissCreditTransferBuilder {
+        $xmlCdtTrfTxInf = $this->createCreditTransferTransactionElement($amount);
+
+        //amount
+        $this->addAmountElement($xmlCdtTrfTxInf, $amount, $currency);
+
+        //creditor
+        $this->addCreditor($xmlCdtTrfTxInf, $creditorFinInstBIC, $creditorIBAN, $creditorName, $postalAddress, $purpose);
+
+        return $this;
+    }
+
+    public function addISRTransaction(
+        string $accountNumber,
+        float $amount,
+        string $currency,
+        string $reference,
+        string $purpose = null
+    ): CustomerSwissCreditTransferBuilder {
+        $xmlCdtTrfTxInf = $this->createCreditTransferTransactionElement($amount);
+
+        //payment type information
+        $xmlPmtTpInf = $this->instance->createElement('PmtTpInf');
+        $xmlCdtTrfTxInf->appendChild($xmlPmtTpInf);
+
+        $xmlLclInstrm = $this->instance->createElement('LclInstrm');
+        $xmlPmtTpInf->appendChild($xmlLclInstrm);
+
+        $xmlPrtry = $this->instance->createElement('Prtry');
+        $xmlPrtry->nodeValue = 'CH01';
+        $xmlLclInstrm->appendChild($xmlPrtry);
+
+        //amount
+        $this->addAmountElement($xmlCdtTrfTxInf, $amount, $currency);
+
+        //creditor
+        //$this->addCreditor($xmlCdtTrfTxInf, $creditorFinInstBIC, $creditorIBAN, $creditorName, $postalAddress, $purpose);
+
+        //account
+        $xmlCdtrAcct = $this->instance->createElements(['CdtrAcct', 'Id', 'Othr'], $accountNumber);
+        $xmlCdtTrfTxInf->appendChild($xmlCdtrAcct);
+
+//        $xmlId = $this->instance->createElement('Id');
+//        $xmlCdtrAcct->appendChild($xmlId);
+//
+//        $xmlOthr = $this->instance->createElement('Othr');
+//        $xmlCdtrAcct->appendChild($xmlOthr);
+//
+//
+//        $xmlIBAN = $this->instance->createElement('IBAN');
+//        $xmlIBAN->nodeValue = str_replace(' ', '', $creditorIBAN);
+//        $xmlId->appendChild($xmlIBAN);
+
+        //purpose
+        if ($purpose !== null && trim($purpose) !== '') {
+            $xmlRmtInf = $this->instance->createElement('RmtInf');
+            $xmlCdtTrfTxInf->appendChild($xmlRmtInf);
+
+            $xmlUstrd = $this->instance->createElement('Ustrd');
+            $xmlUstrd->nodeValue = $purpose;
+            $xmlRmtInf->appendChild($xmlUstrd);
+        }
+
+        return $this;
+    }
 
     public function popInstance(): CustomerCreditTransfer
     {

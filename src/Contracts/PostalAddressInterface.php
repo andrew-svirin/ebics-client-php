@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace AndrewSvirin\Ebics\Contracts;
 
 use DOMElement;
 
