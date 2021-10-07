@@ -50,10 +50,10 @@ class CustomerSwissCreditTransferBuilder
         $this->instance = new CustomerCreditTransfer();
         try {
             $now = new DateTime('now', new DateTimeZone('Europe/Zurich'));
-            $nowFormat1 = $now->format('Y-m-d\TH:i:s');
+            $nowFormat1 = $now->format('Y-m-d\TH:i:s\.vP');
             $nowFormat2 = $now->format('Y-m-d');
         } catch (Exception $exception) {
-            $nowFormat1 = '1900-01-01T00:00:00';
+            $nowFormat1 = '1900-01-01T00:00:00.000+02:00';
             $nowFormat2 = '1900-01-01';
         }
 
@@ -81,7 +81,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = 'MSG-' . time(); // substr($this->randomService->uniqueIdWithDate('msg'), 0, 35); // example: MSGID-9214-170502115114-00
+        $xmlMsgId->nodeValue = substr($this->randomService->uniqueIdWithDate('msg'), 0, 35); // example: MSGID-9214-170502115114-00
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
@@ -119,7 +119,7 @@ class CustomerSwissCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = 'PMTINF-' . time(); // substr($this->randomService->uniqueIdWithDate('pmt'), 0, 35); // example PmtInfId-BP01-POS-01
+        $xmlPmtInfId->nodeValue = substr($this->randomService->uniqueIdWithDate('pmt'), 0, 35); // example PmtInfId-BP01-POS-01
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
@@ -203,11 +203,11 @@ class CustomerSwissCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = 'INSTRID-' . time(); // substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlInstrId->nodeValue = substr($this->randomService->uniqueIdWithDate('pii' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = 'ENDTOENDID-' . time(); // substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
+        $xmlEndToEndId->nodeValue = substr($this->randomService->uniqueIdWithDate('pete' . str_pad((string)$nbOfTxs, 2, '0')), 0, 35);
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         //update parent's elements
