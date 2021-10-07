@@ -57,20 +57,6 @@ class CustomerSwissCreditTransferBuilder
             $nowFormat2 = '1900-01-01';
         }
 
-        /*$xmDocument = $this->instance->createElementNS(
-            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03.ch.02',
-            'Document'
-        );
-        $xmDocument->setAttributeNS(
-            'http://www.w3.org/2000/xmlns/',
-            'xmlns:xsi',
-            'http://www.w3.org/2001/XMLSchema-instance'
-        );
-        $xmDocument->setAttributeNS(
-            'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation',
-            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03.ch.02.xsd'
-        );*/
         $xmDocument = $this->instance->createElementNS(
             'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd',
             'Document'

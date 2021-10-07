@@ -39,7 +39,7 @@ class PublicKeyHashGenerator implements HashGeneratorInterface
 
         $key = $this->cryptService->calculateKey($e, $m);
 
-        $hash = $this->cryptService->calculateCertificateFingerprint($key);
+        $hash = $this->cryptService->calculateKeyHash($key);
 
         return $hash;
     }
