@@ -263,7 +263,7 @@ class CustomerSwissCreditTransferBuilder
         string $creditorName,
         ?PostalAddressInterface $postalAddress,
         string $purpose = null): void {
-        //agent
+        /*//agent
         $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
         $xmlCdtTrfTxInf->appendChild($xmlCdtrAgt);
 
@@ -272,8 +272,9 @@ class CustomerSwissCreditTransferBuilder
 
         $xmlBIC = $this->instance->createElement('BIC');
         $xmlBIC->nodeValue = $creditorFinInstBIC;
-        $xmlFinInstnId->appendChild($xmlBIC);
+        $xmlFinInstnId->appendChild($xmlBIC);*/
 
+        //creditor
         $xmlCdtr = $this->instance->createElement('Cdtr');
         $xmlCdtTrfTxInf->appendChild($xmlCdtr);
 
