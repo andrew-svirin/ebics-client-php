@@ -333,7 +333,7 @@ class CryptService
 
         $key = $this->calculateKey($exponent, $modulus);
 
-        return $this->calculateKeyHash($key, $algorithm, $rawOutput);
+        return $this->calculateCertificateFingerprint($key, $algorithm, $rawOutput);
     }
 
     /**
