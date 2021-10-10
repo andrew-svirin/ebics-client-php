@@ -13,12 +13,6 @@ Support Ebics server versions: 2.5 (default), 3.0
 ## License
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
-## Donation
-[![Donate](https://static.liqpay.ua/userfiles/checkout/4731829.1629653516940239)](https://wise.com/send/#/enterpayment?recipient=189936743)
-
-## Development and integration Ebics for your project and other development
-👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
-
 ## Installation
 ```bash
 $ composer require andrew-svirin/ebics-client-php
@@ -307,3 +301,12 @@ $zip->extractTo($outputDir, $inputPath);
 You'll find one or many XML files in your output directory.
 
 ### 6. Make HKD request to see what order types allowed.
+
+---
+
+## Donation
+- https://static.liqpay.ua/userfiles/checkout/4731829.1629653516940239
+- Bitcoin: bc1qhahtnhcrpg8u93pndjglaeuy0nc0tjau9rnst5
+
+## Development and integration Ebics for your project and other development
+👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
