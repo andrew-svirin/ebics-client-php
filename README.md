@@ -304,7 +304,7 @@ You'll find one or many XML files in your output directory.
 ---
 
 ## Donation
-- https://static.liqpay.ua/userfiles/checkout/4731829.1629653516940239
+- Wise.com https://wise.com/send/#/enterpayment?recipient=189936743
 - Bitcoin: bc1qhahtnhcrpg8u93pndjglaeuy0nc0tjau9rnst5
 
 ## Development and integration Ebics for your project and other development
