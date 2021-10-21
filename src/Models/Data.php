@@ -4,7 +4,6 @@ namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\DataInterface;
 use DOMDocument;
-use DOMElement;
 
 /**
  * Class Data represents Data model.
