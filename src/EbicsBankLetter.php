@@ -8,6 +8,9 @@ use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
+use AndrewSvirin\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
+use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetterService;
@@ -99,5 +102,20 @@ final class EbicsBankLetter
     public function formatBankLetter(BankLetter $bankLetter, FormatterInterface $formatter)
     {
         return $formatter->format($bankLetter);
+    }
+
+    public function createTxtBankLetterFormatter(): TxtBankLetterFormatter
+    {
+        return new TxtBankLetterFormatter();
+    }
+
+    public function createHtmlBankLetterFormatter(): HtmlBankLetterFormatter
+    {
+        return new HtmlBankLetterFormatter();
+    }
+
+    public function createPdfBankLetterFormatter(): PdfBankLetterFormatter
+    {
+        return new PdfBankLetterFormatter();
     }
 }
