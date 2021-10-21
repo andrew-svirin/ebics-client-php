@@ -489,7 +489,6 @@ abstract class RequestFactory
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'FDL')
-                                    ->addOrderAttribute(OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN)
                                     ->addFDLOrderParams(
                                         $context->getFileFormat(),
                                         $context->getCountryCode(),
