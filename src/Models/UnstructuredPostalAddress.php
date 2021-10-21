@@ -14,35 +14,35 @@ use DOMElement;
 class UnstructuredPostalAddress implements PostalAddressInterface
 {
     /**
-     * @var array
-     */
-    protected $addressLines;
-
-    /**
      * @var string
      */
     protected $country;
 
     /**
+     * @var array
+     */
+    protected $addressLines;
+
+    /**
      * Constructor
      *
-     * @param string|null $addressLine1 Street name and house number
-     * @param string|null $addressLine2 Postcode and town
-     * @param string $country Country code (ISO 3166-1 alpha-2)
+     * @param string $country Country code (ISO 3166-1 alpha-2) (max 2 char)
+     * @param string|null $addressLine1 Street name and house number (max 70 char)
+     * @param string|null $addressLine2 Postcode and town (max 70 char)
      */
     public function __construct(
+        string $country,
         ?string $addressLine1,
-        ?string $addressLine2 = null,
-        string $country = 'CH'
+        ?string $addressLine2 = null
     ) {
+        $this->country = $country;
         $this->addressLines = [];
         if ($addressLine1 !== null) {
-            $this->addressLines[] = substr(trim($addressLine1), 0, 70);
+            $this->addressLines[] = $addressLine1;
         }
         if ($addressLine2 !== null) {
-            $this->addressLines[] = substr(trim($addressLine2), 0, 70);
+            $this->addressLines[] = $addressLine2;
         }
-        $this->country = strtoupper(substr(trim($country), 0, 2));
     }
 
     /**

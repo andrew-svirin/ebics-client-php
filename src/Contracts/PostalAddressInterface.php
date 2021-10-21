@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
+use DOMDocument;
 use DOMElement;
 
 /**
@@ -15,9 +16,9 @@ interface PostalAddressInterface
     /**
      * Returns an XML representation of the address
      *
-     * @param \DOMDocument $doc
+     * @param DOMDocument $doc
      *
      * @return DOMElement The built DOM element
      */
-    public function toDomElement(\DOMDocument $doc): DOMElement;
+    public function toDomElement(DOMDocument $doc): DOMElement;
 }
