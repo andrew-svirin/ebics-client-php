@@ -11,17 +11,6 @@ namespace AndrewSvirin\Ebics\Contracts;
 interface DataInterface
 {
     /**
-     * @param string $string
-     */
-    public function ensureUnicode(string &$string): void;
-
-    /**
-     * @param array $nodes
-     * @return \DOMElement|false
-     */
-    public function createElements(array $nodes);
-
-    /**
      * Get formatted content.
      *
      * @return string

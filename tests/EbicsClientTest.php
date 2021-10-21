@@ -593,7 +593,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'DE09820000000083001503',
                 null, // new StructuredPostalAddress(),
                 100.10,
-                'EUR',
+                'CHF',
                 'Test payment  1'
             )
             ->addSEPATransaction(
@@ -602,7 +602,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'Creditor Name 4',
                 null, // new UnstructuredPostalAddress(),
                 200.02,
-                'CHF',
+                'EUR',
                 'Test payment  2'
             )
             ->addForeignTransaction(
@@ -774,7 +774,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
-					'XE2' => ['code' => '090003', 'fake' => false],
+					'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
                 ],
             ],
