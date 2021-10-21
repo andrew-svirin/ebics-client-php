@@ -41,11 +41,11 @@ class StructuredPostalAddress implements PostalAddressInterface
     /**
      * Constructor
      *
-     * @param string|null $street     Street name or null
+     * @param string|null $street Street name or null
      * @param string|null $buildingNo Building number or null
-     * @param string      $postCode   Postal code
-     * @param string      $town       Town name
-     * @param string      $country    Country code (ISO 3166-1 alpha-2)
+     * @param string $postCode Postal code
+     * @param string $town Town name
+     * @param string $country Country code (ISO 3166-1 alpha-2)
      */
     public function __construct(
         ?string $street,

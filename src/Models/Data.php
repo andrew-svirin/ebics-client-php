@@ -21,36 +21,6 @@ abstract class Data extends DOMDocument implements DataInterface
         $this->preserveWhiteSpace = false;
     }
 
-    public function ensureUnicode(string &$string): void
-    {
-        if (!mb_check_encoding($string, 'UTF-8')) {
-            $string = utf8_encode($string);
-        }
-    }
-
-    /**
-     * @param array $nodes
-     * @return DOMElement|false
-     */
-    public function createElements(array $nodes)
-    {
-        $elements = [];
-        foreach ($nodes as $node) {
-            $element = $this->createElement($node);
-            if ($element === false) {
-                return false;
-            }
-
-            if (!empty($elements)) {
-                end($elements)->appendChild($element);
-            }
-
-            $elements[] = $element;
-        }
-
-        return $elements[0];
-    }
-
     public function getContent(): string
     {
         $content = (string)$this->saveXML();
@@ -60,6 +30,7 @@ abstract class Data extends DOMDocument implements DataInterface
             $content
         );
         $content = str_replace(["\n", "\r", "\t"], '', $content);
+        $content = utf8_encode($content);
         $content = trim($content);
 
         return $content;

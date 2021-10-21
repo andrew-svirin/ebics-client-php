@@ -28,7 +28,7 @@ class UnstructuredPostalAddress implements PostalAddressInterface
      *
      * @param string|null $addressLine1 Street name and house number
      * @param string|null $addressLine2 Postcode and town
-     * @param string $country      Country code (ISO 3166-1 alpha-2)
+     * @param string $country Country code (ISO 3166-1 alpha-2)
      */
     public function __construct(
         ?string $addressLine1,
