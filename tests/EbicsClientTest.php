@@ -24,7 +24,6 @@ use Silarhi\Cfonb\CfonbParser;
  */
 class EbicsClientTest extends AbstractEbicsTestCase
 {
-
     /**
      * @dataProvider serversDataProvider
      *
@@ -591,7 +590,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
             ->addBankTransaction(
                 'MARKDEF1820',
                 'DE09820000000083001503',
-                null, // new StructuredPostalAddress(),
+                new StructuredPostalAddress('CH', 'Triesen', '9495'),
                 100.10,
                 'CHF',
                 'Test payment  1'
@@ -609,7 +608,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                 'NWBKGB2L',
                 'GB29 NWBK 6016 1331 9268 19',
                 'United Development Ltd',
-                new UnstructuredPostalAddress('George Street', 'BA1 2FJ Bath', 'GB'),
+                new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
                 65.10,
                 'GBP',
                 'Test payment 3'
@@ -692,7 +691,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
-					'XE2' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
             ],
@@ -719,7 +718,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
-					'XE2' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
                 new WeBankX509Generator(),
@@ -747,7 +746,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
-					'XE2' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
             ],
@@ -774,7 +773,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
-					'XE2' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
                 ],
             ],

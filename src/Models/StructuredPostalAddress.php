@@ -14,6 +14,21 @@ use DOMElement;
 class StructuredPostalAddress implements PostalAddressInterface
 {
     /**
+     * @var string
+     */
+    protected $country;
+
+    /**
+     * @var string
+     */
+    protected $town;
+
+    /**
+     * @var string
+     */
+    protected $postCode;
+
+    /**
      * @var string|null
      */
     protected $street;
@@ -24,41 +39,26 @@ class StructuredPostalAddress implements PostalAddressInterface
     protected $buildingNo;
 
     /**
-     * @var string
-     */
-    protected $postCode;
-
-    /**
-     * @var string
-     */
-    protected $town;
-
-    /**
-     * @var string
-     */
-    protected $country;
-
-    /**
      * Constructor
      *
-     * @param string|null $street Street name or null
-     * @param string|null $buildingNo Building number or null
-     * @param string $postCode Postal code
-     * @param string $town Town name
-     * @param string $country Country code (ISO 3166-1 alpha-2)
+     * @param string $country Country code (ISO 3166-1 alpha-2) (max 2 char)
+     * @param string $town Town name (max 35 char)
+     * @param string $postCode Postal code (max 16 char)
+     * @param string|null $street Street name or null (max 70 char)
+     * @param string|null $buildingNo Building number or null (max 16 char)
      */
     public function __construct(
-        ?string $street,
-        ?string $buildingNo,
-        string $postCode,
+        string $country,
         string $town,
-        string $country = 'CH'
+        string $postCode,
+        string $street = null,
+        string $buildingNo = null
     ) {
-        $this->street = $street !== null && trim($street) !== '' ? substr(trim($street), 0, 70) : null;
-        $this->buildingNo = $buildingNo !== null && trim($buildingNo) !== '' ? substr(trim($buildingNo), 0, 16) : null;
-        $this->postCode = substr(trim($postCode), 0, 16);
-        $this->town = substr(trim($town), 0, 35);
-        $this->country = strtoupper(substr(trim($country), 0, 2));
+        $this->country = $country;
+        $this->town = $town;
+        $this->postCode = $postCode;
+        $this->street = $street;
+        $this->buildingNo = $buildingNo;
     }
 
     /**
