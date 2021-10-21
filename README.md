@@ -257,7 +257,7 @@ try {
 
 ### 5. Play with other transactions!
 |Transaction| Description |
-| --------- | --------- |
+| --- | --- |
 | HEV | Supported protocol version for the Bank. |
 | INI | Send to the bank public signature of signature A005. |
 | HIA | Send to the bank public signatures of authentication (X002) and encryption (E002). |
