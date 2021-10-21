@@ -3,10 +3,13 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
+use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
+use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
+use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
@@ -21,7 +24,6 @@ use Silarhi\Cfonb\CfonbParser;
  */
 class EbicsClientTest extends AbstractEbicsTestCase
 {
-
     /**
      * @dataProvider serversDataProvider
      *
@@ -568,6 +570,65 @@ class EbicsClientTest extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group XE2
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testXE2(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['XE2']['fake']);
+
+        $this->assertExceptionCode($codes['XE2']['code']);
+
+        $builder = new CustomerSwissCreditTransferBuilder();
+        $customerCreditTransfer = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
+            ->addBankTransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                new StructuredPostalAddress('CH', 'Triesen', '9495'),
+                100.10,
+                'CHF',
+                'Test payment  1'
+            )
+            ->addSEPATransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Creditor Name 4',
+                null, // new UnstructuredPostalAddress(),
+                200.02,
+                'EUR',
+                'Test payment  2'
+            )
+            ->addForeignTransaction(
+                'NWBKGB2L',
+                'GB29 NWBK 6016 1331 9268 19',
+                'United Development Ltd',
+                new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
+                65.10,
+                'GBP',
+                'Test payment 3'
+            )
+            ->popInstance();
+
+        $xe2 = $client->XE2($customerCreditTransfer);
+
+        $xe2Transfer = $client->transferTransfer($xe2);
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($xe2Transfer);
+        $reportText = $responseHandler->retrieveH00XReportText($xe2Transfer);
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group CDD
      *
      * @param int $credentialsId
@@ -630,6 +691,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
             ],
@@ -656,6 +718,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
                 new WeBankX509Generator(),
@@ -683,6 +746,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                 ],
             ],
@@ -709,6 +773,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
                 ],
             ],
@@ -733,6 +798,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
 //                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
 //                    ],
 //                    'CCT' => ['code' => null, 'fake' => false],
+//                    'XE2' => ['code' => null, 'fake' => false],
 //                    'CDD' => ['code' => null, 'fake' => false],
 //                ],
 //            ],

@@ -3,9 +3,6 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\EbicsBankLetter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
 
 /**
  * Class EbicsBankLetterTest.
@@ -38,7 +35,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
             $client->getKeyRing()
         );
 
-        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, new TxtBankLetterFormatter());
+        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createTxtBankLetterFormatter());
 
         self::assertIsString($txt);
     }
@@ -63,7 +60,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
             $client->getKeyRing()
         );
 
-        $html = $ebicsBankLetter->formatBankLetter($bankLetter, new HtmlBankLetterFormatter());
+        $html = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createHtmlBankLetterFormatter());
 
         self::assertIsString($html);
     }
@@ -88,7 +85,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
             $client->getKeyRing()
         );
 
-        $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, new PdfBankLetterFormatter());
+        $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 
         self::assertIsString($pdf);
     }

@@ -1,6 +1,7 @@
 # EBICS-CLIENT-PHP
 [![Build Status](https://travis-ci.com/andrew-svirin/ebics-client-php.svg?branch=master)](https://app.travis-ci.com/github/andrew-svirin/ebics-client-php)
 [![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
+[![Total Downloads](https://img.shields.io/packagist/dt/andrew-svirin/ebics-client-php.svg)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 
 ![EBICS](https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png)
@@ -230,7 +231,7 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
     $client->getKeyRing()
 );
 
-$txt = $ebicsBankLetter->formatBankLetter($bankLetter, new \AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter());
+$txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 ```
 
 ### 3. Wait for the bank validation and activation access.
@@ -274,6 +275,7 @@ try {
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 | Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
 | CCT | Initiate the credit transfer per Single Euro Payments Area. |
+| XE2 | Initiate the Swiss credit transfer (i.e available in Switzerland). |
 | CDD | Initiate a direct debit transaction. |
 | BTD | Download request (FETCH request). |
 
