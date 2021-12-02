@@ -38,7 +38,8 @@ class CustomerDirectDebitBuilder
      * @param string $creditorFinInstBIC
      * @param string $creditorIBAN
      * @param string $creditorName
-     * @param bool $batchBooking By deactivating the batch booking procedure, you request your credit institution to book each transaction within this order separately.
+     * @param bool $batchBooking By deactivating the batch booking procedure,
+     * you request your credit institution to book each transaction within this order separately.
      * @return $this
      */
     public function createInstance(
@@ -107,7 +108,7 @@ class CustomerDirectDebitBuilder
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
         $xmlBtchBookg = $this->instance->createElement('BtchBookg');
-        $xmlBtchBookg->nodeValue = (string) $batchBooking;
+        $xmlBtchBookg->nodeValue = (string)$batchBooking;
         $xmlPmtInf->appendChild($xmlBtchBookg);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
