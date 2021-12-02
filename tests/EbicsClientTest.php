@@ -737,7 +737,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'PTK' => ['code' => null, 'fake' => false],
                     'VMK' => ['code' => '090003', 'fake' => false],
                     'STA' => ['code' => '090003', 'fake' => false],
-                    'Z53' => ['code' => null, 'fake' => false],
+                    'Z53' => ['code' => '090005', 'fake' => false],
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
