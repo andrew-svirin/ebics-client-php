@@ -38,7 +38,8 @@ class CustomerCreditTransferBuilder
      * @param string $debitorFinInstBIC
      * @param string $debitorIBAN
      * @param string $debitorName
-     * @param bool $batchBooking By deactivating the batch booking procedure, you request your credit institution to book each transaction within this order separately.
+     * @param bool $batchBooking By deactivating the batch booking procedure,
+     * you request your credit institution to book each transaction within this order separately.
      * @return $this
      */
     public function createInstance(
