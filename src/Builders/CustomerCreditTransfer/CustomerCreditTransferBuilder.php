@@ -34,10 +34,18 @@ class CustomerCreditTransferBuilder
         $this->randomService = new RandomService();
     }
 
+    /**
+     * @param string $debitorFinInstBIC
+     * @param string $debitorIBAN
+     * @param string $debitorName
+     * @param bool $batchBooking By deactivating the batch booking procedure, you request your credit institution to book each transaction within this order separately.
+     * @return $this
+     */
     public function createInstance(
         string $debitorFinInstBIC,
         string $debitorIBAN,
-        string $debitorName
+        string $debitorName,
+        bool $batchBooking = true
     ): CustomerCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         $now = new DateTime();
@@ -97,6 +105,10 @@ class CustomerCreditTransferBuilder
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
         $xmlPmtMtd->nodeValue = 'TRF';
         $xmlPmtInf->appendChild($xmlPmtMtd);
+
+        $xmlBtchBookg = $this->instance->createElement('BtchBookg');
+        $xmlBtchBookg->nodeValue = (string) $batchBooking;
+        $xmlPmtInf->appendChild($xmlBtchBookg);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
         $xmlNbOfTxs->nodeValue = '0';
