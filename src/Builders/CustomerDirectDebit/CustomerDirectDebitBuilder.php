@@ -39,6 +39,8 @@ class CustomerDirectDebitBuilder
      * @param string $creditorIban
      * @param string $creditorName
      * @param string|null $creditorId
+     * @param string $sequenceType  FRST | RCUR
+     * @param string|null $collectionDate
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
      * @param string|null $msgId Overwrite default generated message id - should be unique at
@@ -52,6 +54,8 @@ class CustomerDirectDebitBuilder
         string $creditorIban,
         string $creditorName,
         string $creditorId = null,
+        string $sequenceType = 'FRST',
+        string $collectionDate = null,
         bool $batchBooking = true,
         string $msgId = null,
         string $paymentReference = null
@@ -153,11 +157,15 @@ class CustomerDirectDebitBuilder
         $xmlLclInstrm->appendChild($xmlCd);
 
         $xmlSeqTp = $this->instance->createElement('SeqTp');
-        $xmlSeqTp->nodeValue = 'FRST';
+        $xmlSeqTp->nodeValue = $sequenceType;
         $xmlPmtTpInf->appendChild($xmlSeqTp);
 
         $xmlReqdColltnDt = $this->instance->createElement('ReqdColltnDt');
-        $xmlReqdColltnDt->nodeValue = $now->format('Y-m-d');
+        if($collectionDate) {
+            $xmlReqdColltnDt->nodeValue = date('Y-m-d', strtotime($collectionDate));
+        } else {
+            $xmlReqdColltnDt->nodeValue = $now->format('Y-m-d');
+        }
         $xmlPmtInf->appendChild($xmlReqdColltnDt);
 
         $xmlCdtr = $this->instance->createElement('Cdtr');
@@ -225,7 +233,10 @@ class CustomerDirectDebitBuilder
         string $debitorName,
         float $amount,
         string $currency,
-        string $purpose
+        string $purpose,
+        string $mandateReference,
+        string $signatureDate,
+        string $endToEndId = null
     ): CustomerDirectDebitBuilder {
         $xpath = $this->prepareXPath($this->instance);
         $nbOfTxsList = $xpath->query('//CstmrDrctDbtInitn/PmtInf/NbOfTxs');
@@ -246,9 +257,14 @@ class CustomerDirectDebitBuilder
         $xmlDrctDbtTxInf->appendChild($xmlPmtId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pete' . str_pad((string)$nbOfTxs, 2, '0')
-        );
+        if($endToEndId) {
+            $xmlEndToEndId->nodeValue = $endToEndId;
+        } else {
+            $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
+                'pete' . str_pad((string)$nbOfTxs, 2, '0')
+            );
+        }
+
         $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlInstdAmt = $this->instance->createElement('InstdAmt');
@@ -263,11 +279,11 @@ class CustomerDirectDebitBuilder
         $xmlDrctDbtTx->appendChild($xmlMndtRltdInf);
 
         $xmlMndtId = $this->instance->createElement('MndtId');
-        $xmlMndtId->nodeValue = '1';
+        $xmlMndtId->nodeValue = $mandateReference;
         $xmlMndtRltdInf->appendChild($xmlMndtId);
 
         $xmlDtOfSgntr = $this->instance->createElement('DtOfSgntr');
-        $xmlDtOfSgntr->nodeValue = $reqdColltnDt;
+        $xmlDtOfSgntr->nodeValue = date('Y-m-d', strtotime($signatureDate));
         $xmlMndtRltdInf->appendChild($xmlDtOfSgntr);
 
         $xmlDbtrAgt = $this->instance->createElement('DbtrAgt');
