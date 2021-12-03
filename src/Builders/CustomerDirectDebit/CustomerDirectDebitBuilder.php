@@ -41,6 +41,10 @@ class CustomerDirectDebitBuilder
      * @param string $creditorIdentNumber
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
+     * @param string|null $msgId Overwrite default generated message id - should be unique at
+     * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
+     * @param string|null $paymentReference Overwrite default payment reference -
+     * visible on creditors bank statement (max length: 35 characters)
      * @return $this
      */
     public function createInstance(
@@ -48,7 +52,9 @@ class CustomerDirectDebitBuilder
         string $creditorIban,
         string $creditorName,
         string $creditorIdentNumber,
-        bool   $batchBooking = true
+        bool   $batchBooking = true,
+        string $msgId = null,
+        string $paymentReference = null
     ): CustomerDirectDebitBuilder {
         $this->instance = new CustomerDirectDebit();
         $now = new DateTime();
@@ -77,6 +83,10 @@ class CustomerDirectDebitBuilder
 
         $xmlMsgId = $this->instance->createElement('MsgId');
         $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        if($msgId) {
+            $xmlMsgId->nodeValue = $msgId;
+        }
+
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
@@ -103,6 +113,10 @@ class CustomerDirectDebitBuilder
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
         $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        if($paymentReference) {
+            $xmlPmtInfId->nodeValue = $paymentReference;
+        }
+
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
