@@ -35,18 +35,20 @@ class CustomerDirectDebitBuilder
     }
 
     /**
-     * @param string $creditorFinInstBIC
-     * @param string $creditorIBAN
+     * @param string $creditorFinInstBic
+     * @param string $creditorIban
      * @param string $creditorName
+     * @param string $creditorIdentNumber
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
      * @return $this
      */
     public function createInstance(
-        string $creditorFinInstBIC,
-        string $creditorIBAN,
+        string $creditorFinInstBic,
+        string $creditorIban,
         string $creditorName,
-        bool $batchBooking = true
+        string $creditorIdentNumber,
+        bool   $batchBooking = true
     ): CustomerDirectDebitBuilder {
         $this->instance = new CustomerDirectDebit();
         $now = new DateTime();
@@ -158,7 +160,7 @@ class CustomerDirectDebitBuilder
         $xmlCdtrAcct->appendChild($xmlId);
 
         $xmlIBAN = $this->instance->createElement('IBAN');
-        $xmlIBAN->nodeValue = $creditorIBAN;
+        $xmlIBAN->nodeValue = $creditorIban;
         $xmlId->appendChild($xmlIBAN);
 
         $xmlCdtrAgt = $this->instance->createElement('CdtrAgt');
@@ -168,12 +170,35 @@ class CustomerDirectDebitBuilder
         $xmlCdtrAgt->appendChild($xmlFinInstnId);
 
         $xmlBIC = $this->instance->createElement('BIC');
-        $xmlBIC->nodeValue = $creditorFinInstBIC;
+        $xmlBIC->nodeValue = $creditorFinInstBic;
         $xmlFinInstnId->appendChild($xmlBIC);
 
         $xmlChrgBr = $this->instance->createElement('ChrgBr');
         $xmlChrgBr->nodeValue = 'SLEV';
         $xmlPmtInf->appendChild($xmlChrgBr);
+
+        $xmlCdtrSchmeId = $this->instance->createElement('CdtrSchmeId');
+        $xmlPmtInf->appendChild($xmlCdtrSchmeId);
+
+        $xmlCdtrSchmeIdId = $this->instance->createElement('Id');
+        $xmlCdtrSchmeId->appendChild($xmlCdtrSchmeIdId);
+
+        $xmlCdtrSchmePrvtId = $this->instance->createElement('PrvtId');
+        $xmlCdtrSchmeIdId->appendChild($xmlCdtrSchmePrvtId);
+
+        $xmlCdtrSchmeIdIdPrvtIdOthr = $this->instance->createElement('Othr');
+        $xmlCdtrSchmePrvtId->appendChild($xmlCdtrSchmeIdIdPrvtIdOthr);
+
+        $xmlCdtrSchmeOthrId = $this->instance->createElement('Id');
+        $xmlCdtrSchmeOthrId->nodeValue = $creditorIdentNumber;
+        $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeOthrId);
+
+        $xmlCdtrSchmeSchmeNm = $this->instance->createElement('SchmeNm');
+        $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeSchmeNm);
+
+        $xmlCdtrSchmePrtry = $this->instance->createElement('Prtry');
+        $xmlCdtrSchmePrtry->nodeValue = 'SEPA';
+        $xmlCdtrSchmeSchmeNm->appendChild($xmlCdtrSchmePrtry);
 
         return $this;
     }
