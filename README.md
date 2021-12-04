@@ -4,10 +4,12 @@
 [![Total Downloads](https://img.shields.io/packagist/dt/andrew-svirin/ebics-client-php.svg)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 
-![EBICS](https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png)
+![EBICS](https://assets.cstatic.io/img/github/andrew-svirin/ebics-client-php.png)
+
+
 
 PHP library to communicate with a bank through EBICS protocol.  
-Supported PHP versions - PHP 7.2 & PHP 7.3 & PHP 7.4 & PHP 8.0  
+Supported PHP versions - PHP 7.2 - PHP 8.1  
 Support Ebics server versions: 2.5 (default), 3.0  
 
 ## License
@@ -275,6 +277,7 @@ try {
 | Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 | Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
 | CCT | Initiate the credit transfer per Single Euro Payments Area. |
+| CIP | Initiate the instant credit transfer per Single Euro Payments Area. |
 | XE2 | Initiate the Swiss credit transfer (i.e available in Switzerland). |
 | CDD | Initiate a direct debit transaction. |
 | BTD | Download request (FETCH request). |
