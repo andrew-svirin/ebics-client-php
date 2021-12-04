@@ -54,7 +54,7 @@ class RequestFactoryV2 extends RequestFactory
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN;
                 break;
             default:
-                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
+                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN;
         }
 
         return $orderDetailsBuilder
