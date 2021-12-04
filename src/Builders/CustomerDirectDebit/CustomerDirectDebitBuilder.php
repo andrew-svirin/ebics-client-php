@@ -229,12 +229,6 @@ class CustomerDirectDebitBuilder
         $xmlPmtId = $this->instance->createElement('PmtId');
         $xmlDrctDbtTxInf->appendChild($xmlPmtId);
 
-        $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pii' . str_pad((string)$nbOfTxs, 2, '0')
-        );
-        $xmlPmtId->appendChild($xmlInstrId);
-
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
         $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
             'pete' . str_pad((string)$nbOfTxs, 2, '0')
