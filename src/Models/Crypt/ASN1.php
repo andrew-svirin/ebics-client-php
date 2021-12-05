@@ -466,6 +466,8 @@ class ASN1 implements ASN1Interface
             array_unshift($oid, 2);
         }
 
+        $oid = array_map('strval', $oid);
+
         return implode('.', $oid);
     }
 
