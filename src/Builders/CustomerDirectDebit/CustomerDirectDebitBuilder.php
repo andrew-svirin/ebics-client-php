@@ -52,7 +52,7 @@ class CustomerDirectDebitBuilder
         string $creditorIban,
         string $creditorName,
         string $creditorIdentNumber,
-        bool   $batchBooking = true,
+        bool $batchBooking = true,
         string $msgId = null,
         string $paymentReference = null
     ): CustomerDirectDebitBuilder {
@@ -82,11 +82,11 @@ class CustomerDirectDebitBuilder
         $xmlCstmrDrctDbtInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
-        if($msgId) {
+        if ($msgId) {
             $xmlMsgId->nodeValue = $msgId;
+        } else {
+            $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
         }
-
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
@@ -112,11 +112,11 @@ class CustomerDirectDebitBuilder
         $xmlCstmrDrctDbtInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
-        if($paymentReference) {
+        if ($paymentReference) {
             $xmlPmtInfId->nodeValue = $paymentReference;
+        } else {
+            $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
         }
-
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
