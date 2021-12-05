@@ -198,7 +198,7 @@ class X509 implements X509Interface
      * There's no guarantee X509 is going to re-encode an X.509 cert in the same way it was originally
      * encoded so we take save the portion of the original cert that the signature would have made for.
      *
-     * @var string
+     * @var string|null
      */
     protected $signatureSubject;
 
@@ -1031,7 +1031,7 @@ class X509 implements X509Interface
 
         $key = &$x509['tbsCertificate']['subjectPublicKeyInfo']['subjectPublicKey'];
         $key = $this->reformatKey($x509['tbsCertificate']['subjectPublicKeyInfo']['algorithm']['algorithm'], $key);
-        
+
         $this->currentCert = $x509;
         $this->dn = $x509['tbsCertificate']['subject'];
 

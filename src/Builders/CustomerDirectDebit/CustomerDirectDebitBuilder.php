@@ -38,17 +38,23 @@ class CustomerDirectDebitBuilder
      * @param string $creditorFinInstBic
      * @param string $creditorIban
      * @param string $creditorName
-     * @param string $creditorIdentNumber
+     * @param string|null $creditorId
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
+     * @param string|null $msgId Overwrite default generated message id - should be unique at
+     * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
+     * @param string|null $paymentReference Overwrite default payment reference -
+     * visible on creditors bank statement (max length: 35 characters)
      * @return $this
      */
     public function createInstance(
         string $creditorFinInstBic,
         string $creditorIban,
         string $creditorName,
-        string $creditorIdentNumber,
-        bool   $batchBooking = true
+        string $creditorId = null,
+        bool $batchBooking = true,
+        string $msgId = null,
+        string $paymentReference = null
     ): CustomerDirectDebitBuilder {
         $this->instance = new CustomerDirectDebit();
         $now = new DateTime();
@@ -76,7 +82,11 @@ class CustomerDirectDebitBuilder
         $xmlCstmrDrctDbtInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        if ($msgId) {
+            $xmlMsgId->nodeValue = $msgId;
+        } else {
+            $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        }
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
@@ -102,7 +112,11 @@ class CustomerDirectDebitBuilder
         $xmlCstmrDrctDbtInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        if ($paymentReference) {
+            $xmlPmtInfId->nodeValue = $paymentReference;
+        } else {
+            $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        }
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
@@ -177,28 +191,30 @@ class CustomerDirectDebitBuilder
         $xmlChrgBr->nodeValue = 'SLEV';
         $xmlPmtInf->appendChild($xmlChrgBr);
 
-        $xmlCdtrSchmeId = $this->instance->createElement('CdtrSchmeId');
-        $xmlPmtInf->appendChild($xmlCdtrSchmeId);
+        if ($creditorId) {
+            $xmlCdtrSchmeId = $this->instance->createElement('CdtrSchmeId');
+            $xmlPmtInf->appendChild($xmlCdtrSchmeId);
 
-        $xmlCdtrSchmeIdId = $this->instance->createElement('Id');
-        $xmlCdtrSchmeId->appendChild($xmlCdtrSchmeIdId);
+            $xmlCdtrSchmeIdId = $this->instance->createElement('Id');
+            $xmlCdtrSchmeId->appendChild($xmlCdtrSchmeIdId);
 
-        $xmlCdtrSchmePrvtId = $this->instance->createElement('PrvtId');
-        $xmlCdtrSchmeIdId->appendChild($xmlCdtrSchmePrvtId);
+            $xmlCdtrSchmePrvtId = $this->instance->createElement('PrvtId');
+            $xmlCdtrSchmeIdId->appendChild($xmlCdtrSchmePrvtId);
 
-        $xmlCdtrSchmeIdIdPrvtIdOthr = $this->instance->createElement('Othr');
-        $xmlCdtrSchmePrvtId->appendChild($xmlCdtrSchmeIdIdPrvtIdOthr);
+            $xmlCdtrSchmeIdIdPrvtIdOthr = $this->instance->createElement('Othr');
+            $xmlCdtrSchmePrvtId->appendChild($xmlCdtrSchmeIdIdPrvtIdOthr);
 
-        $xmlCdtrSchmeOthrId = $this->instance->createElement('Id');
-        $xmlCdtrSchmeOthrId->nodeValue = $creditorIdentNumber;
-        $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeOthrId);
+            $xmlCdtrSchmeOthrId = $this->instance->createElement('Id');
+            $xmlCdtrSchmeOthrId->nodeValue = $creditorId;
+            $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeOthrId);
 
-        $xmlCdtrSchmeSchmeNm = $this->instance->createElement('SchmeNm');
-        $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeSchmeNm);
+            $xmlCdtrSchmeSchmeNm = $this->instance->createElement('SchmeNm');
+            $xmlCdtrSchmeIdIdPrvtIdOthr->appendChild($xmlCdtrSchmeSchmeNm);
 
-        $xmlCdtrSchmePrtry = $this->instance->createElement('Prtry');
-        $xmlCdtrSchmePrtry->nodeValue = 'SEPA';
-        $xmlCdtrSchmeSchmeNm->appendChild($xmlCdtrSchmePrtry);
+            $xmlCdtrSchmePrtry = $this->instance->createElement('Prtry');
+            $xmlCdtrSchmePrtry->nodeValue = 'SEPA';
+            $xmlCdtrSchmeSchmeNm->appendChild($xmlCdtrSchmePrtry);
+        }
 
         return $this;
     }
@@ -228,12 +244,6 @@ class CustomerDirectDebitBuilder
 
         $xmlPmtId = $this->instance->createElement('PmtId');
         $xmlDrctDbtTxInf->appendChild($xmlPmtId);
-
-        $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pii' . str_pad((string)$nbOfTxs, 2, '0')
-        );
-        $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
         $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(

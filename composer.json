@@ -31,13 +31,13 @@
     "ext-json": "*"
   },
   "require-dev": {
-    "mpdf/mpdf": "^8.0",
-    "phpstan/phpstan": "^0.12.29",
-    "phpunit/phpunit": "^8.5",
+    "mpdf/mpdf": "^8",
+    "phpstan/phpstan": "^1",
+    "phpunit/phpunit": "^9",
     "andrew-svirin/cfonb-php": "dev-master",
     "andrew-svirin/mt942-php": "dev-master",
     "phpseclib/phpseclib": "~2.0",
-    "squizlabs/php_codesniffer": "^3.3"
+    "squizlabs/php_codesniffer": "^3"
   },
   "autoload": {
     "psr-4": {

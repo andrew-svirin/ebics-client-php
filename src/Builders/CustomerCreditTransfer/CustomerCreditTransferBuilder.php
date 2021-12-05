@@ -40,13 +40,19 @@ class CustomerCreditTransferBuilder
      * @param string $debitorName
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
+     * @param string|null $msgId Overwrite default generated message id - should be unique at
+     * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
+     * @param string|null $paymentReference Overwrite default payment reference -
+     * visible on creditors bank statement (max length: 35 characters)
      * @return $this
      */
     public function createInstance(
         string $debitorFinInstBIC,
         string $debitorIBAN,
         string $debitorName,
-        bool $batchBooking = true
+        bool $batchBooking = true,
+        string $msgId = null,
+        string $paymentReference = null
     ): CustomerCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         $now = new DateTime();
@@ -74,7 +80,11 @@ class CustomerCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        if ($msgId) {
+            $xmlMsgId->nodeValue = $msgId;
+        } else {
+            $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
+        }
         $xmlGrpHdr->appendChild($xmlMsgId);
 
         $xmlMsgId = $this->instance->createElement('CreDtTm');
@@ -100,7 +110,11 @@ class CustomerCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        if ($paymentReference) {
+            $xmlPmtInfId->nodeValue = $paymentReference;
+        } else {
+            $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
+        }
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
         $xmlPmtMtd = $this->instance->createElement('PmtMtd');
@@ -188,12 +202,6 @@ class CustomerCreditTransferBuilder
 
         $xmlPmtId = $this->instance->createElement('PmtId');
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
-
-        $xmlInstrId = $this->instance->createElement('InstrId');
-        $xmlInstrId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pii' . str_pad((string)$nbOfTxs, 2, '0')
-        );
-        $xmlPmtId->appendChild($xmlInstrId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
         $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
