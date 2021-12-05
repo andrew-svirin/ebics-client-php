@@ -1,6 +1,6 @@
 # EBICS-CLIENT-PHP
 
-[![CI](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/ci.yml/badge.svg)](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/0ci.yml)
+[![CI](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/ci.yml/badge.svg)](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/ci.yml)
 [![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![Total Downloads](https://img.shields.io/packagist/dt/andrew-svirin/ebics-client-php.svg)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
 [![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
