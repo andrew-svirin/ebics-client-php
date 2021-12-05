@@ -58,5 +58,10 @@
     "sort-packages": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "scripts": {
+    "code-test": "vendor/bin/phpunit",
+    "code-style": "vendor/bin/phpcs",
+    "code-analyse": "vendor/bin/phpstan"
+  }
 }
