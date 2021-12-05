@@ -639,7 +639,27 @@ class EbicsClientTest extends AbstractEbicsTestCase
      */
     public function testCIP(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
-        $this->markTestSkipped('Implement it');
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['CIP']['fake']);
+
+        $this->assertExceptionCode($codes['CIP']['code']);
+
+        $builder = new CustomerDirectDebitBuilder();
+        $customerDirectDebit = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
+            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
+                'Test payment  1')
+            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
+            ->popInstance();
+
+        $cip = $client->CIP($customerDirectDebit);
+
+        $cipTransfer = $client->transferTransfer($cip);
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($cipTransfer);
+        $reportText = $responseHandler->retrieveH00XReportText($cipTransfer);
+
+        $this->assertResponseOk($code, $reportText);
     }
 
     /**
@@ -709,7 +729,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
-                    'CIP' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => '091005', 'fake' => false],
                 ],
             ],
             [
@@ -766,7 +786,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
-                    'CIP' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => '091005', 'fake' => false],
                 ],
             ],
             [
@@ -794,7 +814,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => '090003', 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
-                    'CIP' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => '091005', 'fake' => false],
                 ],
             ],
 //            [
