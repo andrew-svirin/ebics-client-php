@@ -80,9 +80,10 @@ class CustomerCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlGrpHdr);
 
         $xmlMsgId = $this->instance->createElement('MsgId');
-        $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
-        if($msgId) {
+        if ($msgId) {
             $xmlMsgId->nodeValue = $msgId;
+        } else {
+            $xmlMsgId->nodeValue = $this->randomService->uniqueIdWithDate('msg');
         }
         $xmlGrpHdr->appendChild($xmlMsgId);
 
@@ -109,9 +110,10 @@ class CustomerCreditTransferBuilder
         $xmlCstmrCdtTrfInitn->appendChild($xmlPmtInf);
 
         $xmlPmtInfId = $this->instance->createElement('PmtInfId');
-        $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
-        if($paymentReference) {
+        if ($paymentReference) {
             $xmlPmtInfId->nodeValue = $paymentReference;
+        } else {
+            $xmlPmtInfId->nodeValue = $this->randomService->uniqueIdWithDate('pmt');
         }
         $xmlPmtInf->appendChild($xmlPmtInfId);
 
