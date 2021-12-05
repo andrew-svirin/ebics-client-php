@@ -629,6 +629,22 @@ class EbicsClientTest extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group CIP
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testCIP(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $this->markTestSkipped('Implement it');
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group CDD
      *
      * @param int $credentialsId
