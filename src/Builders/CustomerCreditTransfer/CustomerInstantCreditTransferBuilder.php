@@ -9,7 +9,8 @@ use AndrewSvirin\Ebics\Services\RandomService;
 use DateTime;
 
 /**
- * Class CustomerInstantCreditTransferBuilder builder for model @see \AndrewSvirin\Ebics\Models\CustomerInstantCreditTransfer
+ * Class CustomerInstantCreditTransferBuilder builder for model
+ * @see \AndrewSvirin\Ebics\Models\CustomerInstantCreditTransfer
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Linus Holtstiege
@@ -43,8 +44,14 @@ class CustomerInstantCreditTransferBuilder
      * @param string|null $paymentReference
      * @return CustomerInstantCreditTransferBuilder
      */
-    public function createInstance(string $debtorFinInstBic, string $debttorIban, string $debitorName, bool $batchBooking = true, string $msgId = null, string $paymentReference = null): CustomerInstantCreditTransferBuilder
-    {
+    public function createInstance(
+        string $debtorFinInstBic,
+        string $debttorIban,
+        string $debitorName,
+        bool $batchBooking = true,
+        string $msgId = null,
+        string $paymentReference = null
+    ): CustomerInstantCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         $now = new DateTime();
 
@@ -187,8 +194,15 @@ class CustomerInstantCreditTransferBuilder
      * @param string $endToendId
      * @return CustomerInstantCreditTransferBuilder
      */
-    public function addTransaction(string $creditorFinInstBIC, string $creditorIBAN, string $creditorName, float $amount, string $currency, string $purpose, string $endToendId): CustomerInstantCreditTransferBuilder
-    {
+    public function addTransaction(
+        string $creditorFinInstBIC,
+        string $creditorIBAN,
+        string $creditorName,
+        float $amount,
+        string $currency,
+        string $purpose,
+        string $endToendId
+    ): CustomerInstantCreditTransferBuilder {
         $xpath = $this->prepareXPath($this->instance);
         $nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/NbOfTxs');
         $nbOfTxs = (int)DOMHelper::safeItemValue($nbOfTxsList);
