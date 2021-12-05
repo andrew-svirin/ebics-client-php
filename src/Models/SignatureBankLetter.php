@@ -60,7 +60,7 @@ class SignatureBankLetter
     /**
      * @var bool
      */
-    private $isCertified;
+    private $isCertified = false;
 
     public function __construct(
         string $type,
@@ -171,6 +171,6 @@ class SignatureBankLetter
      */
     public function isCertified(): bool
     {
-        return $this->isCertified ?? false;
+        return $this->isCertified;
     }
 }

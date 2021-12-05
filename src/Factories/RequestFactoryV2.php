@@ -53,8 +53,14 @@ class RequestFactoryV2 extends RequestFactory
             case 'HIA':
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN;
                 break;
-            default:
+            case 'CCT':
+            case 'CDD':
+            case 'XE2':
+            case 'CIP':
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN;
+                break;
+            default:
+                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
         }
 
         return $orderDetailsBuilder

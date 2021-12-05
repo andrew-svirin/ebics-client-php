@@ -693,6 +693,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => null, 'fake' => false],
                 ],
             ],
             [
@@ -720,6 +721,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => null, 'fake' => false],
                 ],
                 new WeBankX509Generator(),
             ],
@@ -737,7 +739,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'PTK' => ['code' => null, 'fake' => false],
                     'VMK' => ['code' => '090003', 'fake' => false],
                     'STA' => ['code' => '090003', 'fake' => false],
-                    'Z53' => ['code' => '090005', 'fake' => false],
+                    'Z53' => ['code' => null, 'fake' => false],
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
@@ -748,6 +750,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CIP' => ['code' => null, 'fake' => false],
                 ],
             ],
             [
@@ -775,6 +778,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CCT' => ['code' => '090003', 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
+                    'CIP' => ['code' => null, 'fake' => false],
                 ],
             ],
 //            [
@@ -800,6 +804,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
 //                    'CCT' => ['code' => null, 'fake' => false],
 //                    'XE2' => ['code' => null, 'fake' => false],
 //                    'CDD' => ['code' => null, 'fake' => false],
+//                    'CIP' => ['code' => null, 'fake' => false],
 //                ],
 //            ],
         ];
