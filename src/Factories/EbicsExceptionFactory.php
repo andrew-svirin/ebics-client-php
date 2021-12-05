@@ -31,9 +31,7 @@ class EbicsExceptionFactory
         ?Request $request = null,
         ?Response $response = null
     ): void {
-        if (!empty(EbicsErrorCodeMapping::$mapping[$errorCode])) {
-            $exceptionClass = EbicsErrorCodeMapping::$mapping[$errorCode];
-
+        if (($exceptionClass = EbicsErrorCodeMapping::resolveClass($errorCode))) {
             $exception = new $exceptionClass($errorText);
         } else {
             $exception = new EbicsResponseException($errorCode, $errorText);

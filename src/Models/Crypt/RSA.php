@@ -510,7 +510,11 @@ class RSA implements RSAInterface
         if ($length & 0x80) { // definite length, long form
             $length &= 0x7F;
             $temp = $this->stringShift($string, $length);
-            [, $length] = unpack('N', substr(str_pad($temp, 4, chr(0), STR_PAD_LEFT), -4));
+            $array = unpack('N', substr(str_pad($temp, 4, chr(0), STR_PAD_LEFT), -4));
+            if (!is_array($array)) {
+                throw new LogicException('Unpack failed');
+            }
+            [, $length] = $array;
         }
         return $length;
     }
