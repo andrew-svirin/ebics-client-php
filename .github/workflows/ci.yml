@@ -44,3 +44,18 @@ jobs:
         run: composer install --no-scripts --no-progress --ansi
       - name: Run phpcs
         run: composer code-style
+
+  # Test code by PHPUnit
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: Composer Install
+        run: composer install --no-scripts --no-progress --ansi
+      - name: Run phpunit
+        run: composer code-test
