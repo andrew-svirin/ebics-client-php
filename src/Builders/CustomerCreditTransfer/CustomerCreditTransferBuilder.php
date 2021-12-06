@@ -122,7 +122,7 @@ class CustomerCreditTransferBuilder
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
         $xmlBtchBookg = $this->instance->createElement('BtchBookg');
-        $xmlBtchBookg->nodeValue = (string)$batchBooking;
+        $xmlBtchBookg->nodeValue = $batchBooking ? 'true' : 'false';
         $xmlPmtInf->appendChild($xmlBtchBookg);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
