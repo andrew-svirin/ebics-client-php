@@ -118,7 +118,7 @@ class CustomerInstantCreditTransferBuilder
         $xmlPmtInf->appendChild($xmlPmtMtd);
 
         $xmlBtchBookg = $this->instance->createElement('BtchBookg');
-        $xmlBtchBookg->nodeValue = var_export($batchBooking, true);
+        $xmlBtchBookg->nodeValue = $batchBooking ? 'true' : 'false';
         $xmlPmtInf->appendChild($xmlBtchBookg);
 
         $xmlNbOfTxs = $this->instance->createElement('NbOfTxs');
