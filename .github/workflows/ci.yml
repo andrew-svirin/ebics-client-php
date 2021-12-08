@@ -9,6 +9,9 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  release:
+    # Only use the types keyword to narrow down the activity types that will trigger your workflow.
+    types: [published, created, edited]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
