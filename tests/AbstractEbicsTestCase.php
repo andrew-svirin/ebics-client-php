@@ -54,7 +54,8 @@ abstract class AbstractEbicsTestCase extends TestCase
     protected function setupKeyKeyRingManager($credentialsId): KeyRingManagerInterface
     {
         $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
-        return new KeyRingManager($keyRingRealPath, 'test123');
+        $password = 'test123';
+        return new KeyRingManager($keyRingRealPath, $password);
     }
 
     protected function setupKeys(KeyRing $keyRing)
