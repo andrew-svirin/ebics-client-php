@@ -257,29 +257,29 @@ try {
 ```
 
 ### 5. Play with other transactions!
-| Transaction | Description |
-| --- | --- |
-| HEV | Supported protocol version for the Bank. |
-| INI | Send to the bank public signature of signature A005. |
-| HIA | Send to the bank public signatures of authentication (X002) and encryption (E002). |
-| HPB | Retrieve the Bank public signatures authentication (X002) and encryption (E002). |
-| HPD | Retrieve the bank server parameters. |
-| HKD | Retrieve customer's customer and subscriber information. |
-| HTD | Retrieve subscriber's customer and subscriber information. |
-| PTK | Downloads transaction status. |
-| FDL | Retrieve subscriber's customer and subscriber information. |
-| HAA | Downloads the interim transaction report in SWIFT format (MT942). |
-| VMK | Downloads the interim transaction report in SWIFT format (MT942). |
-| STA | Retrieve the bank account statement. |
-| C52 | Retrieve the bank account report in Camt.052 format. |
-| C53 | Retrieve the bank account statement in Camt.053 format. |
-| Z53 | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
-| Z54 | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland). |
-| CCT | Initiate the credit transfer per Single Euro Payments Area. |
-| CIP | Initiate the instant credit transfer per Single Euro Payments Area. |
-| XE2 | Initiate the Swiss credit transfer (i.e available in Switzerland). |
-| CDD | Initiate a direct debit transaction. |
-| BTD | Download request (FETCH request). |
+| Transaction | Description                                                                                                 |
+|-------------|-------------------------------------------------------------------------------------------------------------|
+| HEV         | Supported protocol version for the Bank.                                                                    |
+| INI         | Send to the bank public signature of signature A005.                                                        |
+| HIA         | Send to the bank public signatures of authentication (X002) and encryption (E002).                          |
+| HPB         | Retrieve the Bank public signatures authentication (X002) and encryption (E002).                            |
+| HPD         | Retrieve the bank server parameters.                                                                        |
+| HKD         | Retrieve customer's customer and subscriber information.                                                    |
+| HTD         | Retrieve subscriber's customer and subscriber information.                                                  |
+| PTK         | Downloads transaction status.                                                                               |
+| FDL         | Retrieve subscriber's customer and subscriber information.                                                  |
+| HAA         | Downloads the interim transaction report in SWIFT format (MT942).                                           |
+| VMK         | Downloads the interim transaction report in SWIFT format (MT942).                                           |
+| STA         | Retrieve the bank account statement.                                                                        |
+| C52         | Retrieve the bank account report in Camt.052 format.                                                        |
+| C53         | Retrieve the bank account statement in Camt.053 format.                                                     |
+| Z53         | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
+| Z54         | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland).                        |
+| CCT         | Initiate the credit transfer per Single Euro Payments Area.                                                 |
+| CIP         | Initiate the instant credit transfer per Single Euro Payments Area.                                         |
+| XE2         | Initiate the Swiss credit transfer (i.e available in Switzerland).                                          |
+| CDD         | Initiate a direct debit transaction.                                                                        |
+| BTD         | Download request (FETCH request).                                                                           |
 
 #### Unzipping EBICS response.
 

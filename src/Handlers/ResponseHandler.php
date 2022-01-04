@@ -182,8 +182,8 @@ abstract class ResponseHandler
         $orderDataXmlItems = $this->zipService->extractFilesFromString($plainOrderData);
 
         $orderDataItems = [];
-        foreach ($orderDataXmlItems as $orderDataXmlItem) {
-            $orderDataItems[] = $this->orderDataFactory->createOrderDataFromContent($orderDataXmlItem);
+        foreach ($orderDataXmlItems as $key => $orderDataXmlItem) {
+            $orderDataItems[$key] = $this->orderDataFactory->createOrderDataFromContent($orderDataXmlItem);
         }
 
         return $orderDataItems;

@@ -49,7 +49,7 @@ class ZipService
         // Read zipped order data items.
         $fileContentItems = [];
         for ($i = 0; $i < $zip->numFiles; $i++) {
-            $fileContentItems[] = $zip->getFromIndex($i);
+            $fileContentItems[$zip->getNameIndex($i)] = $zip->getFromIndex($i);
         }
 
         // Close zip.
