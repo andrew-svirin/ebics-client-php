@@ -718,12 +718,12 @@ final class EbicsClient implements EbicsClientInterface
         $transaction = $this->responseHandler->retrieveTransaction($response);
         $response->addTransaction($transaction);
 
-        $plainOrderData = $this->responseHandler->retrieveOrderDataItems(
+        $orderDataItems = $this->responseHandler->retrieveOrderDataItems(
             $response,
             $transaction->getKey(),
             $this->keyRing
         );
-        $transaction->setOrderDataItems($plainOrderData);
+        $transaction->setOrderDataItems($orderDataItems);
 
         return $response;
     }
