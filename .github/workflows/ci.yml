@@ -6,9 +6,9 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the dev branch
   push:
-    branches: [ master ]
+    branches: [ 2.x, 1.x ]
   pull_request:
-    branches: [ master ]
+    branches: [ 2.x, 1.x ]
   release:
     # Only use the types keyword to narrow down the activity types that will trigger your workflow.
     types: [published, created, edited]
