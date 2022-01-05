@@ -10,8 +10,8 @@ use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
+use AndrewSvirin\Ebics\Models\Document;
 use AndrewSvirin\Ebics\Models\KeyRing;
-use AndrewSvirin\Ebics\Models\OrderData;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DateTimeInterface;
@@ -73,23 +73,15 @@ abstract class OrderDataHandler
 
     abstract protected function createSignaturePubKeyOrderData(CustomerINI $xml): DOMElement;
 
-    /**
-     * @return void
-     */
     abstract protected function handleINISignaturePubKey(
         DOMElement $xmlSignaturePubKeyInfo,
         CustomerINI $xml,
         SignatureInterface $certificateA,
         DateTimeInterface $dateTime
-    );
+    ): void;
 
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
-     *
-     * @param CustomerINI $xml
-     * @param SignatureInterface $certificateA
-     * @param DateTimeInterface $dateTime
-     *
      * @throws EbicsException
      */
     public function handleINI(CustomerINI $xml, SignatureInterface $certificateA, DateTimeInterface $dateTime): void
@@ -127,34 +119,22 @@ abstract class OrderDataHandler
 
     abstract protected function createHIARequestOrderData(CustomerHIA $xml): DOMElement;
 
-    /**
-     * @return void
-     */
     abstract protected function handleHIAAuthenticationPubKey(
         DOMElement $xmlAuthenticationPubKeyInfo,
         CustomerHIA $xml,
         SignatureInterface $certificateX,
         DateTimeInterface $dateTime
-    );
+    ): void;
 
-    /**
-     * @return void
-     */
     abstract protected function handleHIAEncryptionPubKey(
         DOMElement $xmlEncryptionPubKeyInfo,
         CustomerHIA $xml,
         SignatureInterface $certificateE,
         DateTimeInterface $dateTime
-    );
+    ): void;
 
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
-     *
-     * @param CustomerHIA $xml
-     * @param SignatureInterface $certificateE
-     * @param SignatureInterface $certificateX
-     * @param DateTimeInterface $dateTime
-     *
      * @throws EbicsException
      */
     public function handleHIA(
@@ -212,11 +192,6 @@ abstract class OrderDataHandler
 
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
-     *
-     * @param DOMNode $xmlPublicKeyInfo
-     * @param DOMDocument $xml
-     * @param SignatureInterface $certificate
-     *
      * @throws EbicsException
      */
     private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, SignatureInterface $certificate): void
@@ -258,9 +233,6 @@ abstract class OrderDataHandler
 
     /**
      * Add PartnerID to OrderData XML Node.
-     *
-     * @param DOMNode $xmlOrderData
-     * @param DOMDocument $xml
      */
     private function handlePartnerId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
@@ -271,9 +243,6 @@ abstract class OrderDataHandler
 
     /**
      * Add UserID to OrderData XML Node.
-     *
-     * @param DOMNode $xmlOrderData
-     * @param DOMDocument $xml
      */
     private function handleUserId(DOMNode $xmlOrderData, DOMDocument $xml): void
     {
@@ -284,19 +253,11 @@ abstract class OrderDataHandler
 
     /**
      * Extract Authentication Certificate from the $orderData.
-     *
-     * @param OrderData $orderData
-     *
-     * @return SignatureInterface
      */
-    abstract public function retrieveAuthenticationSignature(OrderData $orderData): SignatureInterface;
+    abstract public function retrieveAuthenticationSignature(Document $document): SignatureInterface;
 
     /**
      * Extract Encryption Certificate from the $orderData.
-     *
-     * @param OrderData $orderData
-     *
-     * @return SignatureInterface
      */
-    abstract public function retrieveEncryptionSignature(OrderData $orderData): SignatureInterface;
+    abstract public function retrieveEncryptionSignature(Document $document): SignatureInterface;
 }

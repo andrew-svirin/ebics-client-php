@@ -3,12 +3,13 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\OrderDataFactory;
-use AndrewSvirin\Ebics\Factories\TransactionFactory;
+use AndrewSvirin\Ebics\Factories\SegmentFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Models\DownloadSegment;
+use AndrewSvirin\Ebics\Models\Http\Response;
+use AndrewSvirin\Ebics\Models\InitializationSegment;
 use AndrewSvirin\Ebics\Models\KeyRing;
-use AndrewSvirin\Ebics\Models\OrderData;
-use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Models\UploadSegment;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use AndrewSvirin\Ebics\Services\ZipService;
@@ -25,14 +26,9 @@ abstract class ResponseHandler
     use XPathTrait;
 
     /**
-     * @var OrderDataFactory
+     * @var SegmentFactory
      */
-    private $orderDataFactory;
-
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
+    private $segmentFactory;
 
     /**
      * @var CryptService
@@ -46,8 +42,7 @@ abstract class ResponseHandler
 
     public function __construct()
     {
-        $this->orderDataFactory = new OrderDataFactory();
-        $this->transactionFactory = new TransactionFactory();
+        $this->segmentFactory = new SegmentFactory();
         $this->cryptService = new CryptService();
         $this->zipService = new ZipService();
     }
@@ -144,104 +139,76 @@ abstract class ResponseHandler
     abstract public function retrieveH00XOrderData(DOMDocument $xml): ?string;
 
     /**
-     * Retrieve OrderData.
-     *
-     * @param DOMDocument $xml
-     * @param string $transactionKey
-     * @param KeyRing $keyRing
-     *
-     * @return OrderData
+     * Extract InitializationSegment from the DOM XML.
      * @throws EbicsException
      */
-    public function retrieveOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): OrderData
+    public function extractInitializationSegment(Response $response, KeyRing $keyRing): InitializationSegment
     {
-        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
-        $orderData = $this->orderDataFactory->createOrderDataFromContent($plainOrderData);
-
-        return $orderData;
-    }
-
-    /**
-     * Retrieve OrderData items.
-     * Unzip order data items.
-     *
-     * @param DOMDocument $xml
-     * @param string $transactionKey
-     * @param KeyRing $keyRing
-     *
-     * @return OrderData[]
-     * @throws EbicsException
-     */
-    public function retrieveOrderDataItems(
-        DOMDocument $xml,
-        string $transactionKey,
-        KeyRing $keyRing
-    ): array {
-        $plainOrderData = $this->retrievePlainOrderData($xml, $transactionKey, $keyRing);
-
-        $orderDataXmlItems = $this->zipService->extractFilesFromString($plainOrderData);
-
-        $orderDataItems = [];
-        foreach ($orderDataXmlItems as $key => $orderDataXmlItem) {
-            $orderDataItems[$key] = $this->orderDataFactory->createOrderDataFromContent($orderDataXmlItem);
-        }
-
-        return $orderDataItems;
-    }
-
-    /**
-     * Retrieve plain OrderData.
-     *
-     * @param DOMDocument $xml
-     * @param string $transactionKey
-     * @param KeyRing $keyRing
-     *
-     * @return string
-     * @throws EbicsException
-     */
-    public function retrievePlainOrderData(DOMDocument $xml, string $transactionKey, KeyRing $keyRing): string
-    {
-        $plainOrderDataEncrypted = $this->retrieveH00XOrderData($xml);
-        if (null === $plainOrderDataEncrypted) {
-            throw new EbicsException('EBICS response empty result.');
-        }
-
-        $plainOrderDataCompressed = $this->cryptService->decryptPlainOrderDataCompressed(
+        $transactionKeyEncoded = $this->retrieveH00XTransactionKey($response);
+        $transactionKey = base64_decode($transactionKeyEncoded);
+        $orderDataEncrypted = $this->retrieveH00XOrderData($response);
+        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
             $keyRing,
-            $plainOrderDataEncrypted,
+            $orderDataEncrypted,
             $transactionKey
         );
+        $orderData = $this->zipService->uncompress($orderDataCompressed);
 
-        $plainOrderData = $this->zipService->uncompress($plainOrderDataCompressed);
+        $segment = $this->segmentFactory->createInitializationSegment();
+        $segment->setResponse($response);
+        $segment->setTransactionKey($transactionKey);
+        $segment->setOrderData($orderData);
 
-        return $plainOrderData;
+        return $segment;
     }
 
     /**
-     * Extract Transaction from the DOM XML.
-     *
-     * @param DOMDocument $xml
-     *
-     * @return Transaction
+     * Extract DownloadSegment from the DOM XML.
+     * @throws EbicsException
      */
-    public function retrieveTransaction(DOMDocument $xml): Transaction
+    public function extractDownloadSegment(Response $response, KeyRing $keyRing): DownloadSegment
     {
-        $transactionId = $this->retrieveH00XTransactionId($xml);
-        $transactionPhase = $this->retrieveH00XTransactionPhase($xml);
-        $numSegments = $this->retrieveH00XNumSegments($xml);
-        $orderId = $this->retrieveH00XOrderId($xml);
-        $segmentNumber = $this->retrieveH00XSegmentNumber($xml);
-        $transactionKeyEncoded = $this->retrieveH00XTransactionKey($xml);
+        $transactionId = $this->retrieveH00XTransactionId($response);
+        $transactionPhase = $this->retrieveH00XTransactionPhase($response);
+        $transactionKeyEncoded = $this->retrieveH00XTransactionKey($response);
         $transactionKey = base64_decode($transactionKeyEncoded);
+        $numSegments = $this->retrieveH00XNumSegments($response);
+        $segmentNumber = $this->retrieveH00XSegmentNumber($response);
+        $orderDataEncrypted = $this->retrieveH00XOrderData($response);
+        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
+            $keyRing,
+            $orderDataEncrypted,
+            $transactionKey
+        );
+        $orderData = $this->zipService->uncompress($orderDataCompressed);
 
-        $transaction = $this->transactionFactory->create();
-        $transaction->setId($transactionId);
-        $transaction->setPhase($transactionPhase);
-        $transaction->setNumSegments(null !== $numSegments ? (int)$numSegments : null);
-        $transaction->setOrderId($orderId);
-        $transaction->setSegmentNumber(null !== $segmentNumber ? (int)$segmentNumber : null);
-        $transaction->setKey($transactionKey);
+        $segment = $this->segmentFactory->createDownloadSegment();
+        $segment->setResponse($response);
+        $segment->setTransactionId($transactionId);
+        $segment->setTransactionPhase($transactionPhase);
+        $segment->setTransactionKey($transactionKey);
+        $segment->setNumSegments((int)$numSegments);
+        $segment->setSegmentNumber((int)$segmentNumber);
+        $segment->setOrderData($orderData);
 
-        return $transaction;
+        return $segment;
+    }
+
+    /**
+     * Extract DownloadSegment from the DOM XML.
+     */
+    public function extractUploadSegment(Response $response): UploadSegment
+    {
+        $transactionId = $this->retrieveH00XTransactionId($response);
+        $transactionPhase = $this->retrieveH00XTransactionPhase($response);
+        $orderId = $this->retrieveH00XOrderId($response);
+
+        $segment = $this->segmentFactory->createUploadSegment();
+        $segment->setResponse($response);
+        $segment->setTransactionId($transactionId);
+        $segment->setTransactionPhase($transactionPhase);
+        $segment->setOrderId($orderId);
+
+        return $segment;
     }
 }

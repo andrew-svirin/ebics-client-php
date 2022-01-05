@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\EbicsClient;
 use Closure;
 use DOMDocument;
 use DOMElement;

@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
@@ -53,11 +52,11 @@ class UserSignatureHandler
      * Build signature value before added PartnerID and UserID.
      *
      * @param UserSignature $xml
-     * @param OrderDataInterface $orderData
+     * @param string $orderData
      *
      * @throws EbicsException
      */
-    public function handle(UserSignature $xml, OrderDataInterface $orderData): void
+    public function handle(UserSignature $xml, string $orderData): void
     {
         // Add UserSignatureData to root.
         $xmlUserSignatureData = $xml->createElementNS(
@@ -88,7 +87,7 @@ class UserSignatureHandler
         $signatureMethodAlgorithm = 'sha256';
 
         // Add SignatureValue to OrderSignatureData.
-        $canonicalizedUserSignatureData = $orderData->getContent();
+        $canonicalizedUserSignatureData = $orderData;
         $canonicalizedUserSignatureDataHash = $this->cryptService->calculateHash(
             $canonicalizedUserSignatureData,
             $signatureMethodAlgorithm

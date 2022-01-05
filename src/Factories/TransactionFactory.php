@@ -2,25 +2,30 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Models\DownloadTransaction;
+use AndrewSvirin\Ebics\Models\InitializationTransaction;
+use AndrewSvirin\Ebics\Models\UploadTransaction;
 
 /**
- * Class TransactionFactory represents producers for the @see Transaction.
+ * Class TransactionFactory represents producers for the @see DownloadTransaction.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class TransactionFactory
+final class TransactionFactory
 {
-    /**
-     * Build Transactions from arguments.
-     *
-     * @return Transaction
-     */
-    public function create(): Transaction
+    public function createDownloadTransaction(): DownloadTransaction
     {
-        $transaction = new Transaction();
+        return new DownloadTransaction();
+    }
 
-        return $transaction;
+    public function createUploadTransaction(): UploadTransaction
+    {
+        return new UploadTransaction();
+    }
+
+    public function createInitializationTransaction(): InitializationTransaction
+    {
+        return new InitializationTransaction();
     }
 }

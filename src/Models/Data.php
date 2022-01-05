@@ -13,7 +13,6 @@ use DOMDocument;
  */
 abstract class Data extends DOMDocument implements DataInterface
 {
-
     public function __construct()
     {
         parent::__construct('1.0', 'utf-8');
