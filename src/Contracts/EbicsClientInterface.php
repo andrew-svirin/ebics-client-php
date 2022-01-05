@@ -3,7 +3,10 @@
 namespace AndrewSvirin\Ebics\Contracts;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Models\DownloadOrderResult;
 use AndrewSvirin\Ebics\Models\Http\Response;
+use AndrewSvirin\Ebics\Models\InitializationOrderResult;
+use AndrewSvirin\Ebics\Models\UploadOrderResult;
 use DateTimeInterface;
 
 /**
@@ -49,27 +52,28 @@ interface EbicsClientInterface
     public function HIA(DateTimeInterface $dateTime = null): Response;
 
     /**
+     * Retrieve the Bank public signatures authentication (X002) and encryption (E002).
+     * Decrypt OrderData.
+     * Prepare E002 and X002 bank signatures for KeyRing.
+     *
+     * @param DateTimeInterface|null $dateTime current date
+     * @return InitializationOrderResult
+     */
+    public function HPB(DateTimeInterface $dateTime = null): InitializationOrderResult;
+
+    /**
      * Make BTD request.
      * Download request (FETCH request)
      * @requires Ebics 3.0
+     *
+     * @return DownloadOrderResult
      */
     public function BTD(
         BTFContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): string;
-
-    /**
-     * Retrieve the Bank public signatures authentication (X002) and encryption (E002).
-     * Decrypt OrderData.
-     * Prepare E002 and X002 bank signatures for KeyRing.
-     *
-     * @param DateTimeInterface|null $dateTime current date
-     *
-     * @return Response
-     */
-    public function HPB(DateTimeInterface $dateTime = null): Response;
+    ): DownloadOrderResult;
 
     /**
      * Retrieve the bank server parameters.
@@ -77,9 +81,9 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $dateTime
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
-    public function HPD(DateTimeInterface $dateTime = null): Response;
+    public function HPD(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
      * Retrieve customer's customer and subscriber information.
@@ -87,9 +91,9 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $dateTime
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
-    public function HKD(DateTimeInterface $dateTime = null): Response;
+    public function HKD(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
      * Retrieve subscriber's customer and subscriber information.
@@ -97,9 +101,9 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $dateTime
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
-    public function HTD(DateTimeInterface $dateTime = null): Response;
+    public function HTD(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
      * Use PTK order type to download transaction status.
@@ -107,31 +111,9 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $dateTime
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
-    public function PTK(DateTimeInterface $dateTime = null): Response;
-
-    /**
-     * Retrieve subscriber's customer and subscriber information.
-     * Send self::transferReceipt() after transaction finished.
-     *
-     * @param string $fileInfo
-     * @param string $format = 'plain' ?? 'xml'
-     * @param string $countryCode
-     * @param DateTimeInterface|null $dateTime
-     * @param DateTimeInterface|null $startDateTime
-     * @param DateTimeInterface|null $endDateTime
-     *
-     * @return Response
-     */
-    public function FDL(
-        string $fileInfo,
-        string $format = 'plain',
-        string $countryCode = 'FR',
-        DateTimeInterface $dateTime = null,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
-    ): Response;
+    public function PTK(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
      * Retrieve  Bank available order types.
@@ -139,93 +121,89 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $dateTime current date
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
-    public function HAA(DateTimeInterface $dateTime = null): Response;
+    public function HAA(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
      * Downloads the interim transaction report in SWIFT format (MT942).
-     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTimeInterface|null $dateTime current date
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
     public function VMK(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
 
     /**
      * Retrieve the bank account statement.
-     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
     public function STA(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
 
     /**
      * Retrieve the bank account statement in Camt.052 format.
-     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
     // @codingStandardsIgnoreStart
     public function C52(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
     // @codingStandardsIgnoreEnd
 
     /**
      * Retrieve the bank account statement in Camt.053 format.
-     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
     // @codingStandardsIgnoreStart
     public function C53(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
     // @codingStandardsIgnoreEnd
+
     /**
      * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services).
-     * Send self::transferReceipt() after transaction finished.
      *
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response
+     * @return DownloadOrderResult
      */
     // @codingStandardsIgnoreStart
     public function Z53(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
     // @codingStandardsIgnoreEnd
 
     /**
@@ -236,15 +214,37 @@ interface EbicsClientInterface
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
      *
-     * @return Response zipped camt.054 XML files.
+     * @return DownloadOrderResult
      */
     // @codingStandardsIgnoreStart
     public function Z54(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response;
+    ): DownloadOrderResult;
     // @codingStandardsIgnoreEnd
+
+    /**
+     * Retrieve subscriber's customer and subscriber information.
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param string $fileInfo Format of response.
+     * @param string $format = 'text' ?? 'xml'
+     * @param string $countryCode
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return DownloadOrderResult
+     */
+    public function FDL(
+        string $fileInfo,
+        string $format = 'text',
+        string $countryCode = 'FR',
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult;
 
     /**
      * Using the CCT order type, the user can initiate the credit transfer per Single Euro Payments Area (SEPA)
@@ -256,15 +256,18 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
-     * @param int $numSegments
      *
-     * @return Response
+     * @return UploadOrderResult
      */
-    public function CCT(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response;
+    public function CCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+
+    /**
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     *
+     * @return UploadOrderResult
+     */
+    public function CIP(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
      * Using the XE2 order type, the user can initiate the credit transfer per Swiss Payments
@@ -276,15 +279,10 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
-     * @param int $numSegments
      *
-     * @return Response
+     * @return UploadOrderResult
      */
-    public function XE2(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response;
+    public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
      * Using the CDD order type the user can initiate a direct debit transaction.
@@ -295,34 +293,10 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
-     * @param int $numSegments
      *
-     * @return Response
+     * @return UploadOrderResult
      */
-    public function CDD(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response;
-
-    /**
-     * Mark transactions as received.
-     *
-     * @param Response $response
-     * @param bool $acknowledged
-     *
-     * @return Response
-     */
-    public function transferReceipt(Response $response, bool $acknowledged = true): Response;
-
-    /**
-     * Mark transactions as transferred.
-     *
-     * @param Response $response
-     *
-     * @return Response
-     */
-    public function transferTransfer(Response $response): Response;
+    public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
      * Set certificate X509 Generator for French bank.

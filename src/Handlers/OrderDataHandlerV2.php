@@ -6,7 +6,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\OrderData;
+use AndrewSvirin\Ebics\Models\Document;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTimeInterface;
 use DOMDocument;
@@ -47,7 +47,7 @@ class OrderDataHandlerV2 extends OrderDataHandler
         CustomerINI $xml,
         SignatureInterface $certificateA,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         $this->handlePubKeyValue($xmlSignaturePubKeyInfo, $xml, $certificateA, $dateTime);
     }
 
@@ -56,7 +56,7 @@ class OrderDataHandlerV2 extends OrderDataHandler
         CustomerHIA $xml,
         SignatureInterface $certificateX,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         $this->handlePubKeyValue($xmlAuthenticationPubKeyInfo, $xml, $certificateX, $dateTime);
     }
 
@@ -65,7 +65,7 @@ class OrderDataHandlerV2 extends OrderDataHandler
         CustomerHIA $xml,
         SignatureInterface $certificateE,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         $this->handlePubKeyValue($xmlEncryptionPubKeyInfo, $xml, $certificateE, $dateTime);
     }
 
@@ -109,9 +109,9 @@ class OrderDataHandlerV2 extends OrderDataHandler
         $xmlPubKeyValue->appendChild($xmlTimeStamp);
     }
 
-    public function retrieveAuthenticationSignature(OrderData $orderData): SignatureInterface
+    public function retrieveAuthenticationSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH004XPath($orderData);
+        $xpath = $this->prepareH004XPath($document);
 
         $modulus = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
         $modulusValue = DOMHelper::safeItemValue($modulus);
@@ -135,9 +135,9 @@ class OrderDataHandlerV2 extends OrderDataHandler
         return $certificate;
     }
 
-    public function retrieveEncryptionSignature(OrderData $orderData): SignatureInterface
+    public function retrieveEncryptionSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH004XPath($orderData);
+        $xpath = $this->prepareH004XPath($document);
 
         $modulus = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
         $modulusValue = DOMHelper::safeItemValue($modulus);

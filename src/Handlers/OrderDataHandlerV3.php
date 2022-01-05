@@ -7,7 +7,7 @@ use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Crypt\X509;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\OrderData;
+use AndrewSvirin\Ebics\Models\Document;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTimeInterface;
 use DOMElement;
@@ -45,7 +45,7 @@ class OrderDataHandlerV3 extends OrderDataHandler
         CustomerINI $xml,
         SignatureInterface $certificateA,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         // Is not need for V3.
     }
 
@@ -54,7 +54,7 @@ class OrderDataHandlerV3 extends OrderDataHandler
         CustomerHIA $xml,
         SignatureInterface $certificateX,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         // Is not need for V3.
     }
 
@@ -63,13 +63,13 @@ class OrderDataHandlerV3 extends OrderDataHandler
         CustomerHIA $xml,
         SignatureInterface $certificateE,
         DateTimeInterface $dateTime
-    ) {
+    ): void {
         // Is not need for V3.
     }
 
-    public function retrieveAuthenticationSignature(OrderData $orderData): SignatureInterface
+    public function retrieveAuthenticationSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH005XPath($orderData);
+        $xpath = $this->prepareH005XPath($document);
 
         $x509Certificate = $xpath->query('//H005:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);
@@ -96,9 +96,9 @@ class OrderDataHandlerV3 extends OrderDataHandler
         return $certificate;
     }
 
-    public function retrieveEncryptionSignature(OrderData $orderData): SignatureInterface
+    public function retrieveEncryptionSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH005XPath($orderData);
+        $xpath = $this->prepareH005XPath($document);
 
         $x509Certificate = $xpath->query('//H005:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);

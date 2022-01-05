@@ -65,7 +65,7 @@ class CryptService
      * @return string
      * @throws EbicsException
      */
-    public function decryptPlainOrderDataCompressed(
+    public function decryptOrderDataCompressed(
         KeyRing $keyRing,
         string $orderDataEncrypted,
         string $transactionKey

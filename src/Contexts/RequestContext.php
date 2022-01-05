@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
@@ -15,7 +14,7 @@ use DateTimeInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class RequestContext
+final class RequestContext
 {
 
     /**
@@ -64,9 +63,14 @@ class RequestContext
     private $receiptCode;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $segmentNumber;
+
+    /**
+     * @var bool|null
+     */
+    private $isLastSegment;
 
     /**
      * @var string
@@ -84,7 +88,7 @@ class RequestContext
     private $numSegments;
 
     /**
-     * @var OrderDataInterface
+     * @var string
      */
     private $orderData;
 
@@ -206,16 +210,28 @@ class RequestContext
         return $this->receiptCode;
     }
 
-    public function setSegmentNumber(int $segmentNumber): RequestContext
+    public function setSegmentNumber(?int $segmentNumber): RequestContext
     {
         $this->segmentNumber = $segmentNumber;
 
         return $this;
     }
 
-    public function getSegmentNumber(): int
+    public function getSegmentNumber(): ?int
     {
         return $this->segmentNumber;
+    }
+
+    public function setIsLastSegment(?bool $isLastSegment): RequestContext
+    {
+        $this->isLastSegment = $isLastSegment;
+
+        return $this;
+    }
+
+    public function getIsLastSegment(): ?bool
+    {
+        return $this->isLastSegment;
     }
 
     public function setTransactionId(string $transactionId): RequestContext
@@ -254,14 +270,14 @@ class RequestContext
         return $this->numSegments;
     }
 
-    public function setOrderData(OrderDataInterface $orderData): RequestContext
+    public function setOrderData(string $orderData): RequestContext
     {
         $this->orderData = $orderData;
 
         return $this;
     }
 
-    public function getOrderData(): OrderDataInterface
+    public function getOrderData(): string
     {
         return $this->orderData;
     }

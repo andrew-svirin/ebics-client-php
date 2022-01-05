@@ -9,11 +9,15 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
+use AndrewSvirin\Ebics\Factories\OrderResultFactory;
 use AndrewSvirin\Ebics\Factories\RequestFactory;
 use AndrewSvirin\Ebics\Factories\RequestFactoryV2;
 use AndrewSvirin\Ebics\Factories\RequestFactoryV3;
+use AndrewSvirin\Ebics\Factories\SegmentFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
+use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV2;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV3;
@@ -21,12 +25,22 @@ use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV3;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\Document;
+use AndrewSvirin\Ebics\Models\DownloadOrderResult;
+use AndrewSvirin\Ebics\Models\DownloadSegment;
+use AndrewSvirin\Ebics\Models\DownloadTransaction;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
+use AndrewSvirin\Ebics\Models\InitializationOrderResult;
+use AndrewSvirin\Ebics\Models\InitializationSegment;
+use AndrewSvirin\Ebics\Models\InitializationTransaction;
 use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\UploadOrderResult;
+use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\HttpClient;
+use AndrewSvirin\Ebics\Services\ZipService;
 use DateTime;
 use DateTimeInterface;
 use LogicException;
@@ -79,6 +93,21 @@ final class EbicsClient implements EbicsClientInterface
     private $cryptService;
 
     /**
+     * @var ZipService
+     */
+    private $zipService;
+
+    /**
+     * @var DocumentFactory
+     */
+    private $documentFactory;
+
+    /**
+     * @var OrderResultFactory
+     */
+    private $orderResultFactory;
+
+    /**
      * @var SignatureFactory
      */
     private $signatureFactory;
@@ -87,11 +116,20 @@ final class EbicsClient implements EbicsClientInterface
      * @var X509GeneratorInterface|null
      */
     private $x509Generator;
-
     /**
      * @var HttpClientInterface
      */
     private $httpClient;
+
+    /**
+     * @var TransactionFactory
+     */
+    private $transactionFactory;
+
+    /**
+     * @var SegmentFactory
+     */
+    private $segmentFactory;
 
     /**
      * Constructor.
@@ -119,13 +157,19 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $this->cryptService = new CryptService();
+        $this->zipService = new ZipService();
         $this->signatureFactory = new SignatureFactory();
+        $this->documentFactory = new DocumentFactory();
+        $this->orderResultFactory = new OrderResultFactory();
+        $this->transactionFactory = new TransactionFactory();
+        $this->segmentFactory = new SegmentFactory();
         // Set default http client.
         $this->httpClient = new HttpClient();
     }
 
     /**
      * @inheritDoc
+     * @throws EbicsException
      */
     public function createUserSignatures(): void
     {
@@ -141,6 +185,7 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
      */
     public function HEV(): Response
     {
@@ -201,138 +246,168 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
+    public function HPB(DateTimeInterface $dateTime = null): InitializationOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->initializeTransaction(
+            function () use ($dateTime) {
+                return $this->requestFactory->createHPB($dateTime);
+            }
+        );
+
+        $orderResult = $this->createInitializationOrderResult($transaction);
+
+        $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderResult->getDataDocument());
+        $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderResult->getDataDocument());
+        $this->keyRing->setBankSignatureX($signatureX);
+        $this->keyRing->setBankSignatureE($signatureE);
+
+        return $orderResult;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
     public function BTD(
         BTFContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): string {
+    ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createBTD(
-            $dateTime,
-            $btfContext,
-            $startDateTime,
-            $endDateTime
-        );
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH00XReturnCode($request, $response);
-
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
-        $orderData = $this->responseHandler->retrievePlainOrderData(
-            $response,
-            $transaction->getKey(),
-            $this->keyRing
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createBTD(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
         );
 
-        return $orderData;
+        return $this->createDownloadOrderResult($transaction, 'text');
     }
 
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPB(DateTimeInterface $dateTime = null): Response
+    public function HPD(DateTimeInterface $dateTime = null): DownloadOrderResult
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createHPB($dateTime);
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
-        $this->checkH00XReturnCode($request, $response);
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
-        $orderData = $this->responseHandler->retrieveOrderData(
-            $response,
-            $transaction->getKey(),
-            $this->keyRing
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHPD(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
         );
-        $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderData);
-        $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderData);
-        $this->keyRing->setBankSignatureX($signatureX);
-        $this->keyRing->setBankSignatureE($signatureE);
 
-        return $response;
+        return $this->createDownloadOrderResult($transaction, 'xml');
     }
 
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPD(DateTimeInterface $dateTime = null): Response
+    public function HKD(DateTimeInterface $dateTime = null): DownloadOrderResult
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createHPD($dateTime);
-        $response = $this->retrieveOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHKD(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
     }
 
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HKD(DateTimeInterface $dateTime = null): Response
+    public function HTD(DateTimeInterface $dateTime = null): DownloadOrderResult
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createHKD($dateTime);
-        $response = $this->retrieveOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHTD(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
     }
 
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HTD(DateTimeInterface $dateTime = null): Response
+    public function PTK(DateTimeInterface $dateTime = null): DownloadOrderResult
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
 
-        $request = $this->requestFactory->createHTD($dateTime);
-        $response = $this->retrieveOrderData($request);
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createPTK(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
 
-        return $response;
+        return $this->createDownloadOrderResult($transaction, 'text');
     }
 
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function PTK(DateTimeInterface $dateTime = null): Response
+    public function HAA(DateTimeInterface $dateTime = null): DownloadOrderResult
     {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createPTK($dateTime);
-        $response = $this->retrievePlainOrderData($request);
 
-        return $response;
-    }
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHAA(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
 
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsException
-     */
-    public function HAA(DateTimeInterface $dateTime = null): Response
-    {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-        $request = $this->requestFactory->createHAA($dateTime);
-        $response = $this->retrieveOrderData($request);
-
-        return $response;
+        return $this->createDownloadOrderResult($transaction, 'xml');
     }
 
     /**
@@ -343,14 +418,24 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createVMK($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrievePlainOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createVMK(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'text');
     }
 
     /**
@@ -361,14 +446,24 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createSTA($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrievePlainOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createSTA(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'text');
     }
 
     /**
@@ -380,15 +475,25 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createC52($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrieveOrderDataItems($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createC52(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
     }
 
     /**
@@ -400,15 +505,25 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createC53($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrieveOrderDataItems($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createC53(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
     }
 
     /**
@@ -420,15 +535,25 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createZ53($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrievePlainOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createZ53(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'text');
     }
 
     /**
@@ -440,15 +565,25 @@ final class EbicsClient implements EbicsClientInterface
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
-        $request = $this->requestFactory->createZ54($dateTime, $startDateTime, $endDateTime);
-        $response = $this->retrievePlainOrderData($request);
 
-        return $response;
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createZ54(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
     }
 
     /**
@@ -457,156 +592,163 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function FDL(
         $fileInfo,
-        $format = 'plain',
+        $format = 'text',
         $countryCode = 'FR',
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
-    ): Response {
+    ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
 
-        $request = $this->requestFactory->createFDL($dateTime, $fileInfo, $countryCode, $startDateTime, $endDateTime);
-        switch ($format) {
-            case 'plain':
-                $response = $this->retrievePlainOrderData($request);
-                break;
-            case 'xml':
-            default:
-                $response = $this->retrieveOrderData($request);
-                break;
-        }
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     */
-    public function CCT(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transactionKey = $this->cryptService->generateTransactionKey();
-
-        $request = $this->requestFactory->createCCT($dateTime, $numSegments, $transactionKey, $orderData);
-        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     */
-    public function CIP(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transactionKey = $this->cryptService->generateTransactionKey();
-
-        $request = $this->requestFactory->createCIP($dateTime, $numSegments, $transactionKey, $orderData);
-        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     */
-    public function XE2(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transactionKey = $this->cryptService->generateTransactionKey();
-
-        $request = $this->requestFactory->createXE2($dateTime, $numSegments, $transactionKey, $orderData);
-        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     */
-    public function CDD(
-        OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        int $numSegments = 1
-    ): Response {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transactionKey = $this->cryptService->generateTransactionKey();
-
-        $request = $this->requestFactory->createCDD($dateTime, $numSegments, $transactionKey, $orderData);
-        $response = $this->retrieveTransaction($request, $orderData, $numSegments, $transactionKey);
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws EbicsException
-     */
-    public function transferReceipt(Response $response, bool $acknowledged = true): Response
-    {
-        $lastTransaction = $response->getLastTransaction();
-        if (null === $lastTransaction) {
-            throw new EbicsException('There is no transactions to mark as received.');
-        }
-
-        $request = $this->requestFactory->createTransferReceipt($lastTransaction->getId(), $acknowledged);
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
-
-        $this->checkH00XReturnCode($request, $response);
-
-        return $response;
-    }
-
-    /**
-     * @inheritDoc
-     * @throws EbicsException
-     */
-    public function transferTransfer(Response $response): Response
-    {
-        $lastTransaction = $response->getLastTransaction();
-        if (null === $lastTransaction) {
-            throw new EbicsException('There is no transactions to mark as transferred.');
-        }
-
-        $lastTransaction->setSegmentNumber(1);
-        $request = $this->requestFactory->createTransferTransfer(
-            $lastTransaction->getId(),
-            $lastTransaction->getKey(),
-            $lastTransaction->getOrderData(),
-            $lastTransaction->getSegmentNumber()
+        $transaction = $this->downloadTransaction(
+            function (
+                $segmentNumber,
+                $isLastSegment
+            ) use (
+                $dateTime,
+                $fileInfo,
+                $countryCode,
+                $startDateTime,
+                $endDateTime
+            ) {
+                return $this->requestFactory->createFDL(
+                    $dateTime,
+                    $fileInfo,
+                    $countryCode,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
         );
+
+        return $this->createDownloadOrderResult($transaction, $format);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function CCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+            return $this->requestFactory->createCCT(
+                $dateTime,
+                $transaction
+            );
+        }, $orderData->getContent());
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function CIP(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+            return $this->requestFactory->createCIP(
+                $dateTime,
+                $transaction
+            );
+        }, $orderData->getContent());
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+            return $this->requestFactory->createXE2(
+                $dateTime,
+                $transaction
+            );
+        }, $orderData->getContent());
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+            return $this->requestFactory->createCDD(
+                $dateTime,
+                $transaction
+            );
+        }, $orderData->getContent());
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * Upload transaction finish and mark transaction as receipt.
+     *
+     * @throws EbicsException
+     * @throws Exceptions\EbicsResponseException
+     */
+    private function transferReceipt(DownloadTransaction $transaction, bool $acknowledged = true): void
+    {
+        $request = $this->requestFactory->createTransferReceipt($transaction->getId(), $acknowledged);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
 
-        return $response;
+        $transaction->setReceipt($response);
+    }
+
+    /**
+     * Upload transaction segments and mark transaction as transfer.
+     *
+     * @throws EbicsException
+     * @throws Exceptions\EbicsResponseException
+     */
+    private function transferTransfer(UploadTransaction $uploadTransaction): void
+    {
+        foreach ($uploadTransaction->getSegments() as $segment) {
+            $request = $this->requestFactory->createTransferTransfer(
+                $segment->getTransactionId(),
+                $segment->getTransactionKey(),
+                $segment->getOrderData(),
+                $segment->getSegmentNumber(),
+                $segment->getIsLastSegment()
+            );
+            $response = $this->httpClient->post($this->bank->getUrl(), $request);
+            $this->checkH00XReturnCode($request, $response);
+
+            $segment->setResponse($response);
+        }
     }
 
     /**
@@ -651,109 +793,182 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @param Request $request
-     *
-     * @return Response
-     * @throws EbicsException
+     * Walk by segments to build transaction.
+     * @param callable $requestClosure
+     * @throws Exceptions\EbicsResponseException|EbicsException
+     */
+    private function initializeTransaction($requestClosure): InitializationTransaction
+    {
+        $transaction = $this->transactionFactory->createInitializationTransaction();
+
+        $request = call_user_func($requestClosure);
+
+        $segment = $this->retrieveInitializationSegment($request);
+        $transaction->setInitializationSegment($segment);
+
+        return $transaction;
+    }
+
+    /**
      * @throws Exceptions\EbicsResponseException
      */
-    private function retrieveOrderData(Request $request)
+    private function retrieveInitializationSegment(Request $request): InitializationSegment
     {
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
+        return $this->responseHandler->extractInitializationSegment($response, $this->keyRing);
+    }
 
-        $orderData = $this->responseHandler->retrieveOrderData(
-            $response,
-            $transaction->getKey(),
-            $this->keyRing
-        );
+    /**
+     * Walk by segments to build transaction.
+     * @param callable $requestClosure
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    private function downloadTransaction($requestClosure): DownloadTransaction
+    {
+        $transaction = $this->transactionFactory->createDownloadTransaction();
+
+        $segmentNumber = null;
+        $isLastSegment = null;
+
+        $request = call_user_func_array($requestClosure, [$segmentNumber, $isLastSegment]);
+
+        $segment = $this->retrieveDownloadSegment($request);
+        $transaction->addSegment($segment);
+        while (!$transaction->getLastSegment()->isLastSegmentNumber()) {
+            $request = call_user_func_array(
+                $requestClosure,
+                [
+                    $transaction->getLastSegment()->getNextSegmentNumber(),
+                    $transaction->getLastSegment()->isLastNextSegmentNumber()
+                ]
+            );
+
+            $segment = $this->retrieveDownloadSegment($request);
+            $transaction->addSegment($segment);
+        }
+
+        $this->transferReceipt($transaction);
+
+        return $transaction;
+    }
+
+    /**
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    private function retrieveDownloadSegment(Request $request): DownloadSegment
+    {
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH00XReturnCode($request, $response);
+
+        return $this->responseHandler->extractDownloadSegment($response, $this->keyRing);
+    }
+
+    /**
+     * @param callable $requestClosure
+     * @throws EbicsException
+     * @throws Exceptions\EbicsResponseException
+     */
+    private function uploadTransaction($requestClosure, string $orderData): UploadTransaction
+    {
+        $transaction = $this->transactionFactory->createUploadTransaction();
+        $transaction->setKey($this->cryptService->generateTransactionKey());
+        $transaction->setNumSegments(1);
         $transaction->setOrderData($orderData);
 
-        return $response;
+        $request = call_user_func_array($requestClosure, [$transaction]);
+
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+        $this->checkH00XReturnCode($request, $response);
+
+        $uploadSegment = $this->responseHandler->extractUploadSegment($response);
+        $transaction->setInitialization($uploadSegment);
+
+        $segment = $this->segmentFactory->createTransferSegment();
+        $segment->setTransactionKey($transaction->getKey());
+        $segment->setSegmentNumber(1);
+        $segment->setIsLastSegment(true);
+        $segment->setNumSegments($transaction->getNumSegments());
+        $segment->setOrderData($transaction->getOrderData());
+        $segment->setTransactionId($transaction->getInitialization()->getTransactionId());
+        $transaction->addSegment($segment);
+        $transaction->setKey($transaction->getInitialization()->getTransactionId());
+
+        $this->transferTransfer($transaction);
+
+        return $transaction;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return Response
-     * @throws EbicsException
-     * @throws Exceptions\EbicsResponseException
-     */
-    private function retrievePlainOrderData(Request $request)
+    private function createInitializationOrderResult(InitializationTransaction $transaction): InitializationOrderResult
     {
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+        $orderResult = $this->orderResultFactory->createInitializationOrderResult();
+        $orderResult->setTransaction($transaction);
+        $orderResult->setData($transaction->getOrderData());
+        $orderResult->setDataDocument($this->extractOrderDataDocument($orderResult->getData()));
 
-        $this->checkH00XReturnCode($request, $response);
-
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
-
-        $plainOrderData = $this->responseHandler->retrievePlainOrderData(
-            $response,
-            $transaction->getKey(),
-            $this->keyRing
-        );
-        $transaction->setPlainOrderData($plainOrderData);
-
-        return $response;
+        return $orderResult;
     }
 
     /**
-     * @param Request $request
-     *
-     * @return Response
-     * @throws EbicsException
-     * @throws Exceptions\EbicsResponseException
+     * @param string $format 'text' ?? 'xml' ?? 'files'
      */
-    private function retrieveOrderDataItems(Request $request)
+    private function createDownloadOrderResult(DownloadTransaction $transaction, string $format): DownloadOrderResult
     {
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+        $orderResult = $this->orderResultFactory->createDownloadOrderResult();
+        $orderResult->setTransaction($transaction);
+        $orderResult->setData($transaction->getOrderData());
 
-        $this->checkH00XReturnCode($request, $response);
+        switch ($format) {
+            case 'text':
+                break;
+            case 'xml':
+                $orderResult->setDataDocument($this->extractOrderDataDocument($orderResult->getData()));
+                break;
+            case 'files':
+                $orderResult->setDataFiles($this->extractOrderDataFiles($orderResult->getData()));
+                break;
+            default:
+                throw new \RuntimeException('Incorrect format');
+        }
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $response->addTransaction($transaction);
+        return $orderResult;
+    }
 
-        $orderDataItems = $this->responseHandler->retrieveOrderDataItems(
-            $response,
-            $transaction->getKey(),
-            $this->keyRing
-        );
-        $transaction->setOrderDataItems($orderDataItems);
+    private function createUploadOrderResult(
+        UploadTransaction $transaction,
+        OrderDataInterface $document
+    ): UploadOrderResult {
+        $orderResult = $this->orderResultFactory->createUploadOrderResult();
+        $orderResult->setTransaction($transaction);
+        $orderResult->setDataDocument($document);
+        $orderResult->setData($document->getContent());
 
-        return $response;
+        return $orderResult;
+    }
+
+    private function extractOrderDataDocument(string $orderData): Document
+    {
+        return $this->documentFactory->create($orderData);
     }
 
     /**
-     * @param Request $request
-     * @param OrderDataInterface $orderData
-     * @param int $numSegments
-     * @param string $transactionKey
-     *
-     * @return Response
-     * @throws Exceptions\EbicsResponseException
+     * @return Document[]
      */
-    private function retrieveTransaction(
-        Request $request,
-        OrderDataInterface $orderData,
-        int $numSegments,
-        string $transactionKey
-    ) {
-        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+    private function extractOrderDataFiles(string $orderData): array
+    {
+        $files = $this->zipService->extractFilesFromString($orderData);
 
-        $this->checkH00XReturnCode($request, $response);
+        $documents = [];
+        foreach ($files as $key => $file) {
+            $documents[$key] = $this->documentFactory->create($file);
+        }
 
-        $transaction = $this->responseHandler->retrieveTransaction($response);
-        $transaction->setOrderData($orderData);
-        $transaction->setNumSegments($numSegments);
-        $transaction->setKey($transactionKey);
-        $response->addTransaction($transaction);
-
-        return $response;
+        return $documents;
     }
 
     /**

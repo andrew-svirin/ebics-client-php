@@ -131,8 +131,8 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $hpb = $client->HPB();
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($hpb);
-        $reportText = $responseHandler->retrieveH00XReportText($hpb);
+        $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
         $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
         $keyRingManager->saveKeyRing($client->getKeyRing());
@@ -157,43 +157,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $hkd = $client->HKD();
 
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($hkd);
-        $reportText = $responseHandler->retrieveH00XReportText($hkd);
+        $code = $responseHandler->retrieveH00XReturnCode($hkd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hkd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $hkdReceipt = $client->transferReceipt($hkd);
-        $code = $responseHandler->retrieveH00XReturnCode($hkdReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($hkdReceipt);
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group PTK
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testPTK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClient($credentialsId, $x509Generator, $codes['PTK']['fake']);
-
-        $this->assertExceptionCode($codes['PTK']['code']);
-        $ptk = $client->PTK();
-
-        $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($ptk);
-        $reportText = $responseHandler->retrieveH00XReportText($ptk);
-        $this->assertResponseOk($code, $reportText);
-
-        $ptkReceipt = $client->transferReceipt($ptk);
-        $code = $responseHandler->retrieveH00XReturnCode($ptkReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($ptkReceipt);
+        $code = $responseHandler->retrieveH00XReturnCode($hkd->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($hkd->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -217,13 +186,41 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $htd = $client->HTD();
 
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($htd);
-        $reportText = $responseHandler->retrieveH00XReportText($htd);
+        $code = $responseHandler->retrieveH00XReturnCode($htd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($htd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $htdReceipt = $client->transferReceipt($htd);
-        $code = $responseHandler->retrieveH00XReturnCode($htdReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($htdReceipt);
+        $code = $responseHandler->retrieveH00XReturnCode($htd->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($htd->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group PTK
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testPTK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['PTK']['fake']);
+
+        $this->assertExceptionCode($codes['PTK']['code']);
+        $ptk = $client->PTK();
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -247,13 +244,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $hpd = $client->HPD();
 
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($hpd);
-        $reportText = $responseHandler->retrieveH00XReportText($hpd);
+        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $hpdReceipt = $client->transferReceipt($hpd);
-        $code = $responseHandler->retrieveH00XReturnCode($hpdReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($hpdReceipt);
+        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -277,14 +273,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $haa = $client->HAA();
 
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($haa);
-        $reportText = $responseHandler->retrieveH00XReportText($haa);
-
+        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $haaReceipt = $client->transferReceipt($haa);
-        $code = $responseHandler->retrieveH00XReturnCode($haaReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($haaReceipt);
+        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -308,10 +302,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $vmk = $client->VMK();
 
         $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($vmk->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
 
-        $vmkReceipt = $client->transferReceipt($vmk);
-        $code = $responseHandler->retrieveH00XReturnCode($vmkReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($vmkReceipt);
+        $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($vmk->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -335,127 +331,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $sta = $client->STA();
 
         $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($sta->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($sta->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
 
-        $staReceipt = $client->transferReceipt($sta);
-        $code = $responseHandler->retrieveH00XReturnCode($staReceipt);
-        $reportText = $responseHandler->retrieveH00XReportText($staReceipt);
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group FDL
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        foreach ($codes['FDL'] as $format => $code) {
-            $client = $this->setupClient($credentialsId, $x509Generator, $code['fake']);
-
-            $this->assertExceptionCode($code['code']);
-
-            $fdl = $client->FDL(
-                $format,
-                'plain',
-                'FR',
-                new DateTime(),
-                (new DateTime())->modify('-100 day'),
-                (new DateTime())->modify('-1 day')
-            );
-
-            $content = '';
-            foreach ($fdl->getTransactions() as $transaction) {
-                //Plain format (like CFONB)
-                $content .= $transaction->getPlainOrderData();
-            }
-
-            $parser = new CfonbParser();
-            switch ($format) {
-                case 'camt.xxx.cfonb120.stm':
-                    $statements = $parser->read120C($content);
-                    self::assertNotEmpty($statements);
-                    break;
-                case 'camt.xxx.cfonb240.act':
-                    $statements = $parser->read240C($content);
-                    self::assertNotEmpty($statements);
-                    break;
-            }
-
-            $fdlReceipt = $client->transferReceipt($fdl);
-
-            $responseHandler = new ResponseHandlerV2();
-            $code = $responseHandler->retrieveH00XReturnCode($fdlReceipt);
-            $reportText = $responseHandler->retrieveH00XReportText($fdlReceipt);
-
-            $this->assertResponseDone($code, $reportText);
-        }
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group Z53
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testZ53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClient($credentialsId, $x509Generator, $codes['Z53']['fake']);
-
-        $this->assertExceptionCode($codes['Z53']['code']);
-        $z53 = $client->Z53(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
-
-        $responseHandler = new ResponseHandlerV2();
-
-        $z53Receipt = $client->transferReceipt($z53);
-        $code = $responseHandler->retrieveH00XReturnCode($z53Receipt);
-        $reportText = $responseHandler->retrieveH00XReportText($z53Receipt);
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group Z54
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClient($credentialsId, $x509Generator, $codes['Z54']['fake']);
-
-        $this->assertExceptionCode($codes['Z54']['code']);
-        $z54 = $client->Z54(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
-
-        $responseHandler = new ResponseHandlerV2();
-
-        $z54Receipt = $client->transferReceipt($z54);
-        $code = $responseHandler->retrieveH00XReturnCode($z54Receipt);
-        $reportText = $responseHandler->retrieveH00XReportText($z54Receipt);
+        $code = $responseHandler->retrieveH00XReturnCode($sta->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($sta->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -479,10 +360,12 @@ class EbicsClientTest extends AbstractEbicsTestCase
         $c52 = $client->C52();
 
         $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($c52->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($c52->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
 
-        $c52Receipt = $client->transferReceipt($c52);
-        $code = $responseHandler->retrieveH00XReturnCode($c52Receipt);
-        $reportText = $responseHandler->retrieveH00XReportText($c52Receipt);
+        $code = $responseHandler->retrieveH00XReturnCode($c52->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($c52->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -510,12 +393,131 @@ class EbicsClientTest extends AbstractEbicsTestCase
         );
 
         $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
 
-        $c53Receipt = $client->transferReceipt($c53);
-        $code = $responseHandler->retrieveH00XReturnCode($c53Receipt);
-        $reportText = $responseHandler->retrieveH00XReportText($c53Receipt);
+        $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group Z53
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testZ53(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['Z53']['fake']);
+
+        $this->assertExceptionCode($codes['Z53']['code']);
+        $z53 = $client->Z53(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($z53->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($z53->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($z53->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($z53->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group Z54
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['Z54']['fake']);
+
+        $this->assertExceptionCode($codes['Z54']['code']);
+        $z54 = $client->Z54(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group FDL
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        foreach ($codes['FDL'] as $format => $code) {
+            $client = $this->setupClient($credentialsId, $x509Generator, $code['fake']);
+
+            $this->assertExceptionCode($code['code']);
+
+            $fdl = $client->FDL(
+                $format,
+                'text',
+                'FR',
+                new DateTime(),
+                (new DateTime())->modify('-100 day'),
+                (new DateTime())->modify('-1 day')
+            );
+
+            $parser = new CfonbParser();
+            switch ($format) {
+                case 'camt.xxx.cfonb120.stm':
+                    $statements = $parser->read120C($fdl->getData());
+                    self::assertNotEmpty($statements);
+                    break;
+                case 'camt.xxx.cfonb240.act':
+                    $statements = $parser->read240C($fdl->getData());
+                    self::assertNotEmpty($statements);
+                    break;
+            }
+
+            $responseHandler = new ResponseHandlerV2();
+            $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getLastSegment()->getResponse());
+            $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getLastSegment()->getResponse());
+            $this->assertResponseOk($code, $reportText);
+
+            $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getReceipt());
+            $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getReceipt());
+
+            $this->assertResponseDone($code, $reportText);
+        }
     }
 
     /**
@@ -558,11 +560,51 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $cct = $client->CCT($customerCreditTransfer);
 
-        $cctTransfer = $client->transferTransfer($cct);
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cct->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cct->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group CIP
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testCIP(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['CIP']['fake']);
+
+        $this->assertExceptionCode($codes['CIP']['code']);
+
+        $builder = new CustomerDirectDebitBuilder();
+        $customerDirectDebit = $builder
+            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
+            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
+                'Test payment  1')
+            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
+            ->popInstance();
+
+        $cip = $client->CIP($customerDirectDebit);
 
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($cctTransfer);
-        $reportText = $responseHandler->retrieveH00XReportText($cctTransfer);
+        $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cip->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cip->getTransaction()->getInitialization()->getResponse());
 
         $this->assertResponseOk($code, $reportText);
     }
@@ -617,47 +659,13 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $xe2 = $client->XE2($customerCreditTransfer);
 
-        $xe2Transfer = $client->transferTransfer($xe2);
-
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($xe2Transfer);
-        $reportText = $responseHandler->retrieveH00XReportText($xe2Transfer);
-
+        $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
-    }
 
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group CIP
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testCIP(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClient($credentialsId, $x509Generator, $codes['CIP']['fake']);
-
-        $this->assertExceptionCode($codes['CIP']['code']);
-
-        $builder = new CustomerDirectDebitBuilder();
-        $customerDirectDebit = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
-            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
-                'Test payment  1')
-            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
-            ->popInstance();
-
-        $cip = $client->CIP($customerDirectDebit);
-
-        $cipTransfer = $client->transferTransfer($cip);
-
-        $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($cipTransfer);
-        $reportText = $responseHandler->retrieveH00XReportText($cipTransfer);
+        $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getInitialization()->getResponse());
 
         $this->assertResponseOk($code, $reportText);
     }
@@ -689,11 +697,13 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $cdd = $client->CDD($customerDirectDebit);
 
-        $cddTransfer = $client->transferTransfer($cdd);
-
         $responseHandler = new ResponseHandlerV2();
-        $code = $responseHandler->retrieveH00XReturnCode($cddTransfer);
-        $reportText = $responseHandler->retrieveH00XReportText($cddTransfer);
+        $code = $responseHandler->retrieveH00XReturnCode($cdd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cdd->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($cdd->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cdd->getTransaction()->getInitialization()->getResponse());
 
         $this->assertResponseOk($code, $reportText);
     }
@@ -845,6 +855,14 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CIP' => ['code' => '091005', 'fake' => false],
                 ],
             ],
+
+//            [
+//                6, // Credentials Id.
+//                [
+//                    'STA' => ['code' => null, 'fake' => true],
+//                    'C53' => ['code' => null, 'fake' => true],
+//                ],
+//            ],
         ];
     }
 }

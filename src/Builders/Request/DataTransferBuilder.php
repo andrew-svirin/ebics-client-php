@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\ZipService;
@@ -53,9 +52,9 @@ class DataTransferBuilder
         return $this;
     }
 
-    public function addOrderData(OrderDataInterface $orderData, string $transactionKey = null): DataTransferBuilder
+    public function addOrderData(string $orderData, string $transactionKey = null): DataTransferBuilder
     {
-        $orderDataCompressed = $this->zipService->compress($orderData->getContent());
+        $orderDataCompressed = $this->zipService->compress($orderData);
 
         if (null !== $transactionKey) {
             $orderDataCompressedEncrypted = $this->cryptService->encryptByKey(
