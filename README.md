@@ -153,21 +153,14 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     //Fetch datas from your bank
-    $response = $client->FDL('camt.xxx.cfonb120.stm');
-    foreach($response->getTransactions() as $transaction) {
-        //Plain format (like CFONB)
-        $content = $transaction->getPlainOrderData();
+    $fdl = $client->FDL('camt.xxx.cfonb120.stm');
+
+    //Plain format (like CFONB)
+    $content = $fdl->getData();
     
-        //XML format (Like MT942)
-        $xmlContent = $transaction->getOrderData();
-
-        //Do your work with the transactions content
-        //...
+    //XML format (Like MT942)
+    $xmlContent = $fdl->getDataDocument();
     }
-
-    //Once your work finished, tell your Bank that those files are received.
-    //By doing this, you will not be able to download this documents anymore
-    $client->transferReceipt($response);
 } catch (NoDownloadDataAvailableException $exception) {
     echo "No data to download today !";
 } catch (EbicsResponseExceptionInterface $exception) {
@@ -182,6 +175,15 @@ try {
 
 More methods you can find in `tests/EbicsTest`
 
+### EBICS zipped files order types (Z53, Z54).
+
+Some responses are sent as list of files.
+```php
+/* @var \AndrewSvirin\Ebics\EbicsClient $client */
+$z54 = $client->Z54();
+
+$files =$z54->getDataFiles()
+```
 
 ## Global process and interaction with Bank Department
 ### 1. Create and store your 3 certificates
@@ -280,28 +282,6 @@ try {
 | XE2         | Initiate the Swiss credit transfer (i.e available in Switzerland).                                          |
 | CDD         | Initiate a direct debit transaction.                                                                        |
 | BTD         | Download request (FETCH request).                                                                           |
-
-#### Unzipping EBICS response.
-
-Some responses are sent as zipped list of files and therefore require unzipping them first to access the XML files 
-content. In this example, we use PHP's ZipArchive which requires `ext-zip` extension to unzip a camt.054 response.
-
-```php
-$zip = new \ZipArchive();
-
-/* @var \AndrewSvirin\Ebics\EbicsClient $client */
-$z54 = $client->Z54();
-
-// ... write $z54 content into a file (zip)
-
-$inputPath = 'zip-file-path';
-$outputDir = 'your-output-directory';
-
-$zip->extractTo($outputDir, $inputPath);
-
-```
-
-You'll find one or many XML files in your output directory.
 
 ### 6. Make HKD request to see what order types allowed.
 
