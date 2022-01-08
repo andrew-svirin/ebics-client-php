@@ -10,9 +10,8 @@ use LogicException;
  *
  * Uses openssl.  Operates in the EDE3 mode (encrypt-decrypt-encrypt).
  */
-class TripleDES implements TripleDESInterface
+final class TripleDES implements TripleDESInterface
 {
-
     /**
      * @var string
      */

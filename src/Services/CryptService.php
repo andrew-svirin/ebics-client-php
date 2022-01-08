@@ -17,9 +17,8 @@ use RuntimeException;
  *
  * @internal
  */
-class CryptService
+final class CryptService
 {
-
     /**
      * @var RSAFactory
      */

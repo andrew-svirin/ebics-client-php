@@ -10,9 +10,8 @@ use RuntimeException;
 /**
  * @internal
  */
-class DOMHelper
+final class DOMHelper
 {
-
     /**
      * @param DOMNodeList|false $domNodeList
      *

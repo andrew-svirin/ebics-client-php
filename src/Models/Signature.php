@@ -10,7 +10,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Signature implements SignatureInterface
+final class Signature implements SignatureInterface
 {
     /**
      * @var string

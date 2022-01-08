@@ -283,9 +283,12 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $btfContext, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createBTD(
                     $dateTime,
+                    $btfContext,
+                    $startDateTime,
+                    $endDateTime,
                     $segmentNumber,
                     $isLastSegment
                 );
@@ -514,6 +517,36 @@ final class EbicsClient implements EbicsClientInterface
         $transaction = $this->downloadTransaction(
             function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createC53(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    // @codingStandardsIgnoreStart
+    public function C54(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult {
+        // @codingStandardsIgnoreEnd
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createC54(
                     $dateTime,
                     $startDateTime,
                     $endDateTime,

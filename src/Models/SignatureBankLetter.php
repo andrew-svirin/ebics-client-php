@@ -10,9 +10,8 @@ use DateTime;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class SignatureBankLetter
+final class SignatureBankLetter
 {
-
     const TYPE_A = 'A';
     const TYPE_X = 'X';
     const TYPE_E = 'E';

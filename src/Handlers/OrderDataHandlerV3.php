@@ -20,7 +20,7 @@ use DOMElement;
  *
  * @internal
  */
-class OrderDataHandlerV3 extends OrderDataHandler
+final class OrderDataHandlerV3 extends OrderDataHandler
 {
     use XPathTrait;
 

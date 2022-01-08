@@ -10,9 +10,8 @@ use AndrewSvirin\Ebics\Models\SignatureBankLetter;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class SignatureBankLetterFactory
+final class SignatureBankLetterFactory
 {
-
     /**
      * @param string $type
      * @param string $version

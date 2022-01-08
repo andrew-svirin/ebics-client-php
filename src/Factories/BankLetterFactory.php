@@ -13,9 +13,8 @@ use AndrewSvirin\Ebics\Models\User;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BankLetterFactory
+final class BankLetterFactory
 {
-
     /**
      * @param Bank $bank
      * @param User $user

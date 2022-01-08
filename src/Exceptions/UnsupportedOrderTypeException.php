@@ -8,7 +8,7 @@ namespace AndrewSvirin\Ebics\Exceptions;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
  */
-class UnsupportedOrderTypeException extends EbicsResponseException
+final class UnsupportedOrderTypeException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {

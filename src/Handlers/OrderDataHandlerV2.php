@@ -22,7 +22,7 @@ use DOMNodeList;
  *
  * @internal
  */
-class OrderDataHandlerV2 extends OrderDataHandler
+final class OrderDataHandlerV2 extends OrderDataHandler
 {
     use XPathTrait;
 

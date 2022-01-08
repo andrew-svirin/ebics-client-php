@@ -13,9 +13,8 @@ use AndrewSvirin\Ebics\Services\DigestResolver;
  *
  * @internal
  */
-class CertificateHashGenerator implements HashGeneratorInterface
+final class CertificateHashGenerator implements HashGeneratorInterface
 {
-
     /**
      * @var DigestResolver
      */

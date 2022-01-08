@@ -8,7 +8,7 @@ namespace AndrewSvirin\Ebics\Exceptions;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
  */
-class UserUnknownException extends EbicsResponseException
+final class UserUnknownException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {

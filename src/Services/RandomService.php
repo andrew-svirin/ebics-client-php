@@ -12,9 +12,8 @@ use DateTime;
  *
  * @internal
  */
-class RandomService
+final class RandomService
 {
-
     /**
      * Generate random string from HEX characters in upper register.
      *

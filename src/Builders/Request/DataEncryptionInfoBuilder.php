@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Exceptions\SignatureEbicsException;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DOMDocument;
@@ -14,9 +14,8 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class DataEncryptionInfoBuilder
+final class DataEncryptionInfoBuilder
 {
-
     /**
      * @var DOMElement
      */
@@ -58,15 +57,15 @@ class DataEncryptionInfoBuilder
      * @param string $algorithm
      *
      * @return $this
-     * @throws EbicsException
+     * @throws SignatureEbicsException
      */
     public function addEncryptionPubKeyDigest(KeyRing $keyRing, string $algorithm = 'sha256'): DataEncryptionInfoBuilder
     {
         if (!($signatureE = $keyRing->getBankSignatureE())) {
-            throw new EbicsException('Bank Certificate E is empty.');
+            throw new SignatureEbicsException('Bank Certificate E is empty.');
         }
         $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
-        $encryptionPubKeyDigestNodeValue =  base64_encode($certificateEDigest);
+        $encryptionPubKeyDigestNodeValue = base64_encode($certificateEDigest);
 
         $xmlEncryptionPubKeyDigest = $this->dom->createElement('EncryptionPubKeyDigest');
         $xmlEncryptionPubKeyDigest->setAttribute('Version', $keyRing->getBankSignatureEVersion());

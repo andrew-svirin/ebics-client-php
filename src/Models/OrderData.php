@@ -10,6 +10,6 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class OrderData extends Data implements OrderDataInterface
+abstract class OrderData extends Data implements OrderDataInterface
 {
 }

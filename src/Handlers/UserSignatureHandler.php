@@ -20,7 +20,7 @@ use DOMNode;
  *
  * @internal
  */
-class UserSignatureHandler
+final class UserSignatureHandler
 {
     use C14NTrait;
     use XPathTrait;

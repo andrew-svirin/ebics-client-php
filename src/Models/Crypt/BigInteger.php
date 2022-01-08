@@ -10,9 +10,8 @@ use LogicException;
  *
  * Supports base-10 and base-256 numbers.  Uses the BCMath extension.
  */
-class BigInteger implements BigIntegerInterface
+final class BigInteger implements BigIntegerInterface
 {
-
     /**
      * Holds the BigInteger's value.
      *

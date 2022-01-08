@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use AndrewSvirin\Ebics\Exceptions\CertificateEbicsException;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
@@ -192,12 +193,12 @@ abstract class OrderDataHandler
 
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
-     * @throws EbicsException
+     * @throws CertificateEbicsException
      */
     private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, SignatureInterface $certificate): void
     {
         if (!($certificateContent = $certificate->getCertificateContent())) {
-            throw new EbicsException('Certificate X509 is empty.');
+            throw new CertificateEbicsException('Certificate X509 is empty.');
         }
         $certificateX509 = $this->certificateX509Factory->createFromContent($certificateContent);
 

@@ -20,7 +20,7 @@ use AndrewSvirin\Ebics\Services\DigestResolverV3;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class RequestFactoryV3 extends RequestFactory
+final class RequestFactoryV3 extends RequestFactory
 {
     /**
      * Constructor.

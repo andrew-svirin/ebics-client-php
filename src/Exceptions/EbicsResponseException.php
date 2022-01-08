@@ -6,7 +6,7 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 
-class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
+abstract class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
 {
     /** @var string */
     private $responseCode;

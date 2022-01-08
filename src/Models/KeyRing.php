@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
 
 /**
  * EBICS key ring representation.
@@ -11,7 +11,7 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class KeyRing
+final class KeyRing
 {
     const USER_PREFIX = 'USER';
     const BANK_PREFIX = 'BANK';
@@ -122,12 +122,12 @@ class KeyRing
 
     /**
      * @return string
-     * @throws EbicsException
+     * @throws PasswordEbicsException
      */
     public function getPassword(): string
     {
         if ($this->password === null) {
-            throw new EbicsException('Password must be set');
+            throw new PasswordEbicsException('Password must be set');
         }
 
         return $this->password;

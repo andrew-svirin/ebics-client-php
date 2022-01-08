@@ -29,7 +29,6 @@ use LogicException;
 class X509 implements X509Interface
 {
 
-    /**#@+*/
     /**
      * Save as DER
      */
@@ -40,7 +39,6 @@ class X509 implements X509Interface
      * Used only by the load*() functions
      */
     const FORMAT_AUTO_DETECT = 3;
-    /**#@-*/
 
     /**
      * Attribute value disposition.
@@ -50,7 +48,6 @@ class X509 implements X509Interface
     const ATTR_APPEND = -2; // Add a value.
     const ATTR_REPLACE = -3; // Clear first, then add a value.
 
-    /**#@+*/
     /**
      * Return internal array representation
      */
@@ -63,9 +60,8 @@ class X509 implements X509Interface
      * Return canonical ASN.1 RDNs string
      */
     const DN_CANON = 4;
-    /**#@-*/
 
-    /**#@+
+    /**
      * ASN.1 syntax for various extensions
      */
     /**

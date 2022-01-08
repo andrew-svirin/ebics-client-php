@@ -12,7 +12,7 @@ use DOMDocument;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class ResponseHandlerV2 extends ResponseHandler
+final class ResponseHandlerV2 extends ResponseHandler
 {
     use XPathTrait;
 

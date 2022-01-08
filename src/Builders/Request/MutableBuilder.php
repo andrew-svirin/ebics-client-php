@@ -11,9 +11,8 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class MutableBuilder
+final class MutableBuilder
 {
-
     const PHASE_INITIALIZATION = 'Initialisation';
     const PHASE_RECEIPT = 'Receipt';
     const PHASE_TRANSFER = 'Transfer';

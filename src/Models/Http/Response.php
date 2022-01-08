@@ -10,6 +10,6 @@ use AndrewSvirin\Ebics\Models\Data;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Response extends Data
+final class Response extends Data
 {
 }

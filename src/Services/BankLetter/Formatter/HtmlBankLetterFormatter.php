@@ -19,7 +19,7 @@ use RuntimeException;
  *
  * @internal
  */
-class HtmlBankLetterFormatter implements FormatterInterface
+final class HtmlBankLetterFormatter implements FormatterInterface
 {
 
     public function format(BankLetter $bankLetter)

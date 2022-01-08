@@ -11,7 +11,7 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Jonathan Luthi
  */
-class UnstructuredPostalAddress implements PostalAddressInterface
+final class UnstructuredPostalAddress implements PostalAddressInterface
 {
     /**
      * @var string

@@ -16,9 +16,8 @@ use AndrewSvirin\Ebics\Models\SignatureBankLetter;
  *
  * @internal
  */
-class BankLetterService
+final class BankLetterService
 {
-
     /**
      * @var CryptService
      */

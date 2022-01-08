@@ -14,9 +14,8 @@ use AndrewSvirin\Ebics\Services\CryptService;
  *
  * @internal
  */
-class PublicKeyHashGenerator implements HashGeneratorInterface
+final class PublicKeyHashGenerator implements HashGeneratorInterface
 {
-
     /**
      * @var CryptService
      */

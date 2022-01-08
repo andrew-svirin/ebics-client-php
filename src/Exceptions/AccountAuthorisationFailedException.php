@@ -8,9 +8,8 @@ namespace AndrewSvirin\Ebics\Exceptions;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
  */
-class AccountAuthorisationFailedException extends EbicsResponseException
+final class AccountAuthorisationFailedException extends EbicsResponseException
 {
-
     public function __construct($responseMessage = null)
     {
         parent::__construct(

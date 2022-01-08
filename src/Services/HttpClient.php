@@ -13,9 +13,8 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class HttpClient implements HttpClientInterface
+final class HttpClient implements HttpClientInterface
 {
-
     /**
      * @param string $url
      * @param Request $request
