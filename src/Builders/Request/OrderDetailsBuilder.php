@@ -13,9 +13,8 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class OrderDetailsBuilder
+final class OrderDetailsBuilder
 {
-
     const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
     const ORDER_ATTRIBUTE_UZHNN = 'UZHNN';

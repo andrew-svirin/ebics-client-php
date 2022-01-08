@@ -35,8 +35,14 @@ class X509ExtensionOptionsNormalizerTest extends AbstractEbicsTestCase
             [['value' => ['foo']], ['value' => ['foo'], 'critical' => false, 'replace' => true]],
             [['value' => ['foo'], 'critical' => false], ['value' => ['foo'], 'critical' => false, 'replace' => true]],
             [['value' => ['foo'], 'critical' => true], ['value' => ['foo'], 'critical' => true, 'replace' => true]],
-            [['value' => ['foo'], 'critical' => false, 'replace' => false], ['value' => ['foo'], 'critical' => false, 'replace' => false]],
-            [['value' => ['foo'], 'critical' => true, 'replace' => true], ['value' => ['foo'], 'critical' => true, 'replace' => true]],
+            [
+                ['value' => ['foo'], 'critical' => false, 'replace' => false],
+                ['value' => ['foo'], 'critical' => false, 'replace' => false]
+            ],
+            [
+                ['value' => ['foo'], 'critical' => true, 'replace' => true],
+                ['value' => ['foo'], 'critical' => true, 'replace' => true]
+            ],
         ];
     }
 }

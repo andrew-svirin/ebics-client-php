@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Factories;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsErrorCodeMapping;
-use AndrewSvirin\Ebics\Exceptions\EbicsResponseException;
+use AndrewSvirin\Ebics\Exceptions\IncorrectResponseEbicsException;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 
@@ -13,9 +13,8 @@ use AndrewSvirin\Ebics\Models\Http\Response;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
  */
-class EbicsExceptionFactory
+final class EbicsExceptionFactory
 {
-
     /**
      * @param string $errorCode
      * @param string|null $errorText
@@ -23,7 +22,7 @@ class EbicsExceptionFactory
      * @param Response|null $response
      *
      * @return void
-     * @throws EbicsResponseException
+     * @throws IncorrectResponseEbicsException
      */
     public static function buildExceptionFromCode(
         string $errorCode,
@@ -34,7 +33,11 @@ class EbicsExceptionFactory
         if (($exceptionClass = EbicsErrorCodeMapping::resolveClass($errorCode))) {
             $exception = new $exceptionClass($errorText);
         } else {
-            $exception = new EbicsResponseException($errorCode, $errorText);
+            throw new IncorrectResponseEbicsException(sprintf(
+                'Incorrect Response Exception %s %s',
+                $errorCode,
+                $errorText
+            ));
         }
 
         if (null !== $request) {

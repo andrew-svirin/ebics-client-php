@@ -11,10 +11,9 @@ use LogicException;
 /**
  * Pure-PHP ASN.1 Parser
  */
-class ASN1 implements ASN1Interface
+final class ASN1 implements ASN1Interface
 {
-
-    /**#@+
+    /**
      * Tag Classes
      *
      * @link http://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf#page=12
@@ -23,9 +22,8 @@ class ASN1 implements ASN1Interface
     const CLASS_APPLICATION = 1;
     const CLASS_CONTEXT_SPECIFIC = 2;
     const CLASS_PRIVATE = 3;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Tag Classes
      *
      * @link http://www.obj-sys.com/asn1tutorial/node124.html
@@ -45,8 +43,8 @@ class ASN1 implements ASN1Interface
     //const TYPE_RELATIVE_OID      = 13;
     const TYPE_SEQUENCE = 16; // SEQUENCE OF
     const TYPE_SET = 17; // SET OF
-    /**#@-*/
-    /**#@+
+
+    /**
      * More Tag Classes
      *
      * @access private
@@ -65,16 +63,14 @@ class ASN1 implements ASN1Interface
     const TYPE_UNIVERSAL_STRING = 28;
     //const TYPE_CHARACTER_STRING = 29;
     const TYPE_BMP_STRING = 30;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Tag Aliases
      *
      * These tags are kinda place holders for other tags.
      */
     const TYPE_CHOICE = -1;
     const TYPE_ANY = -2;
-    /**#@-*/
 
     /**
      * ASN.1 object identifier

@@ -14,9 +14,8 @@ use AndrewSvirin\Ebics\Models\BankLetter;
  *
  * @internal
  */
-class PdfBankLetterFormatter implements FormatterInterface
+final class PdfBankLetterFormatter implements FormatterInterface
 {
-
     /**
      * @var HtmlBankLetterFormatter
      */

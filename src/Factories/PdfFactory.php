@@ -11,7 +11,7 @@ use AndrewSvirin\Ebics\Models\Pdf;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class PdfFactory
+final class PdfFactory
 {
     public function createFromHtml(string $html): PdfInterface
     {

@@ -11,9 +11,8 @@ use AndrewSvirin\Ebics\Models\Crypt\X509;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class X509Factory
+final class X509Factory
 {
-
     /**
      * @return X509Interface
      */

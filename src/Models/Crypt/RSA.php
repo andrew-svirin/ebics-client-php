@@ -11,19 +11,16 @@ use LogicException;
  * Pure-PHP PKCS#1 (v2.1) compliant implementation of RSA.
  * Uses encryption mode PKCS1.
  */
-class RSA implements RSAInterface
+final class RSA implements RSAInterface
 {
 
-    /**#@+*/
     /**
      * PKCS#1 formatted private key
      *
      * Used by OpenSSH
      */
     const PRIVATE_FORMAT_PKCS1 = 0;
-    /**#@-*/
 
-    /**#@+*/
     /**
      * Raw public key
      *

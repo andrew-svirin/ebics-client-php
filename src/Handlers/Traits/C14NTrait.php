@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers\Traits;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Exceptions\AlgoEbicsException;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;
@@ -24,7 +24,7 @@ trait C14NTrait
      *
      * @return string
      *
-     * @throws EbicsException
+     * @throws AlgoEbicsException
      */
     private function calculateC14N(
         DOMXPath $xpath,
@@ -37,7 +37,7 @@ trait C14NTrait
                 $withComments = false;
                 break;
             default:
-                throw new EbicsException(sprintf('Define algo for %s', $algorithm));
+                throw new AlgoEbicsException(sprintf('Define algo for %s', $algorithm));
         }
         $nodes = $xpath->query($path);
         $result = '';

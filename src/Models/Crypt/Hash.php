@@ -12,9 +12,8 @@ use LogicException;
  * Uses hash() or mhash() if available and an internal implementation, otherwise.  Currently supports the following:
  * sha1, sha256
  */
-class Hash implements HashInterface
+final class Hash implements HashInterface
 {
-
     /**
      * Byte-length of compression blocks / key (Internal HMAC)
      *

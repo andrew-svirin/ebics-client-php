@@ -8,7 +8,7 @@ namespace AndrewSvirin\Ebics\Models;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Bank
+final class Bank
 {
     public const VERSION_25 = 'VERSION_25';
     public const VERSION_30 = 'VERSION_30';

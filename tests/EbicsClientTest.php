@@ -5,9 +5,11 @@ namespace AndrewSvirin\Ebics\Tests;
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
+use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
+use AndrewSvirin\Ebics\Handlers\ResponseHandlerV3;
 use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
@@ -228,6 +230,39 @@ class EbicsClientTest extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group BTD
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testBTD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['BTD']['fake']);
+
+        $context = new BTFContext();
+        $context->setServiceName('service-name');
+        $context->setMsgName('msg-name');
+
+        $this->assertExceptionCode($codes['BTD']['code']);
+        $btd = $client->BTD($context);
+
+        $responseHandler = new ResponseHandlerV3();
+        $code = $responseHandler->retrieveH00XReturnCode($btd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($btd->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($btd->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($btd->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group HPD
      *
      * @param int $credentialsId
@@ -399,6 +434,39 @@ class EbicsClientTest extends AbstractEbicsTestCase
 
         $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getReceipt());
         $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group C54
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testC54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['C54']['fake']);
+
+        $this->assertExceptionCode($codes['C54']['code']);
+        $c54 = $client->C53(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
+
+        $responseHandler = new ResponseHandlerV2();
+        $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($c54->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($c54->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -720,6 +788,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'BTD' => ['code' => '091005', 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
@@ -732,6 +801,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -748,6 +818,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
 //                    'HEV' => ['code' => null, 'fake' => false],
 //                    'INI' => ['code' => null, 'fake' => false],
 //                    'HIA' => ['code' => null, 'fake' => false],
+//                    'BTD' => ['code' => '091005', 'fake' => false],
 //                    'HPB' => ['code' => null, 'fake' => false],
 //                    'HPD' => ['code' => null, 'fake' => false],
 //                    'HKD' => ['code' => null, 'fake' => false],
@@ -760,6 +831,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
 //                    'Z54' => ['code' => '061002', 'fake' => false],
 //                    'C52' => ['code' => '061002', 'fake' => false],
 //                    'C53' => ['code' => '061002', 'fake' => false],
+//                    'C54' => ['code' => '090003', 'fake' => false],
 //                    'FDL' => [
 //                        'camt.xxx.cfonb120.stm' => ['code' => '091010', 'fake' => false],
 //                        'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
@@ -777,6 +849,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'BTD' => ['code' => '091005', 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
@@ -789,6 +862,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -805,6 +879,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'BTD' => ['code' => '091005', 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
@@ -817,6 +892,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -833,6 +909,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'BTD' => ['code' => '091005', 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
@@ -845,6 +922,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -855,14 +933,6 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'CIP' => ['code' => '091005', 'fake' => false],
                 ],
             ],
-
-//            [
-//                6, // Credentials Id.
-//                [
-//                    'STA' => ['code' => null, 'fake' => true],
-//                    'C53' => ['code' => null, 'fake' => true],
-//                ],
-//            ],
         ];
     }
 }

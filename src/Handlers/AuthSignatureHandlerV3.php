@@ -14,7 +14,7 @@ use DOMXPath;
  *
  * @internal
  */
-class AuthSignatureHandlerV3 extends AuthSignatureHandler
+final class AuthSignatureHandlerV3 extends AuthSignatureHandler
 {
     use XPathTrait;
 

@@ -9,15 +9,12 @@ use LogicException;
  * Pure-PHP implementation of AES.
  * Able only CBC mode.
  */
-class AES implements AESInterface
+final class AES implements AESInterface
 {
-
-    /**#@+*/
     /**
      * Base value for the mcrypt implementation $engine switch
      */
     const ENGINE_OPENSSL = 3;
-    /**#@-*/
 
     /**
      * The Key Length (in bytes)

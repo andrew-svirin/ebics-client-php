@@ -14,9 +14,8 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class StaticBuilder
+final class StaticBuilder
 {
-
     const SECURITY_MEDIUM_0000 = '0000';
 
     /**

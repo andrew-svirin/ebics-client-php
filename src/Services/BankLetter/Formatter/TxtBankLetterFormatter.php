@@ -15,9 +15,8 @@ use RuntimeException;
  *
  * @internal
  */
-class TxtBankLetterFormatter implements FormatterInterface
+final class TxtBankLetterFormatter implements FormatterInterface
 {
-
     public function format(BankLetter $bankLetter)
     {
         $result = '';

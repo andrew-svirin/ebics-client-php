@@ -69,7 +69,7 @@ class FakerHttpClient implements HttpClientInterface
                 $fileName = 'sta.xml';
                 break;
             case 'CCT':
-                $fileName ='cct.xml';
+                $fileName = 'cct.xml';
                 break;
             case 'CDD':
                 $fileName = 'cdd.xml';

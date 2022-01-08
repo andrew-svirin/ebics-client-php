@@ -10,6 +10,6 @@ use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class SignatureData extends Data implements SignatureDataInterface
+abstract class SignatureData extends Data implements SignatureDataInterface
 {
 }

@@ -10,7 +10,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class DigestResolverV2 extends DigestResolver
+final class DigestResolverV2 extends DigestResolver
 {
     public function digest(SignatureInterface $signature, string $algorithm = 'sha256'): string
     {

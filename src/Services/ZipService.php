@@ -13,9 +13,8 @@ use ZipArchive;
  *
  * @internal
  */
-class ZipService
+final class ZipService
 {
-
     /**
      * Create temporary file to store zipped string.
      * @return string

@@ -12,7 +12,7 @@ use Mpdf\Output\Destination;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Pdf extends Mpdf implements PdfInterface
+final class Pdf extends Mpdf implements PdfInterface
 {
     public function outputString(): string
     {
