@@ -521,6 +521,37 @@ class EbicsClientTest extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group C54
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testC54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClient($credentialsId, $x509Generator, $codes['C54']['fake']);
+
+        $this->assertExceptionCode($codes['C54']['code']);
+        $c54 = $client->C54(
+            new DateTime(),
+            (new DateTime())->modify('-30 day'),
+            (new DateTime())->modify('-1 day')
+        );
+
+        $responseHandler = new ResponseHandlerV2();
+
+        $c54Receipt = $client->transferReceipt($c54);
+        $code = $responseHandler->retrieveH00XReturnCode($c54Receipt);
+        $reportText = $responseHandler->retrieveH00XReportText($c54Receipt);
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group CCT
      *
      * @param int $credentialsId
@@ -722,6 +753,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -750,6 +782,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
 //                    'Z54' => ['code' => '061002', 'fake' => false],
 //                    'C52' => ['code' => '061002', 'fake' => false],
 //                    'C53' => ['code' => '061002', 'fake' => false],
+//                    'C54' => ['code' => '090003', 'fake' => false],
 //                    'FDL' => [
 //                        'camt.xxx.cfonb120.stm' => ['code' => '091010', 'fake' => false],
 //                        'camt.xxx.cfonb240.act' => ['code' => '091010', 'fake' => false],
@@ -779,6 +812,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -807,6 +841,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
@@ -835,6 +870,7 @@ class EbicsClientTest extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'C52' => ['code' => '090003', 'fake' => false],
                     'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],

@@ -210,6 +210,25 @@ interface EbicsClientInterface
         DateTimeInterface $endDateTime = null
     ): Response;
     // @codingStandardsIgnoreEnd
+
+    /**
+     * Retrieve Debit Credit Notification (DTI).
+     * Send self::transferReceipt() after transaction finished.
+     *
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     *
+     * @return Response
+     */
+    // @codingStandardsIgnoreStart
+    public function C54(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Response;
+    // @codingStandardsIgnoreEnd
+
     /**
      * Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services).
      * Send self::transferReceipt() after transaction finished.

@@ -410,6 +410,25 @@ final class EbicsClient implements EbicsClientInterface
 
         return $response;
     }
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    // @codingStandardsIgnoreStart
+    public function C54(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): Response {
+        // @codingStandardsIgnoreEnd
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+        $request = $this->requestFactory->createC54($dateTime, $startDateTime, $endDateTime);
+        $response = $this->retrieveOrderDataItems($request);
+
+        return $response;
+    }
 
     /**
      * @inheritDoc

@@ -9,20 +9,25 @@
 
 PHP library to communicate with a bank through EBICS protocol.  
 Supported PHP versions - PHP 7.2 - PHP 8.1  
-Support Ebics server versions: 2.5 (default), 3.0  
+Support Ebics server versions: 2.5 (default), 3.0
 
 ## License
+
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ## Installation
+
 ```bash
 $ composer require andrew-svirin/ebics-client-php
 ```
+
 If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://github.com/andrew-svirin/cfonb-php)
 If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)
 
 ## Initialize client
-You will need to have this information from your Bank: 
+
+You will need to have this information from your Bank:
+
 - HostID
 - HostURL
 - PartnerID
@@ -48,6 +53,7 @@ $client = new EbicsClient($bank, $user, $keyRing);
 ```
 
 ## Make INI, HIA, HPB requests and update key ring.
+
 ```php
 <?php
 
@@ -93,10 +99,11 @@ try {
 }
 ```
 
-
 ## Note for French Bank
-If you are dealing with a french bank, you will need to create a X509 self-signed certificate.
-You can achieve this by creating a class which extends the `AbstractX509Generator` (or implements the `X509GeneratorInterface` if you want a total control about the generation)
+
+If you are dealing with a french bank, you will need to create a X509 self-signed certificate. You can achieve this by
+creating a class which extends the `AbstractX509Generator` (or implements the `X509GeneratorInterface` if you want a
+total control about the generation)
 
 ```php
 <?php
@@ -129,9 +136,11 @@ class MyCompanyX509Generator extends AbstractX509Generator
     }
 }
 ```
-__You can see more values in the `LegacyX509Generator` class.__ 
+
+__You can see more values in the `LegacyX509Generator` class.__
 
 Once your class is created, call the `X509GeneratorFactory::setGeneratorClass()` method :
+
 ```php
 <?php
 
@@ -144,6 +153,7 @@ $client->setX509Generator(new MyCompanyX509Generator);
 ## Other examples
 
 ### FDL (File Download)
+
 ````php
 <?php
 
@@ -182,9 +192,10 @@ try {
 
 More methods you can find in `tests/EbicsTest`
 
-
 ## Global process and interaction with Bank Department
+
 ### 1. Create and store your 3 certificates
+
 ```php
 <?php
 
@@ -222,6 +233,7 @@ try {
 ```
 
 ### 2. Generate a EBICS letter
+
 ```php
 /* @var \AndrewSvirin\Ebics\EbicsClient $client */
 $ebicsBankLetter = new \AndrewSvirin\Ebics\EbicsBankLetter();
@@ -238,6 +250,7 @@ $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createP
 ### 3. Wait for the bank validation and activation access.
 
 ### 4. Fetch the bank tokens
+
 ```php
 
 try {
@@ -257,6 +270,7 @@ try {
 ```
 
 ### 5. Play with other transactions!
+
 | Transaction | Description                                                                                                 |
 |-------------|-------------------------------------------------------------------------------------------------------------|
 | HEV         | Supported protocol version for the Bank.                                                                    |
@@ -273,6 +287,7 @@ try {
 | STA         | Retrieve the bank account statement.                                                                        |
 | C52         | Retrieve the bank account report in Camt.052 format.                                                        |
 | C53         | Retrieve the bank account statement in Camt.053 format.                                                     |
+| C54         | Retrieve Debit Credit Notification (DTI).                                                                   |
 | Z53         | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
 | Z54         | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland).                        |
 | CCT         | Initiate the credit transfer per Single Euro Payments Area.                                                 |
@@ -283,7 +298,7 @@ try {
 
 #### Unzipping EBICS response.
 
-Some responses are sent as zipped list of files and therefore require unzipping them first to access the XML files 
+Some responses are sent as zipped list of files and therefore require unzipping them first to access the XML files
 content. In this example, we use PHP's ZipArchive which requires `ext-zip` extension to unzip a camt.054 response.
 
 ```php
@@ -308,8 +323,10 @@ You'll find one or many XML files in your output directory.
 ---
 
 ## Donation
+
 - Wise.com https://wise.com/send/#/enterpayment?recipient=189936743
 - Bitcoin: bc1qhahtnhcrpg8u93pndjglaeuy0nc0tjau9rnst5
 
 ## Development and integration Ebics for your project and other development
+
 👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
