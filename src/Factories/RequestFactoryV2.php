@@ -7,7 +7,7 @@ use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV2;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV2;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV2;
-use AndrewSvirin\Ebics\Handlers\UserSignatureHandler;
+use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\KeyRing;
@@ -32,7 +32,7 @@ final class RequestFactoryV2 extends RequestFactory
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->authSignatureHandler = new AuthSignatureHandlerV2($keyRing);
-        $this->userSignatureHandler = new UserSignatureHandler($user, $keyRing);
+        $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyRing);
         $this->orderDataHandler = new OrderDataHandlerV2($bank, $user, $keyRing);
         $this->digestResolver = new DigestResolverV2();
         parent::__construct($bank, $user, $keyRing);
@@ -58,6 +58,9 @@ final class RequestFactoryV2 extends RequestFactory
             case 'XE2':
             case 'CIP':
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN;
+                break;
+            case 'HVE':
+                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_UZHNN;
                 break;
             default:
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;

@@ -102,6 +102,36 @@ final class RequestContext
      */
     private $btfContext;
 
+    /**
+     * @var HVEContext
+     */
+    private $hveContext;
+
+    /**
+     * @var string
+     */
+    private $dataDigest;
+
+    /**
+     * @var string
+     */
+    private $signatureVersion;
+
+    /**
+     * @var BTUContext
+     */
+    private $btuContext;
+
+    /**
+     * @var HVDContext
+     */
+    private $hvdContext;
+
+    /**
+     * @var HVTContext
+     */
+    private $hvtContext;
+
     public function setBank(Bank $bank): RequestContext
     {
         $this->bank = $bank;
@@ -304,5 +334,77 @@ final class RequestContext
     public function getBTFContext(): BTFContext
     {
         return $this->btfContext;
+    }
+
+    public function setHVEContext(HVEContext $hveContext): RequestContext
+    {
+        $this->hveContext = $hveContext;
+
+        return $this;
+    }
+
+    public function getHVEContext(): HVEContext
+    {
+        return $this->hveContext;
+    }
+
+    public function setHVDContext(HVDContext $hvdContext): RequestContext
+    {
+        $this->hvdContext = $hvdContext;
+
+        return $this;
+    }
+
+    public function getHVDContext(): HVDContext
+    {
+        return $this->hvdContext;
+    }
+
+    public function setHVTContext(HVTContext $hvtContext): RequestContext
+    {
+        $this->hvtContext = $hvtContext;
+
+        return $this;
+    }
+
+    public function getHVTContext(): HVTContext
+    {
+        return $this->hvtContext;
+    }
+
+    public function setBTUContext(BTUContext $btuContext): RequestContext
+    {
+        $this->btuContext = $btuContext;
+
+        return $this;
+    }
+
+    public function getBTUContext(): BTUContext
+    {
+        return $this->btuContext;
+    }
+
+    public function setDataDigest(?string $dataDigest): RequestContext
+    {
+        $this->dataDigest = $dataDigest;
+
+        return $this;
+    }
+
+    public function getDataDigest(): ?string
+    {
+        return $this->dataDigest;
+    }
+
+    public function setSignatureVersion(string $signatureVersion): RequestContext
+    {
+        $this->signatureVersion = $signatureVersion;
+
+        return $this;
+    }
+
+    public function getSignatureVersion(): string
+    {
+        return $this->signatureVersion;
     }
 }

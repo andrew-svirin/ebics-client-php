@@ -2,6 +2,8 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use Closure;
+
 /**
  * Ebics 3.0 XmlBuilder.
  *
@@ -43,6 +45,30 @@ final class XmlBuilderV3 extends XmlBuilder
         }
         $this->instance->setAttribute('Version', 'H005');
         $this->instance->setAttribute('Revision', '1');
+
+        return $this;
+    }
+
+    public function addHeader(Closure $callback): XmlBuilder
+    {
+        $headerBuilder = new HeaderBuilderV3($this->dom);
+        $header = $headerBuilder->createInstance()->getInstance();
+        $this->instance->appendChild($header);
+
+        call_user_func($callback, $headerBuilder);
+
+        return $this;
+    }
+
+    public function addBody(Closure $callback = null): XmlBuilder
+    {
+        $bodyBuilder = new BodyBuilderV3($this->dom);
+        $body = $bodyBuilder->createInstance()->getInstance();
+        $this->instance->appendChild($body);
+
+        if (null !== $callback) {
+            call_user_func($callback, $bodyBuilder);
+        }
 
         return $this;
     }

@@ -64,7 +64,7 @@ final class DataEncryptionInfoBuilder
         if (!($signatureE = $keyRing->getBankSignatureE())) {
             throw new SignatureEbicsException('Bank Certificate E is empty.');
         }
-        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm, true);
+        $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm);
         $encryptionPubKeyDigestNodeValue = base64_encode($certificateEDigest);
 
         $xmlEncryptionPubKeyDigest = $this->dom->createElement('EncryptionPubKeyDigest');

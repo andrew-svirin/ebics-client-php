@@ -22,7 +22,7 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareXPath(DOMDocument $xml): DOMXPath
+    protected function prepareXPath(DOMDocument $xml): DOMXPath
     {
         $xpath = new DOMXpath($xml);
 
@@ -36,7 +36,7 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareH004XPath(DOMDocument $xml): DOMXPath
+    protected function prepareH004XPath(DOMDocument $xml): DOMXPath
     {
         $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H004', 'urn:org:ebics:H004');
@@ -52,7 +52,7 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareH005XPath(DOMDocument $xml): DOMXPath
+    protected function prepareH005XPath(DOMDocument $xml): DOMXPath
     {
         $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H005', 'urn:org:ebics:H005');
@@ -68,7 +68,7 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareH000XPath(DOMDocument $xml): DOMXPath
+    protected function prepareH000XPath(DOMDocument $xml): DOMXPath
     {
         $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H000', 'http://www.ebics.org/H000');
@@ -83,7 +83,7 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareS001XPath(DOMDocument $xml): DOMXPath
+    protected function prepareS001XPath(DOMDocument $xml): DOMXPath
     {
         $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('S001', 'http://www.ebics.org/S001');
@@ -97,7 +97,7 @@ trait XPathTrait
      * @param DOMNode $newNode
      * @param DOMNode $afterNode
      */
-    private function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
+    protected function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
     {
         $nextSibling = $afterNode->nextSibling;
         if ($newNode !== $nextSibling) {

@@ -12,17 +12,17 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class BodyBuilder
+abstract class BodyBuilder
 {
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     public function __construct(DOMDocument $dom = null)
     {
@@ -36,15 +36,7 @@ final class BodyBuilder
         return $this;
     }
 
-    public function addDataTransfer(Closure $callback): BodyBuilder
-    {
-        $dataTransferBuilder = new DataTransferBuilder($this->dom);
-        $this->instance->appendChild($dataTransferBuilder->createInstance()->getInstance());
-
-        call_user_func($callback, $dataTransferBuilder);
-
-        return $this;
-    }
+    abstract public function addDataTransfer(Closure $callback): BodyBuilder;
 
     public function addTransferReceipt(Closure $callback): BodyBuilder
     {

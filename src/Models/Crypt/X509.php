@@ -1144,7 +1144,40 @@ class X509 implements X509Interface
 
     public function getPublicKey(): ?RSAInterface
     {
-        return $this->publicKey;
+        if (isset($this->publicKey)) {
+            return $this->publicKey;
+        }
+
+        if (isset($this->currentCert) && is_array($this->currentCert)) {
+            $paths = [
+                'tbsCertificate/subjectPublicKeyInfo',
+                'certificationRequestInfo/subjectPKInfo',
+                'publicKeyAndChallenge/spki'
+            ];
+            foreach ($paths as $path) {
+                $keyinfo = $this->subArray($this->currentCert, $path);
+                if (!empty($keyinfo)) {
+                    break;
+                }
+            }
+        }
+        if (empty($keyinfo)) {
+            return null;
+        }
+
+        $key = $keyinfo['subjectPublicKey'];
+
+        switch ($keyinfo['algorithm']['algorithm']) {
+            case 'rsaEncryption':
+                $publicKey = new RSA();
+                $publicKey->loadKey($key);
+                $publicKey->setPublicKey($key);
+                break;
+            default:
+                throw new LogicException('Incorrect algorithm');
+        }
+
+        return $publicKey;
     }
 
     public function setPrivateKey($key)
@@ -1269,6 +1302,7 @@ class X509 implements X509Interface
         switch ($signatureAlgorithm) {
             case 'sha256WithRSAEncryption':
                 $key->setHash(preg_replace('#WithRSAEncryption$#', '', $signatureAlgorithm));
+                $key->setSignatureMode(RSA::SIGNATURE_PKCS1);
 
                 $this->currentCert['signature'] = base64_encode("\0" . $key->sign($this->signatureSubject));
                 return $this->currentCert;
@@ -1576,12 +1610,24 @@ class X509 implements X509Interface
 
                 switch ($id) {
                     case 'id-ce-certificatePolicies':
-                        throw new LogicException('id-ce-certificatePolicies not handled.');
+                        for ($j = 0; $j < count($value); $j++) {
+                            if (!isset($value[$j]['policyQualifiers'])) {
+                                continue;
+                            }
+                            for ($k = 0; $k < count($value[$j]['policyQualifiers']); $k++) {
+                                $subid = $value[$j]['policyQualifiers'][$k]['policyQualifierId'];
+                                $map = $this->getMapping($subid);
+                                if ($map !== false) {
+                                    if (isset($value['authorityCertSerialNumber'])) {
+                                        throw new LogicException('id-ce-certificatePolicies not handled.');
+                                    }
+                                }
+                            }
+                        }
+                        break;
                     case 'id-ce-authorityKeyIdentifier': // use 00 as the serial number instead of an empty string
                         if (isset($value['authorityCertSerialNumber'])) {
-                            if ($value['authorityCertSerialNumber']->toBytes() == '') {
-                                throw new LogicException('authorityCertSerialNumber can not be empty.');
-                            }
+                            throw new LogicException('authorityCertSerialNumber can not be empty.');
                         }
                 }
 
@@ -1703,7 +1749,7 @@ class X509 implements X509Interface
      *
      * @param string $propName
      *
-     * @return mixed
+     * @return string|false
      */
     private function translateDNProp(string $propName)
     {
@@ -1816,7 +1862,7 @@ class X509 implements X509Interface
      * @param array|null $dn optional
      * @param bool $withType optional
      *
-     * @return mixed
+     * @return array|false
      */
     private function getDNProp(string $propName, array $dn = null, bool $withType = false)
     {

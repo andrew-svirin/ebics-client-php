@@ -140,4 +140,9 @@ final class Hash implements HashInterface
 
         $this->computedKey = hash($this->hash, $this->key, true);
     }
+
+    public function getLength()
+    {
+        return $this->l;
+    }
 }
