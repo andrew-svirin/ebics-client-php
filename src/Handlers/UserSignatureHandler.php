@@ -9,8 +9,6 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
 use AndrewSvirin\Ebics\Services\CryptService;
-use DOMDocument;
-use DOMNode;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -20,7 +18,7 @@ use DOMNode;
  *
  * @internal
  */
-final class UserSignatureHandler
+abstract class UserSignatureHandler
 {
     use C14NTrait;
     use XPathTrait;
@@ -28,17 +26,17 @@ final class UserSignatureHandler
     /**
      * @var User
      */
-    private $user;
+    protected $user;
 
     /**
      * @var KeyRing
      */
-    private $keyRing;
+    protected $keyRing;
 
     /**
      * @var CryptService
      */
-    private $cryptService;
+    protected $cryptService;
 
     public function __construct(User $user, KeyRing $keyRing)
     {
@@ -52,89 +50,9 @@ final class UserSignatureHandler
      * Build signature value before added PartnerID and UserID.
      *
      * @param UserSignature $xml
-     * @param string $orderData
+     * @param string $digest
      *
      * @throws EbicsException
      */
-    public function handle(UserSignature $xml, string $orderData): void
-    {
-        // Add UserSignatureData to root.
-        $xmlUserSignatureData = $xml->createElementNS(
-            'http://www.ebics.org/S001',
-            'UserSignatureData'
-        );
-        $xmlUserSignatureData->setAttributeNS(
-            'http://www.w3.org/2000/xmlns/',
-            'xmlns:xsi',
-            'http://www.w3.org/2001/XMLSchema-instance'
-        );
-        $xmlUserSignatureData->setAttributeNS(
-            'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation',
-            'http://www.ebics.org/S001 http://www.ebics.org/S001/ebics_signature.xsd'
-        );
-        $xml->appendChild($xmlUserSignatureData);
-
-        // Add OrderSignatureData to UserSignatureData.
-        $xmlOrderSignatureData = $xml->createElement('OrderSignatureData');
-        $xmlUserSignatureData->appendChild($xmlOrderSignatureData);
-
-        // Add SignatureVersion to OrderSignatureData.
-        $xmlSignatureVersion = $xml->createElement('SignatureVersion');
-        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
-        $xmlOrderSignatureData->appendChild($xmlSignatureVersion);
-
-        $signatureMethodAlgorithm = 'sha256';
-
-        // Add SignatureValue to OrderSignatureData.
-        $canonicalizedUserSignatureData = $orderData;
-        $canonicalizedUserSignatureDataHash = $this->cryptService->calculateHash(
-            $canonicalizedUserSignatureData,
-            $signatureMethodAlgorithm
-        );
-        $canonicalizedUserSignatureDataHashSigned = $this->cryptService->encryptSignatureValue(
-            $this->keyRing->getUserSignatureA()->getPrivateKey(),
-            $this->keyRing->getPassword(),
-            $canonicalizedUserSignatureDataHash
-        );
-        $signatureValueNodeValue = base64_encode($canonicalizedUserSignatureDataHashSigned);
-
-        $xmlSignatureValue = $xml->createElement('SignatureValue');
-        $xmlSignatureValue->nodeValue = $signatureValueNodeValue;
-        $xmlOrderSignatureData->appendChild($xmlSignatureValue);
-
-        $this->insertAfter($xmlSignatureValue, $xmlSignatureVersion);
-
-        // Add PartnerID to OrderSignatureData.
-        $this->handlePartnerId($xmlOrderSignatureData, $xml);
-
-        // Add UserID to OrderSignatureData.
-        $this->handleUserId($xmlOrderSignatureData, $xml);
-    }
-
-    /**
-     * Add PartnerID to OrderData XML Node.
-     *
-     * @param DOMNode $xmlOrderSignatureData
-     * @param DOMDocument $xml
-     */
-    private function handlePartnerId(DOMNode $xmlOrderSignatureData, DOMDocument $xml): void
-    {
-        $xmlPartnerID = $xml->createElement('PartnerID');
-        $xmlPartnerID->nodeValue = $this->user->getPartnerId();
-        $xmlOrderSignatureData->appendChild($xmlPartnerID);
-    }
-
-    /**
-     * Add UserID to OrderData XML Node.
-     *
-     * @param DOMNode $xmlOrderSignatureData
-     * @param DOMDocument $xml
-     */
-    private function handleUserId(DOMNode $xmlOrderSignatureData, DOMDocument $xml): void
-    {
-        $xmlUserID = $xml->createElement('UserID');
-        $xmlUserID->nodeValue = $this->user->getUserId();
-        $xmlOrderSignatureData->appendChild($xmlUserID);
-    }
+    abstract public function handle(UserSignature $xml, string $digest): void;
 }

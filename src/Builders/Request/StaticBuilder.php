@@ -14,24 +14,26 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class StaticBuilder
+abstract class StaticBuilder
 {
     const SECURITY_MEDIUM_0000 = '0000';
+    const SECURITY_MEDIUM_0100 = '0100';
+    const SECURITY_MEDIUM_0200 = '0200';
 
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     /**
      * @var CryptService
      */
-    private $cryptService;
+    protected $cryptService;
 
     public function __construct(DOMDocument $dom = null)
     {
@@ -108,15 +110,7 @@ final class StaticBuilder
         return $this;
     }
 
-    public function addOrderDetails(Closure $callable = null): StaticBuilder
-    {
-        $orderDetailsBuilder = new OrderDetailsBuilder($this->dom);
-        $this->instance->appendChild($orderDetailsBuilder->createInstance()->getInstance());
-
-        call_user_func($callable, $orderDetailsBuilder);
-
-        return $this;
-    }
+    abstract public function addOrderDetails(Closure $callable = null): StaticBuilder;
 
     public function addNumSegments(int $numSegments): StaticBuilder
     {

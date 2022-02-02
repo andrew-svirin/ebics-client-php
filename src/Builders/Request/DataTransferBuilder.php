@@ -15,27 +15,27 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class DataTransferBuilder
+abstract class DataTransferBuilder
 {
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     /**
      * @var ZipService
      */
-    private $zipService;
+    protected $zipService;
 
     /**
      * @var CryptService
      */
-    private $cryptService;
+    protected $cryptService;
 
     public function __construct(DOMDocument $dom = null)
     {
@@ -51,33 +51,36 @@ final class DataTransferBuilder
         return $this;
     }
 
-    public function addOrderData(string $orderData, string $transactionKey = null): DataTransferBuilder
+    public function addOrderData(string $orderData = null, string $transactionKey = null): DataTransferBuilder
     {
-        $orderDataCompressed = $this->zipService->compress($orderData);
-
-        if (null !== $transactionKey) {
-            $orderDataCompressedEncrypted = $this->cryptService->encryptByKey(
-                $transactionKey,
-                $orderDataCompressed
-            );
-            $orderDataNodeValue = base64_encode($orderDataCompressedEncrypted);
-        } else {
-            $orderDataNodeValue = base64_encode($orderDataCompressed);
-        }
-
         $xmlDataTransfer = $this->dom->createElement('OrderData');
-        $xmlDataTransfer->nodeValue = $orderDataNodeValue;
         $this->instance->appendChild($xmlDataTransfer);
+
+        if (null !== $orderData) {
+            $orderDataCompressed = $this->zipService->compress($orderData);
+
+            if (null !== $transactionKey) {
+                $orderDataCompressedEncrypted = $this->cryptService->encryptByKey(
+                    $transactionKey,
+                    $orderDataCompressed
+                );
+                $orderDataNodeValue = base64_encode($orderDataCompressedEncrypted);
+            } else {
+                $orderDataNodeValue = base64_encode($orderDataCompressed);
+            }
+
+            $xmlDataTransfer->nodeValue = $orderDataNodeValue;
+        }
 
         return $this;
     }
 
     public function addDataEncryptionInfo(Closure $callable = null): DataTransferBuilder
     {
-        $orderDetailsBuilder = new DataEncryptionInfoBuilder($this->dom);
-        $this->instance->appendChild($orderDetailsBuilder->createInstance()->getInstance());
+        $dataEncryptionInfoBuilder = new DataEncryptionInfoBuilder($this->dom);
+        $this->instance->appendChild($dataEncryptionInfoBuilder->createInstance()->getInstance());
 
-        call_user_func($callable, $orderDetailsBuilder);
+        call_user_func($callable, $dataEncryptionInfoBuilder);
 
         return $this;
     }
@@ -98,6 +101,10 @@ final class DataTransferBuilder
 
         return $this;
     }
+
+    abstract public function addDataDigest(string $signatureVersion, string $digest = null): DataTransferBuilder;
+
+    abstract public function addAdditionalOrderInfo(): DataTransferBuilder;
 
     public function getInstance(): DOMElement
     {

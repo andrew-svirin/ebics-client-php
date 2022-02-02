@@ -3,6 +3,10 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\HVDContext;
+use AndrewSvirin\Ebics\Contexts\HVEContext;
+use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
@@ -296,6 +300,29 @@ final class EbicsClient implements EbicsClientInterface
         );
 
         return $this->createDownloadOrderResult($transaction, 'text');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    public function BTU(BTUContext $btuContext, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($btuContext, $dateTime) {
+            $transaction->setOrderData($btuContext->getFileData());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+            return $this->requestFactory->createBTU(
+                $btuContext,
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $btuContext->getFileDocument());
     }
 
     /**
@@ -672,12 +699,14 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($orderData, $dateTime) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createCCT(
                 $dateTime,
                 $transaction
             );
-        }, $orderData->getContent());
+        });
 
         return $this->createUploadOrderResult($transaction, $orderData);
     }
@@ -693,14 +722,133 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createCIP(
                 $dateTime,
                 $transaction
             );
-        }, $orderData->getContent());
+        });
 
         return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function HVU(DateTimeInterface $dateTime = null): DownloadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHVU($dateTime, $segmentNumber, $isLastSegment);
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function HVZ(DateTimeInterface $dateTime = null): DownloadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+                return $this->requestFactory->createHVZ(
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function HVE(HVEContext $hveContext, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $hveContext) {
+            $transaction->setDigest($hveContext->getDigest());
+            return $this->requestFactory->createHVE(
+                $hveContext,
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadESResult($transaction, $hveContext->getDigest());
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function HVD(HVDContext $hvdContext, DateTimeInterface $dateTime = null): DownloadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($hvdContext, $dateTime) {
+                return $this->requestFactory->createHVD(
+                    $hvdContext,
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function HVT(HVTContext $hvtContext, DateTimeInterface $dateTime = null): DownloadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($hvtContext, $dateTime) {
+                return $this->requestFactory->createHVT(
+                    $hvtContext,
+                    $dateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'xml');
     }
 
     /**
@@ -714,12 +862,14 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createXE2(
                 $dateTime,
                 $transaction
             );
-        }, $orderData->getContent());
+        });
 
         return $this->createUploadOrderResult($transaction, $orderData);
     }
@@ -735,12 +885,14 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function ($transaction) use ($dateTime) {
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createCDD(
                 $dateTime,
                 $transaction
             );
-        }, $orderData->getContent());
+        });
 
         return $this->createUploadOrderResult($transaction, $orderData);
     }
@@ -788,7 +940,7 @@ final class EbicsClient implements EbicsClientInterface
      * @param Request $request
      * @param Response $response
      *
-     * @throws Exceptions\EbicsResponseException
+     * @throws Exceptions\IncorrectResponseEbicsException
      */
     private function checkH00XReturnCode(Request $request, Response $response): void
     {
@@ -811,7 +963,7 @@ final class EbicsClient implements EbicsClientInterface
      * @param Request $request
      * @param Response $response
      *
-     * @throws Exceptions\EbicsResponseException
+     * @throws Exceptions\IncorrectResponseEbicsException
      */
     private function checkH000ReturnCode(Request $request, Response $response): void
     {
@@ -907,12 +1059,11 @@ final class EbicsClient implements EbicsClientInterface
      * @throws EbicsException
      * @throws Exceptions\EbicsResponseException
      */
-    private function uploadTransaction($requestClosure, string $orderData): UploadTransaction
+    private function uploadTransaction($requestClosure): UploadTransaction
     {
         $transaction = $this->transactionFactory->createUploadTransaction();
         $transaction->setKey($this->cryptService->generateTransactionKey());
         $transaction->setNumSegments(1);
-        $transaction->setOrderData($orderData);
 
         $request = call_user_func_array($requestClosure, [$transaction]);
 
@@ -927,7 +1078,7 @@ final class EbicsClient implements EbicsClientInterface
         $segment->setSegmentNumber(1);
         $segment->setIsLastSegment(true);
         $segment->setNumSegments($transaction->getNumSegments());
-        $segment->setOrderData($transaction->getOrderData());
+        $segment->setOrderData($transaction->getOrderData() ?? $transaction->getDigest());
         $segment->setTransactionId($transaction->getInitialization()->getTransactionId());
         $transaction->addSegment($segment);
         $transaction->setKey($transaction->getInitialization()->getTransactionId());
@@ -980,6 +1131,17 @@ final class EbicsClient implements EbicsClientInterface
         $orderResult->setTransaction($transaction);
         $orderResult->setDataDocument($document);
         $orderResult->setData($document->getContent());
+
+        return $orderResult;
+    }
+
+    private function createUploadESResult(
+        UploadTransaction $transaction,
+        string $es
+    ): UploadOrderResult {
+        $orderResult = $this->orderResultFactory->createUploadOrderResult();
+        $orderResult->setTransaction($transaction);
+        $orderResult->setData($es);
 
         return $orderResult;
     }

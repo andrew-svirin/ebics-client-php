@@ -57,29 +57,9 @@ abstract class XmlBuilder
         return $this;
     }
 
-    public function addHeader(Closure $callback): XmlBuilder
-    {
-        $headerBuilder = new HeaderBuilder($this->dom);
-        $header = $headerBuilder->createInstance()->getInstance();
-        $this->instance->appendChild($header);
+    abstract public function addHeader(Closure $callback): XmlBuilder;
 
-        call_user_func($callback, $headerBuilder);
-
-        return $this;
-    }
-
-    public function addBody(Closure $callback = null): XmlBuilder
-    {
-        $bodyBuilder = new BodyBuilder($this->dom);
-        $body = $bodyBuilder->createInstance()->getInstance();
-        $this->instance->appendChild($body);
-
-        if (null !== $callback) {
-            call_user_func($callback, $bodyBuilder);
-        }
-
-        return $this;
-    }
+    abstract public function addBody(Closure $callback = null): XmlBuilder;
 
     public function addHostId(string $hostId): XmlBuilder
     {

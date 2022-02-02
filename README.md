@@ -162,7 +162,7 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
-    //Fetch datas from your bank
+    //Fetch data from your bank
     $fdl = $client->FDL('camt.xxx.cfonb120.stm');
 
     //Plain format (like CFONB)
@@ -198,7 +198,7 @@ $files =$z54->getDataFiles()
 
 ## Global process and interaction with Bank Department
 
-### 1. Create and store your 3 certificates
+### 1. Create and store your 3 keys
 
 ```php
 <?php
@@ -206,7 +206,8 @@ $files =$z54->getDataFiles()
 use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 /* @var \AndrewSvirin\Ebics\EbicsClient $client */
-// For French bank.
+// For French bank or for EBICS 3.0.
+// MyCompanyX509Generator simple certificate class. Create your own.
 $client->setX509Generator(new MyCompanyX509Generator);
 
 try {
@@ -251,9 +252,9 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
 $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 ```
 
-### 3. Wait for the bank validation and activation access.
+### 3. Wait for the bank validation and access activation.
 
-### 4. Fetch the bank tokens
+### 4. Fetch the bank keys.
 
 ```php
 
@@ -275,30 +276,36 @@ try {
 
 ### 5. Play with other transactions!
 
-| Transaction | Description                                                                                                 |
-|-------------|-------------------------------------------------------------------------------------------------------------|
-| HEV         | Supported protocol version for the Bank.                                                                    |
-| INI         | Send to the bank public signature of signature A005.                                                        |
-| HIA         | Send to the bank public signatures of authentication (X002) and encryption (E002).                          |
-| HPB         | Retrieve the Bank public signatures authentication (X002) and encryption (E002).                            |
-| HPD         | Retrieve the bank server parameters.                                                                        |
-| HKD         | Retrieve customer's customer and subscriber information.                                                    |
-| HTD         | Retrieve subscriber's customer and subscriber information.                                                  |
-| PTK         | Downloads transaction status.                                                                               |
-| FDL         | Retrieve subscriber's customer and subscriber information.                                                  |
-| HAA         | Downloads the interim transaction report in SWIFT format (MT942).                                           |
-| VMK         | Downloads the interim transaction report in SWIFT format (MT942).                                           |
-| STA         | Retrieve the bank account statement.                                                                        |
-| C52         | Retrieve the bank account report in Camt.052 format.                                                        |
-| C53         | Retrieve the bank account statement in Camt.053 format.                                                     |
-| C54         | Retrieve Debit Credit Notification (DTI).                                                                   |
-| Z53         | Another way to retrieve the bank account statement in Camt.053 format (i.e Switzerland financial services). |
-| Z54         | Retrieve a bank account statement in Camt.054 format (i.e available in Switzerland).                        |
-| CCT         | Initiate the credit transfer per Single Euro Payments Area.                                                 |
-| CIP         | Initiate the instant credit transfer per Single Euro Payments Area.                                         |
-| XE2         | Initiate the Swiss credit transfer (i.e available in Switzerland).                                          |
-| CDD         | Initiate a direct debit transaction.                                                                        |
-| BTD         | Download request (FETCH request).                                                                           |
+| Transaction | Description                                                                                                       |
+|-------------|-------------------------------------------------------------------------------------------------------------------|
+| HEV         | Download supported protocol versions for the Bank.                                                                |
+| INI         | Send to the bank public signature of signature A005.                                                              |
+| HIA         | Send to the bank public signatures of authentication (X002) and encryption (E002).                                |
+| HPB         | Download the Bank public signatures authentication (X002) and encryption (E002).                                  |
+| HPD         | Download the bank server parameters.                                                                              |
+| HKD         | Download customer's customer and subscriber information.                                                          |
+| HTD         | Download subscriber's customer and subscriber information.                                                        |
+| PTK         | Download transaction status.                                                                                      |
+| FDL         | Download subscriber's customer and subscriber information.                                                        |
+| HAA         | Download Bank available order types.                                                                              |
+| VMK         | Download the interim transaction report in SWIFT format (MT942).                                                  |
+| STA         | Download the bank account statement.                                                                              |
+| C52         | Download the bank account report in Camt.052 format.                                                              |
+| C53         | Download the bank account statement in Camt.053 format.                                                           |
+| C54         | Download Debit Credit Notification (DTI).                                                                         |
+| Z53         | Download the bank account statement in Camt.053 format (i.e Switzerland financial services).                      |
+| Z54         | Download the bank account statement in Camt.054 format (i.e available in Switzerland).                            |
+| CCT         | Upload initiation of the credit transfer per Single Euro Payments Area.                                           |
+| CIP         | Upload initiation of the instant credit transfer per Single Euro Payments Area.                                   |
+| XE2         | Upload initiation of the Swiss credit transfer (i.e available in Switzerland).                                    |
+| CDD         | Upload initiation of the direct debit transaction.                                                                |
+| BTD         | Download request files of any BTF structure.                                                                      |
+| BTU         | Upload the files to the bank.                                                                                     |
+| HVU         | Download List the orders for which the user is authorized as a signatory.                                         |
+| HVZ         | Download VEU overview with additional information.                                                                |
+| HVE         | Upload VEU signature for order.                                                                                   |
+| HVD         | Download the state of a VEU order.                                                                                |
+| HVT         | Download detailed information about an order from VEU processing for which the user is authorized as a signatory. |
 
 ### 6. Make HKD request to see what order types allowed.
 

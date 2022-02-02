@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use DateTime;
+use LogicException;
 
 /**
  * Random function.
@@ -53,6 +54,9 @@ final class RandomService
      */
     public function bytes(int $length): string
     {
+        if ($length < 1) {
+            throw new LogicException('Minimal length is 1');
+        }
         return random_bytes($length);
     }
 

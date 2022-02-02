@@ -22,7 +22,7 @@ class CryptServiceTest extends AbstractEbicsTestCase
     public function testGenerateKeys()
     {
         $credentialsId = 2;
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV2($credentialsId);
         $cryptService = new CryptService();
 
         $keys = $cryptService->generateKeys($client->getKeyRing()->getPassword());

@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\CertificateEbicsException;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
+use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -62,6 +63,11 @@ abstract class OrderDataHandler
      */
     private $certificateX509Factory;
 
+    /**
+     * @var BigIntegerFactory
+     */
+    protected $bigIntegerFactory;
+
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->bank = $bank;
@@ -70,6 +76,7 @@ abstract class OrderDataHandler
         $this->cryptService = new CryptService();
         $this->certificateFactory = new SignatureFactory();
         $this->certificateX509Factory = new CertificateX509Factory();
+        $this->bigIntegerFactory = new BigIntegerFactory();
     }
 
     abstract protected function createSignaturePubKeyOrderData(CustomerINI $xml): DOMElement;

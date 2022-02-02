@@ -13,6 +13,22 @@ use LogicException;
  */
 final class RSA implements RSAInterface
 {
+    /**
+     * Use the Probabilistic Signature Scheme for signing
+     *
+     * Uses sha1 by default.
+     *
+     * @see self::setSaltLength()
+     * @see self::setMGFHash()
+     */
+    const SIGNATURE_PSS = 1;
+    /**
+     * Use the PKCS#1 scheme by default.
+     *
+     * Although self::SIGNATURE_PSS offers more security, including PKCS#1 signing is necessary for purposes of
+     * backwards compatibility with protocols (like SSH-2) written before PSS's introduction.
+     */
+    const SIGNATURE_PKCS1 = 2;
 
     /**
      * PKCS#1 formatted private key
@@ -112,6 +128,13 @@ final class RSA implements RSAInterface
     protected $coefficients;
 
     /**
+     * Signature mode
+     *
+     * @var int
+     */
+    protected $signatureMode = self::SIGNATURE_PSS;
+
+    /**
      * Public Exponent
      *
      * @var mixed
@@ -154,6 +177,34 @@ final class RSA implements RSAInterface
     protected $hash;
 
     /**
+     * Length of hash function output
+     *
+     * @var int
+     */
+    protected $hLen;
+
+    /**
+     * Length of salt
+     *
+     * @var int
+     */
+    protected $sLen;
+
+    /**
+     * Hash function for the Mask Generation Function
+     *
+     * @var HashInterface
+     */
+    protected $mgfHash;
+
+    /**
+     * Length of MGF hash function output
+     *
+     * @var int
+     */
+    protected $mgfHLen;
+
+    /**
      * Precomputed Zero
      *
      * @var BigInteger
@@ -194,6 +245,7 @@ final class RSA implements RSAInterface
     {
         $this->hash = new Hash($hash);
         $this->hashName = $hash;
+        $this->hLen = $this->hash->getLength();
     }
 
     public function createKey($bits = 1024, $timeout = false, $partial = [])
@@ -354,9 +406,7 @@ final class RSA implements RSAInterface
                     $decoded = $this->extractBER($key);
                 }
 
-                if ($decoded !== false) {
-                    $key = $decoded;
-                }
+                $key = $decoded;
 
                 $components = [];
 
@@ -925,7 +975,13 @@ final class RSA implements RSAInterface
             return null;
         }
 
-        return $this->rsassaPkcs1V15Sign($message);
+        switch ($this->signatureMode) {
+            case self::SIGNATURE_PKCS1:
+                return $this->rsassaPkcs1V15Sign($message);
+            //case self::SIGNATURE_PSS:
+            default:
+                return $this->rsassaPssSign($message);
+        }
     }
 
     /**
@@ -956,18 +1012,12 @@ final class RSA implements RSAInterface
         return $s;
     }
 
-    /**
-     * EMSA-PKCS1-V1_5-ENCODE
-     *
-     * See {@link http://tools.ietf.org/html/rfc3447#section-9.2 RFC3447#section-9.2}.
-     *
-     * @param string $m
-     * @param int $emLen
-     *
-     * @return string
-     */
-    private function emsaPkcs1V15Encode(string $m, int $emLen)
+    public function emsaPkcs1V15Encode($m, $emLen = null)
     {
+        if (null === $emLen) {
+            $emLen = $this->k;
+        }
+
         $h = $this->hash->hash($m);
 
         // see http://tools.ietf.org/html/rfc3447#page-43
@@ -1260,5 +1310,171 @@ final class RSA implements RSAInterface
             throw new LogicException('Ciphertext representative out of range');
         }
         return $this->exponentiate($c);
+    }
+
+    /**
+     * RSASSA-PSS-SIGN
+     *
+     * See {@link http://tools.ietf.org/html/rfc3447#section-8.1.1 RFC3447#section-8.1.1}.
+     *
+     * @param string $m
+     *
+     * @return string
+     */
+    private function rsassaPssSign($m)
+    {
+        // EMSA-PSS encoding
+
+        $em = $this->emsaPssEncode($m, 8 * $this->k - 1);
+
+        // RSA signature
+
+        $m = $this->os2ip($em);
+        $s = $this->rsasp1($m);
+        $s = $this->i2osp($s, $this->k);
+
+        // Output the signature S
+
+        return $s;
+    }
+
+    public function emsaPssEncode($m, $emBits = null)
+    {
+        if (null === $emBits) {
+            $emBits = 8 * $this->k - 1;
+        }
+        // if $m is larger than two million terrabytes and you're using sha1, PKCS#1 suggests a "Label too long" error
+        // be output.
+
+        $emLen = ($emBits + 1) >> 3; // ie. ceil($emBits / 8)
+        $sLen = $this->sLen !== null ? $this->sLen : $this->hLen;
+
+        $mHash = $this->hash->hash($m);
+        if ($emLen < $this->hLen + $sLen + 2) {
+            throw new LogicException('Encoding error');
+        }
+
+        $salt = openssl_random_pseudo_bytes($sLen);
+        $m2 = "\0\0\0\0\0\0\0\0" . $mHash . $salt;
+        $h = $this->hash->hash($m2);
+        $ps = str_repeat(chr(0), $emLen - $sLen - $this->hLen - 2);
+        $db = $ps . chr(1) . $salt;
+        $dbMask = $this->mgf1($h, $emLen - $this->hLen - 1);
+        $maskedDB = $db ^ $dbMask;
+        if (empty($maskedDB)) {
+            throw new LogicException('maskedDB can not be empty');
+        }
+        $maskedDB[0] = ~chr(0xFF << ($emBits & 7)) & $maskedDB[0];
+        $em = $maskedDB . $h . chr(0xBC);
+
+        return $em;
+    }
+
+    public function emsaPssVerify($m, $em, $emBits = null)
+    {
+        if (null === $emBits) {
+            $emBits = 8 * $this->k - 1;
+        }
+        // if $m is larger than two million terrabytes and you're using sha1, PKCS#1 suggests a "Label too long" error
+        // be output.
+
+        $emLen = ($emBits + 7) >> 3; // ie. ceil($emBits / 8);
+        $sLen = $this->sLen !== null ? $this->sLen : $this->hLen;
+
+        $mHash = $this->hash->hash($m);
+        if ($emLen < $this->hLen + $sLen + 2) {
+            return false;
+        }
+
+        if ($em[strlen($em) - 1] != chr(0xBC)) {
+            return false;
+        }
+
+        $maskedDB = substr($em, 0, -$this->hLen - 1);
+        $h = substr($em, -$this->hLen - 1, $this->hLen);
+        $temp = chr(0xFF << ($emBits & 7));
+        if ((~$maskedDB[0] & $temp) != $temp) {
+            return false;
+        }
+        $dbMask = $this->mgf1($h, $emLen - $this->hLen - 1);
+        $db = $maskedDB ^ $dbMask;
+        $db[0] = ~chr(0xFF << ($emBits & 7)) & $db[0];
+        $temp = $emLen - $this->hLen - $sLen - 2;
+        if (substr($db, 0, $temp) != str_repeat(chr(0), $temp) || ord($db[$temp]) != 1) {
+            return false;
+        }
+        $salt = substr($db, $temp + 1); // should be $sLen long
+        $m2 = "\0\0\0\0\0\0\0\0" . $mHash . $salt;
+        $h2 = $this->hash->hash($m2);
+        return $this->equals($h, $h2);
+    }
+
+    /**
+     * MGF1
+     *
+     * See {@link http://tools.ietf.org/html/rfc3447#appendix-B.2.1 RFC3447#appendix-B.2.1}.
+     *
+     * @param string $mgfSeed
+     * @param int $maskLen
+     * @return string
+     */
+    private function mgf1($mgfSeed, $maskLen)
+    {
+        // if $maskLen would yield strings larger than 4GB, PKCS#1 suggests a "Mask too long" error be output.
+
+        $t = '';
+        $count = ceil($maskLen / $this->mgfHLen);
+        for ($i = 0; $i < $count; $i++) {
+            $c = pack('N', $i);
+            $t .= $this->mgfHash->hash($mgfSeed . $c);
+        }
+
+        return substr($t, 0, $maskLen);
+    }
+
+    public function setMGFHash($hash)
+    {
+        // Hash supports algorithms that PKCS#1 doesn't support.  md5-96 and sha1-96, for example.
+        $this->mgfHash = new Hash($hash);
+        $this->mgfHLen = $this->mgfHash->getLength();
+    }
+
+    public function setSignatureMode($mode)
+    {
+        $this->signatureMode = $mode;
+    }
+
+    /**
+     * Performs blinded RSA equality testing
+     *
+     * Protects against a particular type of timing attack described.
+     *
+     * See {@link http://codahale.com/a-lesson-in-timing-attacks/ A Lesson In Timing Attacks (or,
+     * Don't use MessageDigest.isEquals)}
+     *
+     * Thanks for the heads up singpolyma!
+     *
+     * @access private
+     * @param string $x
+     * @param string $y
+     * @return bool
+     */
+    private function equals($x, $y)
+    {
+        if (function_exists('hash_equals')) {
+            return hash_equals($x, $y);
+        }
+
+        if (strlen($x) != strlen($y)) {
+            return false;
+        }
+
+        $result = "\0";
+        $x ^= $y;
+        for ($i = 0; $i < strlen($x); $i++) {
+            $result |= $x[$i];
+        }
+
+        return $result === "\0";
     }
 }

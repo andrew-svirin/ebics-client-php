@@ -2,9 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\Signature;
@@ -24,15 +24,9 @@ final class SignatureFactory
      */
     private $rsaFactory;
 
-    /**
-     * @var BigIntegerFactory
-     */
-    private $bigIntegerFactory;
-
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
-        $this->bigIntegerFactory = new BigIntegerFactory();
     }
 
     /**
@@ -149,24 +143,28 @@ final class SignatureFactory
     }
 
     /**
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
-    public function createCertificateEFromDetails(string $exponent, string $modulus): SignatureInterface
-    {
+    public function createCertificateEFromDetails(
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
+    ): SignatureInterface {
         return $this->createCertificateFromDetails(SignatureInterface::TYPE_E, $exponent, $modulus);
     }
 
     /**
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
-    public function createCertificateXFromDetails(string $exponent, string $modulus): SignatureInterface
-    {
+    public function createCertificateXFromDetails(
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
+    ): SignatureInterface {
         return $this->createCertificateFromDetails(SignatureInterface::TYPE_X, $exponent, $modulus);
     }
 
@@ -241,20 +239,21 @@ final class SignatureFactory
 
     /**
      * @param string $type
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
     private function createCertificateFromDetails(
         string $type,
-        string $exponent,
-        string $modulus
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
     ): SignatureInterface {
-        $rsa = $this->rsaFactory->createPublic([
-            'modulus' => $this->bigIntegerFactory->create($modulus, 256),
-            'exponent' => $this->bigIntegerFactory->create($exponent, 256),
-        ]);
+        $details = [
+            'modulus' => $modulus,
+            'exponent' => $exponent,
+        ];
+        $rsa = $this->rsaFactory->createPublic($details);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
 
         return new Signature($type, $publicKey, null);

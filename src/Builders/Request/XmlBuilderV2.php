@@ -2,8 +2,10 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
+use Closure;
+
 /**
- * Ebics 3.0 XmlBuilder.
+ * Ebics 2.5 XmlBuilder.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
@@ -43,6 +45,30 @@ final class XmlBuilderV2 extends XmlBuilder
         }
         $this->instance->setAttribute('Version', 'H004');
         $this->instance->setAttribute('Revision', '1');
+
+        return $this;
+    }
+
+    public function addHeader(Closure $callback): XmlBuilder
+    {
+        $headerBuilder = new HeaderBuilderV2($this->dom);
+        $header = $headerBuilder->createInstance()->getInstance();
+        $this->instance->appendChild($header);
+
+        call_user_func($callback, $headerBuilder);
+
+        return $this;
+    }
+
+    public function addBody(Closure $callback = null): XmlBuilder
+    {
+        $bodyBuilder = new BodyBuilderV2($this->dom);
+        $body = $bodyBuilder->createInstance()->getInstance();
+        $this->instance->appendChild($body);
+
+        if (null !== $callback) {
+            call_user_func($callback, $bodyBuilder);
+        }
 
         return $this;
     }

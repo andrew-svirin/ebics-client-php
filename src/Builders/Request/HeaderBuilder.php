@@ -12,17 +12,17 @@ use DOMElement;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class HeaderBuilder
+abstract class HeaderBuilder
 {
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     public function __construct(DOMDocument $dom = null)
     {
@@ -42,15 +42,7 @@ final class HeaderBuilder
         return $this;
     }
 
-    public function addStatic(Closure $callback): HeaderBuilder
-    {
-        $staticBuilder = new StaticBuilder($this->dom);
-        $this->instance->appendChild($staticBuilder->createInstance()->getInstance());
-
-        call_user_func($callback, $staticBuilder);
-
-        return $this;
-    }
+    abstract public function addStatic(Closure $callback): HeaderBuilder;
 
     public function addMutable(Closure $callable = null): HeaderBuilder
     {
