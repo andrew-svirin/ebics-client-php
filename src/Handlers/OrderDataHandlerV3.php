@@ -11,6 +11,7 @@ use AndrewSvirin\Ebics\Models\Document;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DateTimeInterface;
 use DOMElement;
+use RuntimeException;
 
 /**
  * Ebics 3.0 OrderDataHandler.
@@ -73,22 +74,24 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
         $x509Certificate = $xpath->query('//H005:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);
+        $x509CertificateValueDe = base64_decode($x509CertificateValue);
 
         if (null === $x509CertificateValue) {
-            // TODO: Require to check with DE servers.
-            throw new \RuntimeException('Version 3.0 is not supported for not certified banks yet.');
+            throw new RuntimeException('Version 3.0 is not supported for not certified banks yet.');
         }
 
         $x509 = new X509();
-        $cert = $x509->loadX509($x509CertificateValue);
+        $cert = $x509->loadX509($x509CertificateValueDe);
         $certificateContent = $x509->saveX509($cert);
         if (false === $certificateContent) {
             $certificateContent = null;
         }
 
+        $publicKey = $x509->getPublicKey();
+
         $certificate = $this->certificateFactory->createCertificateXFromDetails(
-            $x509->getPublicKey()->getModulus()->getValue(),
-            $x509->getPublicKey()->getExponent()->getValue()
+            $publicKey->getModulus(),
+            $publicKey->getExponent()
         );
 
         $certificate->setCertificateContent($certificateContent ?? null);
@@ -102,22 +105,24 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
         $x509Certificate = $xpath->query('//H005:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);
+        $x509CertificateValueDe = base64_decode($x509CertificateValue);
 
         if (null === $x509CertificateValue) {
-            // TODO: Require to check with DE servers.
-            throw new \RuntimeException('Version 3.0 is not supported for not certified banks yet.');
+            throw new RuntimeException('Version 3.0 is not supported for not certified banks yet.');
         }
 
         $x509 = new X509();
-        $cert = $x509->loadX509($x509CertificateValue);
+        $cert = $x509->loadX509($x509CertificateValueDe);
         $certificateContent = $x509->saveX509($cert);
         if (false === $certificateContent) {
             $certificateContent = null;
         }
 
+        $publicKey = $x509->getPublicKey();
+
         $certificate = $this->certificateFactory->createCertificateEFromDetails(
-            $x509->getPublicKey()->getModulus()->getValue(),
-            $x509->getPublicKey()->getExponent()->getValue()
+            $publicKey->getModulus(),
+            $publicKey->getExponent()
         );
 
         $certificate->setCertificateContent($certificateContent ?? null);

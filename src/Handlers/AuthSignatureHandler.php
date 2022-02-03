@@ -123,7 +123,7 @@ abstract class AuthSignatureHandler
             $signaturePath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
+        $canonicalizedHeaderHash = $this->cryptService->hash($canonicalizedHeader, $digestMethodAlgorithm);
         $digestValueNodeValue = base64_encode($canonicalizedHeaderHash);
 
         $xmlDigestValue->nodeValue = $digestValueNodeValue;
@@ -136,11 +136,11 @@ abstract class AuthSignatureHandler
             $canonicalizationPath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedSignedInfoHash = $this->cryptService->calculateHash(
+        $canonicalizedSignedInfoHash = $this->cryptService->hash(
             $canonicalizedSignedInfo,
             $signatureMethodAlgorithm
         );
-        $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encryptSignatureValue(
+        $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encrypt(
             $this->keyRing->getUserSignatureX()->getPrivateKey(),
             $this->keyRing->getPassword(),
             $canonicalizedSignedInfoHash

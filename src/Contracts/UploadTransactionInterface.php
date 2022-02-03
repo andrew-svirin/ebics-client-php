@@ -18,6 +18,4 @@ interface UploadTransactionInterface extends TransactionInterface
      * @return TransferSegment[]
      */
     public function getSegments(): array;
-
-    public function getOrderData(): string;
 }

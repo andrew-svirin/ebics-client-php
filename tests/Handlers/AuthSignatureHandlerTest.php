@@ -30,7 +30,7 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
     {
         parent::setUp();
         $credentialsId = 1;
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV2($credentialsId);
         $this->setupKeys($client->getKeyRing());
         $this->authSignatureHandler = new AuthSignatureHandlerV2($client->getKeyRing());
     }

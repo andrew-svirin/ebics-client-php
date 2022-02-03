@@ -2,11 +2,13 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\KeyRing;
+use LogicException;
 use RuntimeException;
 
 /**
@@ -46,12 +48,12 @@ final class CryptService
      *
      * @param string $text
      * @param string $algorithm
-     *
+     * @param bool $binary
      * @return string
      */
-    public function calculateHash(string $text, string $algorithm = 'sha256'): string
+    public function hash(string $text, string $algorithm = 'sha256', bool $binary = true): string
     {
-        return hash($algorithm, $text, true);
+        return hash($algorithm, $text, $binary);
     }
 
     /**
@@ -104,17 +106,17 @@ final class CryptService
      * Algorithm AES-128-CBC.
      *
      * @param string $key
-     * @param string $decrypted
+     * @param string $data
      *
      * @return string
      */
-    public function encryptByKey(string $key, string $decrypted)
+    public function encryptByKey(string $key, string $data)
     {
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($key);
         $aes->setOpenSSLOptions(OPENSSL_RAW_DATA);
-        $encrypted = $aes->encrypt($decrypted);
+        $encrypted = $aes->encrypt($data);
 
         return $encrypted;
     }
@@ -124,18 +126,48 @@ final class CryptService
      *
      * @param string $privateKey
      * @param string $password
-     * @param string $hash
+     * @param string $data
      *
      * @return string
      */
-    public function encryptSignatureValue(
+    public function encrypt(
         string $privateKey,
         string $password,
-        string $hash
+        string $data
     ): string {
-        $digestToSignBin = $this->filter($hash);
+        $digestToSignBin = $this->filter($data);
 
-        return $this->encryptByRsaPrivateKey($privateKey, $password, $digestToSignBin);
+        $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
+
+        return $this->encryptByRsa($rsa, $digestToSignBin);
+    }
+
+    public function sign(
+        string $privateKey,
+        string $password,
+        string $type,
+        string $data
+    ): string {
+        switch ($type) {
+            case 'A005':
+                $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
+                $rsa->setHash('sha256');
+                $sign = $rsa->emsaPkcs1V15Encode($data);
+                break;
+            case 'A006':
+                $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
+                $rsa->setHash('sha256');
+                $rsa->setMGFHash('sha256');
+                $sign = $rsa->emsaPssEncode($data);
+                if (!$rsa->emsaPssVerify($data, $sign)) {
+                    throw new LogicException('Sign verification failed');
+                }
+                break;
+            default:
+                throw new LogicException(sprintf('Algorithm type %s not supported', $type));
+        }
+
+        return $sign;
     }
 
     /**
@@ -154,23 +186,19 @@ final class CryptService
     /**
      * Encrypt by private key.
      *
-     * @param string $privateKey
-     * @param string $password
+     * @param RSAInterface $rsa
      * @param string $data
      *
      * @return string
      */
-    private function encryptByRsaPrivateKey(string $privateKey, string $password, string $data): string
+    private function encryptByRsa(RSAInterface $rsa, string $data): string
     {
-        $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
-
         if (!($encrypted = $rsa->encrypt($data))) {
             throw new RuntimeException('Incorrect encryption.');
         }
 
         return $encrypted;
     }
-
 
     /**
      * Encrypt by public key.
@@ -323,7 +351,7 @@ final class CryptService
     public function calculateDigest(
         SignatureInterface $signature,
         string $algorithm = 'sha256',
-        bool $rawOutput = false
+        bool $rawOutput = true
     ): string {
         $rsa = $this->rsaFactory->createPublic($signature->getPublicKey());
 
@@ -332,7 +360,7 @@ final class CryptService
 
         $key = $this->calculateKey($exponent, $modulus);
 
-        return $this->calculateKeyHash($key, $algorithm, $rawOutput);
+        return $this->hash($key, $algorithm, $rawOutput);
     }
 
     /**
@@ -352,23 +380,6 @@ final class CryptService
         $modulus = ltrim($modulus, '0');
 
         return sprintf('%s %s', $exponent, $modulus);
-    }
-
-    /**
-     * Make key hash.
-     *
-     * @param string $key
-     * @param string $algorithm
-     * @param bool $rawOutput
-     *
-     * @return string
-     */
-    public function calculateKeyHash(
-        string $key,
-        string $algorithm = 'sha256',
-        bool $rawOutput = false
-    ): string {
-        return hash($algorithm, $key, $rawOutput);
     }
 
     /**

@@ -33,6 +33,11 @@ final class UploadTransaction extends Transaction implements UploadTransactionIn
     private $orderData;
 
     /**
+     * @var string
+     */
+    private $digest;
+
+    /**
      * @var UploadSegment
      */
     private $initialization;
@@ -84,9 +89,19 @@ final class UploadTransaction extends Transaction implements UploadTransactionIn
         $this->orderData = $orderData;
     }
 
-    public function getOrderData(): string
+    public function getOrderData(): ?string
     {
         return $this->orderData;
+    }
+
+    public function setDigest(string $digest): void
+    {
+        $this->digest = $digest;
+    }
+
+    public function getDigest(): ?string
+    {
+        return $this->digest;
     }
 
     public function setInitialization(UploadSegment $uploadSegment): void

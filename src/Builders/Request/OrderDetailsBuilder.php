@@ -3,17 +3,21 @@
 namespace AndrewSvirin\Ebics\Builders\Request;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\HVDContext;
+use AndrewSvirin\Ebics\Contexts\HVEContext;
+use AndrewSvirin\Ebics\Contexts\HVTContext;
 use DateTimeInterface;
 use DOMDocument;
 use DOMElement;
 
 /**
- * Class OrderDetailsBuilder builder for request container.
+ * Abstract Class OrderDetailsBuilder builder for request container.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class OrderDetailsBuilder
+abstract class OrderDetailsBuilder
 {
     const ORDER_ATTRIBUTE_DZNNN = 'DZNNN';
     const ORDER_ATTRIBUTE_DZHNN = 'DZHNN';
@@ -23,12 +27,12 @@ final class OrderDetailsBuilder
     /**
      * @var DOMElement
      */
-    private $instance;
+    protected $instance;
 
     /**
      * @var DOMDocument
      */
-    private $dom;
+    protected $dom;
 
     public function __construct(DOMDocument $dom = null)
     {
@@ -47,43 +51,26 @@ final class OrderDetailsBuilder
         return $this;
     }
 
-    public function addOrderType(string $orderType): OrderDetailsBuilder
+    abstract public function addOrderType(string $orderType): OrderDetailsBuilder;
+
+    abstract public function addAdminOrderType(string $orderType): OrderDetailsBuilder;
+
+    public function addOrderId(string $orderId): OrderDetailsBuilder
     {
-        $xmlOrderType = $this->dom->createElement('OrderType');
-        $xmlOrderType->nodeValue = $orderType;
-        $this->instance->appendChild($xmlOrderType);
+        $xmlOrderID = $this->dom->createElement('OrderID');
+        $xmlOrderID->nodeValue = $orderId;
+        $this->instance->appendChild($xmlOrderID);
 
         return $this;
     }
 
-    /**
-     * Since EBICS 3.0 the AdminOrderType is mandatory inside the OrderDetails element.
-     * For EBICS 2.x it is ignored and the OrderType is used instead.
-     * @param string $orderType
-     * @return $this
-     */
-    public function addAdminOrderType(string $orderType): OrderDetailsBuilder
-    {
-        $xmlOrderType = $this->dom->createElement('AdminOrderType');
-        $xmlOrderType->nodeValue = $orderType;
-        $this->instance->appendChild($xmlOrderType);
-
-        return $this;
-    }
-
-    public function addOrderAttribute(string $orderAttribute): OrderDetailsBuilder
-    {
-        $xmlOrderAttribute = $this->dom->createElement('OrderAttribute');
-        $xmlOrderAttribute->nodeValue = $orderAttribute;
-        $this->instance->appendChild($xmlOrderAttribute);
-
-        return $this;
-    }
+    abstract public function addOrderAttribute(string $orderAttribute): OrderDetailsBuilder;
 
     public function addStandardOrderParams(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): OrderDetailsBuilder {
+        // Add StandardOrderParams to OrderDetails.
         $xmlStandardOrderParams = $this->dom->createElement('StandardOrderParams');
         $this->instance->appendChild($xmlStandardOrderParams);
 
@@ -102,15 +89,16 @@ final class OrderDetailsBuilder
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): OrderDetailsBuilder {
-        // Add StandardOrderParams to OrderDetails.
+        // Add FDLOrderParams to OrderDetails.
         $xmlFDLOrderParams = $this->dom->createElement('FDLOrderParams');
         $this->instance->appendChild($xmlFDLOrderParams);
 
         // Add FileFormat to FDLOrderParams.
         $xmlFileFormat = $this->dom->createElement('FileFormat');
         $xmlFileFormat->nodeValue = $fileFormat;
-        $xmlFileFormat->setAttribute('CountryCode', $countryCode);
         $xmlFDLOrderParams->appendChild($xmlFileFormat);
+
+        $xmlFileFormat->setAttribute('CountryCode', $countryCode);
 
         if (null !== $startDateTime && null !== $endDateTime) {
             // Add DateRange to FDLOrderParams.
@@ -121,75 +109,44 @@ final class OrderDetailsBuilder
         return $this;
     }
 
-    public function addBTDOrderParams(
-        BTFContext $btfContext,
-        ?DateTimeInterface $startDateTime = null,
-        ?DateTimeInterface $endDateTime = null
-    ): OrderDetailsBuilder {
-        // Add BTDOrderParams to OrderDetails.
-        $xmlBTDOrderParams = $this->dom->createElement('BTDOrderParams');
-        $this->instance->appendChild($xmlBTDOrderParams);
+    public function getInstance(): DOMElement
+    {
+        return $this->instance;
+    }
 
-        // Add Service to BTDOrderParams.
-        $xmlService = $this->dom->createElement('Service');
-        $xmlBTDOrderParams->appendChild($xmlService);
+    abstract public function addHVEOrderParams(HVEContext $hveContext): OrderDetailsBuilder;
 
-        // Add ServiceName to Service.
-        $xmlServiceName = $this->dom->createElement('ServiceName');
-        $xmlServiceName->nodeValue = $btfContext->getServiceName();
-        $xmlService->appendChild($xmlServiceName);
-
-        // Add optional ServiceOption to Service.
-        if (null !== $btfContext->getServiceOption()) {
-            $xmlServiceOption = $this->dom->createElement('ServiceOption');
-            $xmlServiceOption->nodeValue = $btfContext->getServiceOption();
-            $xmlService->appendChild($xmlServiceOption);
-        }
-
-        // Add optional ContainerFlag to Service.
-        if (null !== $btfContext->getContainerFlag()) {
-            $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
-            $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
-            $xmlService->appendChild($xmlContainerFlag);
-        }
-
-        // Add optional Scope to Service.
-        if (null !== $btfContext->getScope()) {
-            $xmlScope = $this->dom->createElement('Scope');
-            $xmlScope->nodeValue = $btfContext->getScope();
-            $xmlService->appendChild($xmlScope);
-        }
-
-        // Add MsgName to Service.
-        $xmlMsgName = $this->dom->createElement('MsgName');
-        $xmlMsgName->nodeValue = $btfContext->getMsgName();
-        $xmlService->appendChild($xmlMsgName);
-
-        // Add optional MsgName version attribute
-        if (null !== $btfContext->getMsgNameVersion()) {
-            $xmlMsgName->setAttribute('version', $btfContext->getMsgNameVersion());
-        }
-
-        // Add optional MsgName variant attribute
-        if (null !== $btfContext->getMsgNameVariant()) {
-            $xmlMsgName->setAttribute('variant', $btfContext->getMsgNameVariant());
-        }
-
-        // Add optional MsgName format attribute
-        if (null !== $btfContext->getMsgNameFormat()) {
-            $xmlMsgName->setAttribute('format', $btfContext->getMsgNameFormat());
-        }
-
-        if (null !== $startDateTime && null !== $endDateTime) {
-            // Add DateRange to BTDOrderParams.
-            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
-            $xmlBTDOrderParams->appendChild($xmlDateRange);
-        }
+    public function addHVUOrderParams(): OrderDetailsBuilder
+    {
+        // Add HVUOrderParams to OrderDetails.
+        $xmlHVUOrderParams = $this->dom->createElement('HVUOrderParams');
+        $this->instance->appendChild($xmlHVUOrderParams);
 
         return $this;
     }
 
-    private function createDateRange(DateTimeInterface $startDateTime, DateTimeInterface $endDateTime): DOMElement
+    public function addHVZOrderParams(): OrderDetailsBuilder
+    {
+        // Add HVZOrderParams to OrderDetails.
+        $xmlHVZOrderParams = $this->dom->createElement('HVZOrderParams');
+        $this->instance->appendChild($xmlHVZOrderParams);
+
+        return $this;
+    }
+
+    abstract public function addHVDOrderParams(HVDContext $hvdContext): OrderDetailsBuilder;
+
+    abstract public function addHVTOrderParams(HVTContext $hvtContext): OrderDetailsBuilder;
+
+    abstract public function addBTDOrderParams(
+        BTFContext $btfContext,
+        ?DateTimeInterface $startDateTime = null,
+        ?DateTimeInterface $endDateTime = null
+    ): OrderDetailsBuilder;
+
+    abstract public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder;
+
+    protected function createDateRange(DateTimeInterface $startDateTime, DateTimeInterface $endDateTime): DOMElement
     {
         $xmlDateRange = $this->dom->createElement('DateRange');
 
@@ -204,10 +161,5 @@ final class OrderDetailsBuilder
         $xmlDateRange->appendChild($xmlEnd);
 
         return $xmlDateRange;
-    }
-
-    public function getInstance(): DOMElement
-    {
-        return $this->instance;
     }
 }

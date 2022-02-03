@@ -19,4 +19,11 @@ interface HashInterface
      * @return string
      */
     public function hash($text);
+
+    /**
+     * Returns the hash length (in bytes)
+     *
+     * @return int
+     */
+    public function getLength();
 }
