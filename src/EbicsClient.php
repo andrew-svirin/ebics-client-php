@@ -789,8 +789,10 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $hveContext) {
-            $transaction->setNumSegments(0);
+        $transaction = $this->uploadESTransaction(function (UploadTransaction $transaction) use (
+            $dateTime,
+            $hveContext
+        ) {
             $transaction->setDigest($hveContext->getDigest());
             return $this->requestFactory->createHVE(
                 $hveContext,
@@ -1055,6 +1057,20 @@ final class EbicsClient implements EbicsClientInterface
         return $this->responseHandler->extractDownloadSegment($response, $this->keyRing);
     }
 
+    private function uploadESTransaction($requestClosure): UploadTransaction
+    {
+        $transaction = $this->transactionFactory->createUploadTransaction();
+        $transaction->setKey($this->cryptService->generateTransactionKey());
+        $transaction->setNumSegments(0);
+
+        $request = call_user_func_array($requestClosure, [$transaction]);
+
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+        $this->checkH00XReturnCode($request, $response);
+
+        return $transaction;
+    }
+
     /**
      * @param callable $requestClosure
      * @throws EbicsException
@@ -1079,7 +1095,7 @@ final class EbicsClient implements EbicsClientInterface
         $segment->setSegmentNumber(1);
         $segment->setIsLastSegment(true);
         $segment->setNumSegments($transaction->getNumSegments());
-        $segment->setOrderData($transaction->getOrderData() ?? $transaction->getDigest());
+        $segment->setOrderData($transaction->getOrderData());
         $segment->setTransactionId($transaction->getInitialization()->getTransactionId());
         $transaction->addSegment($segment);
         $transaction->setKey($transaction->getInitialization()->getTransactionId());
