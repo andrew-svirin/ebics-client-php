@@ -1057,6 +1057,11 @@ final class EbicsClient implements EbicsClientInterface
         return $this->responseHandler->extractDownloadSegment($response, $this->keyRing);
     }
 
+    /**
+     * @param $requestClosure
+     * @return UploadTransaction
+     * @throws Exceptions\IncorrectResponseEbicsException
+     */
     private function uploadESTransaction($requestClosure): UploadTransaction
     {
         $transaction = $this->transactionFactory->createUploadTransaction();
