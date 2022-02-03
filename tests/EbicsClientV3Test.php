@@ -516,15 +516,15 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $context->setFetchLimit(1);
         $context->setFetchOffset(0);
 
-        $hvd = $client->HVT($context);
+        $hvt = $client->HVT($context);
 
         $responseHandler = new ResponseHandlerV3();
-        $code = $responseHandler->retrieveH00XReturnCode($hvd->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($hvd->getTransaction()->getLastSegment()->getResponse());
+        $code = $responseHandler->retrieveH00XReturnCode($hvt->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hvt->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $code = $responseHandler->retrieveH00XReturnCode($hvd->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($hvd->getTransaction()->getReceipt());
+        $code = $responseHandler->retrieveH00XReturnCode($hvt->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($hvt->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
