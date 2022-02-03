@@ -1072,6 +1072,21 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
         $this->checkH00XReturnCode($request, $response);
 
+        $uploadSegment = $this->responseHandler->extractUploadSegment($response);
+        $transaction->setInitialization($uploadSegment);
+
+        $segment = $this->segmentFactory->createTransferSegment();
+        $segment->setTransactionKey($transaction->getKey());
+        $segment->setSegmentNumber(1);
+        $segment->setIsLastSegment(true);
+        $segment->setNumSegments($transaction->getNumSegments());
+        $segment->setOrderData('');
+        $segment->setTransactionId($transaction->getInitialization()->getTransactionId());
+        $transaction->addSegment($segment);
+        $transaction->setKey($transaction->getInitialization()->getTransactionId());
+
+        $this->transferTransfer($transaction);
+
         return $transaction;
     }
 
