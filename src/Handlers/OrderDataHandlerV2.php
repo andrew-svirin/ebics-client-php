@@ -121,8 +121,8 @@ final class OrderDataHandlerV2 extends OrderDataHandler
         $exponentValueDe = base64_decode($exponentValue);
 
         $certificate = $this->certificateFactory->createCertificateXFromDetails(
-            $modulusValueDe,
-            $exponentValueDe
+            $this->bigIntegerFactory->create($modulusValueDe, 256),
+            $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
 
         $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
@@ -147,8 +147,8 @@ final class OrderDataHandlerV2 extends OrderDataHandler
         $exponentValueDe = base64_decode($exponentValue);
 
         $certificate = $this->certificateFactory->createCertificateEFromDetails(
-            $modulusValueDe,
-            $exponentValueDe
+            $this->bigIntegerFactory->create($modulusValueDe, 256),
+            $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
 
         $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');

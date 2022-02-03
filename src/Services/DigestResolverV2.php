@@ -14,6 +14,6 @@ final class DigestResolverV2 extends DigestResolver
 {
     public function digest(SignatureInterface $signature, string $algorithm = 'sha256'): string
     {
-        return $this->cryptService->calculateDigest($signature, $algorithm, true);
+        return $this->cryptService->calculateDigest($signature, $algorithm);
     }
 }

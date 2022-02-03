@@ -123,6 +123,18 @@ interface RSAInterface
     public function setHash(string $hash);
 
     /**
+     * Determines which hashing function should be used for the mask generation function
+     *
+     * The mask generation function is used by self::ENCRYPTION_OAEP and self::SIGNATURE_PSS and although it's
+     * best if Hash and MGFHash are set to the same thing this is not a requirement.
+     *
+     * @param string $hash = 'sha256'
+     *
+     * @return void
+     */
+    public function setMGFHash($hash);
+
+    /**
      * Create public / private key pair.
      *
      * Returns an array with the following three elements:
@@ -177,4 +189,52 @@ interface RSAInterface
      * @return string|null
      */
     public function sign(string $message);
+
+    /**
+     * Set Signature Mode
+     *
+     * Valid values include self::SIGNATURE_PSS and self::SIGNATURE_PKCS1
+     *
+     * @param int $mode
+     *
+     * @return void
+     */
+    public function setSignatureMode($mode);
+
+    /**
+     * EMSA-PKCS1-V1_5-ENCODE
+     *
+     * See {@link http://tools.ietf.org/html/rfc3447#section-9.2 RFC3447#section-9.2}.
+     *
+     * @param string $m
+     * @param int|null $emLen
+     *
+     * @return string
+     */
+    public function emsaPkcs1V15Encode($m, $emLen = null);
+
+    /**
+     * EMSA-PSS-ENCODE
+     *
+     * See {@link http://tools.ietf.org/html/rfc3447#section-9.1.1 RFC3447#section-9.1.1}.
+     *
+     * @param string $m
+     * @param int|null $emBits
+     *
+     * @return string
+     */
+    public function emsaPssEncode($m, $emBits = null);
+
+    /**
+     * EMSA-PSS-VERIFY
+     *
+     * See {@link http://tools.ietf.org/html/rfc3447#section-9.1.2 RFC3447#section-9.1.2}.
+     *
+     * @access private
+     * @param string $m
+     * @param string $em
+     * @param int|null $emBits
+     * @return bool
+     */
+    public function emsaPssVerify($m, $em, $emBits = null);
 }

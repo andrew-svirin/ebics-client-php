@@ -29,7 +29,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $client = $this->setupClient(3);
+        $client = $this->setupClientV2(3);
         $this->setupKeys($client->getKeyRing());
         $this->orderDataHandler = new OrderDataHandlerV2($client->getBank(), $client->getUser(), $client->getKeyRing());
     }

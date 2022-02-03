@@ -27,14 +27,38 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected $fixtures = __DIR__ . '/_fixtures';
 
-    protected function setupClient(
+    protected function setupClientV2(
         int $credentialsId,
         X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
-        $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], Bank::VERSION_25);
+        $bank->setIsCertified($credentials['hostIsCertified']);
+        $bank->setServerName(sprintf('Server %d', $credentialsId));
+        $user = new User($credentials['partnerId'], $credentials['userId']);
+        $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
+        $keyRing = $keyRingManager->loadKeyRing();
+
+        $ebicsClient = new EbicsClient($bank, $user, $keyRing);
+        $ebicsClient->setX509Generator($x509Generator);
+
+        if (true === $fake) {
+            $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));
+        }
+
+        return $ebicsClient;
+    }
+
+    protected function setupClientV3(
+        int $credentialsId,
+        X509GeneratorInterface $x509Generator = null,
+        $fake = false
+    ): EbicsClientInterface {
+        $credentials = $this->credentialsDataProvider($credentialsId);
+
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], Bank::VERSION_30);
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);

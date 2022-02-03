@@ -13,6 +13,10 @@ use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\HVDContext;
+use AndrewSvirin\Ebics\Contexts\HVEContext;
+use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
@@ -648,6 +652,89 @@ abstract class RequestFactory
         return $request;
     }
 
+    public function createBTU(
+        BTUContext $btuContext,
+        DateTimeInterface $dateTime,
+        UploadTransaction $transaction
+    ): Request {
+        // BTFContext
+        $signatureData = new UserSignature();
+
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
+
+        $signatureVersion = $this->keyRing->getUserSignatureAVersion();
+        $dataDigest = $this->cryptService->sign(
+            $this->keyRing->getUserSignatureA()->getPrivateKey(),
+            $this->keyRing->getPassword(),
+            $this->keyRing->getUserSignatureAVersion(),
+            $transaction->getDigest()
+        );
+
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setBTUContext($btuContext)
+            ->setTransactionKey($transaction->getKey())
+            ->setNumSegments($transaction->getNumSegments())
+            ->setSignatureData($signatureData)
+            ->setSignatureVersion($signatureVersion)
+            ->setDataDigest($dataDigest);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'BTU')
+                                    ->addOrderId('A001')
+                                    ->addBTUOrderParams($context->getBTUContext());
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey())
+                            ->addDataDigest(
+                                $context->getSignatureVersion(),
+                                $context->getDataDigest()
+                            )
+                            ->addAdditionalOrderInfo();
+                    });
+                });
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
     /**
      * @throws EbicsException
      */
@@ -1136,7 +1223,7 @@ abstract class RequestFactory
     public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getOrderData());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -1194,10 +1281,13 @@ abstract class RequestFactory
         return $request;
     }
 
+    /**
+     * @throws EbicsException
+     */
     public function createCIP(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getOrderData());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -1255,10 +1345,293 @@ abstract class RequestFactory
         return $request;
     }
 
+    /**
+     * @throws EbicsException
+     */
+    public function createHVU(
+        DateTimeInterface $dateTime,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setSegmentNumber($segmentNumber)
+            ->setIsLastSegment($isLastSegment);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HVU')
+                                    ->addHVUOrderParams();
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
+                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
+    public function createHVZ(
+        DateTimeInterface $dateTime,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setSegmentNumber($segmentNumber)
+            ->setIsLastSegment($isLastSegment);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HVZ')
+                                    ->addHVZOrderParams();
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
+                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
+    public function createHVE(
+        HVEContext $hveContext,
+        DateTimeInterface $dateTime,
+        UploadTransaction $transaction
+    ): Request {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
+
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setTransactionKey($transaction->getKey())
+            ->setNumSegments($transaction->getNumSegments())
+            ->setSignatureData($signatureData)
+            ->setHVEContext($hveContext);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HVE')
+                                    ->addHVEOrderParams($context->getHVEContext());
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey())
+                            ->addDataDigest($context->getKeyRing()->getUserSignatureAVersion());
+                    });
+                });
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    public function createHVD(
+        HVDContext $hvdContext,
+        DateTimeInterface $dateTime,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setSegmentNumber($segmentNumber)
+            ->setIsLastSegment($isLastSegment)
+            ->setHVDContext($hvdContext);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HVD')
+                                    ->addHVDOrderParams($context->getHVDContext());
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
+                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    public function createHVT(
+        HVTContext $hvtContext,
+        DateTimeInterface $dateTime,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setSegmentNumber($segmentNumber)
+            ->setIsLastSegment($isLastSegment)
+            ->setHVTContext($hvtContext);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'HVT')
+                                    ->addHVTOrderParams($context->getHVTContext());
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
+                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
     public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getOrderData());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -1319,7 +1692,7 @@ abstract class RequestFactory
     public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getOrderData());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context = (new RequestContext())
             ->setBank($this->bank)

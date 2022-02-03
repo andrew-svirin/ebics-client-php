@@ -26,7 +26,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterTxt(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV2($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
@@ -51,7 +51,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterHtml(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV2($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
@@ -76,7 +76,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterPdf(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV2($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
