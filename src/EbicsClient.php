@@ -1058,7 +1058,7 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @param $requestClosure
+     * @param callable $requestClosure
      * @return UploadTransaction
      * @throws Exceptions\IncorrectResponseEbicsException
      */
