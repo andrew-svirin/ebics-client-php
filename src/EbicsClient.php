@@ -780,7 +780,6 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
     public function HVE(HVEContext $hveContext, DateTimeInterface $dateTime = null): UploadOrderResult
