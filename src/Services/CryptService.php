@@ -106,17 +106,17 @@ final class CryptService
      * Algorithm AES-128-CBC.
      *
      * @param string $key
-     * @param string $decrypted
+     * @param string $data
      *
      * @return string
      */
-    public function encryptByKey(string $key, string $decrypted)
+    public function encryptByKey(string $key, string $data)
     {
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($key);
         $aes->setOpenSSLOptions(OPENSSL_RAW_DATA);
-        $encrypted = $aes->encrypt($decrypted);
+        $encrypted = $aes->encrypt($data);
 
         return $encrypted;
     }

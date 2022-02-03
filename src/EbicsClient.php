@@ -790,6 +790,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $hveContext) {
+            $transaction->setNumSegments(0);
             $transaction->setDigest($hveContext->getDigest());
             return $this->requestFactory->createHVE(
                 $hveContext,
