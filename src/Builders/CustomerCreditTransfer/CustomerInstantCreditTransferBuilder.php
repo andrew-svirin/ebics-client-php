@@ -191,7 +191,7 @@ final class CustomerInstantCreditTransferBuilder
      * @param float $amount
      * @param string $currency
      * @param string $purpose
-     * @param string $endToendId
+     * @param string $endToEndId
      * @return CustomerInstantCreditTransferBuilder
      */
     public function addTransaction(
@@ -201,7 +201,7 @@ final class CustomerInstantCreditTransferBuilder
         float $amount,
         string $currency,
         string $purpose,
-        string $endToendId
+        string $endToEndId
     ): CustomerInstantCreditTransferBuilder {
         $xpath = $this->prepareXPath($this->instance);
         $nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/NbOfTxs');
@@ -218,11 +218,12 @@ final class CustomerInstantCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pete' . str_pad((string)$nbOfTxs, 2, '0')
-        );
-        if ($endToendId) {
-            $xmlEndToEndId->nodeValue = $endToendId;
+        if ($endToEndId) {
+            $xmlEndToEndId->nodeValue = $endToEndId;
+        } else {
+            $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
+                'pete' . str_pad((string)$nbOfTxs, 2, '0')
+            );
         }
         $xmlPmtId->appendChild($xmlEndToEndId);
 
