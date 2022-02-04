@@ -241,6 +241,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                 'ZKBKCHZZ80A',
                 'SE7500800000000000001123',
                 'Debitor Name',
+                null,
                 true,
                 'msg-123',
                 'pr-123'
@@ -617,6 +618,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                 'ZKBKCHZZ80A',
                 'SE7500800000000000001123',
                 'Debitor Name',
+                null,
                 true,
                 'msg-123',
                 'pr-123'
