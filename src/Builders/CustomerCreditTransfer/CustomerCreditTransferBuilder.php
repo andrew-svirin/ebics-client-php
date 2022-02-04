@@ -193,7 +193,8 @@ final class CustomerCreditTransferBuilder
         string $creditorName,
         float $amount,
         string $currency,
-        string $purpose
+        string $purpose,
+        string $endToEndId = null
     ): CustomerCreditTransferBuilder {
         $xpath = $this->prepareXPath($this->instance);
         $nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/NbOfTxs');
@@ -210,10 +211,13 @@ final class CustomerCreditTransferBuilder
         $xmlCdtTrfTxInf->appendChild($xmlPmtId);
 
         $xmlEndToEndId = $this->instance->createElement('EndToEndId');
-        $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-            'pete' . str_pad((string)$nbOfTxs, 2, '0')
-        );
-        $xmlPmtId->appendChild($xmlEndToEndId);
+        if ($endToEndId) {
+            $xmlEndToEndId->nodeValue = $endToEndId;
+        } else {
+            $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
+                'pete' . str_pad((string)$nbOfTxs, 2, '0')
+            );
+        }
 
         $xmlAmt = $this->instance->createElement('Amt');
         $xmlCdtTrfTxInf->appendChild($xmlAmt);
