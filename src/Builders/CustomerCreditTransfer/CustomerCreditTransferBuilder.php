@@ -218,6 +218,7 @@ final class CustomerCreditTransferBuilder
                 'pete' . str_pad((string)$nbOfTxs, 2, '0')
             );
         }
+        $xmlPmtId->appendChild($xmlEndToEndId);
 
         $xmlAmt = $this->instance->createElement('Amt');
         $xmlCdtTrfTxInf->appendChild($xmlAmt);
