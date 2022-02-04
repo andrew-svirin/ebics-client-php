@@ -38,6 +38,7 @@ final class CustomerCreditTransferBuilder
      * @param string $debitorFinInstBIC
      * @param string $debitorIBAN
      * @param string $debitorName
+     * @param DateTime|null $executionDate
      * @param bool $batchBooking By deactivating the batch booking procedure,
      * you request your credit institution to book each transaction within this order separately.
      * @param string|null $msgId Overwrite default generated message id - should be unique at
@@ -50,6 +51,7 @@ final class CustomerCreditTransferBuilder
         string $debitorFinInstBIC,
         string $debitorIBAN,
         string $debitorName,
+        DateTime $executionDate = null,
         bool $batchBooking = true,
         string $msgId = null,
         string $paymentReference = null
@@ -144,7 +146,11 @@ final class CustomerCreditTransferBuilder
         $xmlSvcLvl->appendChild($xmlCd);
 
         $xmlReqdExctnDt = $this->instance->createElement('ReqdExctnDt');
-        $xmlReqdExctnDt->nodeValue = $now->format('Y-m-d');
+        if ($executionDate) {
+            $xmlReqdExctnDt->nodeValue = $executionDate->format('Y-m-d');
+        } else {
+            $xmlReqdExctnDt->nodeValue = $now->format('Y-m-d');
+        }
         $xmlPmtInf->appendChild($xmlReqdExctnDt);
 
         $xmlDbtr = $this->instance->createElement('Dbtr');
