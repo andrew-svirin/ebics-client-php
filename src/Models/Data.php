@@ -28,7 +28,6 @@ abstract class Data extends DOMDocument implements DataInterface
             $content
         );
         $content = str_replace(["\n", "\r", "\t"], '', $content);
-        $content = utf8_encode($content);
         $content = trim($content);
 
         return $content;
