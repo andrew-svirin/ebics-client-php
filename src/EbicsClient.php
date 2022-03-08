@@ -591,6 +591,36 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     // @codingStandardsIgnoreStart
+    public function Z52(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult {
+        // @codingStandardsIgnoreEnd
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createZ52(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    // @codingStandardsIgnoreStart
     public function Z53(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
@@ -613,7 +643,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'text');
+        return $this->createDownloadOrderResult($transaction, 'files');
     }
 
     /**

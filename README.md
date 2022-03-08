@@ -297,6 +297,7 @@ try {
 | C52         | Download the bank account report in Camt.052 format.                                                              |
 | C53         | Download the bank account statement in Camt.053 format.                                                           |
 | C54         | Download Debit Credit Notification (DTI).                                                                         |
+| Z52         | Download the bank account report in Camt.052 format (i.e Switzerland financial services).                         |
 | Z53         | Download the bank account statement in Camt.053 format (i.e Switzerland financial services).                      |
 | Z54         | Download the bank account statement in Camt.054 format (i.e available in Switzerland).                            |
 | CCT         | Upload initiation of the credit transfer per Single Euro Payments Area.                                           |
