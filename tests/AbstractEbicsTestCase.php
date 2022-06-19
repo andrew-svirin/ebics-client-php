@@ -38,8 +38,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
-        $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
-        $keyRing = $keyRingManager->loadKeyRing();
+        $keyRing = $this->loadKeyRing($credentialsId);
 
         $ebicsClient = new EbicsClient($bank, $user, $keyRing);
         $ebicsClient->setX509Generator($x509Generator);
@@ -62,8 +61,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
-        $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
-        $keyRing = $keyRingManager->loadKeyRing();
+        $keyRing = $this->loadKeyRing($credentialsId);
 
         $ebicsClient = new EbicsClient($bank, $user, $keyRing);
         $ebicsClient->setX509Generator($x509Generator);
@@ -75,11 +73,20 @@ abstract class AbstractEbicsTestCase extends TestCase
         return $ebicsClient;
     }
 
-    protected function setupKeyKeyRingManager($credentialsId): KeyRingManagerInterface
+    protected function loadKeyRing($credentialsId): KeyRing
     {
         $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
         $password = 'test123';
-        return new FileKeyRingManager($keyRingRealPath, $password);
+        $keyRingManager = new FileKeyRingManager();
+
+        return $keyRingManager->loadKeyRing($keyRingRealPath, $password);
+    }
+
+    protected function saveKeyRing($credentialsId, KeyRing $keyRing): void
+    {
+        $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
+        $keyRingManager = new FileKeyRingManager();
+        $keyRingManager->saveKeyRing($keyRing, $keyRingRealPath);
     }
 
     protected function setupKeys(KeyRing $keyRing)
