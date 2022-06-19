@@ -269,7 +269,11 @@ final class AES implements AESInterface
         }
 
         if (!defined('OPENSSL_RAW_DATA')) {
+            /** @var string|false */
             $substr = substr($ciphertext, -$this->block_size);
+            if (false === $substr) {
+                throw new LogicException('Substr failed.');
+            }
             $padding = str_repeat(chr($this->block_size), $this->block_size) ^ $substr;
 
             if (!($encrypted = openssl_encrypt(

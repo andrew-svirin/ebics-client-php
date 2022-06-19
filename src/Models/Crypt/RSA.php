@@ -1392,7 +1392,11 @@ final class RSA implements RSAInterface
             return false;
         }
 
+        /** @var string|false */
         $maskedDB = substr($em, 0, -$this->hLen - 1);
+        if (false === $maskedDB) {
+            throw new LogicException('Substr failed.');
+        }
         $h = substr($em, -$this->hLen - 1, $this->hLen);
         $temp = chr(0xFF << ($emBits & 7));
         if ((~$maskedDB[0] & $temp) != $temp) {

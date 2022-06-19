@@ -3,7 +3,6 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
@@ -12,9 +11,9 @@ use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
+use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV3;
-use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
-use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
+use AndrewSvirin\Ebics\Models\Document;
 use AndrewSvirin\Ebics\Tests\Factories\X509\CreditSuisseX509Generator;
 use AndrewSvirin\Ebics\Tests\Factories\X509\ZKBX509Generator;
 
@@ -302,6 +301,41 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group YCT
+     * @group V3
+     * @group YCT-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testYCT(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['YCT']['fake']);
+
+        $this->assertExceptionCode($codes['YCT']['code']);
+
+        $documentFactory = new DocumentFactory();
+        $context = $documentFactory->create(file_get_contents($this->fixtures . '/yct.pain001.xml'));
+
+        $yct = $client->YCT($context);
+
+        $responseHandler = new ResponseHandlerV3();
+        $code = $responseHandler->retrieveH00XReturnCode($yct->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($yct->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($yct->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($yct->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group CIP
      * @group V3
      * @group CIP-V3
@@ -533,130 +567,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
-     * @group XE2
-     * @group V3
-     * @group XE2-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testXE2(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['XE2']['fake']);
-
-        $this->assertExceptionCode($codes['XE2']['code']);
-
-        $builder = new CustomerSwissCreditTransferBuilder();
-        $customerCreditTransfer = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
-            ->addBankTransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                new StructuredPostalAddress('CH', 'Triesen', '9495'),
-                100.10,
-                'CHF',
-                'Test payment  1'
-            )
-            ->addSEPATransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 4',
-                null, // new UnstructuredPostalAddress(),
-                200.02,
-                'EUR',
-                'Test payment  2'
-            )
-            ->addForeignTransaction(
-                'NWBKGB2L',
-                'GB29 NWBK 6016 1331 9268 19',
-                'United Development Ltd',
-                new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
-                65.10,
-                'GBP',
-                'Test payment 3'
-            )
-            ->popInstance();
-
-        $xe2 = $client->XE2($customerCreditTransfer);
-
-        $responseHandler = new ResponseHandlerV3();
-        $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getInitialization()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getInitialization()->getResponse());
-
-        $this->assertResponseOk($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group CCT
-     * @group V3
-     * @group CCT-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testCCT(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['CCT']['fake']);
-
-        $this->assertExceptionCode($codes['CCT']['code']);
-
-        $builder = new CustomerCreditTransferBuilder();
-        $customerCreditTransfer = $builder
-            ->createInstance(
-                'ZKBKCHZZ80A',
-                'SE7500800000000000001123',
-                'Debitor Name',
-                null,
-                true,
-                'msg-123',
-                'pr-123'
-            )
-            ->addTransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                'Creditor Name 1',
-                100.10,
-                'EUR',
-                'Test payment  1'
-            )
-            ->addTransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 2',
-                200.02,
-                'EUR',
-                'Test payment  2'
-            )
-            ->popInstance();
-
-        $cct = $client->CCT($customerCreditTransfer);
-
-        $responseHandler = new ResponseHandlerV3();
-        $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($cct->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getInitialization()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($cct->getTransaction()->getInitialization()->getResponse());
-
-        $this->assertResponseOk($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
      * @group PTK
      * @group V3
      * @group PTK-V3
@@ -688,9 +598,9 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
-     * @group VMK
+     * @group Z54
      * @group V3
-     * @group VMK-V3
+     * @group Z54-V3
      *
      * @param int $credentialsId
      * @param array $codes
@@ -698,20 +608,51 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
      *
      * @covers
      */
-    public function testVMK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['VMK']['fake']);
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['Z54']['fake']);
 
-        $this->assertExceptionCode($codes['VMK']['code']);
-        $vmk = $client->VMK();
+        $this->assertExceptionCode($codes['Z54']['code']);
+        $z54 = $client->Z54();
 
         $responseHandler = new ResponseHandlerV3();
-        $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($vmk->getTransaction()->getLastSegment()->getResponse());
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
 
-        $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($vmk->getTransaction()->getReceipt());
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group ZSR
+     * @group V3
+     * @group ZSR-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testZSR(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['ZSR']['fake']);
+
+        $this->assertExceptionCode($codes['ZSR']['code']);
+        $zsr = $client->ZSR();
+
+        $responseHandler = new ResponseHandlerV3();
+        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -799,11 +740,11 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HVE' => ['code' => '090003', 'fake' => false],
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
-                    'XE2' => ['code' => '091010', 'fake' => false],
-                    'CCT' => ['code' => '091010', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
-                    'VMK' => ['code' => '090003', 'fake' => false],
+                    'Z54' => ['code' => '091005', 'fake' => false],
+                    'ZSR' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => '091121', 'fake' => false],
+                    'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],
@@ -824,11 +765,11 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HVE' => ['code' => '090003', 'fake' => false],
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
-                    'XE2' => ['code' => '091010', 'fake' => false],
-                    'CCT' => ['code' => '091010', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
-                    'VMK' => ['code' => '090003', 'fake' => false],
+                    'Z54' => ['code' => '091005', 'fake' => false],
+                    'ZSR' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => '091121', 'fake' => false],
+                    'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],

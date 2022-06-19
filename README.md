@@ -300,9 +300,11 @@ try {
 | Z52         | Download the bank account report in Camt.052 format (i.e Switzerland financial services).                         |
 | Z53         | Download the bank account statement in Camt.053 format (i.e Switzerland financial services).                      |
 | Z54         | Download the bank account statement in Camt.054 format (i.e available in Switzerland).                            |
+| ZSR         | Download Order/Payment Status report.                                                                             |
 | CCT         | Upload initiation of the credit transfer per Single Euro Payments Area.                                           |
 | CIP         | Upload initiation of the instant credit transfer per Single Euro Payments Area.                                   |
 | XE2         | Upload initiation of the Swiss credit transfer (i.e available in Switzerland).                                    |
+| YCT         | Upload Credit transfer CGI (SEPA & non SEPA).                                                                     |
 | CDD         | Upload initiation of the direct debit transaction.                                                                |
 | BTD         | Download request files of any BTF structure.                                                                      |
 | BTU         | Upload the files to the bank.                                                                                     |
