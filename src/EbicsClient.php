@@ -678,6 +678,33 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
+     */
+    public function ZSR(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createZSR(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, 'files');
+    }
+
+    /**
+     * @inheritDoc
      * @throws Exceptions\EbicsException
      */
     public function FDL(
@@ -733,6 +760,75 @@ final class EbicsClient implements EbicsClientInterface
             $transaction->setOrderData($orderData->getContent());
             $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createCCT(
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+            return $this->requestFactory->createCDD(
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+            return $this->requestFactory->createXE2(
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
+    public function YCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+            return $this->requestFactory->createYCT(
                 $dateTime,
                 $transaction
             );
@@ -881,52 +977,6 @@ final class EbicsClient implements EbicsClientInterface
         );
 
         return $this->createDownloadOrderResult($transaction, 'xml');
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     * @throws EbicsException
-     */
-    public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
-    {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
-            $transaction->setOrderData($orderData->getContent());
-            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
-            return $this->requestFactory->createXE2(
-                $dateTime,
-                $transaction
-            );
-        });
-
-        return $this->createUploadOrderResult($transaction, $orderData);
-    }
-
-    /**
-     * @inheritDoc
-     * @throws Exceptions\EbicsResponseException
-     * @throws EbicsException
-     */
-    public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
-    {
-        if (null === $dateTime) {
-            $dateTime = new DateTime();
-        }
-
-        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
-            $transaction->setOrderData($orderData->getContent());
-            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
-            return $this->requestFactory->createCDD(
-                $dateTime,
-                $transaction
-            );
-        });
-
-        return $this->createUploadOrderResult($transaction, $orderData);
     }
 
     /**

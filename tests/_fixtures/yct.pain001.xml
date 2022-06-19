@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2018 rel. 2 (x64) (http://www.altova.com) by  (RABOBANK NEDERLAND) -->
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:pain.001.001.03" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <CstmrCdtTrfInitn>
+        <GrpHdr>
+            <MsgId>MMMM20211231v1</MsgId>
+            <CreDtTm>2013-07-18T10:00:00</CreDtTm>
+            <NbOfTxs>2</NbOfTxs>
+            <CtrlSum>0.03</CtrlSum>
+            <InitgPty>
+                <Nm>MIB</Nm>
+            </InitgPty>
+        </GrpHdr>
+        <PmtInf>
+            <PmtInfId>PmtInfId-MM20211231-1</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>false</BtchBookg>
+            <PmtTpInf>
+                <InstrPrty>NORM</InstrPrty>
+                <SvcLvl>
+                    <Cd>SEPA</Cd>
+                </SvcLvl>
+            </PmtTpInf>
+            <ReqdExctnDt>2021-12-31</ReqdExctnDt>
+            <Dbtr>
+                <Nm>MïB</Nm>
+                <PstlAdr>
+                    <Ctry>NL</Ctry>
+                    <AdrLine>Gräädt van Roggenweg 400</AdrLine>
+                    <AdrLine>Utrecht</AdrLine>
+                </PstlAdr>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>NL86RABO1999999991</IBAN>
+                </Id>
+                <Ccy>EUR</Ccy>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BIC>RABONL2U</BIC>
+                </FinInstnId>
+            </DbtrAgt>
+            <CdtTrfTxInf>
+                <PmtId>
+                    <InstrId>MIB InstrId305-312MM20211231v1</InstrId>
+                    <EndToEndId>MIB E2E305-312MM20211231v1</EndToEndId>
+                </PmtId>
+                <PmtTpInf/>
+                <Amt>
+                    <InstdAmt Ccy="EUR">0.01</InstdAmt>
+                </Amt>
+                <CdtrAgt>
+                    <FinInstnId>
+                        <BIC>RABONL2U</BIC>
+                    </FinInstnId>
+                </CdtrAgt>
+                <Cdtr>
+                    <Nm>MIB 320</Nm>
+                    <PstlAdr>
+                        <Ctry>NL</Ctry>
+                        <AdrLine>Graadt van Roggenweg 400</AdrLine>
+                        <AdrLine>Utrecht</AdrLine>
+                    </PstlAdr>
+                </Cdtr>
+                <CdtrAcct>
+                    <Id>
+                        <IBAN>NL11RABO3444444443</IBAN>
+                    </Id>
+                    <Ccy>EUR</Ccy>
+                </CdtrAcct>
+                <RmtInf>
+                    <Ustrd>MIB304-320MM20211231v1</Ustrd>
+                </RmtInf>
+            </CdtTrfTxInf>
+        </PmtInf>
+        <PmtInf>
+            <PmtInfId>PmtInfId-MM20211231-2</PmtInfId>
+            <PmtMtd>TRF</PmtMtd>
+            <BtchBookg>false</BtchBookg>
+            <PmtTpInf>
+                <InstrPrty>NORM</InstrPrty>
+                <SvcLvl>
+                    <Cd>SEPA</Cd>
+                </SvcLvl>
+            </PmtTpInf>
+            <ReqdExctnDt>2021-12-31</ReqdExctnDt>
+            <Dbtr>
+                <Nm>MIB</Nm>
+                <PstlAdr>
+                    <Ctry>NL</Ctry>
+                    <AdrLine>Graadt van Roggenweg 400</AdrLine>
+                    <AdrLine>Utrecht</AdrLine>
+                </PstlAdr>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <IBAN>NL86RABO1999999991</IBAN>
+                </Id>
+                <Ccy>EUR</Ccy>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BIC>RABONL2U</BIC>
+                </FinInstnId>
+            </DbtrAgt>
+            <CdtTrfTxInf>
+                <PmtId>
+                    <InstrId>MIB InstrId305-312MM20211231v1</InstrId>
+                    <EndToEndId>MIB E2E305-312MM20211231v1</EndToEndId>
+                </PmtId>
+                <PmtTpInf/>
+                <Amt>
+                    <InstdAmt Ccy="EUR">0.02</InstdAmt>
+                </Amt>
+                <CdtrAgt>
+                    <FinInstnId>
+                        <BIC>RABONL2U</BIC>
+                    </FinInstnId>
+                </CdtrAgt>
+                <Cdtr>
+                    <Nm>MIB 320</Nm>
+                    <PstlAdr>
+                        <Ctry>NL</Ctry>
+                        <AdrLine>Graadt van Roggenweg 400</AdrLine>
+                        <AdrLine>Utrecht</AdrLine>
+                    </PstlAdr>
+                </Cdtr>
+                <CdtrAcct>
+                    <Id>
+                        <IBAN>NL11RABO3444444443</IBAN>
+                    </Id>
+                    <Ccy>EUR</Ccy>
+                </CdtrAcct>
+                <RmtInf>
+                    <Ustrd>MIB305-320MM20211231</Ustrd>
+                </RmtInf>
+            </CdtTrfTxInf>
+        </PmtInf>
+    </CstmrCdtTrfInitn>
+</Document>
