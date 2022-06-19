@@ -269,8 +269,8 @@ final class AES implements AESInterface
         }
 
         if (!defined('OPENSSL_RAW_DATA')) {
-            $padding = str_repeat(chr($this->block_size), $this->block_size) ^
-                substr($ciphertext, -$this->block_size);
+            $substr = substr($ciphertext, -$this->block_size);
+            $padding = str_repeat(chr($this->block_size), $this->block_size) ^ $substr;
 
             if (!($encrypted = openssl_encrypt(
                 $padding,
@@ -334,7 +334,12 @@ final class AES implements AESInterface
     private function clearBuffers()
     {
         // mcrypt's handling of invalid's $iv:
-        $this->encryptIV = $this->decryptIV = str_pad(substr($this->iv, 0, $this->block_size), $this->block_size, "\0");
+        if (null === $this->iv) {
+            $substr = '';
+        } else {
+            $substr = substr($this->iv, 0, $this->block_size);
+        }
+        $this->encryptIV = $this->decryptIV = str_pad($substr, $this->block_size, "\0");
 
         $this->key = str_pad(substr($this->key, 0, $this->key_length), $this->key_length, "\0");
     }

@@ -40,7 +40,7 @@ You will need to have this information from your Bank:
 ```php
 <?php
 
-use AndrewSvirin\Ebics\Services\KeyRingManager;
+use AndrewSvirin\Ebics\Services\FileKeyRingManager;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\EbicsClient;
@@ -48,7 +48,7 @@ use AndrewSvirin\Ebics\EbicsClient;
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 $keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
-$keyRingManager = new KeyRingManager($keyRingRealPath, __PASSWORD__);
+$keyRingManager = new FileKeyRingManager($keyRingRealPath, __PASSWORD__);
 $keyRing = $keyRingManager->loadKeyRing();
 $bank = new Bank(__HOST_ID__, __HOST_URL__, __EBICS_SERVER_VERSION___);
 $bank->setIsCertified(__IS_CERTIFIED__);
@@ -66,7 +66,7 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->INI();
-    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Services\FileKeyRingManager $keyRingManager */
     /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
@@ -216,7 +216,7 @@ $client->setX509Generator(new MyCompanyX509Generator);
 
 try {
     $client->INI();
-    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Services\FileKeyRingManager $keyRingManager */
     /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
@@ -253,7 +253,7 @@ $bankLetter = $ebicsBankLetter->prepareBankLetter(
     $client->getKeyRing()
 );
 
-$txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
+$pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 ```
 
 ### 3. Wait for the bank validation and access activation.
@@ -265,7 +265,7 @@ $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createP
 try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->HPB();
-    /* @var \AndrewSvirin\Ebics\Services\KeyRingManager $keyRingManager */
+    /* @var \AndrewSvirin\Ebics\Services\FileKeyRingManager $keyRingManager */
     /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
     $keyRingManager->saveKeyRing($keyRing);
 } catch (EbicsResponseExceptionInterface $exception) {
