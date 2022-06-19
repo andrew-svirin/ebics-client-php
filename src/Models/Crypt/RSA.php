@@ -891,6 +891,7 @@ final class RSA implements RSAInterface
             throw new LogicException('K can not be less than 0.');
         }
 
+        /** @var string[]|false */
         $ciphertext = str_split($ciphertext, $this->k);
         if (empty($ciphertext)) {
             throw new LogicException('Ciphertext was not split.');
@@ -925,8 +926,9 @@ final class RSA implements RSAInterface
             throw new LogicException('Length must be more 0.');
         }
 
+        /** @var string[]|false */
         $plaintext = str_split($plaintext, $length);
-        if (empty($plaintext)) {
+        if (false === $plaintext) {
             throw new LogicException('Plaintext was not split.');
         }
         $ciphertext = '';

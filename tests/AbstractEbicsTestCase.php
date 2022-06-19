@@ -10,7 +10,7 @@ use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Services\KeyRingManager;
+use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -79,7 +79,7 @@ abstract class AbstractEbicsTestCase extends TestCase
     {
         $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
         $password = 'test123';
-        return new KeyRingManager($keyRingRealPath, $password);
+        return new FileKeyRingManager($keyRingRealPath, $password);
     }
 
     protected function setupKeys(KeyRing $keyRing)

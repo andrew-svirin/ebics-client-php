@@ -1,0 +1,33 @@
+version: '3.2'
+
+services:
+  php-cli-ebics-client-php:
+    container_name: php-cli-ebics-client-php
+    build:
+      context: php-cli
+    volumes:
+      - ~/.ssh:/home/root/.ssh
+      - ../:/var/www/ebics-client-php
+      - ./php-cli/php.ini:/usr/local/etc/php/php.ini:ro
+      - ~/.bash_history:/home/root/.bash_history
+    expose:
+      - 9000
+      - 9003
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      ebics-client-php-net:
+        ipv4_address: 172.110.0.3
+    environment:
+      PHP_IDE_CONFIG: "serverName=ebics-client-php"
+
+networks:
+  ebics-client-php-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.110.0.0/24
+    driver_opts:
+      com.docker.network.bridge.name: br_ecp
