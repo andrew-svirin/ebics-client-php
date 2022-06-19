@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Models\KeyRing;
+use LogicException;
 
 /**
  * EBICS KeyRing representation manage one key ring stored in the array.
@@ -13,35 +14,19 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 final class ArrayKeyringManager extends KeyRingManager
 {
     /**
-     * The array with keyring
-     *
-     * @var array
-     */
-    private $keyRingData;
-
-    /**
-     * Constructor.
-     *
-     * @param array $keyRingData
-     * @param string $passphrase
-     */
-    public function __construct(array $keyRingData, string $passphrase)
-    {
-        $this->keyRingData = $keyRingData;
-        parent::__construct($passphrase);
-    }
-
-    /**
      * @inheritDoc
      */
-    public function loadKeyRing(): KeyRing
+    public function loadKeyRing($resource, string $passphrase): KeyRing
     {
-        if (!empty($this->keyRingData)) {
-            $result = $this->keyRingFactory->createKeyRingFromData($this->keyRingData);
+        if (!is_array($resource)) {
+            throw new LogicException('Expects array.');
+        }
+        if (!empty($resource)) {
+            $result = $this->keyRingFactory->createKeyRingFromData($resource);
         } else {
             $result = new KeyRing();
         }
-        $result->setPassword($this->password);
+        $result->setPassword($passphrase);
 
         return $result;
     }
@@ -49,8 +34,11 @@ final class ArrayKeyringManager extends KeyRingManager
     /**
      * @inheritDoc
      */
-    public function saveKeyRing(KeyRing $keyRing): array
+    public function saveKeyRing(KeyRing $keyRing, &$resource): void
     {
-        return $this->keyRingFactory->buildDataFromKeyRing($keyRing);
+        if (!is_array($resource)) {
+            throw new LogicException('Expects array.');
+        }
+        $resource = $this->keyRingFactory->buildDataFromKeyRing($keyRing);
     }
 }

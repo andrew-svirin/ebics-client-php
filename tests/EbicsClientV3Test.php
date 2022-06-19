@@ -77,8 +77,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $ini = $client->INI();
         if (!$userExists) {
             $responseHandler = new ResponseHandlerV3();
-            $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
-            $keyRingManager->saveKeyRing($client->getKeyRing());
+            $this->saveKeyRing($credentialsId, $client->getKeyRing());
             $code = $responseHandler->retrieveH00XReturnCode($ini);
             $reportText = $responseHandler->retrieveH00XReportText($ini);
             $this->assertResponseOk($code, $reportText);
@@ -111,8 +110,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $hia = $client->HIA();
         if (!$bankExists) {
             $responseHandler = new ResponseHandlerV3();
-            $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
-            $keyRingManager->saveKeyRing($client->getKeyRing());
+            $this->saveKeyRing($credentialsId, $client->getKeyRing());
             $code = $responseHandler->retrieveH00XReturnCode($hia);
             $reportText = $responseHandler->retrieveH00XReportText($hia);
             $this->assertResponseOk($code, $reportText);
@@ -145,8 +143,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
-        $keyRingManager = $this->setupKeyKeyRingManager($credentialsId);
-        $keyRingManager->saveKeyRing($client->getKeyRing());
+        $this->saveKeyRing($credentialsId, $client->getKeyRing());
     }
 
     /**

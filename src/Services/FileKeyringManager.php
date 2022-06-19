@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Models\KeyRing;
+use LogicException;
 
 /**
  * EBICS KeyRing representation manage one key ring stored in the file.
@@ -13,37 +14,21 @@ use AndrewSvirin\Ebics\Models\KeyRing;
 final class FileKeyringManager extends KeyRingManager
 {
     /**
-     * The path to a key file.
-     *
-     * @var string
-     */
-    private $keyRingRealPath;
-
-    /**
-     * Constructor.
-     *
-     * @param string $keyRingRealPath
-     * @param string $passphrase
-     */
-    public function __construct(string $keyRingRealPath, string $passphrase)
-    {
-        $this->keyRingRealPath = $keyRingRealPath;
-        parent::__construct($passphrase);
-    }
-
-    /**
      * @inheritDoc
      */
-    public function loadKeyRing(): KeyRing
+    public function loadKeyRing($resource, string $passphrase): KeyRing
     {
-        if (is_file($this->keyRingRealPath) &&
-            ($content = file_get_contents($this->keyRingRealPath)) &&
+        if (!is_string($resource)) {
+            throw new LogicException('Expects string.');
+        }
+        if (is_file($resource) &&
+            ($content = file_get_contents($resource)) &&
             is_string($content)) {
             $result = $this->keyRingFactory->createKeyRingFromData(json_decode($content, true));
         } else {
             $result = new KeyRing();
         }
-        $result->setPassword($this->password);
+        $result->setPassword($passphrase);
 
         return $result;
     }
@@ -51,11 +36,12 @@ final class FileKeyringManager extends KeyRingManager
     /**
      * @inheritDoc
      */
-    public function saveKeyRing(KeyRing $keyRing): array
+    public function saveKeyRing(KeyRing $keyRing, &$resource): void
     {
+        if (!is_string($resource)) {
+            throw new LogicException('Expects string.');
+        }
         $data = $this->keyRingFactory->buildDataFromKeyRing($keyRing);
-        file_put_contents($this->keyRingRealPath, json_encode($data, JSON_PRETTY_PRINT));
-
-        return $data;
+        file_put_contents($resource, json_encode($data, JSON_PRETTY_PRINT));
     }
 }

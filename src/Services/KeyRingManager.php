@@ -17,25 +17,15 @@ use AndrewSvirin\Ebics\Factories\KeyRingFactory;
 abstract class KeyRingManager implements KeyRingManagerInterface
 {
     /**
-     * The passphrase by which all private keys are encrypted/decrypted.
-     *
-     * @var string
-     */
-    protected $password;
-
-    /**
      * @var KeyRingFactory
      */
     protected $keyRingFactory;
 
     /**
      * Constructor.
-     *
-     * @param string $passphrase
      */
-    public function __construct(string $passphrase)
+    public function __construct()
     {
-        $this->password = $passphrase;
         $this->keyRingFactory = new KeyRingFactory();
     }
 }
