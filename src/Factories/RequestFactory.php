@@ -14,6 +14,7 @@ use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
@@ -526,6 +527,79 @@ abstract class RequestFactory
                             ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
                     });
                 })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
+    public function createFUL(
+        DateTimeInterface $dateTime,
+        string $fileFormat,
+        FULContext $fulContext,
+        UploadTransaction $transaction
+    ): Request {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
+
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyRing($this->keyRing)
+            ->setDateTime($dateTime)
+            ->setFileFormat($fileFormat)
+            ->setFULContext($fulContext)
+            ->setTransactionKey($transaction->getKey())
+            ->setNumSegments($transaction->getNumSegments())
+            ->setSignatureData($signatureData);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'FUL')
+                                    ->addFULOrderParams(
+                                        $context->getFileFormat(),
+                                        $context->getFULContext()
+                                    );;
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyRing()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
+                                $context->getKeyRing()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
+                    });
+                });
             })
             ->popInstance();
 

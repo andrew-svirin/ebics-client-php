@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
@@ -743,6 +744,34 @@ final class EbicsClient implements EbicsClientInterface
         );
 
         return $this->createDownloadOrderResult($transaction, $format);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
+    public function FUL(
+        string $fileFormat,
+        OrderDataInterface $orderData,
+        FULContext $fulContext,
+        DateTimeInterface $dateTime = null
+    ): UploadOrderResult {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($orderData, $fileFormat, $fulContext, $dateTime) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+            return $this->requestFactory->createFUL(
+                $dateTime,
+                $fileFormat,
+                $fulContext,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $orderData);
     }
 
     /**
