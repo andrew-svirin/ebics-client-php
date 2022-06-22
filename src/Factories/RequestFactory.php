@@ -576,7 +576,7 @@ abstract class RequestFactory
                                     ->addFULOrderParams(
                                         $context->getFileFormat(),
                                         $context->getFULContext()
-                                    );;
+                                    );
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyRing()->getBankSignatureXVersion(),
