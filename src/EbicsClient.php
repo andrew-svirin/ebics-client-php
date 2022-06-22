@@ -765,7 +765,12 @@ final class EbicsClient implements EbicsClientInterface
             $dateTime = new DateTime();
         }
 
-        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($orderData, $fileFormat, $fulContext, $dateTime) {
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use (
+            $orderData,
+            $fileFormat,
+            $fulContext,
+            $dateTime
+        ) {
             $transaction->setOrderData($orderData->getContent());
             $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
             return $this->requestFactory->createFUL(
