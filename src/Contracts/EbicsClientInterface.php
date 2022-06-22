@@ -265,7 +265,7 @@ interface EbicsClientInterface
     ): DownloadOrderResult;
     
     /**
-     * Standard order type for submitting the files to the bank. Using this order type ensures a 
+     * Standard order type for submitting the files to the bank. Using this order type ensures a
      * transparent transfer of files of any format.
      */
     public function FUL(
