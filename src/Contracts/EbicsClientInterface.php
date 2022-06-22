@@ -19,7 +19,6 @@ use DateTimeInterface;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
- * @method void setAcknowledgedTransferReceipt(bool $acknowledgedTransferReceipt) Autosend to the bank the transfer receipt order
  */
 interface EbicsClientInterface
 {
@@ -270,9 +269,9 @@ interface EbicsClientInterface
      * transparent transfer of files of any format.
      */
     public function FUL(
-        string $fileFormat, 
-        OrderDataInterface $orderData, 
-        FULContext $fulContext, 
+        string $fileFormat,
+        OrderDataInterface $orderData,
+        FULContext $fulContext,
         DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
