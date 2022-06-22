@@ -19,8 +19,6 @@ use DateTimeInterface;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
- * 
- * @method UploadOrderResult FUL(string $fileFormat, OrderDataInterface $orderData, FULContext $fulContext, DateTimeInterface $dateTime = null) Standard order type for submitting the files to the bank. Using this order type ensures a transparent transfer of files of any format.
  */
 interface EbicsClientInterface
 {
@@ -265,6 +263,17 @@ interface EbicsClientInterface
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): DownloadOrderResult;
+    
+    /**
+     * Standard order type for submitting the files to the bank. Using this order type ensures a 
+     * transparent transfer of files of any format.
+     */
+    public function FUL(
+        string $fileFormat, 
+        OrderDataInterface $orderData, 
+        FULContext $fulContext, 
+        DateTimeInterface $dateTime = null
+    ): UploadOrderResult;
 
     /**
      * Upload initiation of the credit transfer per Single Euro Payments Area (SEPA)
