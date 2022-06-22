@@ -1,4 +1,5 @@
 ## 2.1
 
-* Add `setAcknowledgedTransferReceipt` to EbicsClientInterface
 * Add `FUL` order type for EBICS 2.5
+* Add methods `YCT`, `ZSR`
+* Major update for keyring manager. Added Array & File keyring managers instead of keyring.
