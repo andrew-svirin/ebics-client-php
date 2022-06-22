@@ -137,11 +137,6 @@ final class EbicsClient implements EbicsClientInterface
     private $segmentFactory;
 
     /**
-     * @var bool
-     */
-    private $acknowledgedTransferReceipt = true;
-
-    /**
      * Constructor.
      *
      * @param Bank $bank
@@ -1133,7 +1128,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    private function downloadTransaction($requestClosure): DownloadTransaction
+    private function downloadTransaction($requestClosure, bool $acknowledged = true): DownloadTransaction
     {
         $transaction = $this->transactionFactory->createDownloadTransaction();
 
@@ -1157,7 +1152,7 @@ final class EbicsClient implements EbicsClientInterface
             $transaction->addSegment($segment);
         }
 
-        $this->transferReceipt($transaction, $this->acknowledgedTransferReceipt);
+        $this->transferReceipt($transaction, $acknowledged);
 
         return $transaction;
     }
@@ -1390,22 +1385,6 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         return $newSignature ?? $signature;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAcknowledgedTransferReceipt(): bool
-    {
-        return $this->acknowledgedTransferReceipt;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setAcknowledgedTransferReceipt(bool $acknowledgedTransferReceipt): void
-    {
-        $this->acknowledgedTransferReceipt = $acknowledgedTransferReceipt;
     }
 
     /**
