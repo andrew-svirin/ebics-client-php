@@ -132,6 +132,11 @@ final class RequestContext
      */
     private $hvtContext;
 
+    /**
+     * @var FULContext
+     */
+    private $fulContext;
+
     public function setBank(Bank $bank): RequestContext
     {
         $this->bank = $bank;
@@ -370,6 +375,18 @@ final class RequestContext
     public function getHVTContext(): HVTContext
     {
         return $this->hvtContext;
+    }
+
+    public function setFULContext(FULContext $fulContext): RequestContext
+    {
+        $this->fulContext = $fulContext;
+
+        return $this;
+    }
+
+    public function getFULContext(): FULContext
+    {
+        return $this->fulContext;
     }
 
     public function setBTUContext(BTUContext $btuContext): RequestContext

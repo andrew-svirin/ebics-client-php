@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Builders\Request;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
@@ -105,6 +106,30 @@ abstract class OrderDetailsBuilder
             $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
             $xmlFDLOrderParams->appendChild($xmlDateRange);
         }
+
+        return $this;
+    }
+
+    public function addFULOrderParams(
+        string $fileFormat,
+        FULContext $fulContext
+    ): OrderDetailsBuilder {
+        // Add FULOrderParams to OrderDetails.
+        $xmlFULOrderParams = $this->dom->createElement('FULOrderParams');
+        $this->instance->appendChild($xmlFULOrderParams);
+
+        // Add FileFormat to FULOrderParams.
+        $xmlFileFormat = $this->dom->createElement('FileFormat');
+        $xmlFileFormat->nodeValue = $fileFormat;
+        $xmlFULOrderParams->appendChild($xmlFileFormat);
+
+        $xmlTest = $this->dom->createElement('TEST');
+        $xmlTest->nodeValue = $fulContext->isTest() ? 'TRUE' : 'FALSE';
+        $xmlFULOrderParams->appendChild($xmlTest);
+
+        $xmlEbcdic = $this->dom->createElement('EBCDIC');
+        $xmlEbcdic->nodeValue = $fulContext->isEbcdic() ? 'TRUE' : 'FALSE';
+        $xmlFULOrderParams->appendChild($xmlEbcdic);
 
         return $this;
     }

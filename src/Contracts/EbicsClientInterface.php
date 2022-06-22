@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Contracts;
 
 use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
@@ -18,6 +19,8 @@ use DateTimeInterface;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ * 
+ * @method UploadOrderResult FUL(string $fileFormat, OrderDataInterface $orderData, FULContext $fulContext, DateTimeInterface $dateTime = null) Standard order type for submitting the files to the bank. Using this order type ensures a transparent transfer of files of any format.
  */
 interface EbicsClientInterface
 {
