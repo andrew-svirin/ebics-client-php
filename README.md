@@ -290,7 +290,8 @@ try {
 | HKD         | Download customer's customer and subscriber information.                                                          |
 | HTD         | Download subscriber's customer and subscriber information.                                                        |
 | PTK         | Download transaction status.                                                                                      |
-| FDL         | Download subscriber's customer and subscriber information.                                                        |
+| FDL         | Download the files from the bank.                                                                                 |
+| FUL         | Upload the files to the bank.                                                                                     |
 | HAA         | Download Bank available order types.                                                                              |
 | VMK         | Download the interim transaction report in SWIFT format (MT942).                                                  |
 | STA         | Download the bank account statement.                                                                              |
