@@ -18,6 +18,7 @@ use DateTimeInterface;
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
+ * @method void setAcknowledgedTransferReceipt(bool $acknowledgedTransferReceipt) Autosend to the bank the transfer receipt order
  */
 interface EbicsClientInterface
 {
