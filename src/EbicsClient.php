@@ -714,7 +714,8 @@ final class EbicsClient implements EbicsClientInterface
         $countryCode = 'FR',
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        $storeClosure = null
     ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
@@ -740,7 +741,8 @@ final class EbicsClient implements EbicsClientInterface
                     $segmentNumber,
                     $isLastSegment
                 );
-            }
+            },
+            $storeClosure
         );
 
         return $this->createDownloadOrderResult($transaction, $format);
@@ -1125,10 +1127,11 @@ final class EbicsClient implements EbicsClientInterface
     /**
      * Walk by segments to build transaction.
      * @param callable $requestClosure
+     * @param callable|null $storeClosure Custom closure to handle acknowledge.
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    private function downloadTransaction($requestClosure, bool $acknowledged = true): DownloadTransaction
+    private function downloadTransaction($requestClosure, $storeClosure = null): DownloadTransaction
     {
         $transaction = $this->transactionFactory->createDownloadTransaction();
 
@@ -1150,6 +1153,12 @@ final class EbicsClient implements EbicsClientInterface
 
             $segment = $this->retrieveDownloadSegment($request);
             $transaction->addSegment($segment);
+        }
+
+        if (null !== $storeClosure) {
+            $acknowledged = call_user_func_array($requestClosure, [$transaction]);
+        } else {
+            $acknowledged = true;
         }
 
         $this->transferReceipt($transaction, $acknowledged);

@@ -253,6 +253,7 @@ interface EbicsClientInterface
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
+     * @param callable|null $storeClosure Custom closure to handle download acknowledge.
      * @return DownloadOrderResult
      */
     public function FDL(
@@ -261,9 +262,10 @@ interface EbicsClientInterface
         string $countryCode = 'FR',
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        $storeClosure = null
     ): DownloadOrderResult;
-    
+
     /**
      * Standard order type for submitting the files to the bank. Using this order type ensures a
      * transparent transfer of files of any format.
