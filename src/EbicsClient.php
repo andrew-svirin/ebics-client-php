@@ -137,6 +137,11 @@ final class EbicsClient implements EbicsClientInterface
     private $segmentFactory;
 
     /**
+     * @var bool
+     */
+    private $autoAcknowledgeDownload;
+
+    /**
      * Constructor.
      *
      * @param Bank $bank
@@ -170,6 +175,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->segmentFactory = new SegmentFactory();
         // Set default http client.
         $this->httpClient = new HttpClient();
+        $this->autoAcknowledgeDownload = true;
     }
 
     /**
@@ -1014,12 +1020,11 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * Mark download or upload transaction as receipt or not.
-     *
+     * @inheritDoc
      * @throws EbicsException
      * @throws Exceptions\EbicsResponseException
      */
-    private function transferReceipt(DownloadTransaction $transaction, bool $acknowledged): void
+    public function transferReceipt(DownloadTransaction $transaction, bool $acknowledged): void
     {
         $request = $this->requestFactory->createTransferReceipt($transaction->getId(), $acknowledged);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
@@ -1152,7 +1157,9 @@ final class EbicsClient implements EbicsClientInterface
             $transaction->addSegment($segment);
         }
 
-        $this->transferReceipt($transaction, $acknowledged);
+        if ($this->autoAcknowledgeDownload) {
+            $this->transferReceipt($transaction, $acknowledged);
+        }
 
         return $transaction;
     }
@@ -1354,6 +1361,14 @@ final class EbicsClient implements EbicsClientInterface
     public function setHttpClient(HttpClientInterface $httpClient): void
     {
         $this->httpClient = $httpClient;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setAutoAcknowledgeDownload(bool $autoAcknowledgeDownload): void
+    {
+        $this->autoAcknowledgeDownload = $autoAcknowledgeDownload;
     }
 
     /**

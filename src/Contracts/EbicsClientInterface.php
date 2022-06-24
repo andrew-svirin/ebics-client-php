@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Models\DownloadOrderResult;
+use AndrewSvirin\Ebics\Models\DownloadTransaction;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\InitializationOrderResult;
 use AndrewSvirin\Ebics\Models\UploadOrderResult;
@@ -375,4 +376,18 @@ interface EbicsClientInterface
      * @param HttpClientInterface $httpClient
      */
     public function setHttpClient(HttpClientInterface $httpClient): void;
+
+    /**
+     * Mark download or upload transaction as receipt or not.
+     * @param DownloadTransaction $transaction
+     * @param bool $acknowledged
+     */
+    public function transferReceipt(DownloadTransaction $transaction, bool $acknowledged): void;
+
+    /**
+     * Set download transaction auto-acknowledge behavior. If false, method transferReceipt should be called manually
+     * @see EbicsClientInterface::transferReceipt() To send download acknowledgement manually
+     * @param bool $autoAcknowledgeDownload
+     */
+    public function setAutoAcknowledgeDownload(bool $autoAcknowledgeDownload): void;
 }
