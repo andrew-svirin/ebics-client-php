@@ -5,11 +5,13 @@ namespace AndrewSvirin\Ebics\Tests;
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
+use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
+use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
 use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
@@ -586,6 +588,47 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group FUL
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testFUL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $documentFactory = new DocumentFactory();
+        foreach ($codes['FUL'] as $ebcdic => $code) {
+            $client = $this->setupClientV2($credentialsId, $x509Generator, $code['fake']);
+
+            $this->assertExceptionCode($code['code']);
+
+            $context = new FULContext();
+            $context->setEbcdic($ebcdic);
+
+            $fdl = $client->FUL(
+                $code['format'],
+                $documentFactory->create($code['document']),
+                $context,
+                new DateTime()
+            );
+
+            $responseHandler = new ResponseHandlerV2();
+            $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getLastSegment()->getResponse());
+            $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getLastSegment()->getResponse());
+            $this->assertResponseOk($code, $reportText);
+
+            $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getInitialization()->getResponse());
+            $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getInitialization()->getResponse());
+
+            $this->assertResponseOk($code, $reportText);
+        }
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group CCT
      * @group V2
      * @group CCT-V2
@@ -988,6 +1031,14 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
+                    'FUL' => [
+                        'CCT' => [
+                            'code' => '091112',
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
+                            'format' => 'xml',
+                        ],
+                    ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
@@ -1053,6 +1104,14 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
+                    'FUL' => [
+                        'CCT' => [
+                            'code' => '091112',
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
+                            'format' => 'xml',
+                        ],
+                    ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
@@ -1088,6 +1147,14 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
+                    'FUL' => [
+                        'CCT' => [
+                            'code' => '091112',
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
+                            'format' => 'xml',
+                        ],
+                    ],
                     'CCT' => ['code' => '090003', 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
@@ -1122,6 +1189,14 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
+                    ],
+                    'FUL' => [
+                        'CCT' => [
+                            'code' => '091112',
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
+                            'format' => 'xml',
+                        ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
