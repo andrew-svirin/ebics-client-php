@@ -679,6 +679,7 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
+     * @throws Exceptions\EbicsException
      */
     public function ZSR(
         DateTimeInterface $dateTime = null,

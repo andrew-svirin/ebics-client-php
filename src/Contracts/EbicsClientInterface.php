@@ -269,6 +269,11 @@ interface EbicsClientInterface
     /**
      * Standard order type for submitting the files to the bank. Using this order type ensures a
      * transparent transfer of files of any format.
+     * @param string $fileFormat 'xml' ?? 'zip' ? ...
+     * @param OrderDataInterface $orderData File to be uploaded.
+     * @param FULContext $fulContext Order attributes.
+     * @param DateTimeInterface|null $dateTime
+     * @return UploadOrderResult
      */
     public function FUL(
         string $fileFormat,
