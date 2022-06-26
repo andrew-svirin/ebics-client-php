@@ -12,7 +12,6 @@ use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
-use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
 use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
@@ -45,7 +44,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $client = $this->setupClientV2($credentialsId, $x509Generator, $codes['HEV']['fake']);
         $hev = $client->HEV();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH000ReturnCode($hev);
         $reportText = $responseHandler->retrieveH000ReportText($hev);
         $this->assertResponseOk($code, $reportText);
@@ -74,7 +73,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         }
         $ini = $client->INI();
         if (!$userExists) {
-            $responseHandler = new ResponseHandlerV2();
+            $responseHandler = $client->getResponseHandler();
             $this->saveKeyRing($credentialsId, $client->getKeyRing());
             $code = $responseHandler->retrieveH00XReturnCode($ini);
             $reportText = $responseHandler->retrieveH00XReportText($ini);
@@ -105,7 +104,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         }
         $hia = $client->HIA();
         if (!$bankExists) {
-            $responseHandler = new ResponseHandlerV2();
+            $responseHandler = $client->getResponseHandler();
             $this->saveKeyRing($credentialsId, $client->getKeyRing());
             $code = $responseHandler->retrieveH00XReturnCode($hia);
             $reportText = $responseHandler->retrieveH00XReportText($hia);
@@ -134,7 +133,8 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HPB']['code']);
 
         $hpb = $client->HPB();
-        $responseHandler = new ResponseHandlerV2();
+
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -159,7 +159,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HKD']['code']);
         $hkd = $client->HKD();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hkd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hkd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -188,7 +188,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HTD']['code']);
         $htd = $client->HTD();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($htd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($htd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -217,7 +217,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['PTK']['code']);
         $ptk = $client->PTK();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -246,7 +246,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HPD']['code']);
         $hpd = $client->HPD();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -275,7 +275,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HAA']['code']);
         $haa = $client->HAA();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -304,7 +304,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['VMK']['code']);
         $vmk = $client->VMK();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($vmk->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -333,7 +333,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['STA']['code']);
         $sta = $client->STA();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($sta->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($sta->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -362,7 +362,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['C52']['code']);
         $c52 = $client->C52();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c52->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($c52->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -395,7 +395,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
             (new DateTime())->modify('-1 day')
         );
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -428,7 +428,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
             (new DateTime())->modify('-1 day')
         );
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($c54->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -457,7 +457,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['Z52']['code']);
         $z52 = $client->Z52();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z52->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($z52->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -490,7 +490,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
             (new DateTime())->modify('-1 day')
         );
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z53->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($z53->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -523,7 +523,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
             (new DateTime())->modify('-1 day')
         );
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -573,7 +573,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     break;
             }
 
-            $responseHandler = new ResponseHandlerV2();
+            $responseHandler = $client->getResponseHandler();
             $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getLastSegment()->getResponse());
             $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getLastSegment()->getResponse());
             $this->assertResponseOk($code, $reportText);
@@ -614,7 +614,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                 new DateTime()
             );
 
-            $responseHandler = new ResponseHandlerV2();
+            $responseHandler = $client->getResponseHandler();
             $code = $responseHandler->retrieveH00XReturnCode($fdl->getTransaction()->getLastSegment()->getResponse());
             $reportText = $responseHandler->retrieveH00XReportText($fdl->getTransaction()->getLastSegment()->getResponse());
             $this->assertResponseOk($code, $reportText);
@@ -668,7 +668,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $cct = $client->CCT($customerCreditTransfer);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($cct->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -706,7 +706,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $cip = $client->CIP($customerDirectDebit);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($cip->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -769,7 +769,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $xe2 = $client->XE2($customerCreditTransfer);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -807,7 +807,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $cdd = $client->CDD($customerDirectDebit);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cdd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($cdd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -838,7 +838,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HVU']['code']);
         $hvu = $client->HVU();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hvu->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hvu->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -869,7 +869,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['HVZ']['code']);
         $hvz = $client->HVZ();
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hvz->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hvz->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -911,7 +911,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $hve = $client->HVE($context);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hve->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hve->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -949,7 +949,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $hvd = $client->HVD($context);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hvd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hvd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
@@ -990,7 +990,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $hvd = $client->HVT($context);
 
-        $responseHandler = new ResponseHandlerV2();
+        $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($hvd->getTransaction()->getLastSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hvd->getTransaction()->getLastSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
