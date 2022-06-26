@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
+use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Models\DownloadOrderResult;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\InitializationOrderResult;
@@ -382,4 +383,10 @@ interface EbicsClientInterface
      * @param HttpClientInterface $httpClient
      */
     public function setHttpClient(HttpClientInterface $httpClient): void;
+
+    /**
+     * Get response handler for manual process response.
+     * @return ResponseHandler
+     */
+    public function getResponseHandler(): ResponseHandler;
 }

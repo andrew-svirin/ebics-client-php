@@ -1433,4 +1433,9 @@ final class EbicsClient implements EbicsClientInterface
 
         return $signature;
     }
+
+    public function getResponseHandler(): ResponseHandler
+    {
+        return $this->responseHandler;
+    }
 }
