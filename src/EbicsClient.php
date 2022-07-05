@@ -1157,7 +1157,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         if (null !== $storeClosure) {
-            $acknowledged = call_user_func_array($requestClosure, [$transaction]);
+            $acknowledged = call_user_func_array($storeClosure, [$transaction]);
         } else {
             $acknowledged = true;
         }
