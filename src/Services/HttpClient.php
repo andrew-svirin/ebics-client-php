@@ -30,7 +30,7 @@ final class HttpClient implements HttpClientInterface
             throw new RuntimeException('Can not create curl.');
         }
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: text/xml; charset=ISO-8859-1',
+            'Content-Type: text/xml; charset=UTF-8',
         ]);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
