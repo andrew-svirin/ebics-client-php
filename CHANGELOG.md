@@ -5,3 +5,4 @@
 * Major update for keyring manager. Added Array & File keyring managers instead of keyring.
 * Add responseHandler into ClientInterface
 * Add $storageCallback for download methods that handle acknowledge.
+* Fix UTF-8 encoding.
