@@ -9,6 +9,14 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use RuntimeException;
 
+/**
+ * PSR http client.
+ *
+ * This client allows to use a PSR http client instead of the internal HttpClient.
+ *
+ * @license http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @author Ronan Giron
+ */
 final class PsrHttpClient implements HttpClientInterface
 {
     /** @var ClientInterface */
