@@ -25,10 +25,10 @@
     "ext-bcmath": "*",
     "ext-curl": "*",
     "ext-dom": "*",
+    "ext-json": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
-    "ext-zlib": "*",
-    "ext-json": "*"
+    "ext-zlib": "*"
   },
   "require-dev": {
     "mpdf/mpdf": "^8",
@@ -52,7 +52,9 @@
   "suggest": {
     "andrew-svirin/cfonb-php": "If you need to parse format CFONB from FDL requests.",
     "andrew-svirin/mt942-php": "If you need to parse format MT942 from VMK, STA requests.",
-    "mpdf/mpdf": "If you need to generate PDF file letter for Bank."
+    "mpdf/mpdf": "If you need to generate PDF file letter for Bank.",
+    "psr/http-client": "If you want use the PsrHttpClient",
+    "psr/http-factory": "If you want use the PsrHttpClient"
   },
   "config": {
     "sort-packages": true
