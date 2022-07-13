@@ -33,6 +33,7 @@
   "require-dev": {
     "andrew-svirin/cfonb-php": "dev-master",
     "andrew-svirin/mt942-php": "dev-master",
+    "berlioz/http-message": "^1.2",
     "mpdf/mpdf": "^8",
     "phpseclib/phpseclib": "~2.0.35",
     "phpstan/phpstan": "^1",

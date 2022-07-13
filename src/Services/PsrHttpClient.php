@@ -5,8 +5,10 @@ namespace AndrewSvirin\Ebics\Services;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
 
 /**
@@ -15,7 +17,7 @@ use RuntimeException;
  * This client allows to use a PSR http client instead of the internal HttpClient.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Ronan Giron
+ * @author Ronan GIRON <https://github.com/ElGigi>
  */
 final class PsrHttpClient implements HttpClientInterface
 {
@@ -23,23 +25,30 @@ final class PsrHttpClient implements HttpClientInterface
     private $client;
     /** @var RequestFactoryInterface */
     private $requestFactory;
+    /** @var StreamFactoryInterface */
+    private $streamFactory;
 
     public function __construct(
         ClientInterface $client,
-        RequestFactoryInterface $requestFactory
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory
     ) {
         $this->client = $client;
         $this->requestFactory = $requestFactory;
+        $this->streamFactory = $streamFactory;
     }
 
     /**
      * @inheritDoc
+     * @throws ClientExceptionInterface
      */
     public function post(string $url, Request $request): Response
     {
         // Construct PSR request
-        $psrRequest = $this->requestFactory->createRequest('POST', $url);
-        $psrRequest = $psrRequest->withHeader('Content-Type', 'text/xml; charset=UTF-8');
+        $psrRequest = $this->requestFactory
+            ->createRequest('POST', $url)
+            ->withHeader('Content-Type', 'text/xml; charset=UTF-8')
+            ->withBody($this->streamFactory->createStream($request->getContent()));
 
         // Call PSR HTTP client
         $psrResponse = $this->client->sendRequest($psrRequest);
