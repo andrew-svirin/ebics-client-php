@@ -9,7 +9,7 @@ use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use RuntimeException;
 
-class PsrHttpClient implements HttpClientInterface
+final class PsrHttpClient implements HttpClientInterface
 {
     /** @var ClientInterface */
     private $client;
