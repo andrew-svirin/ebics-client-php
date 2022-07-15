@@ -44,7 +44,7 @@ use AndrewSvirin\Ebics\Models\UploadOrderResult;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\HttpClient;
+use AndrewSvirin\Ebics\Services\CurlHttpClient;
 use AndrewSvirin\Ebics\Services\ZipService;
 use DateTime;
 use DateTimeInterface;
@@ -169,7 +169,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->transactionFactory = new TransactionFactory();
         $this->segmentFactory = new SegmentFactory();
         // Set default http client.
-        $this->httpClient = new HttpClient();
+        $this->httpClient = new CurlHttpClient();
     }
 
     /**

@@ -6,3 +6,4 @@
 * Add responseHandler into ClientInterface
 * Add $storageCallback for download methods that handle acknowledge.
 * Fix UTF-8 encoding.
+* Added CurlHttpClient and PsrHttpClient to use standard client.
