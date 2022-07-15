@@ -25,18 +25,20 @@
     "ext-bcmath": "*",
     "ext-curl": "*",
     "ext-dom": "*",
+    "ext-json": "*",
     "ext-openssl": "*",
     "ext-zip": "*",
-    "ext-zlib": "*",
-    "ext-json": "*"
+    "ext-zlib": "*"
   },
   "require-dev": {
-    "mpdf/mpdf": "^8",
-    "phpstan/phpstan": "^1",
-    "phpunit/phpunit": "^9",
     "andrew-svirin/cfonb-php": "dev-master",
     "andrew-svirin/mt942-php": "dev-master",
+    "mpdf/mpdf": "^8",
     "phpseclib/phpseclib": "~2.0.35",
+    "phpstan/phpstan": "^1",
+    "phpunit/phpunit": "^9",
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.0",
     "squizlabs/php_codesniffer": "^3"
   },
   "autoload": {
@@ -52,7 +54,9 @@
   "suggest": {
     "andrew-svirin/cfonb-php": "If you need to parse format CFONB from FDL requests.",
     "andrew-svirin/mt942-php": "If you need to parse format MT942 from VMK, STA requests.",
-    "mpdf/mpdf": "If you need to generate PDF file letter for Bank."
+    "mpdf/mpdf": "If you need to generate PDF file letter for Bank.",
+    "psr/http-client": "If you want use the PsrHttpClient",
+    "psr/http-factory": "If you want use the PsrHttpClient"
   },
   "config": {
     "sort-packages": true
