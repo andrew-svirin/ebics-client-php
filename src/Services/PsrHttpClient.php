@@ -2,14 +2,12 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
-use RuntimeException;
 
 /**
  * PSR http client.
@@ -19,13 +17,21 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Ronan GIRON <https://github.com/ElGigi>
  */
-final class PsrHttpClient implements HttpClientInterface
+final class PsrHttpClient extends HttpClient
 {
-    /** @var ClientInterface */
+    /**
+     * @var ClientInterface
+     */
     private $client;
-    /** @var RequestFactoryInterface */
+
+    /**
+     * @var RequestFactoryInterface
+     */
     private $requestFactory;
-    /** @var StreamFactoryInterface */
+
+    /**
+     * @var StreamFactoryInterface
+     */
     private $streamFactory;
 
     public function __construct(
@@ -47,20 +53,13 @@ final class PsrHttpClient implements HttpClientInterface
         // Construct PSR request
         $psrRequest = $this->requestFactory
             ->createRequest('POST', $url)
-            ->withHeader('Content-Type', 'text/xml; charset=UTF-8')
+            ->withHeader('Content-Type', self::CONTENT_TYPE)
             ->withBody($this->streamFactory->createStream($request->getContent()));
 
         // Call PSR HTTP client
         $psrResponse = $this->client->sendRequest($psrRequest);
         $contents = $psrResponse->getBody()->getContents();
 
-        if (empty($contents)) {
-            throw new RuntimeException('Response is empty.');
-        }
-
-        $response = new Response();
-        $response->loadXML($contents);
-
-        return $response;
+        return $this->createResponse($contents);
     }
 }
