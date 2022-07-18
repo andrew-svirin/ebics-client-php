@@ -186,7 +186,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
 
-        $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
+        $options = $this->mergeCertificateOptions($options, $this->getCertificateOptions());
 
         $signatureAlgorithm = 'sha256WithRSAEncryption';
 
