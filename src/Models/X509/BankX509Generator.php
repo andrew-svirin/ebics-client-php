@@ -14,6 +14,11 @@ use LogicException;
 final class BankX509Generator extends AbstractX509Generator
 {
     /**
+     * @var array
+     */
+    private $certificateOptions;
+
+    /**
      * Set certificate options by Bank.
      */
     public function setCertificateOptionsByBank(Bank $bank): void
@@ -21,7 +26,7 @@ final class BankX509Generator extends AbstractX509Generator
         $countryName = $this->resolveCountryName($bank->getUrl());
         $domainName = $this->resolveDomainName($bank->getUrl());
         $establishmentName = $this->resolveEstablishmentName($bank->getUrl());
-        $this->setCertificateOptions([
+        $this->certificateOptions = [
             'subject' => [
                 'DN' => [
                     'id-at-countryName' => $countryName,
@@ -34,7 +39,15 @@ final class BankX509Generator extends AbstractX509Generator
                     'id-at-commonName' => $establishmentName,
                 ],
             ],
-        ]);
+        ];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getCertificateOptions(): array
+    {
+        return $this->certificateOptions;
     }
 
     /**
