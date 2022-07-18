@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
 
-
 /**
  * Legacy X509 certificate generator @see X509GeneratorInterface.
  *
@@ -14,11 +13,12 @@ use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
  */
 class SilarhiX509Generator extends AbstractX509Generator
 {
-
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    protected function getCertificateOptions(): array
     {
-        parent::__construct();
-        $this->setCertificateOptions([
+        return [
             'subject' => [
                 'domain' => 'silarhi.fr',
                 'DN' => [
@@ -50,6 +50,6 @@ class SilarhiX509Generator extends AbstractX509Generator
                     'value' => ['id-kp-serverAuth', 'id-kp-clientAuth'],
                 ],
             ],
-        ]);
+        ];
     }
 }

@@ -42,11 +42,6 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     private $x509Factory;
 
     /**
-     * @var array
-     */
-    private $certificateOptions;
-
-    /**
      * @var RandomService
      */
     private $randomService;
@@ -61,24 +56,13 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     }
 
     /**
-     * @param array $certificateOptions
-     */
-    public function setCertificateOptions(array $certificateOptions): void
-    {
-        $this->certificateOptions = $certificateOptions;
-    }
-
-    /**
      * Get certificate options
      *
      * @return array the certificate options
      *
      * @see X509 options
      */
-    protected function getCertificateOptions(): array
-    {
-        return $this->certificateOptions;
-    }
+    abstract protected function getCertificateOptions(): array;
 
     /**
      * @inheritDoc
