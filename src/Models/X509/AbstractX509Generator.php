@@ -42,6 +42,11 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     private $x509Factory;
 
     /**
+     * @var array
+     */
+    private $certificateOptions;
+
+    /**
      * @var RandomService
      */
     private $randomService;
@@ -53,6 +58,16 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $this->x509EndDate = (new DateTime())->modify('+1 year');
         $this->randomService = new RandomService();
         $this->serialNumber = $this->generateSerialNumber();
+        $this->certificateOptions = [];
+    }
+
+    /**
+     * @param array $certificateOptions
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
+     */
+    public function setCertificateOptions(array $certificateOptions): void
+    {
+        $this->certificateOptions = $certificateOptions;
     }
 
     /**
@@ -62,7 +77,10 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
      *
      * @see X509 options
      */
-    abstract protected function getCertificateOptions(): array;
+    protected function getCertificateOptions(): array
+    {
+        return $this->certificateOptions;
+    }
 
     /**
      * @inheritDoc
