@@ -14,11 +14,6 @@ use LogicException;
 final class BankX509Generator extends AbstractX509Generator
 {
     /**
-     * @var array
-     */
-    private $certificateOptions;
-
-    /**
      * Set certificate options by Bank.
      */
     public function setCertificateOptionsByBank(Bank $bank): void
@@ -40,14 +35,6 @@ final class BankX509Generator extends AbstractX509Generator
                 ],
             ],
         ];
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getCertificateOptions(): array
-    {
-        return $this->certificateOptions;
     }
 
     /**
