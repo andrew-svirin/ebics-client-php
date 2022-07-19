@@ -44,7 +44,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
     /**
      * @var array
      */
-    private $certificateOptions;
+    protected $certificateOptions;
 
     /**
      * @var RandomService
@@ -188,7 +188,13 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
 
-        $options = $this->mergeCertificateOptions($options, $this->getCertificateOptions());
+        $certificateOptions = $this->getCertificateOptions();
+        // Prevent not same options between property and getter method
+        if ($certificateOptions !== $this->certificateOptions) {
+            $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
+        }
+
+        $options = $this->mergeCertificateOptions($options, $certificateOptions);
 
         $signatureAlgorithm = 'sha256WithRSAEncryption';
 
