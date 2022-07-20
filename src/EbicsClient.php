@@ -251,8 +251,10 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
+    // @codingStandardsIgnoreStart
     public function H3K(DateTimeInterface $dateTime = null, bool $createSignature = false): Response
     {
+        // @codingStandardsIgnoreEnd
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
