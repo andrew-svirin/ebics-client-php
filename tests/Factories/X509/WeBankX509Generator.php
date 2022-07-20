@@ -13,10 +13,12 @@ use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
  */
 class WeBankX509Generator extends AbstractX509Generator
 {
-    public function __construct()
+    /**
+     * @inheritDoc
+     */
+    protected function getCertificateOptions(): array
     {
-        parent::__construct();
-        $this->setCertificateOptions([
+        return [
             'subject' => [
                 'DN' => [
                     'id-at-countryName' => 'FR',
@@ -29,6 +31,6 @@ class WeBankX509Generator extends AbstractX509Generator
                     'id-at-commonName' => 'Webank Client',
                 ],
             ],
-        ]);
+        ];
     }
 }
