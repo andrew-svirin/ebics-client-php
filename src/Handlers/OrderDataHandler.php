@@ -10,6 +10,7 @@ use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerH3K;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Document;
@@ -196,6 +197,66 @@ abstract class OrderDataHandler
 
         // Add UserID to HIARequestOrderData.
         $this->handleUserId($xmlHIARequestOrderData, $xml);
+    }
+
+    /**
+     * Adds OrderData DOM elements to XML DOM for H3K request.
+     * @throws EbicsException
+     */
+    public function handleH3K(
+        CustomerH3K $xml,
+        SignatureInterface $certificateA,
+        SignatureInterface $certificateE,
+        SignatureInterface $certificateX
+    ): void {
+        // Add H3KRequestOrderData to root.
+        $xmlH3KRequestOrderData = $xml->createElementNS(
+            'urn:org:ebics:H005',
+            'H3KRequestOrderData'
+        );
+        $xmlH3KRequestOrderData->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ds',
+            'http://www.w3.org/2000/09/xmldsig#'
+        );
+
+        $xml->appendChild($xmlH3KRequestOrderData);
+
+        // Add SignatureCertificateInfo to H3KRequestOrderData.
+        $xmlSignatureCertificateInfo = $xml->createElement('SignatureCertificateInfo');
+        $xmlH3KRequestOrderData->appendChild($xmlSignatureCertificateInfo);
+        $this->handleX509Data($xmlSignatureCertificateInfo, $xml, $certificateA);
+
+        // Add EncryptionVersion to EncryptionPubKeyInfo.
+        $xmlSignatureVersion = $xml->createElement('SignatureVersion');
+        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
+        $xmlSignatureCertificateInfo->appendChild($xmlSignatureVersion);
+
+        // Add AuthenticationCertificateInfo to H3KRequestOrderData.
+        $xmlAuthenticationCertificateInfo = $xml->createElement('AuthenticationCertificateInfo');
+        $xmlH3KRequestOrderData->appendChild($xmlAuthenticationCertificateInfo);
+        $this->handleX509Data($xmlAuthenticationCertificateInfo, $xml, $certificateX);
+
+        // Add EncryptionVersion to EncryptionPubKeyInfo.
+        $xmlAuthenticationVersion = $xml->createElement('AuthenticationVersion');
+        $xmlAuthenticationVersion->nodeValue = $this->keyRing->getUserSignatureXVersion();
+        $xmlAuthenticationCertificateInfo->appendChild($xmlAuthenticationVersion);
+
+        // Add EncryptionCertificateInfo to H3KRequestOrderData.
+        $xmlEncryptionCertificateInfo = $xml->createElement('EncryptionCertificateInfo');
+        $xmlH3KRequestOrderData->appendChild($xmlEncryptionCertificateInfo);
+        $this->handleX509Data($xmlEncryptionCertificateInfo, $xml, $certificateE);
+
+        // Add EncryptionVersion to EncryptionPubKeyInfo.
+        $xmlEncryptionVersion = $xml->createElement('EncryptionVersion');
+        $xmlEncryptionVersion->nodeValue = $this->keyRing->getUserSignatureEVersion();
+        $xmlEncryptionCertificateInfo->appendChild($xmlEncryptionVersion);
+
+        // Add PartnerID to HIARequestOrderData.
+        $this->handlePartnerId($xmlH3KRequestOrderData, $xml);
+
+        // Add UserID to HIARequestOrderData.
+        $this->handleUserId($xmlH3KRequestOrderData, $xml);
     }
 
     /**
