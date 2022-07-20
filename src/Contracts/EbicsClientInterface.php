@@ -59,7 +59,9 @@ interface EbicsClientInterface
      * @param DateTimeInterface|null $dateTime current date
      * @return Response
      */
+    // @codingStandardsIgnoreStart
     public function H3K(DateTimeInterface $dateTime = null): Response;
+    // @codingStandardsIgnoreEnd
 
     /**
      * Download the Bank public signatures authentication (X002) and encryption (E002).
