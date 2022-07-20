@@ -43,8 +43,9 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * @var array
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
-    private $certificateOptions;
+    protected $certificateOptions = [];
 
     /**
      * @var RandomService
@@ -62,6 +63,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * @param array $certificateOptions
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
     public function setCertificateOptions(array $certificateOptions): void
     {
@@ -185,8 +187,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         ];
 
         $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
-
-        $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
+        $options = $this->mergeCertificateOptions($options, $this->getCertificateOptions());
 
         $signatureAlgorithm = 'sha256WithRSAEncryption';
 
