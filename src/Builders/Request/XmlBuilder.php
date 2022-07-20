@@ -16,6 +16,7 @@ abstract class XmlBuilder
 {
     const EBICS_REQUEST = 'ebicsRequest';
     const EBICS_UNSECURED_REQUEST = 'ebicsUnsecuredRequest';
+    const EBICS_UNSIGNED_REQUEST = 'ebicsUnsignedRequest';
     const EBICS_NO_PUB_KEY_DIGESTS = 'ebicsNoPubKeyDigestsRequest';
     const EBICS_HEV = 'ebicsHEVRequest';
 
@@ -39,6 +40,8 @@ abstract class XmlBuilder
     abstract public function createSecuredNoPubKeyDigests(): XmlBuilder;
 
     abstract public function createSecured(): XmlBuilder;
+
+    abstract public function createUnsigned(): XmlBuilder;
 
     public function createHEV(): XmlBuilder
     {

@@ -33,6 +33,13 @@ final class XmlBuilderV2 extends XmlBuilder
         return $this;
     }
 
+    public function createUnsigned(): XmlBuilder
+    {
+        $this->createH004(self::EBICS_UNSIGNED_REQUEST);
+
+        return $this;
+    }
+
     private function createH004(string $container, bool $secured = false): XmlBuilder
     {
         $this->instance = $this->dom->createElementNS('urn:org:ebics:H004', $container);
