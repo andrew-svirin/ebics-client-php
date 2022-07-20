@@ -228,7 +228,6 @@ abstract class RequestFactory
             $certificateX
         );
 
-        print $orderData->getContent();
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
