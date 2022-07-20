@@ -228,15 +228,23 @@ abstract class RequestFactory
             $certificateX
         );
 
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle(
+            $signatureData,
+            $this->cryptService->hash($orderData->getContent())
+        );
+
         $context = (new RequestContext())
+            ->setKeyRing($this->keyRing)
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setDateTime($dateTime)
-            ->setOrderData($orderData->getContent());
+            ->setOrderData($orderData->getContent())
+            ->setSignatureData($signatureData);
 
         $request = $this
             ->createRequestBuilderInstance()
-            ->addContainerUnsecured(function (XmlBuilder $builder) use ($context) {
+            ->addContainerUnsigned(function (XmlBuilder $builder) use ($context) {
                 $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
                     $builder->addStatic(function (StaticBuilder $builder) use ($context) {
                         $builder
@@ -251,6 +259,7 @@ abstract class RequestFactory
                     })->addMutable();
                 })->addBody(function (BodyBuilder $builder) use ($context) {
                     $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder->addSignatureData($context->getSignatureData(), '');
                         $builder->addOrderData($context->getOrderData());
                     });
                 });
