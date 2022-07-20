@@ -53,7 +53,7 @@ interface EbicsClientInterface
     public function HIA(DateTimeInterface $dateTime = null): Response;
 
     /**
-     * Make 3K request.
+     * Make H3K request.
      * Send to the bank public signatures of signature (A00X), authentication (X002) and encryption (E002).
      * Prepare A00X, E002 and X002 user signatures for KeyRing.
      * @param DateTimeInterface|null $dateTime current date
