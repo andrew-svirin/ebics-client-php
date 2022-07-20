@@ -59,6 +59,15 @@ final class RequestBuilder
         return $this;
     }
 
+    public function addContainerUnsigned(Closure $callback): RequestBuilder
+    {
+        $this->instance->appendChild($this->xmlBuilder->createUnsigned()->getInstance());
+
+        call_user_func($callback, $this->xmlBuilder);
+
+        return $this;
+    }
+
     public function addContainerHEV(Closure $callback): RequestBuilder
     {
         $this->instance->appendChild($this->xmlBuilder->createHEV()->getInstance());
