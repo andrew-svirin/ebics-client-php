@@ -43,8 +43,9 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * @var array
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
-    protected $certificateOptions;
+    protected $certificateOptions = [];
 
     /**
      * @var RandomService
@@ -58,7 +59,6 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         $this->x509EndDate = (new DateTime())->modify('+1 year');
         $this->randomService = new RandomService();
         $this->serialNumber = $this->generateSerialNumber();
-        $this->certificateOptions = [];
     }
 
     /**
@@ -187,14 +187,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         ];
 
         $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
-
-        $certificateOptions = $this->getCertificateOptions();
-        // Prevent not same options between property and getter method
-        if ($certificateOptions !== $this->certificateOptions) {
-            $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
-        }
-
-        $options = $this->mergeCertificateOptions($options, $certificateOptions);
+        $options = $this->mergeCertificateOptions($options, $this->getCertificateOptions());
 
         $signatureAlgorithm = 'sha256WithRSAEncryption';
 
