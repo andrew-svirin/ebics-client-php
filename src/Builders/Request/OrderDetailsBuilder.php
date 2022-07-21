@@ -25,17 +25,10 @@ abstract class OrderDetailsBuilder
     const ORDER_ATTRIBUTE_UZHNN = 'UZHNN';
     const ORDER_ATTRIBUTE_OZHNN = 'OZHNN';
 
-    /**
-     * @var DOMElement
-     */
-    protected $instance;
+    protected DOMElement $instance;
+    protected ?DOMDocument $dom;
 
-    /**
-     * @var DOMDocument
-     */
-    protected $dom;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }

@@ -19,20 +19,9 @@ use Psr\Http\Message\StreamFactoryInterface;
  */
 final class PsrHttpClient extends HttpClient
 {
-    /**
-     * @var ClientInterface
-     */
-    private $client;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
+    private ClientInterface $client;
+    private RequestFactoryInterface $requestFactory;
+    private StreamFactoryInterface $streamFactory;
 
     public function __construct(
         ClientInterface $client,

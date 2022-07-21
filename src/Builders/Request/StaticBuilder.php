@@ -20,22 +20,11 @@ abstract class StaticBuilder
     const SECURITY_MEDIUM_0100 = '0100';
     const SECURITY_MEDIUM_0200 = '0200';
 
-    /**
-     * @var DOMElement
-     */
-    protected $instance;
+    protected DOMElement $instance;
+    protected ?DOMDocument $dom;
+    protected CryptService $cryptService;
 
-    /**
-     * @var DOMDocument
-     */
-    protected $dom;
-
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
         $this->cryptService = new CryptService();

@@ -16,50 +16,15 @@ final class SignatureBankLetter
     const TYPE_X = 'X';
     const TYPE_E = 'E';
 
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var string
-     */
-    private $exponent;
-
-    /**
-     * @var string
-     */
-    private $modulus;
-
-    /**
-     * @var string
-     */
-    private $keyHash;
-
-    /**
-     * @var int
-     */
-    private $modulusSize;
-
-    /**
-     * @var string|null
-     */
-    private $certificateContent;
-
-    /**
-     * @var DateTime|null
-     */
-    private $certificateCreatedAt;
-
-    /**
-     * @var bool
-     */
-    private $isCertified = false;
+    private string $type;
+    private string $version;
+    private string $exponent;
+    private string $modulus;
+    private string $keyHash;
+    private int $modulusSize;
+    private ?string $certificateContent;
+    private ?DateTime $certificateCreatedAt;
+    private bool $isCertified = false;
 
     public function __construct(
         string $type,
@@ -138,7 +103,7 @@ final class SignatureBankLetter
      */
     public function getCertificateContent(): ?string
     {
-        return $this->certificateContent;
+        return $this->certificateContent ?? null;
     }
 
     /**
@@ -154,7 +119,7 @@ final class SignatureBankLetter
      */
     public function getCertificateCreatedAt(): ?DateTime
     {
-        return $this->certificateCreatedAt;
+        return $this->certificateCreatedAt ?? null;
     }
 
     /**

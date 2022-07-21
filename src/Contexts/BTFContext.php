@@ -9,25 +9,10 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 abstract class BTFContext extends ServiceContext
 {
-    /**
-     * @var string
-     */
-    private $containerFlag;
-
-    /**
-     * @var string
-     */
-    private $msgNameVariant;
-
-    /**
-     * @var string
-     */
-    private $msgNameVersion;
-
-    /**
-     * @var string
-     */
-    private $msgNameFormat;
+    private ?string $containerFlag = null;
+    private ?string $msgNameVariant = null;
+    private ?string $msgNameVersion = null;
+    private ?string $msgNameFormat = null;
 
     public function setContainerFlag(string $containerFlag): BTFContext
     {

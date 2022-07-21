@@ -44,50 +44,15 @@ use DateTimeInterface;
  */
 abstract class RequestFactory
 {
-    /**
-     * @var RequestBuilder
-     */
-    protected $requestBuilder;
-
-    /**
-     * @var OrderDataHandler
-     */
-    protected $orderDataHandler;
-
-    /**
-     * @var DigestResolver
-     */
-    protected $digestResolver;
-
-    /**
-     * @var AuthSignatureHandler
-     */
-    protected $authSignatureHandler;
-
-    /**
-     * @var UserSignatureHandler
-     */
-    protected $userSignatureHandler;
-
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
-
-    /**
-     * @var Bank
-     */
-    protected $bank;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var KeyRing
-     */
-    protected $keyRing;
+    protected RequestBuilder $requestBuilder;
+    protected OrderDataHandler $orderDataHandler;
+    protected DigestResolver $digestResolver;
+    protected AuthSignatureHandler $authSignatureHandler;
+    protected UserSignatureHandler $userSignatureHandler;
+    protected CryptService $cryptService;
+    protected Bank $bank;
+    protected User $user;
+    protected KeyRing $keyRing;
 
     /**
      * Constructor.

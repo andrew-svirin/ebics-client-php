@@ -13,10 +13,7 @@ use AndrewSvirin\Ebics\Models\KeyRing;
  */
 final class KeyRingFactory
 {
-    /**
-     * @var SignatureFactory
-     */
-    private $signatureFactory;
+    private SignatureFactory $signatureFactory;
 
     public function __construct()
     {

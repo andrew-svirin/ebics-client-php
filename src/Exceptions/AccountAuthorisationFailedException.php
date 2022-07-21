@@ -10,7 +10,7 @@ namespace AndrewSvirin\Ebics\Exceptions;
  */
 final class AccountAuthorisationFailedException extends EbicsResponseException
 {
-    public function __construct($responseMessage = null)
+    public function __construct(?string $responseMessage = null)
     {
         parent::__construct(
             '091302',

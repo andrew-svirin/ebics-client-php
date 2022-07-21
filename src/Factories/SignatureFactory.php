@@ -19,10 +19,7 @@ use RuntimeException;
  */
 final class SignatureFactory
 {
-    /**
-     * @var RSAFactory
-     */
-    private $rsaFactory;
+    private RSAFactory $rsaFactory;
 
     public function __construct()
     {

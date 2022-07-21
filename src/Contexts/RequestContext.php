@@ -16,126 +16,30 @@ use DateTimeInterface;
  */
 final class RequestContext
 {
-
-    /**
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
-
-    /**
-     * @var DateTimeInterface
-     */
-    private $dateTime;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $startDateTime;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $endDateTime;
-
-    /**
-     * @var string
-     */
-    private $fileFormat;
-
-    /**
-     * @var string
-     */
-    private $countryCode;
-
-    /**
-     * @var string
-     */
-    private $receiptCode;
-
-    /**
-     * @var int|null
-     */
-    private $segmentNumber;
-
-    /**
-     * @var bool|null
-     */
-    private $isLastSegment;
-
-    /**
-     * @var string
-     */
-    private $transactionId;
-
-    /**
-     * @var string
-     */
-    private $transactionKey;
-
-    /**
-     * @var int
-     */
-    private $numSegments;
-
-    /**
-     * @var string
-     */
-    private $orderData;
-
-    /**
-     * @var SignatureDataInterface
-     */
-    private $signatureData;
-
-    /**
-     * @var BTFContext
-     */
-    private $btfContext;
-
-    /**
-     * @var HVEContext
-     */
-    private $hveContext;
-
-    /**
-     * @var string
-     */
-    private $dataDigest;
-
-    /**
-     * @var string
-     */
-    private $signatureVersion;
-
-    /**
-     * @var BTUContext
-     */
-    private $btuContext;
-
-    /**
-     * @var HVDContext
-     */
-    private $hvdContext;
-
-    /**
-     * @var HVTContext
-     */
-    private $hvtContext;
-
-    /**
-     * @var FULContext
-     */
-    private $fulContext;
+    private Bank $bank;
+    private User $user;
+    private KeyRing $keyRing;
+    private DateTimeInterface $dateTime;
+    private ?DateTimeInterface $startDateTime;
+    private ?DateTimeInterface $endDateTime;
+    private string $fileFormat;
+    private string $countryCode;
+    private string $receiptCode;
+    private ?int $segmentNumber;
+    private ?bool $isLastSegment;
+    private string $transactionId;
+    private string $transactionKey;
+    private int $numSegments;
+    private string $orderData;
+    private SignatureDataInterface $signatureData;
+    private BTFContext $btfContext;
+    private HVEContext $hveContext;
+    private string $dataDigest;
+    private string $signatureVersion;
+    private BTUContext $btuContext;
+    private HVDContext $hvdContext;
+    private HVTContext $hvtContext;
+    private FULContext $fulContext;
 
     public function setBank(Bank $bank): RequestContext
     {

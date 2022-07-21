@@ -17,17 +17,10 @@ final class MutableBuilder
     const PHASE_RECEIPT = 'Receipt';
     const PHASE_TRANSFER = 'Transfer';
 
-    /**
-     * @var DOMElement
-     */
-    private $instance;
+    private DOMElement $instance;
+    private ?DOMDocument $dom;
 
-    /**
-     * @var DOMDocument
-     */
-    private $dom;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }

@@ -14,7 +14,6 @@ use DOMXPath;
  */
 trait XPathTrait
 {
-
     /**
      * Setup XPath for DOM XML.
      *
