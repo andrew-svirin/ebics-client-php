@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
 use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
+use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
 use LogicException;
@@ -67,10 +68,6 @@ final class HtmlBankLetterFormatter implements FormatterInterface
      */
     public function format(BankLetter $bankLetter): string
     {
-        if (empty($serverName = $bankLetter->getBank()->getServerName())) {
-            $serverName = '--';
-        }
-
         return <<<EOF
 <html>
 <head>
@@ -118,7 +115,7 @@ final class HtmlBankLetterFormatter implements FormatterInterface
     <tbody>
         <tr>
             <th>{$this->translations['server_name']}</th>
-            <td>{$serverName}</td>
+            <td>{$this->getServerName($bankLetter->getBank())}</td>
         </tr>
         <tr>
             <th>{$this->translations['host_id']}</th>
@@ -142,6 +139,22 @@ final class HtmlBankLetterFormatter implements FormatterInterface
 </body>
 </html>
 EOF;
+    }
+
+    /**
+     * Get server name.
+     *
+     * @param Bank $bank
+     *
+     * @return string
+     */
+    private function getServerName(Bank $bank): string
+    {
+        if (empty($serverName = $bank->getServerName())) {
+            return '--';
+        }
+
+        return $serverName;
     }
 
     /**
