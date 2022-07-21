@@ -10,20 +10,9 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class UploadSegment extends Segment
 {
-    /**
-     * @var string
-     */
-    private $transactionId;
-
-    /**
-     * @var string|null
-     */
-    private $transactionPhase;
-
-    /**
-     * @var string
-     */
-    private $orderId;
+    private string $transactionId;
+    private ?string $transactionPhase;
+    private string $orderId;
 
     public function getTransactionId(): ?string
     {

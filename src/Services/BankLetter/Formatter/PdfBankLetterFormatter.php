@@ -16,15 +16,8 @@ use AndrewSvirin\Ebics\Models\BankLetter;
  */
 final class PdfBankLetterFormatter implements FormatterInterface
 {
-    /**
-     * @var HtmlBankLetterFormatter
-     */
-    private $bankLetterFormatterHtml;
-
-    /**
-     * @var PdfFactory
-     */
-    private $pdfFactory;
+    private HtmlBankLetterFormatter $bankLetterFormatterHtml;
+    private PdfFactory $pdfFactory;
 
     public function __construct(array $translations = [], string $style = '')
     {

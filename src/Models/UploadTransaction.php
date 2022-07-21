@@ -12,35 +12,12 @@ use AndrewSvirin\Ebics\Contracts\UploadTransactionInterface;
  */
 final class UploadTransaction extends Transaction implements UploadTransactionInterface
 {
-    /**
-     * @var string
-     */
-    private $key;
-
-    /**
-     * @var int
-     */
-    private $numSegments;
-
-    /**
-     * @var TransferSegment[]
-     */
-    private $segments;
-
-    /**
-     * @var string
-     */
-    private $orderData;
-
-    /**
-     * @var string
-     */
-    private $digest;
-
-    /**
-     * @var UploadSegment
-     */
-    private $initialization;
+    private string $key;
+    private int $numSegments;
+    private array $segments;
+    private string $orderData;
+    private string $digest;
+    private UploadSegment $initialization;
 
     /**
      * @param string $key

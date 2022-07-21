@@ -16,22 +16,11 @@ use DOMElement;
  */
 final class DataEncryptionInfoBuilder
 {
-    /**
-     * @var DOMElement
-     */
-    private $instance;
+    private DOMElement $instance;
+    private ?DOMDocument $dom;
+    private CryptService $cryptService;
 
-    /**
-     * @var DOMDocument
-     */
-    private $dom;
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
         $this->cryptService = new CryptService();

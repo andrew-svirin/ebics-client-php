@@ -33,40 +33,13 @@ abstract class OrderDataHandler
 {
     use XPathTrait;
 
-    /**
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
-
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
-
-    /**
-     * @var SignatureFactory
-     */
-    protected $certificateFactory;
-
-    /**
-     * @var CertificateX509Factory
-     */
-    private $certificateX509Factory;
-
-    /**
-     * @var BigIntegerFactory
-     */
-    protected $bigIntegerFactory;
+    private Bank $bank;
+    private User $user;
+    private KeyRing $keyRing;
+    protected CryptService $cryptService;
+    protected SignatureFactory $certificateFactory;
+    private CertificateX509Factory $certificateX509Factory;
+    protected BigIntegerFactory $bigIntegerFactory;
 
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {

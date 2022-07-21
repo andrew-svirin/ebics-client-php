@@ -13,15 +13,8 @@ use DOMElement;
  */
 final class UnstructuredPostalAddress implements PostalAddressInterface
 {
-    /**
-     * @var string
-     */
-    protected $country;
-
-    /**
-     * @var array
-     */
-    protected $addressLines;
+    protected string $country;
+    protected array $addressLines;
 
     /**
      * Constructor

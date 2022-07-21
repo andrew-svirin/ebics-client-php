@@ -10,29 +10,11 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class BankLetter
 {
-    /**
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterA;
-
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterE;
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterX;
+    private Bank $bank;
+    private User $user;
+    private SignatureBankLetter $signatureBankLetterA;
+    private SignatureBankLetter $signatureBankLetterE;
+    private SignatureBankLetter $signatureBankLetterX;
 
     public function __construct(
         Bank $bank,

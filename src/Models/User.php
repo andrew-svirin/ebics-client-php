@@ -12,17 +12,13 @@ final class User
 {
     /**
      * The assigned PartnerID (Kunden-ID).
-     *
-     * @var string
      */
-    private $partnerId;
+    private string $partnerId;
 
     /**
      * The assigned UserID (Teilnehmer-ID).
-     *
-     * @var string
      */
-    private $userId;
+    private string $userId;
 
     /**
      * Constructor.
