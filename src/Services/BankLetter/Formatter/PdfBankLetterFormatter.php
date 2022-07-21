@@ -26,9 +26,9 @@ final class PdfBankLetterFormatter implements FormatterInterface
      */
     private $pdfFactory;
 
-    public function __construct()
+    public function __construct(array $translations = [], string $style = '')
     {
-        $this->bankLetterFormatterHtml = new HtmlBankLetterFormatter();
+        $this->bankLetterFormatterHtml = new HtmlBankLetterFormatter($translations, $style);
         $this->pdfFactory = new PdfFactory();
     }
 
