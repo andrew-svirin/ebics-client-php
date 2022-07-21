@@ -18,41 +18,53 @@ use LogicException;
  */
 final class HtmlBankLetterFormatter implements FormatterInterface
 {
-    /**
-     * @var array
-     */
-    private $translations;
-    /**
-     * @var string
-     */
-    private $style;
+    private array $translations = [
+        'init_letter' => 'Initialization letter',
+        'parameters' => 'Parameters',
+        'server_name' => 'Server Name',
+        'host_id' => 'Host ID',
+        'partner_id' => 'Partner ID',
+        'user_id' => 'User ID',
+        'version' => 'Version',
+        'date' => 'Date',
+        'auth_certificate' => 'Authentication Certificate',
+        'certificate' => 'Certificate',
+        'hash' => 'Hash',
+        'es_signature' => 'ES signature',
+        'encryption_signature' => 'Encryption signature',
+        'authentication_signature' => 'Authentication signature',
+        'exponent' => 'Exponent',
+        'modulus' => 'Modulus',
+    ];
+    private string $style = '';
 
-    public function __construct(array $translations = [], string $style = '')
+    /**
+     * Set translations.
+     *
+     * @param array $translations
+     *
+     * @return void
+     */
+    public function setTranslations(array $translations): void
     {
-        $this->translations = array_replace(
-            [
-                'init_letter' => 'Initialization letter',
-                'parameters' => 'Parameters',
-                'server_name' => 'Server Name',
-                'host_id' => 'Host ID',
-                'partner_id' => 'Partner ID',
-                'user_id' => 'User ID',
-                'version' => 'Version',
-                'date' => 'Date',
-                'auth_certificate' => 'Authentication Certificate',
-                'certificate' => 'Certificate',
-                'hash' => 'Hash',
-                'es_signature' => 'ES signature',
-                'encryption_signature' => 'Encryption signature',
-                'authentication_signature' => 'Authentication signature',
-                'exponent' => 'Exponent',
-                'modulus' => 'Modulus',
-            ],
-            $translations
-        );
+        $this->translations = array_replace($this->translations, $translations);
+    }
+
+    /**
+     * Set additional CSS style.
+     *
+     * @param string $style
+     *
+     * @return void
+     */
+    public function setStyle(string $style): void
+    {
         $this->style = $style;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function format(BankLetter $bankLetter): string
     {
         if (empty($serverName = $bankLetter->getBank()->getServerName())) {
