@@ -10,35 +10,12 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class DownloadSegment extends Segment
 {
-    /**
-     * @var string
-     */
-    private $transactionId;
-
-    /**
-     * @var string|null
-     */
-    private $transactionPhase;
-
-    /**
-     * @var string
-     */
-    private $transactionKey;
-
-    /**
-     * @var int|null
-     */
-    private $segmentNumber;
-
-    /**
-     * @var int|null
-     */
-    private $numSegments;
-
-    /**
-     * @var string
-     */
-    private $orderData;
+    private string $transactionId;
+    private ?string $transactionPhase;
+    private string $transactionKey;
+    private ?int $segmentNumber;
+    private ?int $numSegments;
+    private string $orderData;
 
     public function getTransactionId(): ?string
     {

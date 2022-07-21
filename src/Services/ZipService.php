@@ -66,7 +66,7 @@ final class ZipService
      *
      * @return string
      */
-    public function uncompress(string $compressed)
+    public function uncompress(string $compressed): string
     {
         if (!($uncompressed = gzuncompress($compressed))) {
             throw new RuntimeException('Data can not be uncompressed.');
@@ -82,7 +82,7 @@ final class ZipService
      *
      * @return string
      */
-    public function compress(string $uncompressed)
+    public function compress(string $uncompressed): string
     {
         if (!($compressed = gzcompress($uncompressed))) {
             throw new RuntimeException('Data can not be compressed.');

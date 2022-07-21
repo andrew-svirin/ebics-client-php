@@ -22,6 +22,7 @@ final class RSA implements RSAInterface
      * @see self::setMGFHash()
      */
     const SIGNATURE_PSS = 1;
+
     /**
      * Use the PKCS#1 scheme by default.
      *
@@ -87,52 +88,38 @@ final class RSA implements RSAInterface
 
     /**
      * Modulus length
-     *
-     * @var int|null
      */
-    protected $k;
+    protected ?int $k;
 
     /**
      * Modulus (ie. n)
-     *
-     * @var BigIntegerInterface|null
      */
-    protected $modulus;
+    protected ?BigIntegerInterface $modulus;
 
     /**
      * Exponent (ie. e or d)
-     *
-     * @var BigIntegerInterface|null
      */
-    protected $exponent;
+    protected ?BigIntegerInterface $exponent;
 
     /**
      * Primes for Chinese Remainder Theorem (ie. p and q)
-     *
-     * @var array|null
      */
-    protected $primes;
+    protected ?array $primes;
 
     /**
      * Exponents for Chinese Remainder Theorem (ie. dP and dQ)
-     *
-     * @var array|null
      */
-    protected $exponents;
+    protected ?array $exponents;
 
     /**
      * Coefficients for Chinese Remainder Theorem (ie. qInv)
-     *
-     * @var array|null
      */
-    protected $coefficients;
+    protected ?array $coefficients;
 
     /**
      * Signature mode
-     *
-     * @var int
      */
-    protected $signatureMode = self::SIGNATURE_PSS;
+    protected int $signatureMode = self::SIGNATURE_PSS;
 
     /**
      * Public Exponent
@@ -143,73 +130,53 @@ final class RSA implements RSAInterface
 
     /**
      * Password.
-     *
-     * @var string|null
      */
-    protected $password = null;
+    protected ?string $password = null;
 
     /**
      * Public Key Format.
-     *
-     * @var int
      */
-    protected $publicKeyFormat;
+    protected ?int $publicKeyFormat = null;
 
     /**
      * Private Key Format.
-     *
-     * @var int
      */
-    protected $privateKeyFormat;
+    protected ?int $privateKeyFormat = null;
 
     /**
      * Hash name.
-     *
-     * @var string
      */
-    protected $hashName;
+    protected string $hashName;
 
     /**
      * Hash function
-     *
-     * @var HashInterface
      */
-    protected $hash;
+    protected HashInterface $hash;
 
     /**
      * Length of hash function output
-     *
-     * @var int
      */
-    protected $hLen;
+    protected ?int $hLen = null;
 
     /**
      * Length of salt
-     *
-     * @var int
      */
-    protected $sLen;
+    protected ?int $sLen = null;
 
     /**
      * Hash function for the Mask Generation Function
-     *
-     * @var HashInterface
      */
-    protected $mgfHash;
+    protected HashInterface $mgfHash;
 
     /**
      * Length of MGF hash function output
-     *
-     * @var int
      */
-    protected $mgfHLen;
+    protected int $mgfHLen;
 
     /**
      * Precomputed Zero
-     *
-     * @var BigInteger
      */
-    protected $zero;
+    protected BigInteger $zero;
 
     public function __construct()
     {
@@ -248,7 +215,7 @@ final class RSA implements RSAInterface
         $this->hLen = $this->hash->getLength();
     }
 
-    public function createKey($bits = 1024, $timeout = false, $partial = [])
+    public function createKey($bits = 1024, $timeout = false, $partial = []): array
     {
         if (!defined('CRYPT_RSA_EXPONENT')) {
             // http://en.wikipedia.org/wiki/65537_%28number%29
@@ -319,7 +286,7 @@ final class RSA implements RSAInterface
      *
      * @return array|bool
      */
-    private function parseKey($key, $type)
+    private function parseKey($key, int $type)
     {
         if ($type != self::PUBLIC_FORMAT_RAW && !is_string($key)) {
             return false;
@@ -533,7 +500,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function stringShift(&$string, $index = 1)
+    private function stringShift(string &$string, int $index = 1): string
     {
         $substr = substr($string, 0, $index);
         $string = substr($string, $index);
@@ -551,7 +518,7 @@ final class RSA implements RSAInterface
      *
      * @return int
      */
-    private function decodeLength(&$string)
+    private function decodeLength(string &$string): int
     {
         $length = ord($this->stringShift($string));
         if ($length & 0x80) { // definite length, long form
@@ -577,7 +544,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function encodeLength($length)
+    private function encodeLength(int $length): string
     {
         if ($length <= 0x7F) {
             return chr($length);
@@ -594,7 +561,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function extractBER($str)
+    private function extractBER(string $str): string
     {
         /* X.509 certs are assumed to be base64 encoded but sometimes they'll have additional things in them
          * above and beyond the ceritificate.
@@ -626,8 +593,14 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function convertPrivateKey($n, $e, $d, $primes, $exponents, $coefficients)
-    {
+    private function convertPrivateKey(
+        BigIntegerInterface $n,
+        BigIntegerInterface $e,
+        BigIntegerInterface $d,
+        array $primes,
+        array $exponents,
+        array $coefficients
+    ): string {
         $signed = true;
         $num_primes = count($primes);
         $raw = [
@@ -711,7 +684,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function convertPublicKey($n, $e)
+    private function convertPublicKey(BigIntegerInterface $n, BigIntegerInterface $e): string
     {
         $signed = true;
 
@@ -769,7 +742,7 @@ final class RSA implements RSAInterface
         }
     }
 
-    public function setPublicKey($key = false)
+    public function setPublicKey($key = false): bool
     {
         // if a public key has already been loaded return false
         if (!empty($this->publicExponent)) {
@@ -805,7 +778,7 @@ final class RSA implements RSAInterface
         return true;
     }
 
-    public function loadKey($key, $type = false)
+    public function loadKey($key, $type = false): bool
     {
         $components = false;
         if ($type === false) {
@@ -885,7 +858,7 @@ final class RSA implements RSAInterface
         return true;
     }
 
-    public function decrypt($ciphertext)
+    public function decrypt($ciphertext): string
     {
         if ($this->k <= 0) {
             throw new LogicException('K can not be less than 0.');
@@ -914,7 +887,7 @@ final class RSA implements RSAInterface
         return $plaintext;
     }
 
-    public function encrypt($plaintext)
+    public function encrypt($plaintext): string
     {
         // see the comments of _rsaes_pkcs1_v1_5_decrypt() to understand why this is being done
         if (!defined('CRYPT_RSA_PKCS15_COMPAT')) {
@@ -938,7 +911,7 @@ final class RSA implements RSAInterface
         return $ciphertext;
     }
 
-    public function getPublicKey($type = RSA::PUBLIC_FORMAT_PKCS8)
+    public function getPublicKey($type = RSA::PUBLIC_FORMAT_PKCS8): ?string
     {
         if (empty($this->modulus) || empty($this->publicExponent)) {
             return null;
@@ -971,7 +944,7 @@ final class RSA implements RSAInterface
         return $temp;
     }
 
-    public function sign($message)
+    public function sign($message): ?string
     {
         if (empty($this->modulus) || empty($this->exponent)) {
             return null;
@@ -997,7 +970,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function rsassaPkcs1V15Sign(string $m)
+    private function rsassaPkcs1V15Sign(string $m): string
     {
         // EMSA-PKCS1-v1_5 encoding
 
@@ -1014,7 +987,7 @@ final class RSA implements RSAInterface
         return $s;
     }
 
-    public function emsaPkcs1V15Encode($m, $emLen = null)
+    public function emsaPkcs1V15Encode($m, $emLen = null): string
     {
         if (null === $emLen) {
             $emLen = $this->k;
@@ -1067,7 +1040,7 @@ final class RSA implements RSAInterface
      *
      * @return BigIntegerInterface
      */
-    private function rsasp1($m)
+    private function rsasp1(BigIntegerInterface $m): BigIntegerInterface
     {
         if ($m->compare($this->zero) < 0 || $m->compare($this->modulus) > 0) {
             throw new LogicException('Message representative out of range');
@@ -1084,7 +1057,7 @@ final class RSA implements RSAInterface
      *
      * @return BigIntegerInterface
      */
-    private function exponentiate($x)
+    private function exponentiate(BigIntegerInterface $x): BigIntegerInterface
     {
         switch (true) {
             case empty($this->primes):
@@ -1146,7 +1119,7 @@ final class RSA implements RSAInterface
      *
      * @return BigIntegerInterface
      */
-    private function blind($x, $r, $i)
+    private function blind(BigIntegerInterface $x, BigIntegerInterface $r, int $i): BigIntegerInterface
     {
         $x = $x->multiply($r->modPow($this->publicExponent, $this->primes[$i]));
         $x = $x->modPow($this->exponents[$i], $this->primes[$i]);
@@ -1168,7 +1141,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function i2osp($x, $xLen)
+    private function i2osp(BigIntegerInterface $x, int $xLen): string
     {
         $x = $x->toBytes();
         if (strlen($x) > $xLen) {
@@ -1186,7 +1159,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function rsaesPkcs1V15Encrypt(string $m)
+    private function rsaesPkcs1V15Encrypt(string $m): string
     {
         $mLen = strlen($m);
 
@@ -1236,7 +1209,7 @@ final class RSA implements RSAInterface
      *
      * @return BigIntegerInterface
      */
-    private function rsaep($m)
+    private function rsaep(BigIntegerInterface $m): BigIntegerInterface
     {
         if ($m->compare($this->zero) < 0 || $m->compare($this->modulus) > 0) {
             throw new LogicException('Message representative out of range');
@@ -1264,7 +1237,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function rsaesPkcs1V15Decrypt($c)
+    private function rsaesPkcs1V15Decrypt(string $c): string
     {
         // Length checking
 
@@ -1306,7 +1279,7 @@ final class RSA implements RSAInterface
      *
      * @return BigIntegerInterface
      */
-    private function rsadp($c)
+    private function rsadp(BigIntegerInterface $c): BigIntegerInterface
     {
         if ($c->compare($this->zero) < 0 || $c->compare($this->modulus) > 0) {
             throw new LogicException('Ciphertext representative out of range');
@@ -1323,7 +1296,7 @@ final class RSA implements RSAInterface
      *
      * @return string
      */
-    private function rsassaPssSign($m)
+    private function rsassaPssSign(string $m): string
     {
         // EMSA-PSS encoding
 
@@ -1340,7 +1313,7 @@ final class RSA implements RSAInterface
         return $s;
     }
 
-    public function emsaPssEncode($m, $emBits = null)
+    public function emsaPssEncode($m, $emBits = null): string
     {
         if (null === $emBits) {
             $emBits = 8 * $this->k - 1;
@@ -1372,7 +1345,7 @@ final class RSA implements RSAInterface
         return $em;
     }
 
-    public function emsaPssVerify($m, $em, $emBits = null)
+    public function emsaPssVerify($m, $em, $emBits = null): bool
     {
         if (null === $emBits) {
             $emBits = 8 * $this->k - 1;
@@ -1422,9 +1395,10 @@ final class RSA implements RSAInterface
      *
      * @param string $mgfSeed
      * @param int $maskLen
+     *
      * @return string
      */
-    private function mgf1($mgfSeed, $maskLen)
+    private function mgf1(string $mgfSeed, int $maskLen): string
     {
         // if $maskLen would yield strings larger than 4GB, PKCS#1 suggests a "Mask too long" error be output.
 
@@ -1461,11 +1435,13 @@ final class RSA implements RSAInterface
      * Thanks for the heads up singpolyma!
      *
      * @access private
+     *
      * @param string $x
      * @param string $y
+     *
      * @return bool
      */
-    private function equals($x, $y)
+    private function equals(string $x, string $y): bool
     {
         if (function_exists('hash_equals')) {
             return hash_equals($x, $y);

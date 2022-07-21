@@ -21,35 +21,16 @@ use RuntimeException;
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
-    /**
-     * @var DateTimeInterface
-     */
-    private $x509StartDate;
+    private DateTimeInterface $x509StartDate;
+    private DateTimeInterface $x509EndDate;
+    private string $serialNumber;
+    private X509Factory $x509Factory;
+    private RandomService $randomService;
 
     /**
-     * @var DateTimeInterface
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
-    private $x509EndDate;
-
-    /**
-     * @var string
-     */
-    private $serialNumber;
-
-    /**
-     * @var X509Factory
-     */
-    private $x509Factory;
-
-    /**
-     * @var array
-     */
-    private $certificateOptions;
-
-    /**
-     * @var RandomService
-     */
-    private $randomService;
+    protected array $certificateOptions = [];
 
     public function __construct()
     {
@@ -62,6 +43,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * @param array $certificateOptions
+     * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
     public function setCertificateOptions(array $certificateOptions): void
     {
@@ -185,8 +167,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
         ];
 
         $options = array_merge_recursive($defaultCertificateOptions, $typeCertificateOptions);
-
-        $options = $this->mergeCertificateOptions($options, $this->certificateOptions);
+        $options = $this->mergeCertificateOptions($options, $this->getCertificateOptions());
 
         $signatureAlgorithm = 'sha256WithRSAEncryption';
 

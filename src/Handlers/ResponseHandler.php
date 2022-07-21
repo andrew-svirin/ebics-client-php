@@ -25,20 +25,9 @@ abstract class ResponseHandler
 {
     use XPathTrait;
 
-    /**
-     * @var SegmentFactory
-     */
-    private $segmentFactory;
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    /**
-     * @var ZipService
-     */
-    private $zipService;
+    private SegmentFactory $segmentFactory;
+    private CryptService $cryptService;
+    private ZipService $zipService;
 
     public function __construct()
     {

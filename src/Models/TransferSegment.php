@@ -10,30 +10,11 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class TransferSegment extends Segment
 {
-    /**
-     * @var string
-     */
-    private $transactionId;
-
-    /**
-     * @var int|null
-     */
-    private $segmentNumber;
-
-    /**
-     * @var int|null
-     */
-    private $numSegments;
-
-    /**
-     * @var string
-     */
-    private $orderData;
-
-    /**
-     * @var bool
-     */
-    private $isLastSegment;
+    private string $transactionId;
+    private ?int $segmentNumber;
+    private ?int $numSegments;
+    private string $orderData;
+    private bool $isLastSegment;
 
     public function getTransactionId(): ?string
     {

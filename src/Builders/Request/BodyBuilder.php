@@ -14,17 +14,10 @@ use DOMElement;
  */
 abstract class BodyBuilder
 {
-    /**
-     * @var DOMElement
-     */
-    protected $instance;
+    protected DOMElement $instance;
+    protected ?DOMDocument $dom;
 
-    /**
-     * @var DOMDocument
-     */
-    protected $dom;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }

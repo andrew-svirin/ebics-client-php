@@ -21,8 +21,7 @@ use RuntimeException;
  */
 final class HtmlBankLetterFormatter implements FormatterInterface
 {
-
-    public function format(BankLetter $bankLetter)
+    public function format(BankLetter $bankLetter): string
     {
         $translations = [
             'init_letter' => 'Initialization letter',

@@ -21,20 +21,9 @@ use RuntimeException;
  */
 final class CryptService
 {
-    /**
-     * @var RSAFactory
-     */
-    private $rsaFactory;
-
-    /**
-     * @var AESFactory
-     */
-    private $aesFactory;
-
-    /**
-     * @var RandomService
-     */
-    private $randomService;
+    private RSAFactory $rsaFactory;
+    private AESFactory $aesFactory;
+    private RandomService $randomService;
 
     public function __construct()
     {
@@ -90,7 +79,7 @@ final class CryptService
      *
      * @return string
      */
-    public function decryptByKey(string $key, string $encrypted)
+    public function decryptByKey(string $key, string $encrypted): string
     {
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
@@ -110,7 +99,7 @@ final class CryptService
      *
      * @return string
      */
-    public function encryptByKey(string $key, string $data)
+    public function encryptByKey(string $key, string $data): string
     {
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);

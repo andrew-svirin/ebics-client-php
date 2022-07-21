@@ -118,7 +118,7 @@ use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
 
 class MyCompanyX509Generator extends AbstractX509Generator
 {
-    public function getCertificateOptions(array $options = []) : array {
+    protected function getCertificateOptions() : array {
         return [
              'subject' => [
                 'DN' => [

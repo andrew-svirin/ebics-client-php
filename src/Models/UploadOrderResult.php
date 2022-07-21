@@ -12,15 +12,8 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
  */
 final class UploadOrderResult extends OrderResult
 {
-    /**
-     * @var UploadTransaction
-     */
-    private $transaction;
-
-    /**
-     * @var OrderDataInterface
-     */
-    private $dataDocument;
+    private UploadTransaction $transaction;
+    private OrderDataInterface $dataDocument;
 
     public function setTransaction(UploadTransaction $transaction): void
     {
