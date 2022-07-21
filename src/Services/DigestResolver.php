@@ -12,10 +12,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
  */
 abstract class DigestResolver
 {
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
+    protected CryptService $cryptService;
 
     public function __construct()
     {

@@ -27,15 +27,8 @@ use LogicException;
  */
 final class EbicsBankLetter
 {
-    /**
-     * @var BankLetterService
-     */
-    private $bankLetterService;
-
-    /**
-     * @var BankLetterFactory
-     */
-    private $bankLetterFactory;
+    private BankLetterService $bankLetterService;
+    private BankLetterFactory $bankLetterFactory;
 
     public function __construct()
     {

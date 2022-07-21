@@ -10,20 +10,9 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 final class HVDContext extends BTFContext
 {
-    /**
-     * @var string
-     */
-    private $orderId;
-
-    /**
-     * @var string
-     */
-    private $partnerId;
-
-    /**
-     * @var string
-     */
-    private $orderType;
+    private string $orderId;
+    private string $partnerId;
+    private string $orderType;
 
     public function getOrderId(): string
     {

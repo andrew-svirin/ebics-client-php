@@ -15,36 +15,25 @@ final class Bank
 
     /**
      * The HostID of the bank.
-     *
-     * @var string
      */
-    private $hostId;
+    private string $hostId;
 
     /**
      * The URL of the EBICS server.
-     *
-     * @var string
      */
-    private $url;
+    private string $url;
 
-    /**
-     * @var bool|null
-     */
-    private $isCertified;
+    private ?bool $isCertified;
 
     /**
      * The Server Name of the bank.
-     *
-     * @var string|null
      */
-    private $serverName;
+    private ?string $serverName;
 
     /**
-     * The Server Name of the bank.
-     *
-     * @var string|null
+     * The Server Version of the bank.
      */
-    private $version;
+    private ?string $version;
 
     /**
      * Constructor.
@@ -65,7 +54,7 @@ final class Bank
      *
      * @return string
      */
-    public function getHostId()
+    public function getHostId(): string
     {
         return $this->hostId;
     }
@@ -75,7 +64,7 @@ final class Bank
      *
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
     }

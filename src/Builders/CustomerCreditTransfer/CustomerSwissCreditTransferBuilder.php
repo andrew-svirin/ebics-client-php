@@ -22,18 +22,10 @@ use InvalidArgumentException;
  */
 final class CustomerSwissCreditTransferBuilder
 {
-
     use XPathTrait;
 
-    /**
-     * @var RandomService
-     */
-    private $randomService;
-
-    /**
-     * @var CustomerCreditTransfer|null
-     */
-    private $instance;
+    private RandomService $randomService;
+    private ?CustomerCreditTransfer $instance;
 
     public function __construct()
     {

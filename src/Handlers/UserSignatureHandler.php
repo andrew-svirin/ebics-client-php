@@ -23,20 +23,9 @@ abstract class UserSignatureHandler
     use C14NTrait;
     use XPathTrait;
 
-    /**
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * @var KeyRing
-     */
-    protected $keyRing;
-
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
+    protected User $user;
+    protected KeyRing $keyRing;
+    protected CryptService $cryptService;
 
     public function __construct(User $user, KeyRing $keyRing)
     {

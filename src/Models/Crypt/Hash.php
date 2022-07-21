@@ -16,50 +16,40 @@ final class Hash implements HashInterface
 {
     /**
      * Byte-length of compression blocks / key (Internal HMAC)
-     *
-     * @var int
      */
-    protected $b;
+    protected int $b;
 
     /**
      * Byte-length of hash output (Internal HMAC)
-     *
-     * @var int
      */
-    protected $l;
+    protected int $l;
 
     /**
      * Hash Algorithm
-     *
-     * @var string
      */
-    protected $hash;
+    protected string $hash;
 
     /**
      * Key
-     *
-     * @var string|null
      */
-    protected $key = null;
+    protected ?string $key = null;
 
     /**
      * Computed Key
-     *
-     * @var string|null
      */
-    protected $computedKey = null;
+    protected ?string $computedKey = null;
 
     /**
      * Default Constructor.
      *
      * @param string $hash
      */
-    public function __construct($hash = 'sha1')
+    public function __construct(string $hash = 'sha1')
     {
         $this->setHash($hash);
     }
 
-    public function hash($text)
+    public function hash($text): string
     {
         if (!empty($this->key) || is_string($this->key)) {
             $output = hash_hmac($this->hash, $text, $this->computedKey, true);
@@ -81,7 +71,7 @@ final class Hash implements HashInterface
      *
      * @return void
      */
-    private function setHash($hash)
+    private function setHash(string $hash)
     {
         switch ($hash) {
             case 'sha1':
@@ -141,7 +131,7 @@ final class Hash implements HashInterface
         $this->computedKey = hash($this->hash, $this->key, true);
     }
 
-    public function getLength()
+    public function getLength(): int
     {
         return $this->l;
     }
