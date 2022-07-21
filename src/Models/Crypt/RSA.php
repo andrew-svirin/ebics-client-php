@@ -600,8 +600,7 @@ final class RSA implements RSAInterface
         array $primes,
         array $exponents,
         array $coefficients
-    ): string
-    {
+    ): string {
         $signed = true;
         $num_primes = count($primes);
         $raw = [
