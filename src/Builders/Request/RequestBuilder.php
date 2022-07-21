@@ -13,15 +13,8 @@ use Closure;
  */
 final class RequestBuilder
 {
-    /**
-     * @var Request|null
-     */
-    private $instance;
-
-    /**
-     * @var XmlBuilder
-     */
-    private $xmlBuilder;
+    private ?Request $instance;
+    private XmlBuilder $xmlBuilder;
 
     public function createInstance(Closure $callback): RequestBuilder
     {

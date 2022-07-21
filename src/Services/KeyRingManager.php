@@ -16,10 +16,7 @@ use AndrewSvirin\Ebics\Factories\KeyRingFactory;
  */
 abstract class KeyRingManager implements KeyRingManagerInterface
 {
-    /**
-     * @var KeyRingFactory
-     */
-    protected $keyRingFactory;
+    protected KeyRingFactory $keyRingFactory;
 
     /**
      * Constructor.

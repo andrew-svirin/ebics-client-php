@@ -16,10 +16,7 @@ use AndrewSvirin\Ebics\Services\CryptService;
  */
 final class PublicKeyHashGenerator implements HashGeneratorInterface
 {
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
+    private CryptService $cryptService;
 
     public function __construct()
     {

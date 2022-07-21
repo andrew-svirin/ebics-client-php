@@ -13,30 +13,11 @@ use DOMElement;
  */
 final class StructuredPostalAddress implements PostalAddressInterface
 {
-    /**
-     * @var string
-     */
-    protected $country;
-
-    /**
-     * @var string
-     */
-    protected $town;
-
-    /**
-     * @var string
-     */
-    protected $postCode;
-
-    /**
-     * @var string|null
-     */
-    protected $street;
-
-    /**
-     * @var string|null
-     */
-    protected $buildingNo;
+    protected string $country;
+    protected string $town;
+    protected string $postCode;
+    protected ?string $street;
+    protected ?string $buildingNo;
 
     /**
      * Constructor
@@ -51,8 +32,8 @@ final class StructuredPostalAddress implements PostalAddressInterface
         string $country,
         string $town,
         string $postCode,
-        string $street = null,
-        string $buildingNo = null
+        ?string $street = null,
+        ?string $buildingNo = null
     ) {
         $this->country = $country;
         $this->town = $town;

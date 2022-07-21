@@ -16,18 +16,10 @@ use DateTime;
  */
 final class CustomerDirectDebitBuilder
 {
-
     use XPathTrait;
 
-    /**
-     * @var RandomService
-     */
-    private $randomService;
-
-    /**
-     * @var CustomerDirectDebit|null
-     */
-    private $instance;
+    private RandomService $randomService;
+    private ?CustomerDirectDebit $instance;
 
     public function __construct()
     {

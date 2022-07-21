@@ -4,15 +4,8 @@ namespace AndrewSvirin\Ebics\Contexts;
 
 final class FULContext
 {
-    /**
-     * @var bool
-     */
-    private $test = false;
-
-    /**
-     * @var bool
-     */
-    private $ebcdic = false;
+    private bool $test = false;
+    private bool $ebcdic = false;
 
     public function isTest(): bool
     {

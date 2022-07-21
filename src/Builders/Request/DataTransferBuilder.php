@@ -17,27 +17,12 @@ use DOMElement;
  */
 abstract class DataTransferBuilder
 {
-    /**
-     * @var DOMElement
-     */
-    protected $instance;
+    protected DOMElement $instance;
+    protected ?DOMDocument $dom;
+    protected ZipService $zipService;
+    protected CryptService $cryptService;
 
-    /**
-     * @var DOMDocument
-     */
-    protected $dom;
-
-    /**
-     * @var ZipService
-     */
-    protected $zipService;
-
-    /**
-     * @var CryptService
-     */
-    protected $cryptService;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
         $this->zipService = new ZipService();

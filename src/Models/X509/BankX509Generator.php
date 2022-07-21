@@ -21,7 +21,7 @@ final class BankX509Generator extends AbstractX509Generator
         $countryName = $this->resolveCountryName($bank->getUrl());
         $domainName = $this->resolveDomainName($bank->getUrl());
         $establishmentName = $this->resolveEstablishmentName($bank->getUrl());
-        $this->setCertificateOptions([
+        $this->certificateOptions = [
             'subject' => [
                 'DN' => [
                     'id-at-countryName' => $countryName,
@@ -34,7 +34,7 @@ final class BankX509Generator extends AbstractX509Generator
                     'id-at-commonName' => $establishmentName,
                 ],
             ],
-        ]);
+        ];
     }
 
     /**

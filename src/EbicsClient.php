@@ -58,83 +58,21 @@ use LogicException;
  */
 final class EbicsClient implements EbicsClientInterface
 {
-    /**
-     * An EbicsBank instance.
-     *
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * An EbicsUser instance.
-     *
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
-
-    /**
-     * @var OrderDataHandler
-     */
-    private $orderDataHandler;
-
-    /**
-     * @var ResponseHandler
-     */
-    private $responseHandler;
-
-    /**
-     * @var RequestFactory
-     */
-    private $requestFactory;
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    /**
-     * @var ZipService
-     */
-    private $zipService;
-
-    /**
-     * @var DocumentFactory
-     */
-    private $documentFactory;
-
-    /**
-     * @var OrderResultFactory
-     */
-    private $orderResultFactory;
-
-    /**
-     * @var SignatureFactory
-     */
-    private $signatureFactory;
-
-    /**
-     * @var X509GeneratorInterface|null
-     */
-    private $x509Generator;
-    /**
-     * @var HttpClientInterface
-     */
-    private $httpClient;
-
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
-
-    /**
-     * @var SegmentFactory
-     */
-    private $segmentFactory;
+    private Bank $bank;
+    private User $user;
+    private KeyRing $keyRing;
+    private OrderDataHandler $orderDataHandler;
+    private ResponseHandler $responseHandler;
+    private RequestFactory $requestFactory;
+    private CryptService $cryptService;
+    private ZipService $zipService;
+    private DocumentFactory $documentFactory;
+    private OrderResultFactory $orderResultFactory;
+    private SignatureFactory $signatureFactory;
+    private ?X509GeneratorInterface $x509Generator;
+    private HttpClientInterface $httpClient;
+    private TransactionFactory $transactionFactory;
+    private SegmentFactory $segmentFactory;
 
     /**
      * Constructor.
@@ -1125,10 +1063,13 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * Walk by segments to build transaction.
+     *
      * @param callable $requestClosure
-     * @throws Exceptions\EbicsResponseException|EbicsException
+     *
+     * @return InitializationTransaction
+     * @throws Exceptions\EbicsResponseException
      */
-    private function initializeTransaction($requestClosure): InitializationTransaction
+    private function initializeTransaction(callable $requestClosure): InitializationTransaction
     {
         $transaction = $this->transactionFactory->createInitializationTransaction();
 
@@ -1154,12 +1095,14 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * Walk by segments to build transaction.
+     *
      * @param callable $requestClosure
      * @param callable|null $storeClosure Custom closure to handle acknowledge.
+     *
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    private function downloadTransaction($requestClosure, $storeClosure = null): DownloadTransaction
+    private function downloadTransaction(callable $requestClosure, callable $storeClosure = null): DownloadTransaction
     {
         $transaction = $this->transactionFactory->createDownloadTransaction();
 
@@ -1209,10 +1152,11 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @param callable $requestClosure
+     *
      * @return UploadTransaction
      * @throws Exceptions\IncorrectResponseEbicsException
      */
-    private function uploadESTransaction($requestClosure): UploadTransaction
+    private function uploadESTransaction(callable $requestClosure): UploadTransaction
     {
         $transaction = $this->transactionFactory->createUploadTransaction();
         $transaction->setKey($this->cryptService->generateTransactionKey());
@@ -1243,10 +1187,11 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @param callable $requestClosure
+     *
      * @throws EbicsException
      * @throws Exceptions\EbicsResponseException
      */
-    private function uploadTransaction($requestClosure): UploadTransaction
+    private function uploadTransaction(callable $requestClosure): UploadTransaction
     {
         $transaction = $this->transactionFactory->createUploadTransaction();
         $transaction->setKey($this->cryptService->generateTransactionKey());
