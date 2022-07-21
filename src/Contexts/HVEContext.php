@@ -10,25 +10,10 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 final class HVEContext extends BTFContext
 {
-    /**
-     * @var string
-     */
-    private $orderId;
-
-    /**
-     * @var string
-     */
-    private $partnerId;
-
-    /**
-     * @var string
-     */
-    private $orderType;
-
-    /**
-     * @var string
-     */
-    private $digest;
+    private string $orderId;
+    private string $partnerId;
+    private string $orderType;
+    private string $digest;
 
     public function getOrderId(): string
     {

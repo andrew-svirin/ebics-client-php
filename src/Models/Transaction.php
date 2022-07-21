@@ -12,5 +12,4 @@ use AndrewSvirin\Ebics\Contracts\TransactionInterface;
  */
 abstract class Transaction implements TransactionInterface
 {
-
 }

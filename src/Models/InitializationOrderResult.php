@@ -10,15 +10,8 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class InitializationOrderResult extends OrderResult
 {
-    /**
-     * @var Document
-     */
-    private $dataDocument;
-
-    /**
-     * @var InitializationTransaction
-     */
-    private $transaction;
+    private Document $dataDocument;
+    private InitializationTransaction $transaction;
 
     public function setDataDocument(Document $document): void
     {

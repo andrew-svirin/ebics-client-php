@@ -20,17 +20,10 @@ final class TransferReceiptBuilder
     // Otherwise the value of the acknowledgement is 1 (“negative acknowledgement”).
     const CODE_RECEIPT_NEGATIVE = '1';
 
-    /**
-     * @var DOMElement
-     */
-    private $instance;
+    private DOMElement $instance;
+    private ?DOMDocument $dom;
 
-    /**
-     * @var DOMDocument
-     */
-    private $dom;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }

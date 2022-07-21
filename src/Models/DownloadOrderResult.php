@@ -10,20 +10,9 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class DownloadOrderResult extends OrderResult
 {
-    /**
-     * @var array
-     */
-    private $dataFiles;
-
-    /**
-     * @var Document
-     */
-    private $dataDocument;
-
-    /**
-     * @var DownloadTransaction
-     */
-    private $transaction;
+    private array $dataFiles;
+    private Document $dataDocument;
+    private DownloadTransaction $transaction;
 
     public function setDataFiles(array $dataFiles): void
     {

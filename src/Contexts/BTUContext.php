@@ -12,15 +12,8 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
  */
 final class BTUContext extends BTFContext
 {
-    /**
-     * @var string
-     */
-    private $fileData;
-
-    /**
-     * @var OrderDataInterface
-     */
-    private $orderData;
+    private string $fileData;
+    private OrderDataInterface $orderData;
 
     public function setFileData(string $fileData): BTUContext
     {

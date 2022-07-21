@@ -10,10 +10,7 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class InitializationSegment extends Segment
 {
-    /**
-     * @var string
-     */
-    private $orderData;
+    private string $orderData;
 
     public function getOrderData(): string
     {

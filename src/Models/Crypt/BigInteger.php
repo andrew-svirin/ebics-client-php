@@ -21,17 +21,13 @@ final class BigInteger implements BigIntegerInterface
 
     /**
      * Holds the BigInteger's magnitude.
-     *
-     * @var bool
      */
-    protected $is_negative = false;
+    protected bool $is_negative = false;
 
     /**
      * Precision
-     *
-     * @var int
      */
-    protected $precision = -1;
+    protected int $precision = -1;
 
     /**
      * Precision Bitmask
@@ -49,7 +45,7 @@ final class BigInteger implements BigIntegerInterface
      * @param int|string $x base-10 number or base-$base number if $base set.
      * @param int $base
      */
-    public function __construct($x = 0, $base = 10)
+    public function __construct($x = 0, int $base = 10)
     {
         if (!defined('PHP_INT_SIZE')) {
             define('PHP_INT_SIZE', 4);
@@ -159,12 +155,12 @@ final class BigInteger implements BigIntegerInterface
             ltrim($value, chr(0));
     }
 
-    public function toHex($twosCompliment = false)
+    public function toHex($twosCompliment = false): string
     {
         return bin2hex($this->toBytes($twosCompliment));
     }
 
-    public function toString()
+    public function toString(): string
     {
         if ($this->value === '0') {
             return '0';
@@ -184,12 +180,12 @@ final class BigInteger implements BigIntegerInterface
         return $this->toString();
     }
 
-    public function equals($x)
+    public function equals($x): bool
     {
         return $this->value === $x->getValue() && $this->is_negative == $x->isNegative();
     }
 
-    public function copy()
+    public function copy(): BigInteger
     {
         $temp = new self();
         $temp->value = $this->value;
@@ -199,7 +195,7 @@ final class BigInteger implements BigIntegerInterface
         return $temp;
     }
 
-    public function compare($y)
+    public function compare($y): int
     {
         return bccomp($this->value, $y->getValue(), 0);
     }
@@ -273,7 +269,7 @@ final class BigInteger implements BigIntegerInterface
         return new self($result, 256);
     }
 
-    public function multiply($x)
+    public function multiply($x): BigIntegerInterface
     {
         $temp = new self();
         $temp->setValue(bcmul($this->value, $x->getValue(), 0));
@@ -281,7 +277,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($temp);
     }
 
-    public function modInverse($n)
+    public function modInverse($n): BigIntegerInterface
     {
         static $zero, $one;
         if (!isset($zero)) {
@@ -309,7 +305,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($x);
     }
 
-    public function divide($y)
+    public function divide($y): array
     {
         $quotient = new self();
         $remainder = new self();
@@ -328,7 +324,7 @@ final class BigInteger implements BigIntegerInterface
         return [$this->normalize($quotient), $this->normalize($remainder)];
     }
 
-    public function subtract($y)
+    public function subtract($y): BigIntegerInterface
     {
         $temp = new self();
         $temp->setValue(bcsub($this->value, $y->getValue(), 0));
@@ -336,7 +332,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($temp);
     }
 
-    public function add($y)
+    public function add($y): BigIntegerInterface
     {
         $temp = new self();
         $temp->setValue(bcadd($this->value, $y->getValue(), 0));
@@ -344,7 +340,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($temp);
     }
 
-    public function random($arg1, $arg2 = false)
+    public function random($arg1, $arg2 = false): BigIntegerInterface
     {
         if ($arg2 === false) {
             $max = $arg1;
@@ -404,7 +400,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($random->add($min));
     }
 
-    public function abs()
+    public function abs(): BigInteger
     {
         $temp = new self();
 
@@ -422,7 +418,7 @@ final class BigInteger implements BigIntegerInterface
      *
      * @return BigIntegerInterface
      */
-    private function normalize($result)
+    private function normalize(BigIntegerInterface $result): BigIntegerInterface
     {
         $result->setPrecision($this->precision);
         $result->setBitmask($this->bitmask);
@@ -443,7 +439,7 @@ final class BigInteger implements BigIntegerInterface
      *
      * @return string
      */
-    private function encodeASN1Length($length)
+    private function encodeASN1Length(int $length): string
     {
         if ($length <= 0x7F) {
             return chr($length);
@@ -495,7 +491,7 @@ final class BigInteger implements BigIntegerInterface
      *     'y' => '<BigIntegerInterface>',
      * ]
      */
-    private function extendedGCD($n)
+    private function extendedGCD(BigIntegerInterface $n): array
     {
         // it might be faster to use the binary xGCD algorithim here, as well, but (1) that algorithim works
         // best when the base is a power of 2 and (2) i don't think it'd make much difference, anyway.  as is,
@@ -532,7 +528,7 @@ final class BigInteger implements BigIntegerInterface
         ];
     }
 
-    public function bitwiseLeftShift($shift)
+    public function bitwiseLeftShift($shift): BigIntegerInterface
     {
         $temp = new self();
 
@@ -541,7 +537,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize($temp);
     }
 
-    public function bitwiseOr($x)
+    public function bitwiseOr($x): BigIntegerInterface
     {
         $left = $this->toBytes();
         $right = $x->toBytes();
@@ -554,7 +550,7 @@ final class BigInteger implements BigIntegerInterface
         return $this->normalize(new self($left | $right, 256));
     }
 
-    public function bitwiseAnd($x)
+    public function bitwiseAnd($x): BigIntegerInterface
     {
         $left = $this->toBytes();
         $right = $x->toBytes();
@@ -577,7 +573,7 @@ final class BigInteger implements BigIntegerInterface
         $this->value = $temp->getValue();
     }
 
-    public function bitwiseRightShift($shift)
+    public function bitwiseRightShift($shift): BigIntegerInterface
     {
         $temp = new self();
 
@@ -606,7 +602,7 @@ final class BigInteger implements BigIntegerInterface
         $this->precision = $precision;
     }
 
-    public function isNegative()
+    public function isNegative(): bool
     {
         return $this->is_negative;
     }

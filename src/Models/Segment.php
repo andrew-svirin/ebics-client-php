@@ -12,15 +12,8 @@ use AndrewSvirin\Ebics\Models\Http\Response;
  */
 abstract class Segment
 {
-    /**
-     * @var string
-     */
-    private $transactionKey;
-
-    /**
-     * @var Response
-     */
-    private $response;
+    private string $transactionKey;
+    private Response $response;
 
     public function getTransactionKey(): string
     {
