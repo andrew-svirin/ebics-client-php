@@ -21,36 +21,16 @@ use RuntimeException;
  */
 abstract class AbstractX509Generator implements X509GeneratorInterface
 {
-    /**
-     * @var DateTimeInterface
-     */
-    private $x509StartDate;
+    private DateTimeInterface $x509StartDate;
+    private DateTimeInterface $x509EndDate;
+    private string $serialNumber;
+    private X509Factory $x509Factory;
+    private RandomService $randomService;
 
     /**
-     * @var DateTimeInterface
-     */
-    private $x509EndDate;
-
-    /**
-     * @var string
-     */
-    private $serialNumber;
-
-    /**
-     * @var X509Factory
-     */
-    private $x509Factory;
-
-    /**
-     * @var array
      * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
-    protected $certificateOptions = [];
-
-    /**
-     * @var RandomService
-     */
-    private $randomService;
+    protected array $certificateOptions = [];
 
     public function __construct()
     {

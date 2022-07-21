@@ -17,7 +17,7 @@ use RuntimeException;
  */
 final class TxtBankLetterFormatter implements FormatterInterface
 {
-    public function format(BankLetter $bankLetter)
+    public function format(BankLetter $bankLetter): string
     {
         $result = '';
 

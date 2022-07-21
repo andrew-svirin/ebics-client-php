@@ -10,35 +10,12 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 final class HVTContext extends BTFContext
 {
-    /**
-     * @var string
-     */
-    private $orderId;
-
-    /**
-     * @var string
-     */
-    private $partnerId;
-
-    /**
-     * @var string
-     */
-    private $orderType;
-
-    /**
-     * @var bool
-     */
-    private $completeOrderData;
-
-    /**
-     * @var int
-     */
-    private $fetchLimit;
-
-    /**
-     * @var int
-     */
-    private $fetchOffset;
+    private string $orderId;
+    private string $partnerId;
+    private string $orderType;
+    private bool $completeOrderData;
+    private int $fetchLimit;
+    private int $fetchOffset;
 
     public function getOrderId(): string
     {

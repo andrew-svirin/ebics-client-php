@@ -12,20 +12,9 @@ use LogicException;
  */
 final class TripleDES implements TripleDESInterface
 {
-    /**
-     * @var string
-     */
-    private $method = 'DES-EDE3-CBC';
-
-    /**
-     * @var string
-     */
-    private $key;
-
-    /**
-     * @var string
-     */
-    private $iv;
+    private string $method = 'DES-EDE3-CBC';
+    private string $key;
+    private string $iv;
 
     public function setKey($key)
     {
@@ -37,7 +26,7 @@ final class TripleDES implements TripleDESInterface
         $this->iv = $iv;
     }
 
-    public function decrypt($ciphertext)
+    public function decrypt($ciphertext): string
     {
         if (!($decrypted = openssl_decrypt(
             $ciphertext,
@@ -51,7 +40,7 @@ final class TripleDES implements TripleDESInterface
         return $decrypted;
     }
 
-    public function encrypt($plaintext)
+    public function encrypt($plaintext): string
     {
         if (!($encrypted = openssl_encrypt(
             $plaintext,

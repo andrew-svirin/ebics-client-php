@@ -140,7 +140,8 @@ abstract class AbstractEbicsTestCase extends TestCase
     protected function assertExceptionCode(string $code = null)
     {
         if (null !== $code) {
-            $this->expectExceptionCode((int)$code);
+            $code = (int)$code;
+            $this->expectExceptionCode($code);
         }
     }
 

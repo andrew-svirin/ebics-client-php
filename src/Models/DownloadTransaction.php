@@ -16,12 +16,8 @@ final class DownloadTransaction extends Transaction implements DownloadTransacti
     /**
      * @var DownloadSegment[]
      */
-    private $segments = [];
-
-    /**
-     * @var Response
-     */
-    private $receipt;
+    private array $segments = [];
+    private Response $receipt;
 
     public function getId(): ?string
     {

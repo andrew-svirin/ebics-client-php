@@ -18,20 +18,9 @@ use AndrewSvirin\Ebics\Models\SignatureBankLetter;
  */
 final class BankLetterService
 {
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    /**
-     * @var SignatureBankLetterFactory
-     */
-    private $signatureBankLetterFactory;
-
-    /**
-     * @var CertificateX509Factory
-     */
-    private $certificateX509Factory;
+    private CryptService $cryptService;
+    private SignatureBankLetterFactory $signatureBankLetterFactory;
+    private CertificateX509Factory $certificateX509Factory;
 
     public function __construct()
     {

@@ -25,15 +25,8 @@ abstract class AuthSignatureHandler
     use C14NTrait;
     use XPathTrait;
 
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
+    private KeyRing $keyRing;
+    private CryptService $cryptService;
 
     public function __construct(KeyRing $keyRing)
     {

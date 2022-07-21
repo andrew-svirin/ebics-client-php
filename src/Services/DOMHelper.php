@@ -1,6 +1,5 @@
 <?php
 
-
 namespace AndrewSvirin\Ebics\Services;
 
 use DOMNode;
@@ -17,7 +16,7 @@ final class DOMHelper
      *
      * @return DOMNode
      */
-    public static function safeItem($domNodeList)
+    public static function safeItem($domNodeList): DOMNode
     {
         if (false === $domNodeList) {
             throw new RuntimeException('DOM Node List should not be empty.');

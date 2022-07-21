@@ -9,25 +9,10 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 abstract class ServiceContext
 {
-    /**
-     * @var string
-     */
-    private $serviceName;
-
-    /**
-     * @var string
-     */
-    private $msgName;
-
-    /**
-     * @var string
-     */
-    private $scope;
-
-    /**
-     * @var string
-     */
-    private $serviceOption;
+    private string $serviceName;
+    private string $msgName;
+    private ?string $scope = null;
+    private ?string $serviceOption = null;
 
     public function setServiceName(string $serviceName): ServiceContext
     {
