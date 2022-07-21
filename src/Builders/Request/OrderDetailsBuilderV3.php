@@ -105,7 +105,7 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addBTUOrderParams(BTUContext $btfContext): OrderDetailsBuilder
+    public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder
     {
         // Add BTDOrderParams to OrderDetails.
         $xmlBTDOrderParams = $this->dom->createElement('BTUOrderParams');
@@ -118,48 +118,48 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 
         // Add ServiceName to Service.
         $xmlServiceName = $this->dom->createElement('ServiceName');
-        $xmlServiceName->nodeValue = $btfContext->getServiceName();
+        $xmlServiceName->nodeValue = $btuContext->getServiceName();
         $xmlService->appendChild($xmlServiceName);
 
         // Add optional ServiceOption to Service.
-        if (null !== $btfContext->getServiceOption()) {
+        if (null !== $btuContext->getServiceOption()) {
             $xmlServiceOption = $this->dom->createElement('ServiceOption');
-            $xmlServiceOption->nodeValue = $btfContext->getServiceOption();
+            $xmlServiceOption->nodeValue = $btuContext->getServiceOption();
             $xmlService->appendChild($xmlServiceOption);
         }
 
         // Add optional ContainerFlag to Service.
-        if (null !== $btfContext->getContainerFlag()) {
+        if (null !== $btuContext->getContainerFlag()) {
             $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
-            $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
+            $xmlContainerFlag->nodeValue = $btuContext->getContainerFlag();
             $xmlService->appendChild($xmlContainerFlag);
         }
 
         // Add optional Scope to Service.
-        if (null !== $btfContext->getScope()) {
+        if (null !== $btuContext->getScope()) {
             $xmlScope = $this->dom->createElement('Scope');
-            $xmlScope->nodeValue = $btfContext->getScope();
+            $xmlScope->nodeValue = $btuContext->getScope();
             $xmlService->appendChild($xmlScope);
         }
 
         // Add MsgName to Service.
         $xmlMsgName = $this->dom->createElement('MsgName');
-        $xmlMsgName->nodeValue = $btfContext->getMsgName();
+        $xmlMsgName->nodeValue = $btuContext->getMsgName();
         $xmlService->appendChild($xmlMsgName);
 
         // Add optional MsgName version attribute
-        if (null !== $btfContext->getMsgNameVersion()) {
-            $xmlMsgName->setAttribute('version', $btfContext->getMsgNameVersion());
+        if (null !== $btuContext->getMsgNameVersion()) {
+            $xmlMsgName->setAttribute('version', $btuContext->getMsgNameVersion());
         }
 
         // Add optional MsgName variant attribute
-        if (null !== $btfContext->getMsgNameVariant()) {
-            $xmlMsgName->setAttribute('variant', $btfContext->getMsgNameVariant());
+        if (null !== $btuContext->getMsgNameVariant()) {
+            $xmlMsgName->setAttribute('variant', $btuContext->getMsgNameVariant());
         }
 
         // Add optional MsgName format attribute
-        if (null !== $btfContext->getMsgNameFormat()) {
-            $xmlMsgName->setAttribute('format', $btfContext->getMsgNameFormat());
+        if (null !== $btuContext->getMsgNameFormat()) {
+            $xmlMsgName->setAttribute('format', $btuContext->getMsgNameFormat());
         }
 
         return $this;

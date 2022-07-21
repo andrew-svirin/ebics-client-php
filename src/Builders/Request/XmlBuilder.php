@@ -19,17 +19,10 @@ abstract class XmlBuilder
     const EBICS_NO_PUB_KEY_DIGESTS = 'ebicsNoPubKeyDigestsRequest';
     const EBICS_HEV = 'ebicsHEVRequest';
 
-    /**
-     * @var DOMElement
-     */
-    protected $instance;
+    protected DOMElement $instance;
+    protected ?DOMDocument $dom;
 
-    /**
-     * @var DOMDocument
-     */
-    protected $dom;
-
-    public function __construct(DOMDocument $dom = null)
+    public function __construct(?DOMDocument $dom = null)
     {
         $this->dom = $dom;
     }

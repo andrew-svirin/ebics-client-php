@@ -10,10 +10,7 @@ namespace AndrewSvirin\Ebics\Models;
  */
 abstract class OrderResult
 {
-    /**
-     * @var string
-     */
-    private $data;
+    private string $data;
 
     public function setData(string $data): void
     {

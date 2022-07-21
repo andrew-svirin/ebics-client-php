@@ -12,10 +12,7 @@ use AndrewSvirin\Ebics\Contracts\InitializationTransactionInterface;
  */
 final class InitializationTransaction extends Transaction implements InitializationTransactionInterface
 {
-    /**
-     * @var InitializationSegment
-     */
-    private $initializationSegment;
+    private InitializationSegment $initializationSegment;
 
     public function getKey(): string
     {

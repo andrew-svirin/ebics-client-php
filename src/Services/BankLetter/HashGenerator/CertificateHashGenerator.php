@@ -15,10 +15,7 @@ use AndrewSvirin\Ebics\Services\DigestResolver;
  */
 final class CertificateHashGenerator implements HashGeneratorInterface
 {
-    /**
-     * @var DigestResolver
-     */
-    private $digestResolver;
+    private DigestResolver $digestResolver;
 
     public function __construct(DigestResolver $digestResolver)
     {
