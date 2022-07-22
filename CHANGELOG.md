@@ -9,3 +9,4 @@
 * Fix UTF-8 encoding.
 * Added CurlHttpClient and PsrHttpClient to use standard client.
 * Updated AbstractX509Generator to handle custom options.
+* Improved Bank-letter
