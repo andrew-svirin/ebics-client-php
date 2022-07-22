@@ -187,6 +187,33 @@ final class EbicsClient implements EbicsClientInterface
 
     /**
      * @inheritDoc
+     * @throws EbicsException
+     */
+    // @codingStandardsIgnoreStart
+    public function H3K(DateTimeInterface $dateTime = null, bool $createSignature = false): Response
+    {
+        // @codingStandardsIgnoreEnd
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, $createSignature);
+        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, $createSignature);
+        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, $createSignature);
+
+        $request = $this->requestFactory->createH3K($signatureA, $signatureE, $signatureX, $dateTime);
+        $response = $this->httpClient->post($this->bank->getUrl(), $request);
+
+        $this->checkH00XReturnCode($request, $response);
+        $this->keyRing->setUserSignatureA($signatureA);
+        $this->keyRing->setUserSignatureE($signatureE);
+        $this->keyRing->setUserSignatureX($signatureX);
+
+        return $response;
+    }
+
+    /**
+     * @inheritDoc
      * @throws Exceptions\EbicsException
      */
     public function HPB(DateTimeInterface $dateTime = null): InitializationOrderResult

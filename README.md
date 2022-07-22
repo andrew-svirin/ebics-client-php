@@ -285,6 +285,7 @@ try {
 | HEV         | Download supported protocol versions for the Bank.                                                                |
 | INI         | Send to the bank public signature of signature A005.                                                              |
 | HIA         | Send to the bank public signatures of authentication (X002) and encryption (E002).                                |
+| H3K         | Send to the bank public signatures of signature (A005), authentication (X002) and encryption (E002).              |
 | HPB         | Download the Bank public signatures authentication (X002) and encryption (E002).                                  |
 | HPD         | Download the bank server parameters.                                                                              |
 | HKD         | Download customer's customer and subscriber information.                                                          |
