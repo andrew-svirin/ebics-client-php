@@ -116,6 +116,43 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     }
 
     /**
+     * @dataProvider serversDataProvider
+     *
+     * @group H3K
+     * @group V3
+     * @group H3K-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testH3K(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        if (false === isset($codes['H3K'])) {
+            $this->markTestSkipped(sprintf('No H3K test for bank credential %d', $credentialsId));
+        }
+
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['H3K']['fake']);
+
+        // Check that keyring is empty and or wait on success or wait on exception.
+        $bankExists = $client->getKeyRing()->getUserSignatureX();
+        if ($bankExists) {
+            $this->expectException(InvalidUserOrUserStateException::class);
+            $this->expectExceptionCode(91002);
+        }
+        $hia = $client->H3K();
+        if (!$bankExists) {
+            $responseHandler = $client->getResponseHandler();
+            $this->saveKeyRing($credentialsId, $client->getKeyRing());
+            $code = $responseHandler->retrieveH00XReturnCode($hia);
+            $reportText = $responseHandler->retrieveH00XReportText($hia);
+            $this->assertResponseOk($code, $reportText);
+        }
+    }
+
+    /**
      * Run first HIA and Activate account in bank panel.
      *
      * @dataProvider serversDataProvider
@@ -714,6 +751,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'H3K' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '061099', 'fake' => false],

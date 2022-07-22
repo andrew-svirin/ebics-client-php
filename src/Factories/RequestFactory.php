@@ -25,6 +25,7 @@ use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
 use AndrewSvirin\Ebics\Handlers\UserSignatureHandler;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerH3K;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Http\Request;
@@ -169,6 +170,61 @@ abstract class RequestFactory
                     })->addMutable();
                 })->addBody(function (BodyBuilder $builder) use ($context) {
                     $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder->addOrderData($context->getOrderData());
+                    });
+                });
+            })
+            ->popInstance();
+
+        return $request;
+    }
+
+    public function createH3K(
+        SignatureInterface $certificateA,
+        SignatureInterface $certificateE,
+        SignatureInterface $certificateX,
+        DateTimeInterface $dateTime
+    ): Request {
+        $orderData = new CustomerH3K();
+        $this->orderDataHandler->handleH3K(
+            $orderData,
+            $certificateA,
+            $certificateE,
+            $certificateX
+        );
+
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle(
+            $signatureData,
+            $this->cryptService->hash($orderData->getContent())
+        );
+
+        $context = (new RequestContext())
+            ->setKeyRing($this->keyRing)
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setDateTime($dateTime)
+            ->setOrderData($orderData->getContent())
+            ->setSignatureData($signatureData);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerUnsigned(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $this->addOrderType($orderDetailsBuilder, 'H3K');
+                            })
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
+                    })->addMutable();
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder->addSignatureData($context->getSignatureData(), '');
                         $builder->addOrderData($context->getOrderData());
                     });
                 });
