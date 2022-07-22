@@ -26,6 +26,30 @@ final class PdfBankLetterFormatter implements FormatterInterface
     }
 
     /**
+     * Set translations.
+     *
+     * @param array $translations
+     *
+     * @return void
+     */
+    public function setTranslations(array $translations): void
+    {
+        $this->bankLetterFormatterHtml->setTranslations($translations);
+    }
+
+    /**
+     * Set additional CSS style.
+     *
+     * @param string $style
+     *
+     * @return void
+     */
+    public function setStyle(string $style): void
+    {
+        $this->bankLetterFormatterHtml->setStyle($style);
+    }
+
+    /**
      * @inheritDoc
      */
     public function format(BankLetter $bankLetter)
