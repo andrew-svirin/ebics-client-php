@@ -1,7 +1,7 @@
 ## 2.1
 
 * Up supported PHP version to >= 7.4
-* Add `FUL` order type for EBICS 2.5
+* Add `FUL`, `H3K` order type for EBICS 2.5
 * Add methods `YCT`, `ZSR`, `Z54` order type for EBICS 3.0
 * Major update for keyring manager. Added Array & File keyring managers instead of keyring.
 * Add responseHandler into ClientInterface
