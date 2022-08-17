@@ -33,11 +33,11 @@ interface PdfInterface
     public function outputString(): string;
 
     /**
-     * @param string $filePath
+     * @param string $fileName
      *
      * @return void
      *
      * @see \Mpdf\Mpdf::Output('', Destination::FILE)
      */
-    public function outputFile(string $filePath): void;
+    public function outputFile(string $fileName): void;
 }

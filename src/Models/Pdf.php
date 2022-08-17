@@ -19,8 +19,8 @@ final class Pdf extends Mpdf implements PdfInterface
         return $this->Output('', Destination::STRING_RETURN);
     }
 
-    public function outputFile(string $filePath): void
+    public function outputFile($fileName): void
     {
-        $this->Output($filePath, Destination::FILE);
+        $this->Output($fileName, Destination::FILE);
     }
 }
