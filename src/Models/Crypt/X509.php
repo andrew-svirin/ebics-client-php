@@ -73,6 +73,7 @@ class X509 implements X509Interface
     protected array $ExtKeyUsageSyntax;
     protected array $BasicConstraints;
     protected array $KeyIdentifier;
+    protected array $CRLDistributionPoints;
     protected array $AuthorityKeyIdentifier;
     protected array $CertificatePolicies;
     protected array $SubjectAltName;
@@ -630,6 +631,65 @@ class X509 implements X509Interface
             'min' => 1,
             'max' => -1,
             'children' => $GeneralName
+        ];
+
+        $ReasonFlags = [
+            'type' => ASN1::TYPE_BIT_STRING,
+            'mapping' => [
+                'unused',
+                'keyCompromise',
+                'cACompromise',
+                'affiliationChanged',
+                'superseded',
+                'cessationOfOperation',
+                'certificateHold',
+                'privilegeWithdrawn',
+                'aACompromise'
+            ]
+        ];
+
+        $DistributionPointName = [
+            'type' => ASN1::TYPE_CHOICE,
+            'children' => [
+                'fullName' => [
+                        'constant' => 0,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $GeneralNames,
+                'nameRelativeToCRLIssuer' => [
+                        'constant' => 1,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $this->RelativeDistinguishedName
+            ]
+        ];
+
+        $DistributionPoint = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'children' => [
+                'distributionPoint' => [
+                        'constant' => 0,
+                        'optional' => true,
+                        'explicit' => true
+                    ] + $DistributionPointName,
+                'reasons' => [
+                        'constant' => 1,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $ReasonFlags,
+                'cRLIssuer' => [
+                        'constant' => 2,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $GeneralNames
+            ]
+        ];
+
+        $this->CRLDistributionPoints = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 1,
+            'max' => -1,
+            'children' => $DistributionPoint
         ];
 
         $this->AuthorityKeyIdentifier = [
@@ -1593,6 +1653,8 @@ class X509 implements X509Interface
                 return $this->SubjectAltName;
             case 'id-ce-invalidityDate':
                 return $this->InvalidityDate;
+            case 'id-ce-cRLDistributionPoints':
+                return $this->CRLDistributionPoints;
         }
 
         return false;
