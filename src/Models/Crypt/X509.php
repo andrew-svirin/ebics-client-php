@@ -1633,8 +1633,10 @@ class X509 implements X509Interface
                 /* [extnValue] contains the DER encoding of an ASN.1 value
                    corresponding to the extension type identified by extnID */
                 $map = $this->getMapping($id);
-                if (false === $map) {
-                    throw new LogicException($id . ' is not a currently supported extension');
+                if (is_bool($map)) {
+                    if (!$map) {
+                        throw new LogicException($id . ' is not a currently supported extension');
+                    }
                 } else {
                     $temp = $asn1->encodeDER($value, $map, ['iPAddress' => [$this, '_encodeIP']]);
                     $value = base64_encode($temp);
