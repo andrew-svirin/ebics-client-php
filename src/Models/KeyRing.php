@@ -22,12 +22,12 @@ final class KeyRing
     const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
     const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
 
-    private ?SignatureInterface $userSignatureA;
-    private ?SignatureInterface $userSignatureX;
-    private ?SignatureInterface $userSignatureE;
-    private ?SignatureInterface $bankSignatureX;
-    private ?SignatureInterface $bankSignatureE;
-    private ?string $password;
+    private ?SignatureInterface $userSignatureA = null;
+    private ?SignatureInterface $userSignatureX = null;
+    private ?SignatureInterface $userSignatureE = null;
+    private ?SignatureInterface $bankSignatureX = null;
+    private ?SignatureInterface $bankSignatureE = null;
+    private ?string $password = null;
 
     public function setUserSignatureA(SignatureInterface $signature = null): void
     {
