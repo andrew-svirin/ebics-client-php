@@ -1648,7 +1648,7 @@ class X509 implements X509Interface
      *
      * @param string $extnId
      *
-     * @return array|false
+     * @return array|bool
      */
     private function getMapping(string $extnId)
     {
@@ -1673,6 +1673,9 @@ class X509 implements X509Interface
                 return $this->CRLDistributionPoints;
             case 'id-pe-authorityInfoAccess':
                 return $this->AuthorityInfoAccessSyntax;
+            // "Certificate Transparency"
+            case '1.3.6.1.4.1.11129.2.4.2':
+                return true;
         }
 
         return false;
