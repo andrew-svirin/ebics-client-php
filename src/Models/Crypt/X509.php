@@ -75,6 +75,7 @@ class X509 implements X509Interface
     protected array $KeyIdentifier;
     protected array $CRLDistributionPoints;
     protected array $AuthorityKeyIdentifier;
+    protected array $AuthorityInfoAccessSyntax;
     protected array $CertificatePolicies;
     protected array $SubjectAltName;
     protected array $Name;
@@ -737,6 +738,21 @@ class X509 implements X509Interface
                     'children' => $PolicyQualifierInfo
                 ]
             ]
+        ];
+
+        $AccessDescription = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'children' => [
+                'accessMethod' => ['type' => ASN1::TYPE_OBJECT_IDENTIFIER],
+                'accessLocation' => $GeneralName,
+            ],
+        ];
+
+        $this->AuthorityInfoAccessSyntax = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 1,
+            'max' => -1,
+            'children' => $AccessDescription,
         ];
 
         $this->CertificatePolicies = [
@@ -1655,6 +1671,8 @@ class X509 implements X509Interface
                 return $this->InvalidityDate;
             case 'id-ce-cRLDistributionPoints':
                 return $this->CRLDistributionPoints;
+            case 'id-pe-authorityInfoAccess':
+                return $this->AuthorityInfoAccessSyntax;
         }
 
         return false;
