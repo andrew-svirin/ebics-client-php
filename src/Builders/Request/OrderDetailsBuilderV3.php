@@ -14,7 +14,7 @@ use LogicException;
  * Ebics 3.0 Class OrderDetailsBuilder builder for request container.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author  Andrew Svirin
+ * @author Andrew Svirin
  */
 final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 {
@@ -32,7 +32,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addOrderAttribute(string $orderAttribute
+    public function addOrderAttribute(
+        string $orderAttribute
     ): OrderDetailsBuilder {
         throw new LogicException('Unsupported yet');
     }
@@ -117,7 +118,9 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder {
+    public function addBTUOrderParams(
+        BTUContext $btuContext
+    ): OrderDetailsBuilder {
         // Add BTUOrderParams to OrderDetails.
         $xmlBTUOrderParams = $this->dom->createElement('BTUOrderParams');
         $xmlBTUOrderParams->setAttribute('fileName', $btuContext->getFileName());
@@ -185,7 +188,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addHVEOrderParams(HVEContext $hveContext
+    public function addHVEOrderParams(
+        HVEContext $hveContext
     ): OrderDetailsBuilder {
         // Add HVEOrderParams to OrderDetails.
         $xmlHVEOrderParams = $this->dom->createElement('HVEOrderParams');
@@ -231,7 +235,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addHVDOrderParams(HVDContext $hvdContext
+    public function addHVDOrderParams(
+        HVDContext $hvdContext
     ): OrderDetailsBuilder {
         // Add HVDOrderParams to OrderDetails.
         $xmlHVDOrderParams = $this->dom->createElement('HVDOrderParams');
@@ -277,7 +282,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addHVTOrderParams(HVTContext $hvtContext
+    public function addHVTOrderParams(
+        HVTContext $hvtContext
     ): OrderDetailsBuilder {
         // Add HVTOrderParams to OrderDetails.
         $xmlHVTOrderParams = $this->dom->createElement('HVTOrderParams');
