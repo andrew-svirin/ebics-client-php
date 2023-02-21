@@ -8,7 +8,7 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
  * Class BTUContext context container for BTU orders - requires EBICS 3.0
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author  Andrew Svirin
+ * @author Andrew Svirin
  */
 final class BTUContext extends BTFContext
 {
