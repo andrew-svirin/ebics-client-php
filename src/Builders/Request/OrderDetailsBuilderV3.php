@@ -55,6 +55,13 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         $xmlServiceName->nodeValue = $btfContext->getServiceName();
         $xmlService->appendChild($xmlServiceName);
 
+        // Add optional Scope to Service.
+        if (null !== $btfContext->getScope()) {
+            $xmlScope = $this->dom->createElement('Scope');
+            $xmlScope->nodeValue = $btfContext->getScope();
+            $xmlService->appendChild($xmlScope);
+        }
+
         // Add optional ServiceOption to Service.
         if (null !== $btfContext->getServiceOption()) {
             $xmlServiceOption = $this->dom->createElement('ServiceOption');
@@ -67,13 +74,6 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
             $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
             $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
             $xmlService->appendChild($xmlContainerFlag);
-        }
-
-        // Add optional Scope to Service.
-        if (null !== $btfContext->getScope()) {
-            $xmlScope = $this->dom->createElement('Scope');
-            $xmlScope->nodeValue = $btfContext->getScope();
-            $xmlService->appendChild($xmlScope);
         }
 
         // Add MsgName to Service.
@@ -107,19 +107,26 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 
     public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder
     {
-        // Add BTDOrderParams to OrderDetails.
-        $xmlBTDOrderParams = $this->dom->createElement('BTUOrderParams');
-        $xmlBTDOrderParams->setAttribute('fileName', 'CCT.xml');
-        $this->instance->appendChild($xmlBTDOrderParams);
+        // Add BTUOrderParams to OrderDetails.
+        $xmlBTUOrderParams = $this->dom->createElement('BTUOrderParams');
+        $xmlBTUOrderParams->setAttribute('fileName', 'CCT.xml');
+        $this->instance->appendChild($xmlBTUOrderParams);
 
-        // Add Service to BTDOrderParams.
+        // Add Service to BTUOrderParams.
         $xmlService = $this->dom->createElement('Service');
-        $xmlBTDOrderParams->appendChild($xmlService);
+        $xmlBTUOrderParams->appendChild($xmlService);
 
         // Add ServiceName to Service.
         $xmlServiceName = $this->dom->createElement('ServiceName');
         $xmlServiceName->nodeValue = $btuContext->getServiceName();
         $xmlService->appendChild($xmlServiceName);
+
+        // Add optional Scope to Service.
+        if (null !== $btuContext->getScope()) {
+            $xmlScope = $this->dom->createElement('Scope');
+            $xmlScope->nodeValue = $btuContext->getScope();
+            $xmlService->appendChild($xmlScope);
+        }
 
         // Add optional ServiceOption to Service.
         if (null !== $btuContext->getServiceOption()) {
@@ -133,13 +140,6 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
             $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
             $xmlContainerFlag->nodeValue = $btuContext->getContainerFlag();
             $xmlService->appendChild($xmlContainerFlag);
-        }
-
-        // Add optional Scope to Service.
-        if (null !== $btuContext->getScope()) {
-            $xmlScope = $this->dom->createElement('Scope');
-            $xmlScope->nodeValue = $btuContext->getScope();
-            $xmlService->appendChild($xmlScope);
         }
 
         // Add MsgName to Service.
