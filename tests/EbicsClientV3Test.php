@@ -304,6 +304,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $context->setMsgNameVersion('03');
         $context->setFileData($customerCreditTransfer->getContent());
         $context->setFileDocument($customerCreditTransfer);
+        $context->setFileName('MCT.xml');
 
         $btu = $client->BTU($context);
 

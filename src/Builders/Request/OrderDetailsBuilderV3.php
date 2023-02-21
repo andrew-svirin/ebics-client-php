@@ -14,7 +14,7 @@ use LogicException;
  * Ebics 3.0 Class OrderDetailsBuilder builder for request container.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
- * @author Andrew Svirin
+ * @author  Andrew Svirin
  */
 final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 {
@@ -32,8 +32,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addOrderAttribute(string $orderAttribute): OrderDetailsBuilder
-    {
+    public function addOrderAttribute(string $orderAttribute
+    ): OrderDetailsBuilder {
         throw new LogicException('Unsupported yet');
     }
 
@@ -83,33 +83,44 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 
         // Add optional MsgName version attribute
         if (null !== $btfContext->getMsgNameVersion()) {
-            $xmlMsgName->setAttribute('version', $btfContext->getMsgNameVersion());
+            $xmlMsgName->setAttribute(
+                'version',
+                $btfContext->getMsgNameVersion()
+            );
         }
 
         // Add optional MsgName variant attribute
         if (null !== $btfContext->getMsgNameVariant()) {
-            $xmlMsgName->setAttribute('variant', $btfContext->getMsgNameVariant());
+            $xmlMsgName->setAttribute(
+                'variant',
+                $btfContext->getMsgNameVariant()
+            );
         }
 
         // Add optional MsgName format attribute
         if (null !== $btfContext->getMsgNameFormat()) {
-            $xmlMsgName->setAttribute('format', $btfContext->getMsgNameFormat());
+            $xmlMsgName->setAttribute(
+                'format',
+                $btfContext->getMsgNameFormat()
+            );
         }
 
         if (null !== $startDateTime && null !== $endDateTime) {
             // Add DateRange to BTDOrderParams.
-            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
+            $xmlDateRange = $this->createDateRange(
+                $startDateTime,
+                $endDateTime
+            );
             $xmlBTDOrderParams->appendChild($xmlDateRange);
         }
 
         return $this;
     }
 
-    public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder
-    {
+    public function addBTUOrderParams(BTUContext $btuContext): OrderDetailsBuilder {
         // Add BTUOrderParams to OrderDetails.
         $xmlBTUOrderParams = $this->dom->createElement('BTUOrderParams');
-        $xmlBTUOrderParams->setAttribute('fileName', 'CCT.xml');
+        $xmlBTUOrderParams->setAttribute('fileName', $btuContext->getFileName());
         $this->instance->appendChild($xmlBTUOrderParams);
 
         // Add Service to BTUOrderParams.
@@ -149,24 +160,33 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 
         // Add optional MsgName version attribute
         if (null !== $btuContext->getMsgNameVersion()) {
-            $xmlMsgName->setAttribute('version', $btuContext->getMsgNameVersion());
+            $xmlMsgName->setAttribute(
+                'version',
+                $btuContext->getMsgNameVersion()
+            );
         }
 
         // Add optional MsgName variant attribute
         if (null !== $btuContext->getMsgNameVariant()) {
-            $xmlMsgName->setAttribute('variant', $btuContext->getMsgNameVariant());
+            $xmlMsgName->setAttribute(
+                'variant',
+                $btuContext->getMsgNameVariant()
+            );
         }
 
         // Add optional MsgName format attribute
         if (null !== $btuContext->getMsgNameFormat()) {
-            $xmlMsgName->setAttribute('format', $btuContext->getMsgNameFormat());
+            $xmlMsgName->setAttribute(
+                'format',
+                $btuContext->getMsgNameFormat()
+            );
         }
 
         return $this;
     }
 
-    public function addHVEOrderParams(HVEContext $hveContext): OrderDetailsBuilder
-    {
+    public function addHVEOrderParams(HVEContext $hveContext
+    ): OrderDetailsBuilder {
         // Add HVEOrderParams to OrderDetails.
         $xmlHVEOrderParams = $this->dom->createElement('HVEOrderParams');
         $this->instance->appendChild($xmlHVEOrderParams);
@@ -211,8 +231,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addHVDOrderParams(HVDContext $hvdContext): OrderDetailsBuilder
-    {
+    public function addHVDOrderParams(HVDContext $hvdContext
+    ): OrderDetailsBuilder {
         // Add HVDOrderParams to OrderDetails.
         $xmlHVDOrderParams = $this->dom->createElement('HVDOrderParams');
         $this->instance->appendChild($xmlHVDOrderParams);
@@ -257,8 +277,8 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
         return $this;
     }
 
-    public function addHVTOrderParams(HVTContext $hvtContext): OrderDetailsBuilder
-    {
+    public function addHVTOrderParams(HVTContext $hvtContext
+    ): OrderDetailsBuilder {
         // Add HVTOrderParams to OrderDetails.
         $xmlHVTOrderParams = $this->dom->createElement('HVTOrderParams');
         $this->instance->appendChild($xmlHVTOrderParams);
@@ -302,9 +322,18 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
 
         // Add OrderFlags to HVTOrderParams.
         $xmlOrderFlags = $this->dom->createElement('OrderFlags');
-        $xmlOrderFlags->setAttribute('completeOrderData', $hvtContext->getCompleteOrderData() ? 'true' : 'false');
-        $xmlOrderFlags->setAttribute('fetchLimit', (string)$hvtContext->getFetchLimit());
-        $xmlOrderFlags->setAttribute('fetchOffset', (string)$hvtContext->getFetchOffset());
+        $xmlOrderFlags->setAttribute(
+            'completeOrderData',
+            $hvtContext->getCompleteOrderData() ? 'true' : 'false'
+        );
+        $xmlOrderFlags->setAttribute(
+            'fetchLimit',
+            (string)$hvtContext->getFetchLimit()
+        );
+        $xmlOrderFlags->setAttribute(
+            'fetchOffset',
+            (string)$hvtContext->getFetchOffset()
+        );
         $xmlHVTOrderParams->appendChild($xmlOrderFlags);
 
         return $this;

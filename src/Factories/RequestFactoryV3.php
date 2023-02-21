@@ -342,6 +342,7 @@ final class RequestFactoryV3 extends RequestFactory
         $btfContext->setServiceName('MCT');
         $btfContext->setScope('BIL');
         $btfContext->setMsgName('pain.001');
+        $btfContext->setFileName('yct.pain001.xml');
 
         return $this->createBTU($btfContext, $dateTime, $transaction);
     }
