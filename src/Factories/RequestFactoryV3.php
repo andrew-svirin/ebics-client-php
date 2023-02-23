@@ -175,7 +175,6 @@ final class RequestFactoryV3 extends RequestFactory
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'BTU')
-                                    ->addOrderId('A001')
                                     ->addBTUOrderParams($context->getBTUContext());
                             })
                             ->addBankPubKeyDigests(
