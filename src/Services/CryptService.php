@@ -38,6 +38,7 @@ final class CryptService
      * @param string $text
      * @param string $algorithm
      * @param bool $binary
+     *
      * @return string
      */
     public function hash(string $text, string $algorithm = 'sha256', bool $binary = true): string
@@ -104,7 +105,7 @@ final class CryptService
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($key);
-        $aes->setOpenSSLOptions(OPENSSL_RAW_DATA);
+        $aes->setOpenSSLOptions(OPENSSL_RAW_DATA | OPENSSL_NO_PADDING);
         $encrypted = $aes->encrypt($data);
 
         return $encrypted;
@@ -319,6 +320,7 @@ final class CryptService
         if (false === $result) {
             throw new RuntimeException('Can not convert bytes to array.');
         }
+
         return $result;
     }
 
@@ -377,6 +379,7 @@ final class CryptService
      * @param string $key
      * @param string $algorithm
      * @param bool $rawOutput
+     *
      * @return string
      */
     public function calculateCertificateFingerprint(

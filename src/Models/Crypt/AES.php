@@ -221,9 +221,11 @@ final class AES implements AESInterface
             }
         }
 
-        $pad = $this->block_size - ($length % $this->block_size);
+        // Padding ANSI X 923.
+        $paddingSize = $this->block_size - (strlen($text) % $this->block_size);
+        $padding = str_repeat(chr(0), $paddingSize - 1).chr($paddingSize);
 
-        return str_pad($text, $length + $pad, chr($pad));
+        return $text.$padding;
     }
 
     public function decrypt($ciphertext): string
