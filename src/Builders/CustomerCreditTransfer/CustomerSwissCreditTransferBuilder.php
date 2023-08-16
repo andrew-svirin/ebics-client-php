@@ -32,7 +32,17 @@ final class CustomerSwissCreditTransferBuilder
         $this->randomService = new RandomService();
     }
 
+    /**
+     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
+     * @param string $debitorFinInstBIC
+     * @param string $debitorIBAN
+     * @param string $debitorName
+     *
+     * @return $this
+     * @throws \DOMException
+     */
     public function createInstance(
+        string $schema,
         string $debitorFinInstBIC,
         string $debitorIBAN,
         string $debitorName
@@ -41,18 +51,13 @@ final class CustomerSwissCreditTransferBuilder
         $now = new DateTime();
 
         $xmDocument = $this->instance->createElementNS(
-            'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd',
+            $schema,
             'Document'
         );
         $xmDocument->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:xsi',
             'http://www.w3.org/2001/XMLSchema-instance'
-        );
-        $xmDocument->setAttributeNS(
-            'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation',
-            'http://www.six-interbank-clearing.com/de/pain.001.001.03.ch.02.xsd  pain.001.001.03.ch.02.xsd'
         );
         $this->instance->appendChild($xmDocument);
 

@@ -10,3 +10,6 @@
 * Added CurlHttpClient and PsrHttpClient to use standard client.
 * Updated AbstractX509Generator to handle custom options.
 * Improved Bank-letter
+* Fixed padding for encoding that caused problems for upload methods.
+* Added XE3
+* Fixed CCT, CDD builder.

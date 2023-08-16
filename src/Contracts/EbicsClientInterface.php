@@ -329,6 +329,16 @@ interface EbicsClientInterface
     public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
+     * Upload SEPA Direct Debit Initiation, CH definitions, CORE.
+     * FileFormat pain.008.001.03.ch.02
+     * OrderType:BTU, Service Name:SDD, Scope:CH,Service Option:COR Container:, MsgName:pain.008,Version: 02
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     * @return UploadOrderResult
+     */
+    public function XE3(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+
+    /**
      * Upload Credit transfer CGI (SEPA & non SEPA).
      * OrderType:BTU, Service Name:MCT, Scope:BIL, Container:, MsgName:pain.001
      * @param OrderDataInterface $orderData
