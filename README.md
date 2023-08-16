@@ -306,6 +306,7 @@ try {
 | CCT         | Upload initiation of the credit transfer per Single Euro Payments Area.                                           |
 | CIP         | Upload initiation of the instant credit transfer per Single Euro Payments Area.                                   |
 | XE2         | Upload initiation of the Swiss credit transfer (i.e available in Switzerland).                                    |
+| XE3         | Upload SEPA Direct Debit Initiation, CH definitions, CORE (i.e available in Switzerland).                         |
 | YCT         | Upload Credit transfer CGI (SEPA & non SEPA).                                                                     |
 | CDD         | Upload initiation of the direct debit transaction.                                                                |
 | BTD         | Download request files of any BTF structure.                                                                      |

@@ -855,6 +855,8 @@ abstract class RequestFactory
 
     abstract public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request;
 
+    abstract public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction): Request;
+
     abstract public function createYCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request;
 
     /**

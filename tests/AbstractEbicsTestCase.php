@@ -2,13 +2,18 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
+use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\Contracts\KeyRingManagerInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
+use AndrewSvirin\Ebics\Models\CustomerDirectDebit;
 use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
+use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use PHPUnit\Framework\TestCase;
@@ -23,9 +28,9 @@ use RuntimeException;
 abstract class AbstractEbicsTestCase extends TestCase
 {
 
-    protected $data = __DIR__ . '/_data';
+    protected $data = __DIR__.'/_data';
 
-    protected $fixtures = __DIR__ . '/_fixtures';
+    protected $fixtures = __DIR__.'/_fixtures';
 
     protected function setupClientV2(
         int $credentialsId,
@@ -91,7 +96,7 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected function setupKeys(KeyRing $keyRing)
     {
-        $keys = json_decode(file_get_contents($this->fixtures . '/keys.json'));
+        $keys = json_decode(file_get_contents($this->fixtures.'/keys.json'));
         $keyRing->setPassword('mysecret');
         $signatureFactory = new SignatureFactory();
 
@@ -169,5 +174,93 @@ abstract class AbstractEbicsTestCase extends TestCase
             'partnerId' => $credentialsEnc['partnerId'],
             'userId' => $credentialsEnc['userId'],
         ];
+    }
+
+    /**
+     * Create simple instance of CustomerCreditTransfer.
+     *
+     * @param string $schema
+     *
+     * @return CustomerCreditTransfer
+     * @throws \DOMException
+     */
+    protected function buildCustomerCreditTransfer(string $schema): CustomerCreditTransfer
+    {
+        $builder = new CustomerSwissCreditTransferBuilder();
+        $customerCreditTransfer = $builder
+            ->createInstance(
+                $schema,
+                'ZKBKCHZZ80A',
+                'SE7500800000000000001123',
+                'Debitor Name'
+            )
+            ->addBankTransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                new StructuredPostalAddress('CH', 'Triesen', '9495'),
+                100.10,
+                'CHF',
+                'Test payment  1'
+            )
+            ->addSEPATransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Creditor Name 4',
+                null, // new UnstructuredPostalAddress(),
+                200.02,
+                'EUR',
+                'Test payment  2'
+            )
+            ->addForeignTransaction(
+                'NWBKGB2L',
+                'GB29 NWBK 6016 1331 9268 19',
+                'United Development Ltd',
+                new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
+                65.10,
+                'GBP',
+                'Test payment 3'
+            )
+            ->popInstance();
+
+        return $customerCreditTransfer;
+    }
+
+    /**
+     * Create simple instance of CustomerDirectDebit.
+     *
+     * @param string $schema
+     *
+     * @return CustomerDirectDebit
+     * @throws \DOMException
+     */
+    protected function buildCustomerDirectDebit(string $schema): CustomerDirectDebit
+    {
+        $builder = new CustomerDirectDebitBuilder();
+        $customerDirectDebit = $builder
+            ->createInstance(
+                $schema,
+                'ZKBKCHZZ80A',
+                'SE7500800000000000001123',
+                'Creditor Name'
+            )
+            ->addTransaction(
+                'MARKDEF1820',
+                'DE09820000000083001503',
+                'Debitor Name 1',
+                100.10,
+                'EUR',
+                'Test payment  1'
+            )
+            ->addTransaction(
+                'GIBASKBX',
+                'SK4209000000000331819272',
+                'Debitor Name 2',
+                200.02,
+                'EUR',
+                'Test payment  2'
+            )
+            ->popInstance();
+
+        return $customerDirectDebit;
     }
 }

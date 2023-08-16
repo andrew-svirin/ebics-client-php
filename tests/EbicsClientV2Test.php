@@ -2,9 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
-use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
@@ -12,9 +9,6 @@ use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
-use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
-use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
-use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
 
@@ -682,26 +676,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CCT']['code']);
 
-        $builder = new CustomerCreditTransferBuilder();
-        $customerCreditTransfer = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
-            ->addTransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                'Creditor Name 1',
-                100.10,
-                'EUR',
-                'Test payment  1'
-            )
-            ->addTransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 2',
-                200.02,
-                'EUR',
-                'Test payment  2'
-            )
-            ->popInstance();
+        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.03');
 
         $cct = $client->CCT($customerCreditTransfer);
 
@@ -733,13 +708,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CIP']['code']);
 
-        $builder = new CustomerDirectDebitBuilder();
-        $customerDirectDebit = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
-            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
-                'Test payment  1')
-            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
-            ->popInstance();
+        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
         $cip = $client->CIP($customerDirectDebit);
 
@@ -773,36 +742,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['XE2']['code']);
 
-        $builder = new CustomerSwissCreditTransferBuilder();
-        $customerCreditTransfer = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Debitor Name')
-            ->addBankTransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                new StructuredPostalAddress('CH', 'Triesen', '9495'),
-                100.10,
-                'CHF',
-                'Test payment  1'
-            )
-            ->addSEPATransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 4',
-                null, // new UnstructuredPostalAddress(),
-                200.02,
-                'EUR',
-                'Test payment  2'
-            )
-            ->addForeignTransaction(
-                'NWBKGB2L',
-                'GB29 NWBK 6016 1331 9268 19',
-                'United Development Ltd',
-                new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
-                65.10,
-                'GBP',
-                'Test payment 3'
-            )
-            ->popInstance();
+        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
 
         $xe2 = $client->XE2($customerCreditTransfer);
 
@@ -813,6 +753,40 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getInitialization()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($xe2->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group XE3
+     * @group V2
+     * @group XE3-V2
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testXE3(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV2($credentialsId, $x509Generator, $codes['XE3']['fake']);
+
+        $this->assertExceptionCode($codes['XE3']['code']);
+
+        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
+
+        $xe3 = $client->XE3($customerCreditTransfer);
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe3->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe3->getTransaction()->getInitialization()->getResponse());
 
         $this->assertResponseOk($code, $reportText);
     }
@@ -834,13 +808,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CDD']['code']);
 
-        $builder = new CustomerDirectDebitBuilder();
-        $customerDirectDebit = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
-            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
-                'Test payment  1')
-            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
-            ->popInstance();
+        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
         $cdd = $client->CDD($customerDirectDebit);
 
@@ -1079,6 +1047,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
@@ -1153,6 +1122,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
@@ -1197,6 +1167,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
@@ -1241,6 +1212,7 @@ class EbicsClientV2Test extends AbstractEbicsTestCase
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
                     'XE2' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],

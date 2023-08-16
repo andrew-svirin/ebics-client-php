@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
-use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
@@ -267,44 +265,17 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['BTU']['code']);
 
-        $builder = new CustomerCreditTransferBuilder();
-        $customerCreditTransfer = $builder
-            ->createInstance(
-                'ZKBKCHZZ80A',
-                'SE7500800000000000001123',
-                'Debitor Name',
-                null,
-                true,
-                'msg-123',
-                'pr-123'
-            )
-            ->addTransaction(
-                'MARKDEF1820',
-                'DE09820000000083001503',
-                'Creditor Name 1',
-                100.10,
-                'EUR',
-                'Test payment  1'
-            )
-            ->addTransaction(
-                'GIBASKBX',
-                'SK4209000000000331819272',
-                'Creditor Name 2',
-                200.02,
-                'EUR',
-                'Test payment  2'
-            )
-            ->popInstance();
+        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.09');
 
+        // XE2
         $context = new BTUContext();
-
         $context->setServiceName('MCT');
         $context->setScope('CH');
         $context->setMsgName('pain.001');
-        $context->setMsgNameVersion('03');
+        $context->setMsgNameVersion('09');
+        $context->setFileName('xe2.pain001.xml');
         $context->setFileData($customerCreditTransfer->getContent());
         $context->setFileDocument($customerCreditTransfer);
-        $context->setFileName('MCT.xml');
 
         $btu = $client->BTU($context);
 
@@ -315,6 +286,41 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
 
         $code = $responseHandler->retrieveH00XReturnCode($btu->getTransaction()->getInitialization()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($btu->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group XE3
+     * @group V3
+     * @group XE3-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testXE3(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['XE3']['fake']);
+
+        $this->assertExceptionCode($codes['XE3']['code']);
+
+        $documentFactory = new DocumentFactory();
+        $context = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
+
+        $xe3 = $client->XE3($context);
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe3->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xe3->getTransaction()->getInitialization()->getResponse());
 
         $this->assertResponseOk($code, $reportText);
     }
@@ -339,7 +345,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['YCT']['code']);
 
         $documentFactory = new DocumentFactory();
-        $context = $documentFactory->create(file_get_contents($this->fixtures . '/yct.pain001.xml'));
+        $context = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
 
         $yct = $client->YCT($context);
 
@@ -373,13 +379,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CIP']['code']);
 
-        $builder = new CustomerDirectDebitBuilder();
-        $customerDirectDebit = $builder
-            ->createInstance('ZKBKCHZZ80A', 'SE7500800000000000001123', 'Creditor Name')
-            ->addTransaction('MARKDEF1820', 'DE09820000000083001503', 'Debitor Name 1', 100.10, 'EUR',
-                'Test payment  1')
-            ->addTransaction('GIBASKBX', 'SK4209000000000331819272', 'Debitor Name 2', 200.02, 'EUR', 'Test payment  2')
-            ->popInstance();
+        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
         $cip = $client->CIP($customerDirectDebit);
 
@@ -765,7 +765,8 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'PTK' => ['code' => null, 'fake' => false],
                     'Z54' => ['code' => '091005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
-                    'BTU' => ['code' => '091005', 'fake' => false],
+                    'BTU' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
@@ -791,6 +792,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'Z54' => ['code' => '091005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],

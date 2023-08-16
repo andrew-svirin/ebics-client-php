@@ -296,6 +296,7 @@ final class RequestFactoryV3 extends RequestFactory
         $btfContext->setServiceName('REP');
         $btfContext->setScope('CH');
         $btfContext->setMsgName('camt.054');
+        $btfContext->setMsgNameVersion('04');
         $btfContext->setContainerFlag('ZIP');
 
         return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
@@ -333,6 +334,18 @@ final class RequestFactoryV3 extends RequestFactory
     public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
+    }
+
+    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    {
+        $btfContext = new BTUContext();
+        $btfContext->setServiceName('SDD');
+        $btfContext->setScope('CH');
+        $btfContext->setMsgName('pain.008');
+        $btfContext->setMsgNameVersion('02');
+        $btfContext->setFileName('xe3.pain008.xml');
+
+        return $this->createBTU($btfContext, $dateTime, $transaction);
     }
 
     public function createYCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request

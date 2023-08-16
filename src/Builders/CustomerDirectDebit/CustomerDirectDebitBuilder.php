@@ -27,6 +27,7 @@ final class CustomerDirectDebitBuilder
     }
 
     /**
+     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
      * @param string $creditorFinInstBic
      * @param string $creditorIban
      * @param string $creditorName
@@ -39,9 +40,12 @@ final class CustomerDirectDebitBuilder
      * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
      * @param string|null $paymentReference Overwrite default payment reference -
      * visible on creditors bank statement (max length: 35 characters)
+     *
      * @return $this
+     * @throws \DOMException
      */
     public function createInstance(
+        string $schema,
         string $creditorFinInstBic,
         string $creditorIban,
         string $creditorName,
@@ -56,18 +60,13 @@ final class CustomerDirectDebitBuilder
         $now = new DateTime();
 
         $xmDocument = $this->instance->createElementNS(
-            'urn:iso:std:iso:20022:tech:xsd:pain.008.001.02',
+            $schema,
             'Document'
         );
         $xmDocument->setAttributeNS(
             'http://www.w3.org/2000/xmlns/',
             'xmlns:xsi',
             'http://www.w3.org/2001/XMLSchema-instance'
-        );
-        $xmDocument->setAttributeNS(
-            'http://www.w3.org/2001/XMLSchema-instance',
-            'xsi:schemaLocation',
-            'urn:iso:std:iso:20022:tech:xsd:pain.008.001.02.xsdpain.008.001.02'
         );
         $this->instance->appendChild($xmDocument);
 
@@ -252,7 +251,7 @@ final class CustomerDirectDebitBuilder
             $xmlEndToEndId->nodeValue = $endToEndId;
         } else {
             $xmlEndToEndId->nodeValue = $this->randomService->uniqueIdWithDate(
-                'pete' . str_pad((string)$nbOfTxs, 2, '0')
+                'pete'.str_pad((string)$nbOfTxs, 2, '0')
             );
         }
 
