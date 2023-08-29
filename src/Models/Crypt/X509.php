@@ -24,7 +24,7 @@ use LogicException;
  * the default value is used.  Problem is, if the parameter is there and it just so happens
  * to have the default value there are two ways that that parameter can be encoded.  It can
  * be encoded explicitly or left out all together.  This would effect the signature value
- * and thus may invalidate the the certificate all together unless the certificate is re-signed.
+ * and thus may invalidate the certificate all together unless the certificate is re-signed.
  */
 class X509 implements X509Interface
 {
@@ -145,7 +145,7 @@ class X509 implements X509Interface
      * See {@link http://tools.ietf.org/html/rfc5280#section-4.2.1.1 RFC5280#section-4.2.1.1} and
      * {@link http://tools.ietf.org/html/rfc5280#section-4.2.1.2 RFC5280#section-4.2.1.2}.
      */
-    protected string $currentKeyIdentifier;
+    protected ?string $currentKeyIdentifier;
 
     /**
      * Default Constructor.
@@ -1770,6 +1770,10 @@ class X509 implements X509Interface
             case 'organizationname':
             case 'o':
                 return 'id-at-organizationName';
+            case 'id-at-organizationalunitname':
+            case 'organizationalunitname':
+            case 'ou':
+                return 'id-at-organizationalUnitName';
             case 'id-at-commonname':
             case 'commonname':
             case 'cn':
