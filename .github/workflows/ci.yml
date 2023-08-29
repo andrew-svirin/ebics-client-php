@@ -22,6 +22,9 @@ jobs:
   phpstan:
     name: PHPStan
     runs-on: ubuntu-latest
+    # This workflow is only of value to the andrew-svirin/ebics-client-php repository and
+    # would always fail in forks
+    if: github.repository == 'andrew-svirin/ebics-client-php'
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
@@ -37,6 +40,9 @@ jobs:
   phpcs:
     name: PHPCS
     runs-on: ubuntu-latest
+    # This workflow is only of value to the andrew-svirin/ebics-client-php repository and
+    # would always fail in forks
+    if: github.repository == 'andrew-svirin/ebics-client-php'
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
@@ -52,6 +58,9 @@ jobs:
   phpunit:
     name: PHPUnit
     runs-on: ubuntu-latest
+    # This workflow is only of value to the andrew-svirin/ebics-client-php repository and
+    # would always fail in forks
+    if: github.repository == 'andrew-svirin/ebics-client-php'
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
