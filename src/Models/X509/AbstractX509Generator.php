@@ -223,7 +223,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         if (!empty($options['DN'])) {
             if (!$subject->setDN($options['DN'])) {
-                throw new RuntimeException('Can not set DN.');
+                throw new RuntimeException('Can not set Subject DN.');
             }
         }
 
@@ -254,7 +254,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
         if (!empty($options['DN'])) {
             if (!$issuer->setDN($options['DN'])) {
-                throw new RuntimeException('Can not set DN.');
+                throw new RuntimeException('Can not set Issuer DN.');
             }
         } else {
             $issuer->setDN($subject->getDN());
