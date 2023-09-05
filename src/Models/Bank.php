@@ -28,7 +28,7 @@ final class Bank
     /**
      * The Server Name of the bank.
      */
-    private ?string $serverName;
+    private ?string $serverName = null;
 
     /**
      * The Server Version of the bank.
