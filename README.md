@@ -27,12 +27,7 @@ $ composer require andrew-svirin/ebics-client-php
 
 ## Initialize client
 
-You will need to have this information from your Bank:
-
-- HostID
-- HostURL
-- PartnerID
-- UserID
+You will need to have this information from your Bank: `HostID`, `HostURL`, `PartnerID`, `UserID`
 
 ```php
 <?php
