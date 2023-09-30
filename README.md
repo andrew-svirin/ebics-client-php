@@ -9,7 +9,7 @@
 
 PHP library to communicate with a bank through EBICS protocol.  
 Supported PHP versions - PHP 7.2 - PHP 8.1  
-Support Ebics server versions: 2.5 (default), 3.0
+Support Ebics server versions: 2.4 (partially), 2.5 (default), 3.0
 
 ## License
 
