@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
+use AndrewSvirin\Ebics\Handlers\Traits\H004Trait;
 
 /**
  * Ebics 2.5 AuthSignatureHandler.
@@ -12,7 +12,7 @@ use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
  *
  * @internal
  */
-final class AuthSignatureHandlerV3 extends AuthSignatureHandler
+final class AuthSignatureHandlerV25 extends AuthSignatureHandler
 {
-    use H005Trait;
+    use H004Trait;
 }

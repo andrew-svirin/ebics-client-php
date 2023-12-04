@@ -34,7 +34,7 @@ final class UploadSegment extends Segment
         $this->transactionPhase = $phase;
     }
 
-    public function setOrderId(?string $orderId): void
+    public function setOrderId(string $orderId): void
     {
         $this->orderId = $orderId;
     }

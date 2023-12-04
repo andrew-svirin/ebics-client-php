@@ -2,22 +2,22 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
+use AndrewSvirin\Ebics\Handlers\Traits\H004Trait;
 use Closure;
 
 /**
- * Ebics 3.0 XmlBuilder.
+ * Ebics 2.5 XmlBuilder.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class XmlBuilderV3 extends XmlBuilder
+final class XmlBuilderV25 extends XmlBuilder
 {
-    use H005Trait;
+    use H004Trait;
 
     public function addHeader(Closure $callback): XmlBuilder
     {
-        $headerBuilder = new HeaderBuilderV3($this->dom);
+        $headerBuilder = new HeaderBuilderV2($this->dom);
         $header = $headerBuilder->createInstance()->getInstance();
         $this->instance->appendChild($header);
 
@@ -28,7 +28,7 @@ final class XmlBuilderV3 extends XmlBuilder
 
     public function addBody(Closure $callback = null): XmlBuilder
     {
-        $bodyBuilder = new BodyBuilderV3($this->dom);
+        $bodyBuilder = new BodyBuilderV2($this->dom);
         $body = $bodyBuilder->createInstance()->getInstance();
         $this->instance->appendChild($body);
 

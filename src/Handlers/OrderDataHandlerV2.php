@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Document;
@@ -15,30 +15,22 @@ use DOMNode;
 use DOMNodeList;
 
 /**
- * Ebics 2.5 OrderDataHandler.
+ * Ebics 2.x OrderDataHandler.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  *
  * @internal
  */
-final class OrderDataHandlerV2 extends OrderDataHandler
+abstract class OrderDataHandlerV2 extends OrderDataHandler
 {
-    use XPathTrait;
+    use H00XTrait;
 
     protected function createSignaturePubKeyOrderData(CustomerINI $xml): DOMElement
     {
         return $xml->createElementNS(
             'http://www.ebics.org/S001',
             'SignaturePubKeyOrderData'
-        );
-    }
-
-    protected function createHIARequestOrderData(CustomerHIA $xml): DOMElement
-    {
-        return $xml->createElementNS(
-            'urn:org:ebics:H004',
-            'HIARequestOrderData'
         );
     }
 
@@ -111,12 +103,13 @@ final class OrderDataHandlerV2 extends OrderDataHandler
 
     public function retrieveAuthenticationSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH004XPath($document);
+        $h00x = $this->getH00XVersion();
+        $xpath = $this->prepareH00XXPath($document);
 
-        $modulus = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
+        $modulus = $xpath->query("//$h00x:AuthenticationPubKeyInfo/$h00x:PubKeyValue/ds:RSAKeyValue/ds:Modulus");
         $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
-        $exponent = $xpath->query('//H004:AuthenticationPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
+        $exponent = $xpath->query("//$h00x:AuthenticationPubKeyInfo/$h00x:PubKeyValue/ds:RSAKeyValue/ds:Exponent");
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
@@ -125,7 +118,7 @@ final class OrderDataHandlerV2 extends OrderDataHandler
             $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
 
-        $x509Certificate = $xpath->query('//H004:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
+        $x509Certificate = $xpath->query("//$h00x:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate");
         if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
@@ -137,12 +130,13 @@ final class OrderDataHandlerV2 extends OrderDataHandler
 
     public function retrieveEncryptionSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH004XPath($document);
+        $h00x = $this->getH00XVersion();
+        $xpath = $this->prepareH00XXPath($document);
 
-        $modulus = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Modulus');
+        $modulus = $xpath->query("//$h00x:EncryptionPubKeyInfo/$h00x:PubKeyValue/ds:RSAKeyValue/ds:Modulus");
         $modulusValue = DOMHelper::safeItemValue($modulus);
         $modulusValueDe = base64_decode($modulusValue);
-        $exponent = $xpath->query('//H004:EncryptionPubKeyInfo/H004:PubKeyValue/ds:RSAKeyValue/ds:Exponent');
+        $exponent = $xpath->query("//$h00x:EncryptionPubKeyInfo/$h00x:PubKeyValue/ds:RSAKeyValue/ds:Exponent");
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
@@ -151,7 +145,7 @@ final class OrderDataHandlerV2 extends OrderDataHandler
             $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
 
-        $x509Certificate = $xpath->query('//H004:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
+        $x509Certificate = $xpath->query("//$h00x:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate");
         if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);

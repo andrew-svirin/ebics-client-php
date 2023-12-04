@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
 use AndrewSvirin\Ebics\Models\Crypt\X509;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
@@ -23,21 +23,13 @@ use RuntimeException;
  */
 final class OrderDataHandlerV3 extends OrderDataHandler
 {
-    use XPathTrait;
+    use H005Trait;
 
     protected function createSignaturePubKeyOrderData(CustomerINI $xml): DOMElement
     {
         return $xml->createElementNS(
             'http://www.ebics.org/S002',
             'SignaturePubKeyOrderData'
-        );
-    }
-
-    protected function createHIARequestOrderData(CustomerHIA $xml): DOMElement
-    {
-        return $xml->createElementNS(
-            'urn:org:ebics:H005',
-            'HIARequestOrderData'
         );
     }
 
@@ -70,9 +62,10 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
     public function retrieveAuthenticationSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH005XPath($document);
+        $h00x = $this->getH00XVersion();
+        $xpath = $this->prepareH00XXPath($document);
 
-        $x509Certificate = $xpath->query('//H005:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate');
+        $x509Certificate = $xpath->query("//$h00x:AuthenticationPubKeyInfo/ds:X509Data/ds:X509Certificate");
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);
         $x509CertificateValueDe = base64_decode($x509CertificateValue);
 
@@ -101,9 +94,10 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
     public function retrieveEncryptionSignature(Document $document): SignatureInterface
     {
-        $xpath = $this->prepareH005XPath($document);
+        $h00x = $this->getH00XVersion();
+        $xpath = $this->prepareH00XXPath($document);
 
-        $x509Certificate = $xpath->query('//H005:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate');
+        $x509Certificate = $xpath->query("//$h00x:EncryptionPubKeyInfo/ds:X509Data/ds:X509Certificate");
         $x509CertificateValue = DOMHelper::safeItemValueOrNull($x509Certificate);
         $x509CertificateValueDe = base64_decode($x509CertificateValue);
 

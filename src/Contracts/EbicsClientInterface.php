@@ -261,7 +261,7 @@ interface EbicsClientInterface
      * Download subscriber's customer and subscriber information.
      * @param string $fileInfo Format of response.
      * @param string $format = 'text' ?? 'xml'
-     * @param string $countryCode
+     * @param string $countryCode = 'FR' ?? 'DE'
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime

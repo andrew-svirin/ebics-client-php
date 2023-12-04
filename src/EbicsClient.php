@@ -18,16 +18,19 @@ use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
 use AndrewSvirin\Ebics\Factories\OrderResultFactory;
 use AndrewSvirin\Ebics\Factories\RequestFactory;
-use AndrewSvirin\Ebics\Factories\RequestFactoryV2;
+use AndrewSvirin\Ebics\Factories\RequestFactoryV24;
+use AndrewSvirin\Ebics\Factories\RequestFactoryV25;
 use AndrewSvirin\Ebics\Factories\RequestFactoryV3;
 use AndrewSvirin\Ebics\Factories\SegmentFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Factories\TransactionFactory;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
-use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV2;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV24;
+use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV25;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV3;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
-use AndrewSvirin\Ebics\Handlers\ResponseHandlerV2;
+use AndrewSvirin\Ebics\Handlers\ResponseHandlerV24;
+use AndrewSvirin\Ebics\Handlers\ResponseHandlerV25;
 use AndrewSvirin\Ebics\Handlers\ResponseHandlerV3;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Document;
@@ -87,10 +90,14 @@ final class EbicsClient implements EbicsClientInterface
         $this->user = $user;
         $this->keyRing = $keyRing;
 
-        if (Bank::VERSION_25 === $bank->getVersion()) {
-            $this->requestFactory = new RequestFactoryV2($bank, $user, $keyRing);
-            $this->orderDataHandler = new OrderDataHandlerV2($bank, $user, $keyRing);
-            $this->responseHandler = new ResponseHandlerV2();
+        if (Bank::VERSION_24 === $bank->getVersion()) {
+            $this->requestFactory = new RequestFactoryV24($bank, $user, $keyRing);
+            $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyRing);
+            $this->responseHandler = new ResponseHandlerV24();
+        } elseif (Bank::VERSION_25 === $bank->getVersion()) {
+            $this->requestFactory = new RequestFactoryV25($bank, $user, $keyRing);
+            $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyRing);
+            $this->responseHandler = new ResponseHandlerV25();
         } elseif (Bank::VERSION_30 === $bank->getVersion()) {
             $this->requestFactory = new RequestFactoryV3($bank, $user, $keyRing);
             $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyRing);
@@ -1199,7 +1206,7 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
         $this->checkH00XReturnCode($request, $response);
 
-        $uploadSegment = $this->responseHandler->extractUploadSegment($response);
+        $uploadSegment = $this->responseHandler->extractUploadSegment($request, $response);
         $transaction->setInitialization($uploadSegment);
 
         $segment = $this->segmentFactory->createTransferSegment();
@@ -1234,7 +1241,7 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
         $this->checkH00XReturnCode($request, $response);
 
-        $uploadSegment = $this->responseHandler->extractUploadSegment($response);
+        $uploadSegment = $this->responseHandler->extractUploadSegment($request, $response);
         $transaction->setInitialization($uploadSegment);
 
         $segment = $this->segmentFactory->createTransferSegment();

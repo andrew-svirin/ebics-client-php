@@ -2,32 +2,23 @@
 
 namespace AndrewSvirin\Ebics\Contexts;
 
+/**
+ * Class FULContext context container for FUL orders
+ *
+ * @license http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @author Andrew Svirin
+ */
 final class FULContext
 {
-    private bool $test = false;
-    private bool $ebcdic = false;
+    private array $parameters = [];
 
-    public function isTest(): bool
+    public function setParameter(string $name, string $value): void
     {
-        return $this->test;
+        $this->parameters[$name] = $value;
     }
 
-    public function setTest(bool $test): FULContext
+    public function getParameters(): array
     {
-        $this->test = $test;
-
-        return $this;
-    }
-
-    public function isEbcdic(): bool
-    {
-        return $this->ebcdic;
-    }
-
-    public function setEbcdic(bool $ebcdic): FULContext
-    {
-        $this->ebcdic = $ebcdic;
-
-        return $this;
+        return $this->parameters;
     }
 }

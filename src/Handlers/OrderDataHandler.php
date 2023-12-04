@@ -8,7 +8,7 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\CustomerH3K;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
@@ -32,7 +32,7 @@ use DOMNode;
  */
 abstract class OrderDataHandler
 {
-    use XPathTrait;
+    use H00XTrait;
 
     private Bank $bank;
     private User $user;
@@ -64,6 +64,7 @@ abstract class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for INI request.
+     *
      * @throws EbicsException
      */
     public function handleINI(CustomerINI $xml, SignatureInterface $certificateA, DateTimeInterface $dateTime): void
@@ -99,7 +100,13 @@ abstract class OrderDataHandler
         $this->handleUserId($xmlSignaturePubKeyOrderData, $xml);
     }
 
-    abstract protected function createHIARequestOrderData(CustomerHIA $xml): DOMElement;
+    protected function createHIARequestOrderData(CustomerHIA $xml): DOMElement
+    {
+        return $xml->createElementNS(
+            $this->getH00XNamespace(),
+            'HIARequestOrderData'
+        );
+    }
 
     abstract protected function handleHIAAuthenticationPubKey(
         DOMElement $xmlAuthenticationPubKeyInfo,
@@ -117,6 +124,7 @@ abstract class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for HIA request.
+     *
      * @throws EbicsException
      */
     public function handleHIA(
@@ -174,6 +182,7 @@ abstract class OrderDataHandler
 
     /**
      * Adds OrderData DOM elements to XML DOM for H3K request.
+     *
      * @throws EbicsException
      */
     public function handleH3K(
@@ -184,7 +193,7 @@ abstract class OrderDataHandler
     ): void {
         // Add H3KRequestOrderData to root.
         $xmlH3KRequestOrderData = $xml->createElementNS(
-            'urn:org:ebics:H005',
+            $this->getH00XNamespace(),
             'H3KRequestOrderData'
         );
         $xmlH3KRequestOrderData->setAttributeNS(
@@ -234,6 +243,7 @@ abstract class OrderDataHandler
 
     /**
      * Add ds:X509Data to PublicKeyInfo XML Node.
+     *
      * @throws CertificateEbicsException
      */
     private function handleX509Data(DOMNode $xmlPublicKeyInfo, DOMDocument $xml, SignatureInterface $certificate): void

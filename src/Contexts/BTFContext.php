@@ -3,7 +3,8 @@
 namespace AndrewSvirin\Ebics\Contexts;
 
 /**
- * Business transactions & formats
+ * Business transactions & formats.
+ *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Geoffroy de Corbiac
  */

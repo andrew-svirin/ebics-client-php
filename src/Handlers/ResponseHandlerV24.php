@@ -2,20 +2,20 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
+use AndrewSvirin\Ebics\Handlers\Traits\H003Trait;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\UploadSegment;
 
 /**
- * Ebics 3.0 ResponseHandler.
+ * Ebics 2.4 ResponseHandler.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class ResponseHandlerV3 extends ResponseHandler
+final class ResponseHandlerV24 extends ResponseHandler
 {
-    use H005Trait;
+    use H003Trait;
 
     /**
      * Extract DownloadSegment from the DOM XML.
@@ -24,7 +24,7 @@ final class ResponseHandlerV3 extends ResponseHandler
     {
         $transactionId = $this->retrieveH00XTransactionId($response);
         $transactionPhase = $this->retrieveH00XTransactionPhase($response);
-        $orderId = $this->retrieveH00XResponseOrderId($response);
+        $orderId = $this->retrieveH00XRequestOrderId($request);
 
         $segment = $this->segmentFactory->createUploadSegment();
         $segment->setResponse($response);
