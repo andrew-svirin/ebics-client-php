@@ -14,11 +14,11 @@ use DOMElement;
  */
 abstract class XmlBuilder
 {
-    const EBICS_REQUEST = 'ebicsRequest';
-    const EBICS_UNSECURED_REQUEST = 'ebicsUnsecuredRequest';
-    const EBICS_UNSIGNED_REQUEST = 'ebicsUnsignedRequest';
-    const EBICS_NO_PUB_KEY_DIGESTS = 'ebicsNoPubKeyDigestsRequest';
-    const EBICS_HEV = 'ebicsHEVRequest';
+    private const EBICS_REQUEST = 'ebicsRequest';
+    private const EBICS_UNSECURED_REQUEST = 'ebicsUnsecuredRequest';
+    private const EBICS_UNSIGNED_REQUEST = 'ebicsUnsignedRequest';
+    private const EBICS_NO_PUB_KEY_DIGESTS = 'ebicsNoPubKeyDigestsRequest';
+    private const EBICS_HEV = 'ebicsHEVRequest';
 
     protected DOMElement $instance;
     protected ?DOMDocument $dom;
@@ -28,13 +28,45 @@ abstract class XmlBuilder
         $this->dom = $dom;
     }
 
-    abstract public function createUnsecured(): XmlBuilder;
+    public function createUnsecured(): XmlBuilder
+    {
+        return $this->createH00X(self::EBICS_UNSECURED_REQUEST);
+    }
 
-    abstract public function createSecuredNoPubKeyDigests(): XmlBuilder;
+    public function createSecuredNoPubKeyDigests(): XmlBuilder
+    {
+        return $this->createH00X(self::EBICS_NO_PUB_KEY_DIGESTS, true);
+    }
 
-    abstract public function createSecured(): XmlBuilder;
+    public function createSecured(): XmlBuilder
+    {
+        return $this->createH00X(self::EBICS_REQUEST, true);
+    }
 
-    abstract public function createUnsigned(): XmlBuilder;
+    public function createUnsigned(): XmlBuilder
+    {
+        return $this->createH00X(self::EBICS_UNSIGNED_REQUEST);
+    }
+
+    abstract protected function getH00XVersion(): string;
+
+    abstract protected function getH00XNamespace(): string;
+
+    private function createH00X(string $container, bool $secured = false): XmlBuilder
+    {
+        $this->instance = $this->dom->createElementNS($this->getH00XNamespace(), $container);
+        if ($secured) {
+            $this->instance->setAttributeNS(
+                'http://www.w3.org/2000/xmlns/',
+                'xmlns:ds',
+                'http://www.w3.org/2000/09/xmldsig#'
+            );
+        }
+        $this->instance->setAttribute('Version', $this->getH00XVersion());
+        $this->instance->setAttribute('Revision', '1');
+
+        return $this;
+    }
 
     public function createHEV(): XmlBuilder
     {

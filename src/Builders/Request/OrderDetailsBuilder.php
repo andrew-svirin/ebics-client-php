@@ -87,18 +87,18 @@ abstract class OrderDetailsBuilder
         $xmlFDLOrderParams = $this->dom->createElement('FDLOrderParams');
         $this->instance->appendChild($xmlFDLOrderParams);
 
+        if (null !== $startDateTime && null !== $endDateTime) {
+            // Add DateRange to FDLOrderParams.
+            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
+            $xmlFDLOrderParams->appendChild($xmlDateRange);
+        }
+
         // Add FileFormat to FDLOrderParams.
         $xmlFileFormat = $this->dom->createElement('FileFormat');
         $xmlFileFormat->nodeValue = $fileFormat;
         $xmlFDLOrderParams->appendChild($xmlFileFormat);
 
         $xmlFileFormat->setAttribute('CountryCode', $countryCode);
-
-        if (null !== $startDateTime && null !== $endDateTime) {
-            // Add DateRange to FDLOrderParams.
-            $xmlDateRange = $this->createDateRange($startDateTime, $endDateTime);
-            $xmlFDLOrderParams->appendChild($xmlDateRange);
-        }
 
         return $this;
     }
@@ -111,18 +111,28 @@ abstract class OrderDetailsBuilder
         $xmlFULOrderParams = $this->dom->createElement('FULOrderParams');
         $this->instance->appendChild($xmlFULOrderParams);
 
+        foreach ($fulContext->getParameters() as $name => $value) {
+            // Add Parameter to FULOrderParams.
+            $xmlParameter = $this->dom->createElement('Parameter');
+            $xmlFULOrderParams->appendChild($xmlParameter);
+
+            // Add Name to Parameter.
+            $xmlName = $this->dom->createElement('Name');
+            $xmlParameter->appendChild($xmlName);
+            $xmlName->nodeValue = $name;
+
+            // Add Value to Parameter.
+            $xmlValue = $this->dom->createElement('Value');
+            $xmlParameter->appendChild($xmlValue);
+            $xmlValue->nodeValue = $value;
+
+            $xmlValue->setAttribute('Type', 'string');
+        }
+
         // Add FileFormat to FULOrderParams.
         $xmlFileFormat = $this->dom->createElement('FileFormat');
         $xmlFileFormat->nodeValue = $fileFormat;
         $xmlFULOrderParams->appendChild($xmlFileFormat);
-
-        $xmlTest = $this->dom->createElement('TEST');
-        $xmlTest->nodeValue = $fulContext->isTest() ? 'TRUE' : 'FALSE';
-        $xmlFULOrderParams->appendChild($xmlTest);
-
-        $xmlEbcdic = $this->dom->createElement('EBCDIC');
-        $xmlEbcdic->nodeValue = $fulContext->isEbcdic() ? 'TRUE' : 'FALSE';
-        $xmlFULOrderParams->appendChild($xmlEbcdic);
 
         return $this;
     }

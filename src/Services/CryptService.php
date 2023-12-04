@@ -439,4 +439,47 @@ final class CryptService
             'm' => $rsa->getModulus()->toBytes(),
         ];
     }
+
+    /**
+     * Generate order id from A000 to ZZZZ
+     * Unique value per partner for customer.
+     *
+     * @param string $partnerId
+     *
+     * @return string
+     */
+    public function generateOrderId(string $partnerId): string
+    {
+        $hash = $this->hash($partnerId, 'crc32', false);
+
+        $decs = str_split($hash, 2);
+
+        $first = true;
+        $letOf = 65;
+        $letLim = 90;
+        $dgLim = 9;
+        $letRng = $letLim - $letOf;
+        $letDecRng = $letLim - $letOf + $dgLim;
+
+        $chrs = [];
+        foreach ($decs as $dec) {
+            $dec = hexdec($dec);
+
+            if ($first) {
+                $chrs[] = chr(($dec % $letRng) + $letOf);
+                $first = false;
+                continue;
+            }
+
+            $chrCode = $dec % $letDecRng;
+
+            if ($chrCode > $letRng) {
+                $chrs[] = $chrCode - $letRng;
+            } else {
+                $chrs[] = chr($chrCode + $letOf);
+            }
+        }
+
+        return implode($chrs);
+    }
 }

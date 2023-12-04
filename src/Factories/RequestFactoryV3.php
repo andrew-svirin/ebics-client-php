@@ -38,13 +38,6 @@ use LogicException;
  */
 final class RequestFactoryV3 extends RequestFactory
 {
-    /**
-     * Constructor.
-     *
-     * @param Bank $bank
-     * @param User $user
-     * @param KeyRing $keyRing
-     */
     public function __construct(Bank $bank, User $user, KeyRing $keyRing)
     {
         $this->authSignatureHandler = new AuthSignatureHandlerV3($keyRing);

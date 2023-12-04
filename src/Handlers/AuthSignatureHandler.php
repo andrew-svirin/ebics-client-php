@@ -4,13 +4,12 @@ namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
+use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
 use AndrewSvirin\Ebics\Models\KeyRing;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
-use DOMXPath;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -23,7 +22,7 @@ use DOMXPath;
 abstract class AuthSignatureHandler
 {
     use C14NTrait;
-    use XPathTrait;
+    use H00XTrait;
 
     private KeyRing $keyRing;
     private CryptService $cryptService;
@@ -33,8 +32,6 @@ abstract class AuthSignatureHandler
         $this->keyRing = $keyRing;
         $this->cryptService = new CryptService();
     }
-
-    abstract protected function prepareH00XXPath(DOMDocument $request): DOMXPath;
 
     /**
      * Add body and children elements to request.

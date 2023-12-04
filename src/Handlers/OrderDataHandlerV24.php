@@ -2,17 +2,17 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
+use AndrewSvirin\Ebics\Handlers\Traits\H003Trait;
 
 /**
- * Ebics 2.5 AuthSignatureHandler.
+ * Ebics 2.4 OrderDataHandler.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  *
  * @internal
  */
-final class AuthSignatureHandlerV3 extends AuthSignatureHandler
+final class OrderDataHandlerV24 extends OrderDataHandlerV2
 {
-    use H005Trait;
+    use H003Trait;
 }

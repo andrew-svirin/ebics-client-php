@@ -32,37 +32,39 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected $fixtures = __DIR__.'/_fixtures';
 
-    protected function setupClientV2(
+    protected function setupClientV24(
         int $credentialsId,
         X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
-        $credentials = $this->credentialsDataProvider($credentialsId);
+        return $this->setupClient(Bank::VERSION_24, $credentialsId, $x509Generator, $fake);
+    }
 
-        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], Bank::VERSION_25);
-        $bank->setIsCertified($credentials['hostIsCertified']);
-        $bank->setServerName(sprintf('Server %d', $credentialsId));
-        $user = new User($credentials['partnerId'], $credentials['userId']);
-        $keyRing = $this->loadKeyRing($credentialsId);
-
-        $ebicsClient = new EbicsClient($bank, $user, $keyRing);
-        $ebicsClient->setX509Generator($x509Generator);
-
-        if (true === $fake) {
-            $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));
-        }
-
-        return $ebicsClient;
+    protected function setupClientV25(
+        int $credentialsId,
+        X509GeneratorInterface $x509Generator = null,
+        $fake = false
+    ): EbicsClientInterface {
+        return $this->setupClient(Bank::VERSION_25, $credentialsId, $x509Generator, $fake);
     }
 
     protected function setupClientV3(
         int $credentialsId,
         X509GeneratorInterface $x509Generator = null,
-        $fake = false
+        bool $fake = false
+    ): EbicsClientInterface {
+        return $this->setupClient(Bank::VERSION_30, $credentialsId, $x509Generator, $fake);
+    }
+
+    private function setupClient(
+        string $version,
+        int $credentialsId,
+        X509GeneratorInterface $x509Generator = null,
+        bool $fake = false
     ): EbicsClientInterface {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
-        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], Bank::VERSION_30);
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], $version);
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
