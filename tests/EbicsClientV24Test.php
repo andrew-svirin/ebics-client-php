@@ -160,7 +160,7 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                 'text',
                 'FR',
                 new DateTime(),
-                (new DateTime())->modify('-100 day'),
+                (new DateTime())->modify('-30 day'),
                 (new DateTime())->modify('-1 day')
             );
 
@@ -252,7 +252,7 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'xml',
+                            'format' => 'pain.001.001.03.sct',
                         ],
                     ],
                 ],
@@ -273,7 +273,7 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                             'code' => null,
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'xml',
+                            'format' => 'pain.001.001.03.sct',
                         ],
                     ],
                 ],

@@ -15,8 +15,23 @@ final class DocumentFactory
     public function create(string $content): Document
     {
         $document = new Document();
-        $document->loadXML($content);
+        $document->loadXML(utf8_encode($content));
 
         return $document;
+    }
+
+    /**
+     * @param string[] $contents
+     *
+     * @return Document[]
+     */
+    public function createMultiple(array $contents): array
+    {
+        $documents = [];
+        foreach ($contents as $key => $content) {
+            $documents[$key] = $this->create($content);
+        }
+
+        return $documents;
     }
 }

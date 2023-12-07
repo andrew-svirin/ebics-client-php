@@ -48,6 +48,7 @@ use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\CurlHttpClient;
+use AndrewSvirin\Ebics\Services\XmlService;
 use AndrewSvirin\Ebics\Services\ZipService;
 use DateTime;
 use DateTimeInterface;
@@ -69,6 +70,7 @@ final class EbicsClient implements EbicsClientInterface
     private RequestFactory $requestFactory;
     private CryptService $cryptService;
     private ZipService $zipService;
+    private XmlService $xmlService;
     private DocumentFactory $documentFactory;
     private OrderResultFactory $orderResultFactory;
     private SignatureFactory $signatureFactory;
@@ -107,6 +109,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $this->cryptService = new CryptService();
+        $this->xmlService = new XmlService();
         $this->zipService = new ZipService();
         $this->signatureFactory = new SignatureFactory();
         $this->documentFactory = new DocumentFactory();
@@ -497,7 +500,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -527,7 +530,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -557,7 +560,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -587,7 +590,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -617,7 +620,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -647,7 +650,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -675,7 +678,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'files');
+        return $this->createDownloadOrderResult($transaction, 'zip_files');
     }
 
     /**
@@ -684,7 +687,7 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function FDL(
         $fileInfo,
-        $format = 'text',
+        $parserFormat = 'text',
         $countryCode = 'FR',
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
@@ -719,7 +722,7 @@ final class EbicsClient implements EbicsClientInterface
             $storeClosure
         );
 
-        return $this->createDownloadOrderResult($transaction, $format);
+        return $this->createDownloadOrderResult($transaction, $parserFormat);
     }
 
     /**
@@ -727,7 +730,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function FUL(
-        string $fileFormat,
+        string $fileInfo,
         OrderDataInterface $orderData,
         FULContext $fulContext,
         DateTimeInterface $dateTime = null
@@ -738,7 +741,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use (
             $orderData,
-            $fileFormat,
+            $fileInfo,
             $fulContext,
             $dateTime
         ) {
@@ -747,7 +750,7 @@ final class EbicsClient implements EbicsClientInterface
 
             return $this->requestFactory->createFUL(
                 $dateTime,
-                $fileFormat,
+                $fileInfo,
                 $fulContext,
                 $transaction
             );
@@ -1270,22 +1273,27 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @param string $format 'text' ?? 'xml' ?? 'files'
+     * @param string $parserFormat 'text' ?? 'xml' ?? 'xml_files' ?? 'zip_files'
      */
-    private function createDownloadOrderResult(DownloadTransaction $transaction, string $format): DownloadOrderResult
-    {
+    private function createDownloadOrderResult(
+        DownloadTransaction $transaction,
+        string $parserFormat
+    ): DownloadOrderResult {
         $orderResult = $this->orderResultFactory->createDownloadOrderResult();
         $orderResult->setTransaction($transaction);
         $orderResult->setData($transaction->getOrderData());
 
-        switch ($format) {
+        switch ($parserFormat) {
             case 'text':
                 break;
             case 'xml':
                 $orderResult->setDataDocument($this->extractOrderDataDocument($orderResult->getData()));
                 break;
-            case 'files':
-                $orderResult->setDataFiles($this->extractOrderDataFiles($orderResult->getData()));
+            case 'xml_files':
+                $orderResult->setDataFiles($this->extractOrderDataXmlFiles($orderResult->getData()));
+                break;
+            case 'zip_files':
+                $orderResult->setDataFiles($this->extractOrderDataZipFiles($orderResult->getData()));
                 break;
             default:
                 throw new \RuntimeException('Incorrect format');
@@ -1325,16 +1333,21 @@ final class EbicsClient implements EbicsClientInterface
     /**
      * @return Document[]
      */
-    private function extractOrderDataFiles(string $orderData): array
+    private function extractOrderDataXmlFiles(string $orderData): array
+    {
+        $files = $this->xmlService->extractFilesFromString($orderData);
+
+        return $this->documentFactory->createMultiple($files);
+    }
+
+    /**
+     * @return Document[]
+     */
+    private function extractOrderDataZipFiles(string $orderData): array
     {
         $files = $this->zipService->extractFilesFromString($orderData);
 
-        $documents = [];
-        foreach ($files as $key => $file) {
-            $documents[$key] = $this->documentFactory->create($file);
-        }
-
-        return $documents;
+        return $this->documentFactory->createMultiple($files);
     }
 
     /**

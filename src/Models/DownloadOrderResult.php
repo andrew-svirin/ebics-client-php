@@ -14,11 +14,19 @@ final class DownloadOrderResult extends OrderResult
     private Document $dataDocument;
     private DownloadTransaction $transaction;
 
+    /**
+     * @param Document[] $dataFiles
+     *
+     * @return void
+     */
     public function setDataFiles(array $dataFiles): void
     {
         $this->dataFiles = $dataFiles;
     }
 
+    /**
+     * @return Document[]|null
+     */
     public function getDataFiles(): ?array
     {
         return $this->dataFiles;
