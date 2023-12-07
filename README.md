@@ -32,25 +32,25 @@ You will need to have this information from your Bank: `HostID`, `HostURL`, `Par
 ```php
 <?php
 
-use AndrewSvirin\Ebics\Services\FileKeyRingManager;
+use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\EbicsClient;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
-$keyRingRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
+$keyringRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 // Use __IS_CERTIFIED__ true for French banks, otherwise use false.
-$keyRingManager = new FileKeyRingManager();
-$keyRing = $keyRingManager->loadKeyRing($keyRingRealPath, __PASSWORD__);
+$keyringManager = new FileKeyRingManager();
+$keyring = $keyringManager->loadKeyRing($keyringRealPath, __PASSWORD__);
 $bank = new Bank(__HOST_ID__, __HOST_URL__, __EBICS_SERVER_VERSION___);
 $bank->setIsCertified(__IS_CERTIFIED__);
 $user = new User(__PARTNER_ID__, __USER_ID__);
-$client = new EbicsClient($bank, $user, $keyRing);
+$client = new EbicsClient($bank, $user, $keyring);
 ```
 
 ### Note for French Bank and for Ebics 3.0
 
-If you are dealing with a french bank or with Ebics 3.0, you will need to create a X509 self-signed certificate. 
+If you are dealing with a French bank or with Ebics 3.0, you will need to create a X509 self-signed certificate. 
 You can achieve this by creating a class which extends the `AbstractX509Generator` and use `__IS_CERTIFIED__ = true`
 
 ```php
@@ -100,9 +100,9 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 
 try {
     $client->INI();
-    /* @var \AndrewSvirin\Ebics\Services\FileKeyRingManager $keyRingManager */
-    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
-    $keyRingManager->saveKeyRing($keyRing, $keyRingRealPath);
+    /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
+    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyring */
+    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "INI request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
@@ -114,7 +114,7 @@ try {
 
 try {
     $client->HIA();
-    $keyRingManager->saveKeyRing($keyRing, $keyRingRealPath);
+    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "HIA request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
@@ -149,9 +149,9 @@ $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createP
 try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->HPB();
-    /* @var \AndrewSvirin\Ebics\Services\FileKeyRingManager $keyRingManager */
-    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyRing */
-    $keyRingManager->saveKeyRing($keyRing, $keyRingRealPath);
+    /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
+    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyring */
+    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
