@@ -52,7 +52,8 @@ final class RequestFactoryV24 extends RequestFactoryV2
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN;
                 break;
             case 'FUL':
-                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN;
+                $orderAttribute = $this->bank->usesUploadWithES() ?
+                    OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN : OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
                 break;
             default:
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
