@@ -64,7 +64,8 @@ final class RequestFactoryV25 extends RequestFactoryV2
             case 'XE2':
             case 'XE3':
             case 'CIP':
-                $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN;
+                $orderAttribute = $this->bank->usesUploadWithES() ?
+                    OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN : OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
                 break;
             case 'HVE':
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_UZHNN;

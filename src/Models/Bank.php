@@ -24,7 +24,19 @@ final class Bank
      */
     private string $url;
 
-    private ?bool $isCertified;
+    /**
+     * Uses certificate.
+     *
+     * @var bool
+     */
+    private bool $isCertified = false;
+
+    /**
+     * Uses upload orders with ES.
+     *
+     * @var bool
+     */
+    private bool $usesUploadWithES = true;
 
     /**
      * The Server Name of the bank.
@@ -34,7 +46,7 @@ final class Bank
     /**
      * The Server Version of the bank.
      */
-    private ?string $version;
+    private string $version;
 
     /**
      * Constructor.
@@ -83,7 +95,25 @@ final class Bank
      */
     public function isCertified(): bool
     {
-        return (bool)$this->isCertified;
+        return $this->isCertified;
+    }
+
+    /**
+     * @param bool $usesUploadWithES
+     *
+     * @return void
+     */
+    public function setUsesUploadWithES(bool $usesUploadWithES): void
+    {
+        $this->usesUploadWithES = $usesUploadWithES;
+    }
+
+    /**
+     * @return bool
+     */
+    public function usesUploadWithES(): bool
+    {
+        return $this->usesUploadWithES;
     }
 
     /**
