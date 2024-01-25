@@ -179,6 +179,17 @@ final class CustomerCreditTransferBuilder
         return $this;
     }
 
+    /**
+     * @param string $creditorFinInstBIC
+     * @param string $creditorIBAN
+     * @param string $creditorName
+     * @param float $amount
+     * @param string $currency
+     * @param string $purpose
+     * @param string|null $endToEndId
+     * @param string|null $purposeCode Optional Purpose Code - e.G. BENE BONU CBFF CHAR GOVT PENS SALA SSBE
+     * @return CustomerCreditTransferBuilder
+     */
     public function addTransaction(
         string $creditorFinInstBIC,
         string $creditorIBAN,
@@ -186,7 +197,8 @@ final class CustomerCreditTransferBuilder
         float $amount,
         string $currency,
         string $purpose,
-        string $endToEndId = null
+        string $endToEndId = null,
+        string $purposeCode = null
     ): CustomerCreditTransferBuilder {
         $xpath = $this->prepareXPath($this->instance);
         $nbOfTxsList = $xpath->query('//CstmrCdtTrfInitn/PmtInf/NbOfTxs');
@@ -246,6 +258,15 @@ final class CustomerCreditTransferBuilder
         $xmlIBAN = $this->instance->createElement('IBAN');
         $xmlIBAN->nodeValue = $creditorIBAN;
         $xmlId->appendChild($xmlIBAN);
+
+        if ($purposeCode) {
+            $xmlPurp = $this->instance->createElement('Purp');
+            $xmlCdtTrfTxInf->appendChild($xmlPurp);
+
+            $xmlCd = $this->instance->createElement('Cd');
+            $xmlCd->nodeValue = $purposeCode;
+            $xmlPurp->appendChild($xmlCd);
+        }
 
         $xmlRmtInf = $this->instance->createElement('RmtInf');
         $xmlCdtTrfTxInf->appendChild($xmlRmtInf);

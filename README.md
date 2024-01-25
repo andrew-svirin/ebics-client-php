@@ -8,7 +8,7 @@
 <img src="https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png" width="300">
 
 PHP library to communicate with a bank through EBICS protocol.  
-Supported PHP versions - PHP 7.2 - PHP 8.1  
+Supported PHP versions - PHP 7.2 - PHP 8.3  
 Support Ebics server versions: 2.4 (partially), 2.5 (default), 3.0
 
 ## License
