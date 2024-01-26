@@ -28,6 +28,7 @@ final class CustomerInstantCreditTransferBuilder
     }
 
     /**
+     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
      * @param string $debtorFinInstBic
      * @param string $debttorIban
      * @param string $debitorName
@@ -38,6 +39,7 @@ final class CustomerInstantCreditTransferBuilder
      * @return CustomerInstantCreditTransferBuilder
      */
     public function createInstance(
+        string $schema,
         string $debtorFinInstBic,
         string $debttorIban,
         string $debitorName,
@@ -49,7 +51,7 @@ final class CustomerInstantCreditTransferBuilder
         $now = new DateTime();
 
         $xmDocument = $this->instance->createElementNS(
-            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03',
+            $schema,
             'Document'
         );
         $xmDocument->setAttributeNS(

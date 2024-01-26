@@ -15,7 +15,10 @@ final class DocumentFactory
     public function create(string $content): Document
     {
         $document = new Document();
-        $document->loadXML(utf8_encode($content));
+
+        $content = mb_convert_encoding($content, 'UTF-8', mb_list_encodings());
+
+        $document->loadXML($content);
 
         return $document;
     }
