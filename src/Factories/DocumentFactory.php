@@ -12,12 +12,13 @@ use AndrewSvirin\Ebics\Models\Document;
  */
 final class DocumentFactory
 {
+    /**
+     * @param string $content requires already UTF-8 encoded content
+     * @return Document
+     */
     public function create(string $content): Document
     {
         $document = new Document();
-
-        $content = mb_convert_encoding($content, 'UTF-8', mb_list_encodings());
-
         $document->loadXML($content);
 
         return $document;
