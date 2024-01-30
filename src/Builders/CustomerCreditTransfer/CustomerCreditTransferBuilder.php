@@ -27,6 +27,7 @@ final class CustomerCreditTransferBuilder
     }
 
     /**
+     * @param string $schema namespace schema urn:iso:std:iso:20022:tech:xsd:pain.001.001.03
      * @param string $debitorFinInstBIC
      * @param string $debitorIBAN
      * @param string $debitorName
@@ -40,6 +41,7 @@ final class CustomerCreditTransferBuilder
      * @return $this
      */
     public function createInstance(
+        string $schema,
         string $debitorFinInstBIC,
         string $debitorIBAN,
         string $debitorName,
@@ -52,7 +54,7 @@ final class CustomerCreditTransferBuilder
         $now = new DateTime();
 
         $xmDocument = $this->instance->createElementNS(
-            'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03',
+            $schema,
             'Document'
         );
         $xmDocument->setAttributeNS(
