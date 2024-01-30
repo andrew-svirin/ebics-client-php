@@ -27,6 +27,7 @@ final class CustomerDirectDebitBuilder
     }
 
     /**
+     * @param string $schema namespace schema urn:iso:std:iso:20022:tech:xsd:pain.008.001.02
      * @param string $creditorFinInstBic
      * @param string $creditorIban
      * @param string $creditorName
@@ -39,12 +40,11 @@ final class CustomerDirectDebitBuilder
      * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
      * @param string|null $paymentReference Overwrite default payment reference -
      * visible on creditors bank statement (max length: 35 characters)
-     * @param string $schema default namespace schema urn:iso:std:iso:20022:tech:xsd:pain.008.001.02
-     *
      * @return $this
      * @throws \DOMException
      */
     public function createInstance(
+        string $schema,
         string $creditorFinInstBic,
         string $creditorIban,
         string $creditorName,
@@ -53,8 +53,7 @@ final class CustomerDirectDebitBuilder
         DateTime $collectionDate = null,
         bool $batchBooking = true,
         string $msgId = null,
-        string $paymentReference = null,
-        string $schema = 'urn:iso:std:iso:20022:tech:xsd:pain.008.001.02'
+        string $paymentReference = null
     ): CustomerDirectDebitBuilder {
         $this->instance = new CustomerDirectDebit();
         $now = new DateTime();

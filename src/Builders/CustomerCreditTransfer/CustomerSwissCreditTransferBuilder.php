@@ -33,19 +33,18 @@ final class CustomerSwissCreditTransferBuilder
     }
 
     /**
+     * @param string $schema namespace schema urn:iso:std:iso:20022:tech:xsd:pain.001.001.03
      * @param string $debitorFinInstBIC
      * @param string $debitorIBAN
      * @param string $debitorName
-     * @param string $schema default namespace schema urn:iso:std:iso:20022:tech:xsd:pain.001.001.03
-     *
      * @return $this
      * @throws \DOMException
      */
     public function createInstance(
+        string $schema,
         string $debitorFinInstBIC,
         string $debitorIBAN,
-        string $debitorName,
-        string $schema = 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03'
+        string $debitorName
     ): CustomerSwissCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         $now = new DateTime();
