@@ -28,7 +28,6 @@ final class CustomerInstantCreditTransferBuilder
     }
 
     /**
-     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
      * @param string $debtorFinInstBic
      * @param string $debttorIban
      * @param string $debitorName
@@ -36,16 +35,17 @@ final class CustomerInstantCreditTransferBuilder
      * you request your credit institution to book each transaction within this order separately.
      * @param string|null $msgId
      * @param string|null $paymentReference
+     * @param string $schema default namespace schema urn:iso:std:iso:20022:tech:xsd:pain.001.001.03
      * @return CustomerInstantCreditTransferBuilder
      */
     public function createInstance(
-        string $schema,
         string $debtorFinInstBic,
         string $debttorIban,
         string $debitorName,
         bool $batchBooking = true,
         string $msgId = null,
-        string $paymentReference = null
+        string $paymentReference = null,
+        string $schema = 'urn:iso:std:iso:20022:tech:xsd:pain.001.001.03'
     ): CustomerInstantCreditTransferBuilder {
         $this->instance = new CustomerCreditTransfer();
         $now = new DateTime();
