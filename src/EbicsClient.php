@@ -85,8 +85,9 @@ final class EbicsClient implements EbicsClientInterface
      * @param Bank $bank
      * @param User $user
      * @param KeyRing $keyRing
+     * @param array $curlOpts
      */
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, KeyRing $keyRing, array $curlOpts = [])
     {
         $this->bank = $bank;
         $this->user = $user;
@@ -117,7 +118,7 @@ final class EbicsClient implements EbicsClientInterface
         $this->transactionFactory = new TransactionFactory();
         $this->segmentFactory = new SegmentFactory();
         // Set default http client.
-        $this->httpClient = new CurlHttpClient();
+        $this->httpClient = new CurlHttpClient($curlOpts);
     }
 
     /**

@@ -15,6 +15,14 @@ use RuntimeException;
  */
 final class CurlHttpClient extends HttpClient implements HttpClientInterface
 {
+
+    private array $curlOpts;
+    
+    public function __construct(array $curlOpts = [])
+    {
+        $this->curlOpts = $curlOpts;
+    }
+
     /**
      * @inheritDoc
      */
@@ -35,6 +43,11 @@ final class CurlHttpClient extends HttpClient implements HttpClientInterface
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_FAILONERROR, true);
+
+        foreach ($this->curlOpts as $option => $value) {
+            curl_setopt($ch, $option, $value);
+        }
+        
         $contents = curl_exec($ch);
         if (curl_errno($ch)) {
             $errorMsg = curl_error($ch);
