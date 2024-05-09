@@ -5,7 +5,7 @@ namespace AndrewSvirin\Ebics\Handlers;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
 use AndrewSvirin\Ebics\Services\CryptService;
@@ -24,13 +24,13 @@ abstract class UserSignatureHandler
     use XPathTrait;
 
     protected User $user;
-    protected KeyRing $keyRing;
+    protected Keyring $keyring;
     protected CryptService $cryptService;
 
-    public function __construct(User $user, KeyRing $keyRing)
+    public function __construct(User $user, Keyring $keyring)
     {
         $this->user = $user;
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
         $this->cryptService = new CryptService();
     }
 

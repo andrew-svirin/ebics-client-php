@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Builders\Request;
 
 use AndrewSvirin\Ebics\Exceptions\SignatureEbicsException;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DOMDocument;
 use DOMElement;
@@ -42,22 +42,22 @@ final class DataEncryptionInfoBuilder
     /**
      * Uses bank signature.
      *
-     * @param KeyRing $keyRing
+     * @param Keyring $keyring
      * @param string $algorithm
      *
      * @return $this
      * @throws SignatureEbicsException
      */
-    public function addEncryptionPubKeyDigest(KeyRing $keyRing, string $algorithm = 'sha256'): DataEncryptionInfoBuilder
+    public function addEncryptionPubKeyDigest(Keyring $keyring, string $algorithm = 'sha256'): DataEncryptionInfoBuilder
     {
-        if (!($signatureE = $keyRing->getBankSignatureE())) {
+        if (!($signatureE = $keyring->getBankSignatureE())) {
             throw new SignatureEbicsException('Bank Certificate E is empty.');
         }
         $certificateEDigest = $this->cryptService->calculateDigest($signatureE, $algorithm);
         $encryptionPubKeyDigestNodeValue = base64_encode($certificateEDigest);
 
         $xmlEncryptionPubKeyDigest = $this->dom->createElement('EncryptionPubKeyDigest');
-        $xmlEncryptionPubKeyDigest->setAttribute('Version', $keyRing->getBankSignatureEVersion());
+        $xmlEncryptionPubKeyDigest->setAttribute('Version', $keyring->getBankSignatureEVersion());
         $xmlEncryptionPubKeyDigest->setAttribute(
             'Algorithm',
             sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm)
@@ -68,10 +68,10 @@ final class DataEncryptionInfoBuilder
         return $this;
     }
 
-    public function addTransactionKey(string $transactionKey, KeyRing $keyRing): DataEncryptionInfoBuilder
+    public function addTransactionKey(string $transactionKey, Keyring $keyring): DataEncryptionInfoBuilder
     {
         $transactionKeyEncrypted = $this->cryptService->encryptTransactionKey(
-            $keyRing->getBankSignatureE()->getPublicKey(),
+            $keyring->getBankSignatureE()->getPublicKey(),
             $transactionKey
         );
         $transactionKeyNodeValue = base64_encode($transactionKeyEncrypted);

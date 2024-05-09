@@ -2,29 +2,29 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use LogicException;
 
 /**
- * EBICS KeyRing representation manage one key ring stored in the array.
+ * EBICS Keyring representation manage one key ring stored in the array.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class ArrayKeyringManager extends KeyRingManager
+final class ArrayKeyringManager extends KeyringManager
 {
     /**
      * @inheritDoc
      */
-    public function loadKeyRing($resource, string $passphrase): KeyRing
+    public function loadKeyring($resource, string $passphrase, string $defaultVersion = Keyring::VERSION_25): Keyring
     {
         if (!is_array($resource)) {
             throw new LogicException('Expects array.');
         }
         if (!empty($resource)) {
-            $result = $this->keyRingFactory->createKeyRingFromData($resource);
+            $result = $this->keyringFactory->createKeyringFromData($resource);
         } else {
-            $result = new KeyRing();
+            $result = new Keyring($defaultVersion);
         }
         $result->setPassword($passphrase);
 
@@ -34,11 +34,11 @@ final class ArrayKeyringManager extends KeyRingManager
     /**
      * @inheritDoc
      */
-    public function saveKeyRing(KeyRing $keyRing, &$resource): void
+    public function saveKeyring(Keyring $keyring, &$resource): void
     {
         if (!is_array($resource)) {
             throw new LogicException('Expects array.');
         }
-        $resource = $this->keyRingFactory->buildDataFromKeyRing($keyRing);
+        $resource = $this->keyringFactory->buildDataFromKeyring($keyring);
     }
 }

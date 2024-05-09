@@ -32,7 +32,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
         $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createTxtBankLetterFormatter());
@@ -57,7 +57,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
         $html = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createHtmlBankLetterFormatter());
@@ -82,7 +82,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
         $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());

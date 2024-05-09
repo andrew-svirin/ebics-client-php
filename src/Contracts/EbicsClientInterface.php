@@ -38,7 +38,7 @@ interface EbicsClientInterface
     /**
      * Make INI request.
      * Send to the bank public signature of signature A00X.
-     * Prepare A00X signature for KeyRing.
+     * Prepare A00X signature for Keyring.
      *
      * @param DateTimeInterface|null $dateTime current date
      *
@@ -49,7 +49,7 @@ interface EbicsClientInterface
     /**
      * Make HIA request.
      * Send to the bank public signatures of authentication (X002) and encryption (E002).
-     * Prepare E002 and X002 user signatures for KeyRing.
+     * Prepare E002 and X002 user signatures for Keyring.
      *
      * @param DateTimeInterface|null $dateTime current date
      *
@@ -60,7 +60,7 @@ interface EbicsClientInterface
     /**
      * Make H3K request.
      * Send to the bank public signatures of signature (A00X), authentication (X002) and encryption (E002).
-     * Prepare A00X, E002 and X002 user signatures for KeyRing.
+     * Prepare A00X, E002 and X002 user signatures for Keyring.
      *
      * @param DateTimeInterface|null $dateTime current date
      *
@@ -72,7 +72,7 @@ interface EbicsClientInterface
 
     /**
      * Download the Bank public signatures authentication (X002) and encryption (E002).
-     * Prepare E002 and X002 bank signatures for KeyRing.
+     * Prepare E002 and X002 bank signatures for Keyring.
      *
      * @param DateTimeInterface|null $dateTime current date
      *

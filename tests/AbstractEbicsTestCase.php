@@ -11,7 +11,7 @@ use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
 use AndrewSvirin\Ebics\Models\CustomerDirectDebit;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\User;
@@ -27,7 +27,6 @@ use RuntimeException;
  */
 abstract class AbstractEbicsTestCase extends TestCase
 {
-
     protected $data = __DIR__.'/_data';
 
     protected $fixtures = __DIR__.'/_fixtures';
@@ -37,7 +36,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Bank::VERSION_24, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_24, $credentialsId, $x509Generator, $fake);
     }
 
     protected function setupClientV25(
@@ -45,7 +44,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Bank::VERSION_25, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_25, $credentialsId, $x509Generator, $fake);
     }
 
     protected function setupClientV3(
@@ -53,7 +52,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         X509GeneratorInterface $x509Generator = null,
         bool $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Bank::VERSION_30, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_30, $credentialsId, $x509Generator, $fake);
     }
 
     private function setupClient(
@@ -64,14 +63,14 @@ abstract class AbstractEbicsTestCase extends TestCase
     ): EbicsClientInterface {
         $credentials = $this->credentialsDataProvider($credentialsId);
 
-        $bank = new Bank($credentials['hostId'], $credentials['hostURL'], $version);
+        $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
         $bank->setUsesUploadWithES(true);
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
-        $keyRing = $this->loadKeyRing($credentialsId);
+        $keyring = $this->loadKeyring($credentialsId, $version);
 
-        $ebicsClient = new EbicsClient($bank, $user, $keyRing);
+        $ebicsClient = new EbicsClient($bank, $user, $keyring);
         $ebicsClient->setX509Generator($x509Generator);
 
         if (true === $fake) {
@@ -81,42 +80,48 @@ abstract class AbstractEbicsTestCase extends TestCase
         return $ebicsClient;
     }
 
-    protected function loadKeyRing($credentialsId): KeyRing
+    protected function loadKeyring(string $credentialsId, string $version): Keyring
     {
-        $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
+        $keyringRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
         $password = 'test123';
-        $keyRingManager = new FileKeyRingManager();
+        $keyringManager = new FileKeyringManager();
 
-        return $keyRingManager->loadKeyRing($keyRingRealPath, $password);
+        return $keyringManager->loadKeyring($keyringRealPath, $password, $version);
     }
 
-    protected function saveKeyRing($credentialsId, KeyRing $keyRing): void
+    protected function saveKeyring(string $credentialsId, Keyring $keyring): void
     {
-        $keyRingRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
-        $keyRingManager = new FileKeyRingManager();
-        $keyRingManager->saveKeyRing($keyRing, $keyRingRealPath);
+        $keyringRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
+        $keyringManager = new FileKeyringManager();
+        $keyringManager->saveKeyring($keyring, $keyringRealPath);
     }
 
-    protected function setupKeys(KeyRing $keyRing)
+    protected function setupKeys(Keyring $keyring)
     {
         $keys = json_decode(file_get_contents($this->fixtures.'/keys.json'));
-        $keyRing->setPassword('mysecret');
+        $keyring->setPassword('mysecret');
         $signatureFactory = new SignatureFactory();
 
-        $userSignatureA = $signatureFactory->createSignatureA($keyRing->getUserSignatureA()->getPublicKey(),
-            $keys->A006);
-        $userSignatureA->setCertificateContent($keyRing->getUserSignatureA()->getCertificateContent());
-        $keyRing->setUserSignatureA($userSignatureA);
+        $userSignatureA = $signatureFactory->createSignatureA(
+            $keyring->getUserSignatureA()->getPublicKey(),
+            $keys->A006
+        );
+        $userSignatureA->setCertificateContent($keyring->getUserSignatureA()->getCertificateContent());
+        $keyring->setUserSignatureA($userSignatureA);
 
-        $userSignatureE = $signatureFactory->createSignatureE($keyRing->getUserSignatureE()->getPublicKey(),
-            $keys->E002);
-        $userSignatureE->setCertificateContent($keyRing->getUserSignatureE()->getCertificateContent());
-        $keyRing->setUserSignatureE($userSignatureE);
+        $userSignatureE = $signatureFactory->createSignatureE(
+            $keyring->getUserSignatureE()->getPublicKey(),
+            $keys->E002
+        );
+        $userSignatureE->setCertificateContent($keyring->getUserSignatureE()->getCertificateContent());
+        $keyring->setUserSignatureE($userSignatureE);
 
-        $userSignatureX = $signatureFactory->createSignatureX($keyRing->getUserSignatureX()->getPublicKey(),
-            $keys->X002);
-        $userSignatureX->setCertificateContent($keyRing->getUserSignatureX()->getCertificateContent());
-        $keyRing->setUserSignatureX($userSignatureX);
+        $userSignatureX = $signatureFactory->createSignatureX(
+            $keyring->getUserSignatureX()->getPublicKey(),
+            $keys->X002
+        );
+        $userSignatureX->setCertificateContent($keyring->getUserSignatureX()->getCertificateContent());
+        $keyring->setUserSignatureX($userSignatureX);
     }
 
     /**

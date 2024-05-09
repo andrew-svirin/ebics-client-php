@@ -9,7 +9,7 @@ use AndrewSvirin\Ebics\Models\DownloadSegment;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\InitializationSegment;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadSegment;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
@@ -211,13 +211,13 @@ abstract class ResponseHandler
      *
      * @throws EbicsException
      */
-    public function extractInitializationSegment(Response $response, KeyRing $keyRing): InitializationSegment
+    public function extractInitializationSegment(Response $response, Keyring $keyring): InitializationSegment
     {
         $transactionKeyEncoded = $this->retrieveH00XTransactionKey($response);
         $transactionKey = base64_decode($transactionKeyEncoded);
         $orderDataEncrypted = $this->retrieveH00XOrderData($response);
         $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
-            $keyRing,
+            $keyring,
             $orderDataEncrypted,
             $transactionKey
         );
@@ -236,7 +236,7 @@ abstract class ResponseHandler
      *
      * @throws EbicsException
      */
-    public function extractDownloadSegment(Response $response, KeyRing $keyRing): DownloadSegment
+    public function extractDownloadSegment(Response $response, Keyring $keyring): DownloadSegment
     {
         $transactionId = $this->retrieveH00XTransactionId($response);
         $transactionPhase = $this->retrieveH00XTransactionPhase($response);
@@ -246,7 +246,7 @@ abstract class ResponseHandler
         $segmentNumber = $this->retrieveH00XSegmentNumber($response);
         $orderDataEncrypted = $this->retrieveH00XOrderData($response);
         $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
-            $keyRing,
+            $keyring,
             $orderDataEncrypted,
             $transactionKey
         );

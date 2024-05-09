@@ -39,12 +39,12 @@ final class UserSignatureHandlerV3 extends UserSignatureHandler
 
         // Add SignatureVersion to OrderSignatureData.
         $xmlSignatureVersion = $xml->createElement('SignatureVersion');
-        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
+        $xmlSignatureVersion->nodeValue = $this->keyring->getUserSignatureAVersion();
         $xmlOrderSignatureData->appendChild($xmlSignatureVersion);
 
         $canonicalizedUserSignatureDataHashSigned = $this->cryptService->encrypt(
-            $this->keyRing->getUserSignatureA()->getPrivateKey(),
-            $this->keyRing->getPassword(),
+            $this->keyring->getUserSignatureA()->getPrivateKey(),
+            $this->keyring->getPassword(),
             $digest
         );
         $signatureValueNodeValue = base64_encode($canonicalizedUserSignatureDataHashSigned);

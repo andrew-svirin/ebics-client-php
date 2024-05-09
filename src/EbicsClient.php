@@ -42,7 +42,7 @@ use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\InitializationOrderResult;
 use AndrewSvirin\Ebics\Models\InitializationSegment;
 use AndrewSvirin\Ebics\Models\InitializationTransaction;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadOrderResult;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
@@ -64,7 +64,7 @@ final class EbicsClient implements EbicsClientInterface
 {
     private Bank $bank;
     private User $user;
-    private KeyRing $keyRing;
+    private Keyring $keyring;
     private OrderDataHandler $orderDataHandler;
     private ResponseHandler $responseHandler;
     private RequestFactory $requestFactory;
@@ -84,28 +84,28 @@ final class EbicsClient implements EbicsClientInterface
      *
      * @param Bank $bank
      * @param User $user
-     * @param KeyRing $keyRing
+     * @param Keyring $keyring
      */
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, Keyring $keyring)
     {
         $this->bank = $bank;
         $this->user = $user;
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
 
-        if (Bank::VERSION_24 === $bank->getVersion()) {
-            $this->requestFactory = new RequestFactoryV24($bank, $user, $keyRing);
-            $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyRing);
+        if (Keyring::VERSION_24 === $keyring->getVersion()) {
+            $this->requestFactory = new RequestFactoryV24($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyring);
             $this->responseHandler = new ResponseHandlerV24();
-        } elseif (Bank::VERSION_25 === $bank->getVersion()) {
-            $this->requestFactory = new RequestFactoryV25($bank, $user, $keyRing);
-            $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyRing);
+        } elseif (Keyring::VERSION_25 === $keyring->getVersion()) {
+            $this->requestFactory = new RequestFactoryV25($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyring);
             $this->responseHandler = new ResponseHandlerV25();
-        } elseif (Bank::VERSION_30 === $bank->getVersion()) {
-            $this->requestFactory = new RequestFactoryV3($bank, $user, $keyRing);
-            $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyRing);
+        } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
+            $this->requestFactory = new RequestFactoryV3($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyring);
             $this->responseHandler = new ResponseHandlerV3();
         } else {
-            throw new LogicException(sprintf('Version "%s" is not implemented', $bank->getVersion()));
+            throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
         }
 
         $this->cryptService = new CryptService();
@@ -127,13 +127,13 @@ final class EbicsClient implements EbicsClientInterface
     public function createUserSignatures(): void
     {
         $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, true);
-        $this->keyRing->setUserSignatureA($signatureA);
+        $this->keyring->setUserSignatureA($signatureA);
 
         $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, true);
-        $this->keyRing->setUserSignatureE($signatureE);
+        $this->keyring->setUserSignatureE($signatureE);
 
         $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, true);
-        $this->keyRing->setUserSignatureX($signatureX);
+        $this->keyring->setUserSignatureX($signatureX);
     }
 
     /**
@@ -167,7 +167,7 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
-        $this->keyRing->setUserSignatureA($signatureA);
+        $this->keyring->setUserSignatureA($signatureA);
 
         return $response;
     }
@@ -189,8 +189,8 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
-        $this->keyRing->setUserSignatureE($signatureE);
-        $this->keyRing->setUserSignatureX($signatureX);
+        $this->keyring->setUserSignatureE($signatureE);
+        $this->keyring->setUserSignatureX($signatureX);
 
         return $response;
     }
@@ -215,9 +215,9 @@ final class EbicsClient implements EbicsClientInterface
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
-        $this->keyRing->setUserSignatureA($signatureA);
-        $this->keyRing->setUserSignatureE($signatureE);
-        $this->keyRing->setUserSignatureX($signatureX);
+        $this->keyring->setUserSignatureA($signatureA);
+        $this->keyring->setUserSignatureE($signatureE);
+        $this->keyring->setUserSignatureX($signatureX);
 
         return $response;
     }
@@ -242,8 +242,8 @@ final class EbicsClient implements EbicsClientInterface
 
         $signatureX = $this->orderDataHandler->retrieveAuthenticationSignature($orderResult->getDataDocument());
         $signatureE = $this->orderDataHandler->retrieveEncryptionSignature($orderResult->getDataDocument());
-        $this->keyRing->setBankSignatureX($signatureX);
-        $this->keyRing->setBankSignatureE($signatureE);
+        $this->keyring->setBankSignatureX($signatureX);
+        $this->keyring->setBankSignatureE($signatureE);
 
         return $orderResult;
     }
@@ -1132,7 +1132,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH00XReturnCode($request, $response);
 
-        return $this->responseHandler->extractInitializationSegment($response, $this->keyRing);
+        return $this->responseHandler->extractInitializationSegment($response, $this->keyring);
     }
 
     /**
@@ -1189,7 +1189,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH00XReturnCode($request, $response);
 
-        return $this->responseHandler->extractDownloadSegment($response, $this->keyRing);
+        return $this->responseHandler->extractDownloadSegment($response, $this->keyring);
     }
 
     /**
@@ -1351,11 +1351,11 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @return KeyRing
+     * @return Keyring
      */
-    public function getKeyRing(): KeyRing
+    public function getKeyring(): Keyring
     {
-        return $this->keyRing;
+        return $this->keyring;
     }
 
     /**
@@ -1403,13 +1403,13 @@ final class EbicsClient implements EbicsClientInterface
     {
         switch ($type) {
             case SignatureInterface::TYPE_A:
-                $signature = $this->keyRing->getUserSignatureA();
+                $signature = $this->keyring->getUserSignatureA();
                 break;
             case SignatureInterface::TYPE_E:
-                $signature = $this->keyRing->getUserSignatureE();
+                $signature = $this->keyring->getUserSignatureE();
                 break;
             case SignatureInterface::TYPE_X:
-                $signature = $this->keyRing->getUserSignatureX();
+                $signature = $this->keyring->getUserSignatureX();
                 break;
             default:
                 throw new LogicException(sprintf('Type "%s" not allowed', $type));
@@ -1435,22 +1435,22 @@ final class EbicsClient implements EbicsClientInterface
         switch ($type) {
             case SignatureInterface::TYPE_A:
                 $signature = $this->signatureFactory->createSignatureAFromKeys(
-                    $this->cryptService->generateKeys($this->keyRing->getPassword()),
-                    $this->keyRing->getPassword(),
+                    $this->cryptService->generateKeys($this->keyring->getPassword()),
+                    $this->keyring->getPassword(),
                     $this->bank->isCertified() ? $this->x509Generator : null
                 );
                 break;
             case SignatureInterface::TYPE_E:
                 $signature = $this->signatureFactory->createSignatureEFromKeys(
-                    $this->cryptService->generateKeys($this->keyRing->getPassword()),
-                    $this->keyRing->getPassword(),
+                    $this->cryptService->generateKeys($this->keyring->getPassword()),
+                    $this->keyring->getPassword(),
                     $this->bank->isCertified() ? $this->x509Generator : null
                 );
                 break;
             case SignatureInterface::TYPE_X:
                 $signature = $this->signatureFactory->createSignatureXFromKeys(
-                    $this->cryptService->generateKeys($this->keyRing->getPassword()),
-                    $this->keyRing->getPassword(),
+                    $this->cryptService->generateKeys($this->keyring->getPassword()),
+                    $this->keyring->getPassword(),
                     $this->bank->isCertified() ? $this->x509Generator : null
                 );
                 break;

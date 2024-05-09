@@ -5,7 +5,7 @@ namespace AndrewSvirin\Ebics\Handlers;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
@@ -24,12 +24,12 @@ abstract class AuthSignatureHandler
     use C14NTrait;
     use H00XTrait;
 
-    private KeyRing $keyRing;
+    private Keyring $keyring;
     private CryptService $cryptService;
 
-    public function __construct(KeyRing $keyRing)
+    public function __construct(Keyring $keyring)
     {
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
         $this->cryptService = new CryptService();
     }
 
@@ -131,8 +131,8 @@ abstract class AuthSignatureHandler
             $signatureMethodAlgorithm
         );
         $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encrypt(
-            $this->keyRing->getUserSignatureX()->getPrivateKey(),
-            $this->keyRing->getPassword(),
+            $this->keyring->getUserSignatureX()->getPrivateKey(),
+            $this->keyring->getPassword(),
             $canonicalizedSignedInfoHash
         );
         $signatureValueNodeValue = base64_encode($canonicalizedSignedInfoHashEncrypted);

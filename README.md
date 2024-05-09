@@ -39,10 +39,10 @@ use AndrewSvirin\Ebics\EbicsClient;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 $keyringRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-// Use __IS_CERTIFIED__ true for French banks, otherwise use false.
-$keyringManager = new FileKeyRingManager();
-$keyring = $keyringManager->loadKeyRing($keyringRealPath, __PASSWORD__);
-$bank = new Bank(__HOST_ID__, __HOST_URL__, __EBICS_SERVER_VERSION___);
+// Use __IS_CERTIFIED__ true for EBICS 3.0 and/or French banks, otherwise use false.
+$keyringManager = new FileKeyringManager();
+$keyring = $keyringManager->loadKeyring($keyringRealPath, __PASSWORD__, __EBICS_VERSION__);
+$bank = new Bank(__HOST_ID__, __HOST_URL__);
 $bank->setIsCertified(__IS_CERTIFIED__);
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyring);
@@ -101,8 +101,8 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 try {
     $client->INI();
     /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
-    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyring */
-    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
+    /* @var \AndrewSvirin\Ebics\Models\Keyring $keyring */
+    $keyringManager->saveKeyring($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "INI request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
@@ -114,7 +114,7 @@ try {
 
 try {
     $client->HIA();
-    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
+    $keyringManager->saveKeyring($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "HIA request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",
@@ -134,7 +134,7 @@ $ebicsBankLetter = new \AndrewSvirin\Ebics\EbicsBankLetter();
 $bankLetter = $ebicsBankLetter->prepareBankLetter(
     $client->getBank(),
     $client->getUser(),
-    $client->getKeyRing()
+    $client->getKeyring()
 );
 
 $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
@@ -150,8 +150,8 @@ try {
     /* @var \AndrewSvirin\Ebics\EbicsClient $client */
     $client->HPB();
     /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
-    /* @var \AndrewSvirin\Ebics\Models\KeyRing $keyring */
-    $keyringManager->saveKeyRing($keyring, $keyringRealPath);
+    /* @var \AndrewSvirin\Ebics\Models\Keyring $keyring */
+    $keyringManager->saveKeyring($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
         "HPB request failed. EBICS Error code : %s\nMessage : %s\nMeaning : %s",

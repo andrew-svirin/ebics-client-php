@@ -11,16 +11,20 @@ use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class KeyRing
+final class Keyring
 {
-    const USER_PREFIX = 'USER';
-    const BANK_PREFIX = 'BANK';
-    const SIGNATURE_PREFIX_A = 'A';
-    const SIGNATURE_PREFIX_X = 'X';
-    const SIGNATURE_PREFIX_E = 'E';
-    const CERTIFICATE_PREFIX = 'CERTIFICATE';
-    const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
-    const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
+    public const VERSION_24 = 'VERSION_24';
+    public const VERSION_25 = 'VERSION_25';
+    public const VERSION_30 = 'VERSION_30';
+    public const VERSION_PREFIX = 'VERSION';
+    public const USER_PREFIX = 'USER';
+    public const BANK_PREFIX = 'BANK';
+    public const SIGNATURE_PREFIX_A = 'A';
+    public const SIGNATURE_PREFIX_X = 'X';
+    public const SIGNATURE_PREFIX_E = 'E';
+    public const CERTIFICATE_PREFIX = 'CERTIFICATE';
+    public const PUBLIC_KEY_PREFIX = 'PUBLIC_KEY';
+    public const PRIVATE_KEY_PREFIX = 'PRIVATE_KEY';
 
     private ?SignatureInterface $userSignatureA = null;
     private ?SignatureInterface $userSignatureX = null;
@@ -28,6 +32,24 @@ final class KeyRing
     private ?SignatureInterface $bankSignatureX = null;
     private ?SignatureInterface $bankSignatureE = null;
     private ?string $password = null;
+
+    /**
+     * The Protocol Version.
+     */
+    private string $version;
+
+    public function __construct(string $version)
+    {
+        $this->version = $version;
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion(): string
+    {
+        return $this->version;
+    }
 
     public function setUserSignatureA(SignatureInterface $signature = null): void
     {

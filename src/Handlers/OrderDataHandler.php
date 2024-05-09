@@ -14,7 +14,7 @@ use AndrewSvirin\Ebics\Models\CustomerH3K;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
 use AndrewSvirin\Ebics\Models\Document;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\CryptService;
 use DateTimeInterface;
@@ -36,17 +36,17 @@ abstract class OrderDataHandler
 
     private Bank $bank;
     private User $user;
-    private KeyRing $keyRing;
+    private Keyring $keyring;
     protected CryptService $cryptService;
     protected SignatureFactory $certificateFactory;
     private CertificateX509Factory $certificateX509Factory;
     protected BigIntegerFactory $bigIntegerFactory;
 
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, Keyring $keyring)
     {
         $this->bank = $bank;
         $this->user = $user;
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
         $this->cryptService = new CryptService();
         $this->certificateFactory = new SignatureFactory();
         $this->certificateX509Factory = new CertificateX509Factory();
@@ -90,7 +90,7 @@ abstract class OrderDataHandler
 
         // Add SignatureVersion to SignaturePubKeyInfo.
         $xmlSignatureVersion = $xml->createElement('SignatureVersion');
-        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
+        $xmlSignatureVersion->nodeValue = $this->keyring->getUserSignatureAVersion();
         $xmlSignaturePubKeyInfo->appendChild($xmlSignatureVersion);
 
         // Add PartnerID to SignaturePubKeyOrderData.
@@ -155,7 +155,7 @@ abstract class OrderDataHandler
 
         // Add AuthenticationVersion to AuthenticationPubKeyInfo.
         $xmlAuthenticationVersion = $xml->createElement('AuthenticationVersion');
-        $xmlAuthenticationVersion->nodeValue = $this->keyRing->getUserSignatureXVersion();
+        $xmlAuthenticationVersion->nodeValue = $this->keyring->getUserSignatureXVersion();
         $xmlAuthenticationPubKeyInfo->appendChild($xmlAuthenticationVersion);
 
         // Add EncryptionPubKeyInfo to HIARequestOrderData.
@@ -170,7 +170,7 @@ abstract class OrderDataHandler
 
         // Add EncryptionVersion to EncryptionPubKeyInfo.
         $xmlEncryptionVersion = $xml->createElement('EncryptionVersion');
-        $xmlEncryptionVersion->nodeValue = $this->keyRing->getUserSignatureEVersion();
+        $xmlEncryptionVersion->nodeValue = $this->keyring->getUserSignatureEVersion();
         $xmlEncryptionPubKeyInfo->appendChild($xmlEncryptionVersion);
 
         // Add PartnerID to HIARequestOrderData.
@@ -211,7 +211,7 @@ abstract class OrderDataHandler
 
         // Add EncryptionVersion to EncryptionPubKeyInfo.
         $xmlSignatureVersion = $xml->createElement('SignatureVersion');
-        $xmlSignatureVersion->nodeValue = $this->keyRing->getUserSignatureAVersion();
+        $xmlSignatureVersion->nodeValue = $this->keyring->getUserSignatureAVersion();
         $xmlSignatureCertificateInfo->appendChild($xmlSignatureVersion);
 
         // Add AuthenticationCertificateInfo to H3KRequestOrderData.
@@ -221,7 +221,7 @@ abstract class OrderDataHandler
 
         // Add EncryptionVersion to EncryptionPubKeyInfo.
         $xmlAuthenticationVersion = $xml->createElement('AuthenticationVersion');
-        $xmlAuthenticationVersion->nodeValue = $this->keyRing->getUserSignatureXVersion();
+        $xmlAuthenticationVersion->nodeValue = $this->keyring->getUserSignatureXVersion();
         $xmlAuthenticationCertificateInfo->appendChild($xmlAuthenticationVersion);
 
         // Add EncryptionCertificateInfo to H3KRequestOrderData.
@@ -231,7 +231,7 @@ abstract class OrderDataHandler
 
         // Add EncryptionVersion to EncryptionPubKeyInfo.
         $xmlEncryptionVersion = $xml->createElement('EncryptionVersion');
-        $xmlEncryptionVersion->nodeValue = $this->keyRing->getUserSignatureEVersion();
+        $xmlEncryptionVersion->nodeValue = $this->keyring->getUserSignatureEVersion();
         $xmlEncryptionCertificateInfo->appendChild($xmlEncryptionVersion);
 
         // Add PartnerID to HIARequestOrderData.
