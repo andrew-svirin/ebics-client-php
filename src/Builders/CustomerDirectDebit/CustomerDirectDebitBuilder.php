@@ -27,7 +27,7 @@ final class CustomerDirectDebitBuilder
     }
 
     /**
-     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
+     * @param string $schema namespace schema urn:iso:std:iso:20022:tech:xsd:pain.008.001.02
      * @param string $creditorFinInstBic
      * @param string $creditorIban
      * @param string $creditorName
@@ -40,7 +40,6 @@ final class CustomerDirectDebitBuilder
      * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
      * @param string|null $paymentReference Overwrite default payment reference -
      * visible on creditors bank statement (max length: 35 characters)
-     *
      * @return $this
      * @throws \DOMException
      */
