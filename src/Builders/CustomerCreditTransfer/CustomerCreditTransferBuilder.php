@@ -27,7 +27,7 @@ final class CustomerCreditTransferBuilder
     }
 
     /**
-     * @param string $schema has next formula urn:iso:std:iso:20022:tech:xsd:msgName.001.msgNameVersion
+     * @param string $schema namespace schema urn:iso:std:iso:20022:tech:xsd:pain.001.001.03
      * @param string $debitorFinInstBIC
      * @param string $debitorIBAN
      * @param string $debitorName
