@@ -33,8 +33,8 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
     {
         parent::setUp();
         $client = $this->setupClientV25(3);
-        $this->setupKeys($client->getKeyRing());
-        $this->orderDataHandler = new OrderDataHandlerV25($client->getBank(), $client->getUser(), $client->getKeyRing());
+        $this->setupKeys($client->getKeyring());
+        $this->orderDataHandler = new OrderDataHandlerV25($client->getBank(), $client->getUser(), $client->getKeyring());
     }
 
     /**
@@ -59,7 +59,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
 //      $ini2XML = clone $iniXML;
 //      $this->orderDataHandler->handleINI(
 //         $ini2XML,
-//         $this->keyRing->getUserCertificateA(),
+//         $this->keyring->getUserCertificateA(),
 //         DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $iniDatetime)
 //      );
     }

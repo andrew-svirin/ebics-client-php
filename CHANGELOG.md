@@ -1,3 +1,10 @@
+## 2.2
+* Change signature for KeyringManagerInterface. Moved version from Bank to Keyring.
+* Remove UTF-8 encoding for content.
+* Support EBICS TS mode.
+* Add 'xml_files' parser for order data.
+* Added support for EBICS version 2.4.
+
 ## 2.1
 
 * Up supported PHP version to >= 7.4

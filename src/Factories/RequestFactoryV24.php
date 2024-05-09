@@ -10,7 +10,7 @@ use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV24;
 use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\DigestResolverV2;
@@ -25,13 +25,13 @@ use LogicException;
  */
 final class RequestFactoryV24 extends RequestFactoryV2
 {
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, Keyring $keyring)
     {
-        $this->authSignatureHandler = new AuthSignatureHandlerV24($keyRing);
-        $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyRing);
-        $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyRing);
+        $this->authSignatureHandler = new AuthSignatureHandlerV24($keyring);
+        $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyring);
+        $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyring);
         $this->digestResolver = new DigestResolverV2();
-        parent::__construct($bank, $user, $keyRing);
+        parent::__construct($bank, $user, $keyring);
     }
 
     protected function createRequestBuilderInstance(): RequestBuilder

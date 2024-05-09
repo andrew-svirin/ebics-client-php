@@ -19,7 +19,7 @@ use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV25;
 use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
@@ -35,13 +35,13 @@ use LogicException;
  */
 final class RequestFactoryV25 extends RequestFactoryV2
 {
-    public function __construct(Bank $bank, User $user, KeyRing $keyRing)
+    public function __construct(Bank $bank, User $user, Keyring $keyring)
     {
-        $this->authSignatureHandler = new AuthSignatureHandlerV25($keyRing);
-        $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyRing);
-        $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyRing);
+        $this->authSignatureHandler = new AuthSignatureHandlerV25($keyring);
+        $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyring);
+        $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyring);
         $this->digestResolver = new DigestResolverV2();
-        parent::__construct($bank, $user, $keyRing);
+        parent::__construct($bank, $user, $keyring);
     }
 
     protected function createRequestBuilderInstance(): RequestBuilder
@@ -92,7 +92,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -117,10 +117,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -150,7 +150,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -175,10 +175,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -208,7 +208,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -233,10 +233,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -266,7 +266,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -291,10 +291,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -324,7 +324,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -349,10 +349,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -382,7 +382,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -407,10 +407,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -440,7 +440,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -465,10 +465,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -498,7 +498,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
@@ -523,10 +523,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) use ($context) {
@@ -564,7 +564,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
@@ -588,10 +588,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams();
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -603,8 +603,8 @@ final class RequestFactoryV25 extends RequestFactoryV2
                         $builder
                             ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
                                 $builder
-                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
-                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                                    ->addEncryptionPubKeyDigest($context->getKeyring())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyring());
                             })
                             ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
                     });
@@ -628,7 +628,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
@@ -652,10 +652,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams();
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -667,8 +667,8 @@ final class RequestFactoryV25 extends RequestFactoryV2
                         $builder
                             ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
                                 $builder
-                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
-                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                                    ->addEncryptionPubKeyDigest($context->getKeyring())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyring());
                             })
                             ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
                     });
@@ -692,7 +692,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
@@ -716,10 +716,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams();
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -731,8 +731,8 @@ final class RequestFactoryV25 extends RequestFactoryV2
                         $builder
                             ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
                                 $builder
-                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
-                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                                    ->addEncryptionPubKeyDigest($context->getKeyring())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyring());
                             })
                             ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
                     });
@@ -756,7 +756,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setKeyRing($this->keyRing)
+            ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
@@ -780,10 +780,10 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                     ->addStandardOrderParams();
                             })
                             ->addBankPubKeyDigests(
-                                $context->getKeyRing()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureX()),
-                                $context->getKeyRing()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyRing()->getBankSignatureE())
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -795,8 +795,8 @@ final class RequestFactoryV25 extends RequestFactoryV2
                         $builder
                             ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
                                 $builder
-                                    ->addEncryptionPubKeyDigest($context->getKeyRing())
-                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyRing());
+                                    ->addEncryptionPubKeyDigest($context->getKeyring())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyring());
                             })
                             ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
                     });

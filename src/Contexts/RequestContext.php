@@ -4,7 +4,7 @@ namespace AndrewSvirin\Ebics\Contexts;
 
 use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
 use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\User;
 use DateTimeInterface;
 
@@ -18,7 +18,7 @@ final class RequestContext
 {
     private Bank $bank;
     private User $user;
-    private KeyRing $keyRing;
+    private Keyring $keyring;
     private DateTimeInterface $dateTime;
     private ?DateTimeInterface $startDateTime;
     private ?DateTimeInterface $endDateTime;
@@ -65,16 +65,16 @@ final class RequestContext
         return $this->user;
     }
 
-    public function setKeyRing(KeyRing $keyRing): RequestContext
+    public function setKeyring(Keyring $keyring): RequestContext
     {
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
 
         return $this;
     }
 
-    public function getKeyRing(): KeyRing
+    public function getKeyring(): Keyring
     {
-        return $this->keyRing;
+        return $this->keyring;
     }
 
     public function setDateTime(DateTimeInterface $dateTime): RequestContext

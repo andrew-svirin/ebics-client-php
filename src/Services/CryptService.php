@@ -7,7 +7,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use LogicException;
 use RuntimeException;
 
@@ -49,7 +49,7 @@ final class CryptService
     /**
      * Decrypt encrypted OrderData.
      *
-     * @param KeyRing $keyRing
+     * @param Keyring $keyring
      * @param string $orderDataEncrypted
      * @param string $transactionKey
      *
@@ -57,15 +57,15 @@ final class CryptService
      * @throws EbicsException
      */
     public function decryptOrderDataCompressed(
-        KeyRing $keyRing,
+        Keyring $keyring,
         string $orderDataEncrypted,
         string $transactionKey
     ): string {
-        if (!($signatureE = $keyRing->getUserSignatureE())) {
+        if (!($signatureE = $keyring->getUserSignatureE())) {
             throw new RuntimeException('Signature E is not set.');
         }
 
-        $rsa = $this->rsaFactory->createPrivate($signatureE->getPrivateKey(), $keyRing->getPassword());
+        $rsa = $this->rsaFactory->createPrivate($signatureE->getPrivateKey(), $keyring->getPassword());
         $transactionKeyDecrypted = $rsa->decrypt($transactionKey);
         $orderDataCompressed = $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted);
 

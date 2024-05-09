@@ -65,7 +65,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['INI']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
-        $userExists = $client->getKeyRing()->getUserSignatureA();
+        $userExists = $client->getKeyring()->getUserSignatureA();
         if ($userExists) {
             $this->expectException(InvalidUserOrUserStateException::class);
             $this->expectExceptionCode(91002);
@@ -73,7 +73,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $ini = $client->INI();
         if (!$userExists) {
             $responseHandler = $client->getResponseHandler();
-            $this->saveKeyRing($credentialsId, $client->getKeyRing());
+            $this->saveKeyring($credentialsId, $client->getKeyring());
             $code = $responseHandler->retrieveH00XReturnCode($ini);
             $reportText = $responseHandler->retrieveH00XReportText($ini);
             $this->assertResponseOk($code, $reportText);
@@ -98,7 +98,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['HIA']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
-        $bankExists = $client->getKeyRing()->getUserSignatureX();
+        $bankExists = $client->getKeyring()->getUserSignatureX();
         if ($bankExists) {
             $this->expectException(InvalidUserOrUserStateException::class);
             $this->expectExceptionCode(91002);
@@ -106,7 +106,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $hia = $client->HIA();
         if (!$bankExists) {
             $responseHandler = $client->getResponseHandler();
-            $this->saveKeyRing($credentialsId, $client->getKeyRing());
+            $this->saveKeyring($credentialsId, $client->getKeyring());
             $code = $responseHandler->retrieveH00XReturnCode($hia);
             $reportText = $responseHandler->retrieveH00XReportText($hia);
             $this->assertResponseOk($code, $reportText);
@@ -135,7 +135,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['H3K']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
-        $bankExists = $client->getKeyRing()->getUserSignatureX();
+        $bankExists = $client->getKeyring()->getUserSignatureX();
         if ($bankExists) {
             $this->expectException(InvalidUserOrUserStateException::class);
             $this->expectExceptionCode(91002);
@@ -143,7 +143,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $hia = $client->H3K();
         if (!$bankExists) {
             $responseHandler = $client->getResponseHandler();
-            $this->saveKeyRing($credentialsId, $client->getKeyRing());
+            $this->saveKeyring($credentialsId, $client->getKeyring());
             $code = $responseHandler->retrieveH00XReturnCode($hia);
             $reportText = $responseHandler->retrieveH00XReportText($hia);
             $this->assertResponseOk($code, $reportText);
@@ -177,7 +177,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
-        $this->saveKeyRing($credentialsId, $client->getKeyRing());
+        $this->saveKeyring($credentialsId, $client->getKeyring());
     }
 
     /**

@@ -2,31 +2,32 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Models\Keyring;
 use LogicException;
 
 /**
- * EBICS KeyRing representation manage one key ring stored in the file.
+ * EBICS Keyring representation manage one key ring stored in the file.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class FileKeyringManager extends KeyRingManager
+final class FileKeyringManager extends KeyringManager
 {
     /**
      * @inheritDoc
      */
-    public function loadKeyRing($resource, string $passphrase): KeyRing
+    public function loadKeyring($resource, string $passphrase, string $defaultVersion = Keyring::VERSION_25): Keyring
     {
         if (!is_string($resource)) {
             throw new LogicException('Expects string.');
         }
-        if (is_file($resource) &&
-            ($content = file_get_contents($resource)) &&
-            is_string($content)) {
-            $result = $this->keyRingFactory->createKeyRingFromData(json_decode($content, true));
+        if (is_file($resource)
+            && ($content = file_get_contents($resource))
+            && is_string($content)
+        ) {
+            $result = $this->keyringFactory->createKeyringFromData(json_decode($content, true));
         } else {
-            $result = new KeyRing();
+            $result = new Keyring($defaultVersion);
         }
         $result->setPassword($passphrase);
 
@@ -36,12 +37,12 @@ final class FileKeyringManager extends KeyRingManager
     /**
      * @inheritDoc
      */
-    public function saveKeyRing(KeyRing $keyRing, &$resource): void
+    public function saveKeyring(Keyring $keyring, &$resource): void
     {
         if (!is_string($resource)) {
             throw new LogicException('Expects string.');
         }
-        $data = $this->keyRingFactory->buildDataFromKeyRing($keyRing);
+        $data = $this->keyringFactory->buildDataFromKeyring($keyring);
         file_put_contents($resource, json_encode($data, JSON_PRETTY_PRINT));
     }
 }
