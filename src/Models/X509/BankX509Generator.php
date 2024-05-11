@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models\X509;
 
+use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use LogicException;
 
@@ -53,11 +54,11 @@ final class BankX509Generator extends AbstractX509Generator
 
         switch ($domain) {
             case 'fr':
-                return 'FR';
+                return EbicsClientInterface::COUNTRY_CODE_FR;
             case 'ch':
-                return 'CH';
+                return EbicsClientInterface::COUNTRY_CODE_CH;
             default:
-                return 'DE';
+                return EbicsClientInterface::COUNTRY_CODE_DE;
         }
     }
 

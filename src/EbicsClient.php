@@ -275,7 +275,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'text');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
     /**
@@ -322,7 +322,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -345,7 +345,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -368,7 +368,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -391,7 +391,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'text');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
     /**
@@ -414,7 +414,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -442,7 +442,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'text');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
     /**
@@ -470,7 +470,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'text');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
     /**
@@ -500,7 +500,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -530,7 +530,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -560,7 +560,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -590,7 +590,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -620,7 +620,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -650,7 +650,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -678,7 +678,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'zip_files');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
     }
 
     /**
@@ -686,9 +686,9 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function FDL(
-        $fileInfo,
-        $parserFormat = 'text',
-        $countryCode = 'FR',
+        $fileFormat,
+        $parserFormat = self::FILE_PARSER_FORMAT_TEXT,
+        $countryCode = self::COUNTRY_CODE_DE,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
@@ -704,14 +704,14 @@ final class EbicsClient implements EbicsClientInterface
                 $isLastSegment
             ) use (
                 $dateTime,
-                $fileInfo,
+                $fileFormat,
                 $countryCode,
                 $startDateTime,
                 $endDateTime
             ) {
                 return $this->requestFactory->createFDL(
                     $dateTime,
-                    $fileInfo,
+                    $fileFormat,
                     $countryCode,
                     $startDateTime,
                     $endDateTime,
@@ -730,7 +730,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function FUL(
-        string $fileInfo,
+        string $fileFormat,
         OrderDataInterface $orderData,
         FULContext $fulContext,
         DateTimeInterface $dateTime = null
@@ -741,7 +741,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use (
             $orderData,
-            $fileInfo,
+            $fileFormat,
             $fulContext,
             $dateTime
         ) {
@@ -750,7 +750,7 @@ final class EbicsClient implements EbicsClientInterface
 
             return $this->requestFactory->createFUL(
                 $dateTime,
-                $fileInfo,
+                $fileFormat,
                 $fulContext,
                 $transaction
             );
@@ -920,7 +920,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -944,7 +944,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -995,7 +995,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -1020,7 +1020,7 @@ final class EbicsClient implements EbicsClientInterface
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, 'xml');
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
     }
 
     /**
@@ -1272,9 +1272,6 @@ final class EbicsClient implements EbicsClientInterface
         return $orderResult;
     }
 
-    /**
-     * @param string $parserFormat 'text' ?? 'xml' ?? 'xml_files' ?? 'zip_files'
-     */
     private function createDownloadOrderResult(
         DownloadTransaction $transaction,
         string $parserFormat
@@ -1284,19 +1281,19 @@ final class EbicsClient implements EbicsClientInterface
         $orderResult->setData($transaction->getOrderData());
 
         switch ($parserFormat) {
-            case 'text':
+            case self::FILE_PARSER_FORMAT_TEXT:
                 break;
-            case 'xml':
+            case self::FILE_PARSER_FORMAT_XML:
                 $orderResult->setDataDocument($this->extractOrderDataDocument($orderResult->getData()));
                 break;
-            case 'xml_files':
+            case self::FILE_PARSER_FORMAT_XML_FILES:
                 $orderResult->setDataFiles($this->extractOrderDataXmlFiles($orderResult->getData()));
                 break;
-            case 'zip_files':
+            case self::FILE_PARSER_FORMAT_ZIP_FILES:
                 $orderResult->setDataFiles($this->extractOrderDataZipFiles($orderResult->getData()));
                 break;
             default:
-                throw new \RuntimeException('Incorrect format');
+                throw new LogicException('Incorrect format');
         }
 
         return $orderResult;
