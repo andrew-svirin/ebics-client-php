@@ -495,7 +495,7 @@ abstract class RequestFactory
     public function createFDL(
         DateTimeInterface $dateTime,
         string $fileFormat,
-        string $countryCode = 'DE',
+        string $countryCode,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
         int $segmentNumber = null,

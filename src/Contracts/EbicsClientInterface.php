@@ -23,6 +23,15 @@ use DateTimeInterface;
  */
 interface EbicsClientInterface
 {
+    public const FILE_PARSER_FORMAT_TEXT = 'text';
+    public const FILE_PARSER_FORMAT_XML = 'xml';
+    public const FILE_PARSER_FORMAT_XML_FILES = 'xml_files';
+    public const FILE_PARSER_FORMAT_ZIP_FILES = 'zip_files';
+
+    public const COUNTRY_CODE_DE = 'DE';
+    public const COUNTRY_CODE_FR = 'FR';
+    public const COUNTRY_CODE_CH = 'CH';
+
     /**
      * Create user signatures A, E and X on first launch.
      */
@@ -298,9 +307,9 @@ interface EbicsClientInterface
     /**
      * Download subscriber's customer and subscriber information.
      *
-     * @param string $fileInfo Format of response. ex 'pain.001.001.03.sct'
-     * @param string $parserFormat = 'text' ?? 'xml' ?? 'xml_files' ?? 'zip_files' How to handle response.
-     * @param string $countryCode = 'FR' ?? 'DE'
+     * @param string $fileFormat Format of response. ex 'pain.001.001.03.sct'
+     * @param string $parserFormat How to handle response.
+     * @param string $countryCode Country code (ISO 3166-1 alpha-2) (max 2 char)
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
@@ -309,9 +318,9 @@ interface EbicsClientInterface
      * @return DownloadOrderResult
      */
     public function FDL(
-        string $fileInfo,
-        string $parserFormat = 'text',
-        string $countryCode = 'FR',
+        string $fileFormat,
+        string $parserFormat = self::FILE_PARSER_FORMAT_TEXT,
+        string $countryCode = self::COUNTRY_CODE_DE,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
@@ -322,7 +331,7 @@ interface EbicsClientInterface
      * Standard order type for submitting the files to the bank. Using this order type ensures a
      * transparent transfer of files of any format.
      *
-     * @param string $fileInfo Format of request ex 'pain.001.001.03.sct'
+     * @param string $fileFormat Format of request ex 'pain.001.001.03.sct'
      * @param OrderDataInterface $orderData File to be uploaded.
      * @param FULContext $fulContext Order attributes.
      * @param DateTimeInterface|null $dateTime
@@ -330,7 +339,7 @@ interface EbicsClientInterface
      * @return UploadOrderResult
      */
     public function FUL(
-        string $fileInfo,
+        string $fileFormat,
         OrderDataInterface $orderData,
         FULContext $fulContext,
         DateTimeInterface $dateTime = null

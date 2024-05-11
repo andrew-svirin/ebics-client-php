@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
+use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
@@ -581,22 +582,22 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      */
     public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
-        foreach ($codes['FDL'] as $format => $code) {
+        foreach ($codes['FDL'] as $fileFormat => $code) {
             $client = $this->setupClientV25($credentialsId, $x509Generator, $code['fake']);
 
             $this->assertExceptionCode($code['code']);
 
             $fdl = $client->FDL(
-                $format,
-                'text',
-                'FR',
+                $fileFormat,
+                EbicsClient::FILE_PARSER_FORMAT_TEXT,
+                EbicsClient::COUNTRY_CODE_FR,
                 new DateTime(),
                 (new DateTime())->modify('-30 day'),
                 (new DateTime())->modify('-1 day')
             );
 
             $parser = new CfonbParser();
-            switch ($format) {
+            switch ($fileFormat) {
                 case 'camt.xxx.cfonb120.stm':
                     $statements = $parser->read120C($fdl->getData());
                     self::assertNotEmpty($statements);
@@ -643,7 +644,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
             $context->setParameter('ebcdic', $ebcdic);
 
             $ful = $client->FUL(
-                $code['format'],
+                $code['file_format'],
                 $documentFactory->create($code['document']),
                 $context,
                 new DateTime()
@@ -1046,7 +1047,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'pain.001.001.03.sct',
+                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1091,7 +1092,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                             'code' => null,
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'pain.001.001.03.sct',
+                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1137,7 +1138,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'pain.001.001.03.sct',
+                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1182,7 +1183,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'pain.001.001.03.sct',
+                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
@@ -1227,7 +1228,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'format' => 'pain.001.001.03.sct',
+                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
