@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics;
 
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
@@ -253,7 +253,7 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsException
      */
     public function BTD(
-        BTFContext $btfContext,
+        BTDContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null

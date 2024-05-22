@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
@@ -19,7 +19,7 @@ abstract class RequestFactoryV2 extends RequestFactory
 {
     public function createBTD(
         DateTimeInterface $dateTime,
-        BTFContext $btfContext,
+        BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
         int $segmentNumber = null,

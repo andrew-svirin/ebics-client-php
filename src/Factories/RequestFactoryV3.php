@@ -13,7 +13,6 @@ use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV3;
 use AndrewSvirin\Ebics\Contexts\BTDContext;
-use AndrewSvirin\Ebics\Contexts\BTFContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
@@ -65,7 +64,7 @@ final class RequestFactoryV3 extends RequestFactory
      */
     public function createBTD(
         DateTimeInterface $dateTime,
-        BTFContext $btfContext,
+        BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
         int $segmentNumber = null,
@@ -76,7 +75,7 @@ final class RequestFactoryV3 extends RequestFactory
             ->setUser($this->user)
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
-            ->setBTFContext($btfContext)
+            ->setBTDContext($btdContext)
             ->setStartDateTime($startDateTime)
             ->setEndDateTime($endDateTime)
             ->setSegmentNumber($segmentNumber)
@@ -98,7 +97,7 @@ final class RequestFactoryV3 extends RequestFactory
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'BTD')
                                     ->addBTDOrderParams(
-                                        $context->getBTFContext(),
+                                        $context->getBTDContext(),
                                         $context->getStartDateTime(),
                                         $context->getEndDateTime()
                                     );
@@ -290,7 +289,8 @@ final class RequestFactoryV3 extends RequestFactory
         $btfContext->setScope('CH');
         $btfContext->setMsgName('camt.054');
         $btfContext->setMsgNameVersion('04');
-        $btfContext->setContainerFlag('ZIP');
+        $btfContext->setContainerType('ZIP');
+        $btfContext->setServiceOption('XQRR');
 
         return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
     }
@@ -309,7 +309,7 @@ final class RequestFactoryV3 extends RequestFactory
         $btfContext->setServiceName('PSR');
         $btfContext->setScope('BIL');
         $btfContext->setMsgName('pain.002');
-        $btfContext->setContainerFlag('ZIP');
+        $btfContext->setContainerType('ZIP');
 
         return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
     }

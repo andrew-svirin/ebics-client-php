@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
@@ -42,7 +42,7 @@ final class OrderDetailsBuilderV2 extends OrderDetailsBuilder
     }
 
     public function addBTDOrderParams(
-        BTFContext $btfContext,
+        BTDContext $btfContext,
         ?DateTimeInterface $startDateTime = null,
         ?DateTimeInterface $endDateTime = null
     ): OrderDetailsBuilder {

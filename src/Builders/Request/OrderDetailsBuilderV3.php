@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
@@ -39,7 +39,7 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
     }
 
     public function addBTDOrderParams(
-        BTFContext $btfContext,
+        BTDContext $btfContext,
         ?DateTimeInterface $startDateTime = null,
         ?DateTimeInterface $endDateTime = null
     ): OrderDetailsBuilder {
@@ -75,6 +75,13 @@ final class OrderDetailsBuilderV3 extends OrderDetailsBuilder
             $xmlContainerFlag = $this->dom->createElement('ContainerFlag');
             $xmlContainerFlag->nodeValue = $btfContext->getContainerFlag();
             $xmlService->appendChild($xmlContainerFlag);
+        }
+
+        if (null !== $btfContext->getContainerType()) {
+            // Add optional Container to Service.
+            $xmlContainer = $this->dom->createElement('Container');
+            $xmlContainer->setAttribute('containerType', $btfContext->getContainerType());
+            $xmlService->appendChild($xmlContainer);
         }
 
         // Add MsgName to Service.
