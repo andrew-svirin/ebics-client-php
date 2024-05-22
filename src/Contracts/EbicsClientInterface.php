@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
@@ -92,7 +92,7 @@ interface EbicsClientInterface
     /**
      * Download request files of any BTF structure.
      *
-     * @param BTFContext $btfContext
+     * @param BTDContext $btfContext
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
@@ -100,7 +100,7 @@ interface EbicsClientInterface
      * @return DownloadOrderResult
      */
     public function BTD(
-        BTFContext $btfContext,
+        BTDContext $btfContext,
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null

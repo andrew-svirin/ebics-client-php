@@ -32,11 +32,11 @@ final class RequestContext
     private int $numSegments;
     private string $orderData;
     private SignatureDataInterface $signatureData;
-    private BTFContext $btfContext;
-    private HVEContext $hveContext;
     private string $dataDigest;
     private string $signatureVersion;
+    private BTDContext $btdContext;
     private BTUContext $btuContext;
+    private HVEContext $hveContext;
     private HVDContext $hvdContext;
     private HVTContext $hvtContext;
     private FULContext $fulContext;
@@ -233,16 +233,16 @@ final class RequestContext
         return $this->signatureData;
     }
 
-    public function setBTFContext(BTFContext $btfContext): RequestContext
+    public function setBTDContext(BTDContext $btdContext): RequestContext
     {
-        $this->btfContext = $btfContext;
+        $this->btdContext = $btdContext;
 
         return $this;
     }
 
-    public function getBTFContext(): BTFContext
+    public function getBTDContext(): BTDContext
     {
-        return $this->btfContext;
+        return $this->btdContext;
     }
 
     public function setHVEContext(HVEContext $hveContext): RequestContext

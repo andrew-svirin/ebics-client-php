@@ -3,6 +3,7 @@
 * Remove UTF-8 encoding for content.
 * Support EBICS TS mode.
 * Add 'xml_files' parser for order data.
+* Updated BTD method signature.
 * Added support for EBICS version 2.4.
 
 ## 2.1

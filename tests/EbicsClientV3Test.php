@@ -228,9 +228,25 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     {
         $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['BTD']['fake']);
 
+        /**
+         * Method HKD.
+         * <OrderInfo>
+         * <AdminOrderType>BTD</AdminOrderType>
+         * <Service>
+         * <ServiceName>PSR</ServiceName>
+         * <Scope>CH</Scope>
+         * <Container containerType="ZIP"/>
+         * <MsgName version="03">pain.002</MsgName>
+         * </Service>
+         * <Description>CH Payment Status Report</Description>
+         * </OrderInfo>
+         */
         $context = new BTDContext();
-        $context->setServiceName('IZV');
-        $context->setMsgName('pain.001');
+        $context->setServiceName('PSR');
+        $context->setMsgName('pain.002');
+        $context->setMsgNameVersion('03');
+        $context->setScope('CH');
+        $context->setContainerType('ZIP');
 
         $this->assertExceptionCode($codes['BTD']['code']);
         $btd = $client->BTD($context);
@@ -756,7 +772,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '061099', 'fake' => false],
-                    'BTD' => ['code' => '091005', 'fake' => false],
+                    'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
                     'HVE' => ['code' => '090003', 'fake' => false],
@@ -782,14 +798,14 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '061099', 'fake' => false],
-                    'BTD' => ['code' => '091005', 'fake' => false],
+                    'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
                     'HVE' => ['code' => '090003', 'fake' => false],
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
-                    'Z54' => ['code' => '091005', 'fake' => false],
+                    'Z54' => ['code' => '090005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],

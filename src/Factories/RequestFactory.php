@@ -12,7 +12,7 @@ use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
-use AndrewSvirin\Ebics\Contexts\BTFContext;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
@@ -685,7 +685,7 @@ abstract class RequestFactory
 
     abstract public function createBTD(
         DateTimeInterface $dateTime,
-        BTFContext $btfContext,
+        BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
         int $segmentNumber = null,

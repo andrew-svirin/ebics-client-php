@@ -10,4 +10,17 @@ namespace AndrewSvirin\Ebics\Contexts;
  */
 final class BTDContext extends BTFContext
 {
+    private ?string $containerType = null;
+
+    public function setContainerType(string $containerType): BTDContext
+    {
+        $this->containerType = $containerType;
+
+        return $this;
+    }
+
+    public function getContainerType(): ?string
+    {
+        return $this->containerType;
+    }
 }
