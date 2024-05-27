@@ -5,6 +5,7 @@
 * Add 'xml_files' parser for order data.
 * Updated BTD method signature.
 * Added support for EBICS version 2.4.
+* Added option to specify custom PDF Factory.
 
 ## 2.1
 

@@ -159,9 +159,9 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                 $fileFormat,
                 'text',
                 'FR',
-                new DateTime(),
-                (new DateTime())->modify('-30 day'),
-                (new DateTime())->modify('-1 day')
+                null,
+                new DateTime('2020-03-21'),
+                new DateTime('2020-04-21')
             );
 
             $parser = new CfonbParser();

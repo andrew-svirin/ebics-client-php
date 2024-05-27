@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Contracts;
 
-use Mpdf\HTMLParserMode;
-
 /**
  * PDF class representation.
  *
@@ -23,7 +21,7 @@ interface PdfInterface
      *
      * @see \Mpdf\Mpdf::WriteHTML()
      */
-    public function writeHTML($html, $mode = HTMLParserMode::DEFAULT_MODE, $init = true, $close = true);
+    public function writeHTML($html, $mode = 0, $init = true, $close = true);
 
     /**
      * @return string

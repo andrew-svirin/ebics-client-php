@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Contracts\PdfFactoryInterface;
 use AndrewSvirin\Ebics\Contracts\PdfInterface;
 use AndrewSvirin\Ebics\Models\Pdf;
 
@@ -11,7 +12,7 @@ use AndrewSvirin\Ebics\Models\Pdf;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-final class PdfFactory
+final class PdfFactory implements PdfFactoryInterface
 {
     public function createFromHtml(string $html): PdfInterface
     {

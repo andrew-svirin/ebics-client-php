@@ -302,7 +302,11 @@ interface EbicsClientInterface
      *
      * @return DownloadOrderResult
      */
-    public function ZSR(): DownloadOrderResult;
+    public function ZSR(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult;
 
     /**
      * Download subscriber's customer and subscriber information.

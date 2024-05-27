@@ -3,7 +3,7 @@
 namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
 use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Factories\PdfFactory;
+use AndrewSvirin\Ebics\Contracts\PdfFactoryInterface;
 use AndrewSvirin\Ebics\Models\BankLetter;
 
 /**
@@ -17,12 +17,12 @@ use AndrewSvirin\Ebics\Models\BankLetter;
 final class PdfBankLetterFormatter implements FormatterInterface
 {
     private HtmlBankLetterFormatter $bankLetterFormatterHtml;
-    private PdfFactory $pdfFactory;
+    private PdfFactoryInterface $pdfFactory;
 
-    public function __construct()
+    public function __construct(PdfFactoryInterface $pdfFactory)
     {
         $this->bankLetterFormatterHtml = new HtmlBankLetterFormatter();
-        $this->pdfFactory = new PdfFactory();
+        $this->pdfFactory = $pdfFactory;
     }
 
     /**
