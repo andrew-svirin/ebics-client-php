@@ -12,6 +12,7 @@ use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Tests\Factories\X509\CreditSuisseX509Generator;
 use AndrewSvirin\Ebics\Tests\Factories\X509\ZKBX509Generator;
+use DateTime;
 
 /**
  * Class EbicsClientTest.
@@ -214,6 +215,68 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group HPD
+     * @group V3
+     * @group HPD-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testHPD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['HPD']['fake']);
+
+        $this->assertExceptionCode($codes['HPD']['code']);
+        $hpd = $client->HPD();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group HAA
+     * @group V3
+     * @group HAA-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testHAA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['HAA']['fake']);
+
+        $this->assertExceptionCode($codes['HAA']['code']);
+        $haa = $client->HAA();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group BTD
      * @group V3
      * @group BTD-V3
@@ -228,19 +291,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     {
         $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['BTD']['fake']);
 
-        /**
-         * Method HKD.
-         * <OrderInfo>
-         * <AdminOrderType>BTD</AdminOrderType>
-         * <Service>
-         * <ServiceName>PSR</ServiceName>
-         * <Scope>CH</Scope>
-         * <Container containerType="ZIP"/>
-         * <MsgName version="03">pain.002</MsgName>
-         * </Service>
-         * <Description>CH Payment Status Report</Description>
-         * </OrderInfo>
-         */
         $context = new BTDContext();
         $context->setServiceName('PSR');
         $context->setMsgName('pain.002');
@@ -249,7 +299,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $context->setContainerType('ZIP');
 
         $this->assertExceptionCode($codes['BTD']['code']);
-        $btd = $client->BTD($context);
+        $btd = $client->BTD($context, null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($btd->getTransaction()->getLastSegment()->getResponse());
@@ -258,6 +308,99 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
 
         $code = $responseHandler->retrieveH00XReturnCode($btd->getTransaction()->getReceipt());
         $reportText = $responseHandler->retrieveH00XReportText($btd->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group PTK
+     * @group V3
+     * @group PTK-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testPTK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['PTK']['fake']);
+
+        $this->assertExceptionCode($codes['PTK']['code']);
+        $ptk = $client->PTK();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group Z54
+     * @group V3
+     * @group Z54-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['Z54']['fake']);
+
+        $this->assertExceptionCode($codes['Z54']['code']);
+        $z54 = $client->Z54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group ZSR
+     * @group V3
+     * @group ZSR-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testZSR(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['ZSR']['fake']);
+
+        $this->assertExceptionCode($codes['ZSR']['code']);
+        $zsr = $client->ZSR(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }
@@ -472,7 +615,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
         $this->assertResponseDone($code, $reportText);
     }
 
-
     /**
      * @dataProvider serversDataProvider
      *
@@ -597,161 +739,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
 
         $code = $responseHandler->retrieveH00XReturnCode($hvt->getTransaction()->getReceipt());
         $reportText = $responseHandler->retrieveH00XReportText($hvt->getTransaction()->getReceipt());
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group PTK
-     * @group V3
-     * @group PTK-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testPTK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['PTK']['fake']);
-
-        $this->assertExceptionCode($codes['PTK']['code']);
-        $ptk = $client->PTK();
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($ptk->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($ptk->getTransaction()->getReceipt());
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group Z54
-     * @group V3
-     * @group Z54-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['Z54']['fake']);
-
-        $this->assertExceptionCode($codes['Z54']['code']);
-        $z54 = $client->Z54();
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($z54->getTransaction()->getReceipt());
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group ZSR
-     * @group V3
-     * @group ZSR-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testZSR(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['ZSR']['fake']);
-
-        $this->assertExceptionCode($codes['ZSR']['code']);
-        $zsr = $client->ZSR();
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($zsr->getTransaction()->getReceipt());
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group HPD
-     * @group V3
-     * @group HPD-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testHPD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['HPD']['fake']);
-
-        $this->assertExceptionCode($codes['HPD']['code']);
-        $hpd = $client->HPD();
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($hpd->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($hpd->getTransaction()->getReceipt());
-
-        $this->assertResponseDone($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group HAA
-     * @group V3
-     * @group HAA-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testHAA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['HAA']['fake']);
-
-        $this->assertExceptionCode($codes['HAA']['code']);
-        $haa = $client->HAA();
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($haa->getTransaction()->getReceipt());
-        $reportText = $responseHandler->retrieveH00XReportText($haa->getTransaction()->getReceipt());
 
         $this->assertResponseDone($code, $reportText);
     }

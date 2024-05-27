@@ -238,6 +238,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group PTK
+     * @group PTK-V2
      *
      * @param int $credentialsId
      * @param array $codes
@@ -337,7 +338,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['VMK']['fake']);
 
         $this->assertExceptionCode($codes['VMK']['code']);
-        $vmk = $client->VMK();
+        $vmk = $client->VMK(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getLastSegment()->getResponse());
@@ -366,7 +367,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['STA']['fake']);
 
         $this->assertExceptionCode($codes['STA']['code']);
-        $sta = $client->STA();
+        $sta = $client->STA(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($sta->getTransaction()->getLastSegment()->getResponse());
@@ -395,7 +396,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['C52']['fake']);
 
         $this->assertExceptionCode($codes['C52']['code']);
-        $c52 = $client->C52();
+        $c52 = $client->C52(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c52->getTransaction()->getLastSegment()->getResponse());
@@ -424,11 +425,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['C53']['fake']);
 
         $this->assertExceptionCode($codes['C53']['code']);
-        $c53 = $client->C53(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
+        $c53 = $client->C53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
@@ -457,11 +454,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['C54']['fake']);
 
         $this->assertExceptionCode($codes['C54']['code']);
-        $c54 = $client->C53(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
+        $c54 = $client->C54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getLastSegment()->getResponse());
@@ -490,7 +483,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['Z52']['fake']);
 
         $this->assertExceptionCode($codes['Z52']['code']);
-        $z52 = $client->Z52();
+        $z52 = $client->Z52(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z52->getTransaction()->getLastSegment()->getResponse());
@@ -519,11 +512,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['Z53']['fake']);
 
         $this->assertExceptionCode($codes['Z53']['code']);
-        $z53 = $client->Z53(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
+        $z53 = $client->Z53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z53->getTransaction()->getLastSegment()->getResponse());
@@ -552,11 +541,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['Z54']['fake']);
 
         $this->assertExceptionCode($codes['Z54']['code']);
-        $z54 = $client->Z54(
-            new DateTime(),
-            (new DateTime())->modify('-30 day'),
-            (new DateTime())->modify('-1 day')
-        );
+        $z54 = $client->Z54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
@@ -591,9 +576,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                 $fileFormat,
                 EbicsClient::FILE_PARSER_FORMAT_TEXT,
                 EbicsClient::COUNTRY_CODE_FR,
-                new DateTime(),
-                (new DateTime())->modify('-30 day'),
-                (new DateTime())->modify('-1 day')
+                null,
+                new DateTime('2020-03-21'),
+                new DateTime('2020-04-21')
             );
 
             $parser = new CfonbParser();
