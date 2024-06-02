@@ -176,7 +176,8 @@ try {
 | HPD         | Download the bank server parameters.                                                                              |
 | HKD         | Download customer's customer and subscriber information.                                                          |
 | HTD         | Download subscriber's customer and subscriber information.                                                        |
-| PTK         | Download transaction status.                                                                                      |
+| PTK         | Download transaction status. (text/plain)                                                                         |
+| HAC         | Download transaction status. (text/xml)                                                                           |
 | FDL         | Download the files from the bank.                                                                                 |
 | FUL         | Upload the files to the bank.                                                                                     |
 | HAA         | Download Bank available order types.                                                                              |

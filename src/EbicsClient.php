@@ -394,6 +394,30 @@ final class EbicsClient implements EbicsClientInterface
         return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
+    public function HAC(
+        DateTimeInterface $startDate = null,
+        DateTimeInterface $stopDate = null,
+        DateTimeInterface $dateTime = null
+    ): DownloadOrderResult {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($startDate, $stopDate, $dateTime) {
+                return $this->requestFactory->createHAC(
+                    $dateTime,
+                    $startDate,
+                    $stopDate,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_XML);
+    }
+
     /**
      * @inheritDoc
      * @throws Exceptions\EbicsException
