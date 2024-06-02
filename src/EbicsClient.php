@@ -375,16 +375,21 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function PTK(DateTimeInterface $dateTime = null): DownloadOrderResult
-    {
+    public function PTK(
+        DateTimeInterface $startDate = null,
+        DateTimeInterface $stopDate = null,
+        DateTimeInterface $dateTime = null
+    ): DownloadOrderResult {
         if (null === $dateTime) {
             $dateTime = new DateTime();
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
+            function ($segmentNumber, $isLastSegment) use ($startDate, $stopDate, $dateTime) {
                 return $this->requestFactory->createPTK(
                     $dateTime,
+                    $startDate,
+                    $stopDate,
                     $segmentNumber,
                     $isLastSegment
                 );

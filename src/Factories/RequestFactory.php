@@ -386,6 +386,8 @@ abstract class RequestFactory
      */
     public function createPTK(
         DateTimeInterface $dateTime,
+        DateTimeInterface $startDate = null,
+        DateTimeInterface $stopDate = null,
         int $segmentNumber = null,
         bool $isLastSegment = null
     ): Request {
@@ -399,9 +401,9 @@ abstract class RequestFactory
 
         $request = $this
             ->createRequestBuilderInstance()
-            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
-                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
-                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context, $startDate, $stopDate) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context, $startDate, $stopDate) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context, $startDate, $stopDate) {
                         $builder
                             ->addHostId($context->getBank()->getHostId())
                             ->addRandomNonce()
@@ -409,10 +411,13 @@ abstract class RequestFactory
                             ->addPartnerId($context->getUser()->getPartnerId())
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
-                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use (
+                                $startDate,
+                                $stopDate
+                            ) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'PTK')
-                                    ->addStandardOrderParams();
+                                    ->addStandardOrderParams($startDate, $stopDate);
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
