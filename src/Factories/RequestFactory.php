@@ -465,7 +465,7 @@ abstract class RequestFactory
                             ->addPartnerId($context->getUser()->getPartnerId())
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
-                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use(
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use (
                                 $startDate,
                                 $stopDate
                             ) {
