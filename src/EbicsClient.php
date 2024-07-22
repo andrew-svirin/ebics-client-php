@@ -812,6 +812,30 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
+    public function CDB(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->uploadTransaction(function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            $transaction->setOrderData($orderData->getContent());
+            $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
+
+            return $this->requestFactory->createCDB(
+                $dateTime,
+                $transaction
+            );
+        });
+
+        return $this->createUploadOrderResult($transaction, $orderData);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsResponseException
+     * @throws EbicsException
+     */
     public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
     {
         if (null === $dateTime) {

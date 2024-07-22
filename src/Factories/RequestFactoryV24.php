@@ -169,6 +169,11 @@ final class RequestFactoryV24 extends RequestFactoryV2
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
+    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
     public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');

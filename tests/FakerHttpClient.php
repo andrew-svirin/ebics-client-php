@@ -74,6 +74,9 @@ class FakerHttpClient implements HttpClientInterface
             case 'CDD':
                 $fileName = 'cdd.xml';
                 break;
+            case 'CDB':
+                $fileName = 'cdb.xml';
+                break;
             default:
                 throw new LogicException(sprintf('Faked order type `%s` not supported.', $orderType));
         }
@@ -81,7 +84,7 @@ class FakerHttpClient implements HttpClientInterface
         $fixturePath = $this->fixturesDir . '/' . $fileName;
 
         if (!is_file($fixturePath)) {
-            throw new LogicException('Fixtures file doe not exists.');
+            throw new LogicException('Fixtures file does not exists.');
         }
 
         $response = new Response();

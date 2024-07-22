@@ -195,6 +195,7 @@ try {
 | XE3         | Upload SEPA Direct Debit Initiation, CH definitions, CORE (i.e available in Switzerland).                         |
 | YCT         | Upload Credit transfer CGI (SEPA & non SEPA).                                                                     |
 | CDD         | Upload initiation of the direct debit transaction.                                                                |
+| CDB         | Upload initiation of the direct debit transaction for business.                                                   |
 | BTD         | Download request files of any BTF structure.                                                                      |
 | BTU         | Upload the files to the bank.                                                                                     |
 | HVU         | Download List the orders for which the user is authorized as a signatory.                                         |
