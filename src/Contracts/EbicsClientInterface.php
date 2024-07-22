@@ -377,6 +377,19 @@ interface EbicsClientInterface
     public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
+     * Upload initiation of the direct debit transaction for business.
+     * The CDB order type uses the protocol version H00X.
+     * FileFormat pain.008.001.02
+     * OrderType:BTU, Service Name:SDD, Scope:SDD,Service Option:COR Container:, MsgName:pain.008
+     *
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     *
+     * @return UploadOrderResult
+     */
+    public function CDB(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+
+    /**
      * Upload initiation credit transfer per Swiss Payments specification set by Six banking services.
      * XE2 is an upload order type that uses the protocol version H00X.
      * FileFormat pain.001.001.03.ch.02
