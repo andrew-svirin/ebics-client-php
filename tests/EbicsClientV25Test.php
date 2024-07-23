@@ -816,6 +816,38 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group CDB
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testCDB(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['CDB']['fake']);
+
+        $this->assertExceptionCode($codes['CDB']['code']);
+
+        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
+
+        $cdb = $client->CDB($customerDirectDebit);
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($cdb->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cdb->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($cdb->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($cdb->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group HVU
      * @group V2
      * @group HVU-V25
@@ -1039,6 +1071,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'XE2' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CDB' => ['code' => '090003', 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
@@ -1084,6 +1117,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'XE2' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CDB' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => null, 'fake' => false],
                     'HVU' => ['code' => '091006', 'fake' => false],
                     'HVZ' => ['code' => '091006', 'fake' => false],
@@ -1130,6 +1164,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'XE2' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CDB' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
@@ -1175,6 +1210,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'XE2' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => '090003', 'fake' => false],
+                    'CDB' => ['code' => '090003', 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
@@ -1220,6 +1256,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'XE2' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'CDD' => ['code' => null, 'fake' => false],
+                    'CDB' => ['code' => null, 'fake' => false],
                     'CIP' => ['code' => '091005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],

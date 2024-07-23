@@ -61,6 +61,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
                 break;
             case 'CCT':
             case 'CDD':
+            case 'CDB':
             case 'XE2':
             case 'XE3':
             case 'CIP':
@@ -649,6 +650,70 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'CDD')
+                                    ->addStandardOrderParams();
+                            })
+                            ->addBankPubKeyDigests(
+                                $context->getKeyring()->getBankSignatureXVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $context->getKeyring()->getBankSignatureEVersion(),
+                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                            )
+                            ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
+                            ->addNumSegments($context->getNumSegments());
+                    })->addMutable(function (MutableBuilder $builder) {
+                        $builder->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
+                    });
+                })->addBody(function (BodyBuilder $builder) use ($context) {
+                    $builder->addDataTransfer(function (DataTransferBuilder $builder) use ($context) {
+                        $builder
+                            ->addDataEncryptionInfo(function (DataEncryptionInfoBuilder $builder) use ($context) {
+                                $builder
+                                    ->addEncryptionPubKeyDigest($context->getKeyring())
+                                    ->addTransactionKey($context->getTransactionKey(), $context->getKeyring());
+                            })
+                            ->addSignatureData($context->getSignatureData(), $context->getTransactionKey());
+                    });
+                });
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
+    /**
+     * @throws EbicsException
+     */
+    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    {
+        $signatureData = new UserSignature();
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
+
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setUser($this->user)
+            ->setKeyring($this->keyring)
+            ->setDateTime($dateTime)
+            ->setTransactionKey($transaction->getKey())
+            ->setNumSegments($transaction->getNumSegments())
+            ->setSignatureData($signatureData);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addRandomNonce()
+                            ->addTimestamp($context->getDateTime())
+                            ->addPartnerId($context->getUser()->getPartnerId())
+                            ->addUserId($context->getUser()->getUserId())
+                            ->addProduct('Ebics client PHP', 'de')
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                                $this
+                                    ->addOrderType($orderDetailsBuilder, 'CDB')
                                     ->addStandardOrderParams();
                             })
                             ->addBankPubKeyDigests(
