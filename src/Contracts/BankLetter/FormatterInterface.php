@@ -18,7 +18,16 @@ interface FormatterInterface
      *
      * @param BankLetter $bankLetter
      *
-     * @return mixed
+     * @return string
      */
-    public function format(BankLetter $bankLetter);
+    public function format(BankLetter $bankLetter): string;
+
+    /**
+     * Set translations.
+     *
+     * @param array $translations
+     *
+     * @return void
+     */
+    public function setTranslations(array $translations): void;
 }

@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
 use RuntimeException;
@@ -15,13 +14,11 @@ use RuntimeException;
  *
  * @internal
  */
-final class TxtBankLetterFormatter implements FormatterInterface
+final class TxtBankLetterFormatter extends LetterFormatter
 {
     public function format(BankLetter $bankLetter): string
     {
-        $result = '';
-
-        $result .= $this->formatSection($bankLetter->getSignatureBankLetterA());
+        $result = $this->formatSection($bankLetter->getSignatureBankLetterA());
 
         $result .= $this->formatSection($bankLetter->getSignatureBankLetterE());
 
@@ -46,7 +43,7 @@ final class TxtBankLetterFormatter implements FormatterInterface
         }
 
         return sprintf(
-            "Version:\n%s\n%s\nHash:\n%s\n\n",
+            "{$this->translations['version']}:\n%s\n%s\n{$this->translations['hash']}:\n%s\n\n",
             $signatureBankLetter->getVersion(),
             $signatureSection,
             $this->formatBytes($signatureBankLetter->getKeyHash())
@@ -56,7 +53,7 @@ final class TxtBankLetterFormatter implements FormatterInterface
     private function formatSectionFromCertificate(SignatureBankLetter $certificateBankLetter): string
     {
         return sprintf(
-            "Certificate:\n%s",
+            "{$this->translations['certificate']}:\n%s",
             $this->formatCertificateContent($certificateBankLetter->getCertificateContent())
         );
     }
@@ -64,7 +61,7 @@ final class TxtBankLetterFormatter implements FormatterInterface
     private function formatSectionFromModulusExponent(SignatureBankLetter $certificateBankLetter): string
     {
         return sprintf(
-            "Exponent:\n%s\nModulus:\n%s",
+            "{$this->translations['exponent']}:\n%s\n{$this->translations['modulus']}:\n%s",
             $this->formatBytes($certificateBankLetter->getExponent()),
             $this->formatBytes($certificateBankLetter->getModulus())
         );
@@ -102,19 +99,5 @@ final class TxtBankLetterFormatter implements FormatterInterface
 
         // Convert to upper case and trim leading fictive space.
         return strtoupper(trim($result));
-    }
-
-    /**
-     * @param string $certificateContent
-     *
-     * @return string
-     */
-    private function formatCertificateContent(string $certificateContent): string
-    {
-        return trim(str_replace(
-            ['-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----'],
-            '',
-            $certificateContent
-        ));
     }
 }

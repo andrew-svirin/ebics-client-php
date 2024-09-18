@@ -2,14 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
-use LogicException;
 
 /**
- * Bank letter PDF formatter.
+ * Bank letter HTML formatter.
  * View pattern.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -17,39 +14,12 @@ use LogicException;
  *
  * @internal
  */
-final class HtmlBankLetterFormatter implements FormatterInterface
+final class HtmlBankLetterFormatter extends LetterFormatter
 {
-    private array $translations = [
-        'init_letter' => 'Initialization letter',
-        'parameters' => 'Parameters',
-        'server_name' => 'Server Name',
-        'host_id' => 'Host ID',
-        'partner_id' => 'Partner ID',
-        'user_id' => 'User ID',
-        'version' => 'Version',
-        'date' => 'Date',
-        'auth_certificate' => 'Authentication Certificate',
-        'certificate' => 'Certificate',
-        'hash' => 'Hash',
-        'es_signature' => 'ES signature',
-        'encryption_signature' => 'Encryption signature',
-        'authentication_signature' => 'Authentication signature',
-        'exponent' => 'Exponent',
-        'modulus' => 'Modulus',
-    ];
-    private string $style = '';
-
     /**
-     * Set translations.
-     *
-     * @param array $translations
-     *
-     * @return void
+     * @var string
      */
-    public function setTranslations(array $translations): void
-    {
-        $this->translations = array_replace($this->translations, $translations);
-    }
+    private string $style = '';
 
     /**
      * Set additional CSS style.
@@ -96,6 +66,7 @@ final class HtmlBankLetterFormatter implements FormatterInterface
 
     pre {
         break-inside: avoid;
+        padding: 0 .5rem;
     }
 
     table {
@@ -115,7 +86,7 @@ final class HtmlBankLetterFormatter implements FormatterInterface
     <tbody>
         <tr>
             <th>{$this->translations['server_name']}</th>
-            <td>{$this->getServerName($bankLetter->getBank())}</td>
+            <td>{$this->getServerName($bankLetter)}</td>
         </tr>
         <tr>
             <th>{$this->translations['host_id']}</th>
@@ -142,22 +113,6 @@ EOF;
     }
 
     /**
-     * Get server name.
-     *
-     * @param Bank $bank
-     *
-     * @return string
-     */
-    private function getServerName(Bank $bank): string
-    {
-        if (empty($serverName = $bank->getServerName())) {
-            return '--';
-        }
-
-        return $serverName;
-    }
-
-    /**
      * Format section for one certificate.
      *
      * @param SignatureBankLetter $signatureBankLetter
@@ -166,29 +121,9 @@ EOF;
      */
     private function formatSection(SignatureBankLetter $signatureBankLetter): string
     {
-        switch ($signatureBankLetter->getType()) {
-            case SignatureBankLetter::TYPE_A:
-                $signatureName = $this->translations['es_signature'];
-                break;
-            case SignatureBankLetter::TYPE_E:
-                $signatureName = $this->translations['encryption_signature'];
-                break;
-            case SignatureBankLetter::TYPE_X:
-                $signatureName = $this->translations['authentication_signature'];
-                break;
-            default:
-                throw new LogicException('Signature type unpredictable.');
-        }
-
-        if (($certificateCreatedAt = $signatureBankLetter->getCertificateCreatedAt())) {
-            $createdAt = $certificateCreatedAt->format('d/m/Y H:i:s');
-        } else {
-            $createdAt = '--';
-        }
-
         return <<<EOF
 <div class="section">
-    <h3>{$signatureName}</h3>
+    <h3>{$this->getSignatureName($signatureBankLetter)}</h3>
     <h4>{$this->translations['parameters']}</h4>
     <table>
     <tbody>
@@ -198,7 +133,7 @@ EOF;
         </tr>
         <tr>
             <th>{$this->translations['date']}</th>
-            <td>{$createdAt}</td>
+            <td>{$this->getCertificateCreatedAt($signatureBankLetter)}</td>
         </tr>
     </tbody>
     </table>
@@ -237,7 +172,7 @@ EOF;
     {
         $bytes = str_replace(' ', '', $bytes);
         $bytes = strtoupper($bytes);
-        $bytes = str_split($bytes, 16);
+        $bytes = str_split($bytes, 32);
         $bytes = array_map(
             function ($bytes) {
                 return implode(' ', str_split($bytes, 2));
@@ -253,16 +188,8 @@ EOF;
      *
      * @return string
      */
-    private function formatCertificateContent(string $certificateContent): string
+    protected function formatCertificateContent(string $certificateContent): string
     {
-        $result = trim(
-            str_replace(
-                ['-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----', "\n", "\r"],
-                '',
-                $certificateContent
-            )
-        );
-
-        return chunk_split($result, 64);
+        return chunk_split(parent::formatCertificateContent($certificateContent), 64);
     }
 }

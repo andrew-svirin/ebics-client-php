@@ -14,7 +14,6 @@ use AndrewSvirin\Ebics\EbicsBankLetter;
  */
 class EbicsBankLetterTest extends AbstractEbicsTestCase
 {
-
     /**
      * Prepare bank letter in txt format.
      *
