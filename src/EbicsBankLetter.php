@@ -3,9 +3,7 @@
 namespace AndrewSvirin\Ebics;
 
 use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Contracts\PdfFactoryInterface;
 use AndrewSvirin\Ebics\Factories\BankLetterFactory;
-use AndrewSvirin\Ebics\Factories\PdfFactory;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\Keyring;
@@ -31,13 +29,11 @@ final class EbicsBankLetter
 {
     private BankLetterService $bankLetterService;
     private BankLetterFactory $bankLetterFactory;
-    private PdfFactoryInterface $pdfFactory;
 
     public function __construct()
     {
         $this->bankLetterService = new BankLetterService();
         $this->bankLetterFactory = new BankLetterFactory();
-        $this->pdfFactory = new  PdfFactory();
     }
 
     /**
@@ -94,9 +90,9 @@ final class EbicsBankLetter
      * @param BankLetter $bankLetter
      * @param FormatterInterface $formatter
      *
-     * @return mixed
+     * @return string
      */
-    public function formatBankLetter(BankLetter $bankLetter, FormatterInterface $formatter)
+    public function formatBankLetter(BankLetter $bankLetter, FormatterInterface $formatter): string
     {
         return $formatter->format($bankLetter);
     }
@@ -111,13 +107,8 @@ final class EbicsBankLetter
         return new HtmlBankLetterFormatter();
     }
 
-    public function setPdfFactory(PdfFactoryInterface $pdfFactory): void
-    {
-        $this->pdfFactory = $pdfFactory;
-    }
-
     public function createPdfBankLetterFormatter(): PdfBankLetterFormatter
     {
-        return new PdfBankLetterFormatter($this->pdfFactory);
+        return new PdfBankLetterFormatter();
     }
 }
