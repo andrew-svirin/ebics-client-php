@@ -522,40 +522,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
-     * @group CIP
-     * @group V3
-     * @group CIP-V3
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
-     *
-     * @covers
-     */
-    public function testCIP(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
-    {
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['CIP']['fake']);
-
-        $this->assertExceptionCode($codes['CIP']['code']);
-
-        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
-
-        $cip = $client->CIP($customerDirectDebit);
-
-        $responseHandler = $client->getResponseHandler();
-        $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($cip->getTransaction()->getLastSegment()->getResponse());
-        $this->assertResponseOk($code, $reportText);
-
-        $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getInitialization()->getResponse());
-        $reportText = $responseHandler->retrieveH00XReportText($cip->getTransaction()->getInitialization()->getResponse());
-
-        $this->assertResponseOk($code, $reportText);
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
      * @group HVU
      * @group V3
      * @group HVU-V3
@@ -758,7 +724,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'H3K' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
-                    'CIP' => ['code' => '061099', 'fake' => false],
                     'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
@@ -784,7 +749,6 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'HIA' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
-                    'CIP' => ['code' => '061099', 'fake' => false],
                     'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
