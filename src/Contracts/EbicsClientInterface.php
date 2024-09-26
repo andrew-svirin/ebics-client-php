@@ -142,10 +142,16 @@ interface EbicsClientInterface
      * Download transaction status.
      *
      * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
      *
      * @return DownloadOrderResult
      */
-    public function PTK(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function PTK(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult;
 
     /**
      * Download Bank available order types.
