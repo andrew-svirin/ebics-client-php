@@ -54,8 +54,11 @@ final class RequestFactoryV3 extends RequestFactory
             });
     }
 
-    protected function addOrderType(OrderDetailsBuilder $orderDetailsBuilder, string $orderType): OrderDetailsBuilder
-    {
+    protected function addOrderType(
+        OrderDetailsBuilder $orderDetailsBuilder,
+        string $orderType,
+        bool $withES = true
+    ): OrderDetailsBuilder {
         return $orderDetailsBuilder->addAdminOrderType($orderType);
     }
 
@@ -314,28 +317,32 @@ final class RequestFactoryV3 extends RequestFactory
         return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
     }
 
-    public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-
-    public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCIP(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 3.0');
+    }
+
+    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         $btfContext = new BTUContext();
         $btfContext->setServiceName('SDD');

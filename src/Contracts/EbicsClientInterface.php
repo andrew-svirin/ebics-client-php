@@ -339,6 +339,7 @@ interface EbicsClientInterface
      * @param OrderDataInterface $orderData File to be uploaded.
      * @param FULContext $fulContext Order attributes.
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
@@ -346,11 +347,12 @@ interface EbicsClientInterface
         string $fileFormat,
         OrderDataInterface $orderData,
         FULContext $fulContext,
-        DateTimeInterface $dateTime = null
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
     ): UploadOrderResult;
 
     /**
-     * Upload initiation of the credit transfer per Single Euro Payments Area (SEPA)
+     * Upload initiation of the credit transfer per SEPA.
      * specification set by the European Payment Council or Die Deutsche Kreditwirtschaft (DK (German)).
      * CCT is an upload order type that uses the protocol version H00X.
      * FileFormat pain.001.001.03
@@ -358,10 +360,15 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
-    public function CCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function CCT(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
 
     /**
      * Upload initiation of the direct debit transaction.
@@ -371,10 +378,15 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
-    public function CDD(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function CDD(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
 
     /**
      * Upload initiation of the direct debit transaction for business.
@@ -384,10 +396,30 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
-    public function CDB(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function CDB(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
+
+    /**
+     * Upload initiation of the instant credit transfer per SEPA.
+     *
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
+     *
+     * @return UploadOrderResult
+     */
+    public function CIP(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
 
     /**
      * Upload initiation credit transfer per Swiss Payments specification set by Six banking services.
@@ -397,10 +429,15 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
-    public function XE2(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function XE2(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
 
     /**
      * Upload SEPA Direct Debit Initiation, CH definitions, CORE.
@@ -409,10 +446,15 @@ interface EbicsClientInterface
      *
      * @param OrderDataInterface $orderData
      * @param DateTimeInterface|null $dateTime
+     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
-    public function XE3(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function XE3(
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null,
+        bool $withES = true
+    ): UploadOrderResult;
 
     /**
      * Upload Credit transfer CGI (SEPA & non SEPA).
@@ -424,16 +466,6 @@ interface EbicsClientInterface
      * @return UploadOrderResult
      */
     public function YCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
-
-    /**
-     * Upload initiation of the instant credit transfer per Single Euro Payments Area.
-     *
-     * @param OrderDataInterface $orderData
-     * @param DateTimeInterface|null $dateTime
-     *
-     * @return UploadOrderResult
-     */
-    public function CIP(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
      * Download List the orders for which the user is authorized as a signatory.

@@ -22,6 +22,7 @@ final class RequestContext
     private DateTimeInterface $dateTime;
     private ?DateTimeInterface $startDateTime;
     private ?DateTimeInterface $endDateTime;
+    private ?bool $withES;
     private string $fileFormat;
     private string $countryCode;
     private string $receiptCode;
@@ -111,6 +112,18 @@ final class RequestContext
     public function getEndDateTime(): ?DateTimeInterface
     {
         return $this->endDateTime;
+    }
+
+    public function setWithES(bool $withES): RequestContext
+    {
+        $this->withES = $withES;
+
+        return $this;
+    }
+
+    public function getWithES(): ?bool
+    {
+        return $this->withES;
     }
 
     public function setFileFormat(string $fileFormat): RequestContext

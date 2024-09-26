@@ -44,7 +44,8 @@ final class RequestFactoryV24 extends RequestFactoryV2
 
     protected function addOrderType(
         OrderDetailsBuilder $orderDetailsBuilder,
-        string $orderType
+        string $orderType,
+        bool $withES = true
     ): OrderDetailsBuilder {
         switch ($orderType) {
             case 'INI':
@@ -52,7 +53,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
                 $orderAttribute = OrderDetailsBuilder::ORDER_ATTRIBUTE_DZNNN;
                 break;
             case 'FUL':
-                $orderAttribute = $this->bank->usesUploadWithES() ?
+                $orderAttribute = $withES ?
                     OrderDetailsBuilder::ORDER_ATTRIBUTE_OZHNN : OrderDetailsBuilder::ORDER_ATTRIBUTE_DZHNN;
                 break;
             default:
@@ -157,29 +158,32 @@ final class RequestFactoryV24 extends RequestFactoryV2
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createCCT(
-        DateTimeInterface $dateTime,
-        UploadTransaction $transaction
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createCIP(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }

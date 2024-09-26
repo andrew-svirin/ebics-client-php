@@ -64,7 +64,6 @@ abstract class AbstractEbicsTestCase extends TestCase
         $credentials = $this->credentialsDataProvider($credentialsId);
 
         $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
-        $bank->setUsesUploadWithES(true);
         $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);

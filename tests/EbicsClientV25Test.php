@@ -700,7 +700,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
-        $cip = $client->CIP($customerDirectDebit);
+        $cip = $client->CIP($customerDirectDebit, null, false);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
