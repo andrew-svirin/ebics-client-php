@@ -387,6 +387,8 @@ abstract class RequestFactory
      */
     public function createPTK(
         DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
         int $segmentNumber = null,
         bool $isLastSegment = null
     ): Request {
@@ -395,6 +397,8 @@ abstract class RequestFactory
             ->setUser($this->user)
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime)
             ->setSegmentNumber($segmentNumber)
             ->setIsLastSegment($isLastSegment);
 
@@ -410,10 +414,10 @@ abstract class RequestFactory
                             ->addPartnerId($context->getUser()->getPartnerId())
                             ->addUserId($context->getUser()->getUserId())
                             ->addProduct('Ebics client PHP', 'de')
-                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) {
+                            ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'PTK')
-                                    ->addStandardOrderParams();
+                                    ->addStandardOrderParams($context->getStartDateTime(), $context->getEndDateTime());
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
