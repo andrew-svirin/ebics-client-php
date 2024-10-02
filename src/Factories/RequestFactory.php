@@ -856,6 +856,14 @@ abstract class RequestFactory
         bool $isLastSegment = null
     ): Request;
 
+    abstract public function createXEK(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request;
+
     abstract public function createCCT(
         DateTimeInterface $dateTime,
         UploadTransaction $transaction,

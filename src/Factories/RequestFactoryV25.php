@@ -557,6 +557,16 @@ final class RequestFactoryV25 extends RequestFactoryV2
         throw new LogicException('Method not implemented yet for EBICS 2.5');
     }
 
+    public function createXEK(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        throw new LogicException('Method not implemented yet for EBICS 2.5');
+    }
+
     /**
      * @throws EbicsException
      */

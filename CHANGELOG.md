@@ -7,6 +7,7 @@
 * Added support for EBICS version 2.4.
 * Added option to specify custom PDF Factory.
 * Changed pdf generator to FPDF.
+* Add methods `XEK` order type for EBICS 3.0
 
 ## 2.1
 

@@ -690,6 +690,34 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
+    public function XEK(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
+        $transaction = $this->downloadTransaction(
+            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+                return $this->requestFactory->createXEK(
+                    $dateTime,
+                    $startDateTime,
+                    $endDateTime,
+                    $segmentNumber,
+                    $isLastSegment
+                );
+            }
+        );
+
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Exceptions\EbicsException
+     */
     public function FDL(
         $fileFormat,
         $parserFormat = self::FILE_PARSER_FORMAT_TEXT,

@@ -317,6 +317,25 @@ final class RequestFactoryV3 extends RequestFactory
         return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
     }
 
+    /**
+     * @throws EbicsException
+     */
+    public function createXEK(
+        DateTimeInterface $dateTime,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
+        int $segmentNumber = null,
+        bool $isLastSegment = null
+    ): Request {
+        $btfContext = new BTDContext();
+        $btfContext->setServiceName('EOP');
+        $btfContext->setScope('AT');
+        $btfContext->setMsgName('pdf');
+        $btfContext->setContainerType('ZIP');
+
+        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime, $segmentNumber, $isLastSegment);
+    }
+
     public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');

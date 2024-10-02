@@ -408,6 +408,37 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group XEK
+     * @group V3
+     * @group XEK-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     * @param X509GeneratorInterface|null $x509Generator
+     *
+     * @covers
+     */
+    public function testXEK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['XEK']['fake']);
+
+        $this->assertExceptionCode($codes['XEK']['code']);
+        $xek = $client->XEK(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($xek->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($xek->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($xek->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($xek->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group BTU
      * @group V3
      * @group BTU-V3
@@ -733,6 +764,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'PTK' => ['code' => null, 'fake' => false],
                     'Z54' => ['code' => '091005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
+                    'XEK' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],
@@ -758,6 +790,7 @@ class EbicsClientV3Test extends AbstractEbicsTestCase
                     'PTK' => ['code' => null, 'fake' => false],
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
+                    'XEK' => ['code' => '091005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],

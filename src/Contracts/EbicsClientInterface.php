@@ -306,9 +306,27 @@ interface EbicsClientInterface
      * Download Order/Payment Status report.
      * OrderType:BTD, Service Name:PSR, Scope:BIL, Container:ZIP, MsgName:pain.002
      *
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
      * @return DownloadOrderResult
      */
     public function ZSR(
+        DateTimeInterface $dateTime = null,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null
+    ): DownloadOrderResult;
+
+    /**
+     * Download account information as PDF-file.
+     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $startDateTime
+     * @param DateTimeInterface|null $endDateTime
+     *
+     * @return DownloadOrderResult
+     */
+    public function XEK(
         DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
