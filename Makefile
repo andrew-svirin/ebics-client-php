@@ -6,7 +6,7 @@ endif
 
 docker-up u:
 	cd docker && docker-compose -p ebics-client-php up -d;
-	@if [ "$(WIN_ETH_IP)" ]; then echo "OK" && cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php sh -c "echo '$(WIN_ETH_IP) host.docker.internal' >> /etc/hosts"; fi
+	@if [ "$(WIN_ETH_IP)" ]; then cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php sh -c "echo '$(WIN_ETH_IP) host.docker.internal' >> /etc/hosts"; fi
 
 docker-down d:
 	cd docker && docker-compose -p ebics-client-php down
