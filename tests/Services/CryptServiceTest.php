@@ -17,7 +17,7 @@ class CryptServiceTest extends AbstractEbicsTestCase
 {
 
     /**
-     * @group crypt-services-generate-keys
+     * @group crypt-service-generate-keys
      */
     public function testGenerateKeys()
     {
@@ -30,5 +30,23 @@ class CryptServiceTest extends AbstractEbicsTestCase
         self::assertArrayHasKey('privatekey', $keys);
         self::assertArrayHasKey('publickey', $keys);
         self::assertArrayHasKey('partialkey', $keys);
+    }
+
+    /**
+     * @group crypt-service-check-password
+     */
+    public function testCheckPassword()
+    {
+        $credentialsId = 2;
+        $client = $this->setupClientV25($credentialsId);
+        $cryptService = new CryptService();
+
+        $keyring = $client->getKeyring();
+
+        $this->assertTrue($cryptService->checkKeyring($keyring));
+
+        $keyring->setPassword('incorrect_password');
+
+        $this->assertFalse($cryptService->checkKeyring($keyring));
     }
 }

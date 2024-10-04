@@ -6,7 +6,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
 
 /**
- * EBICS key ring representation.
+ * EBICS keyring representation.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin

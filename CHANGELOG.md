@@ -8,6 +8,7 @@
 * Added option to specify custom PDF Factory.
 * Changed pdf generator to FPDF.
 * Add methods `XEK` order type for EBICS 3.0
+* Add method to check keyring.
 
 ## 2.1
 
