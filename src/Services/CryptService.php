@@ -482,4 +482,22 @@ final class CryptService
 
         return implode($chrs);
     }
+
+    /**
+     * Check keyring is valid.
+     *
+     * @param Keyring $keyring
+     *
+     * @return bool
+     */
+    public function checkKeyring(Keyring $keyring): bool
+    {
+        try {
+            $this->rsaFactory->createPrivate($keyring->getUserSignatureX()->getPrivateKey(), $keyring->getPassword());
+        } catch (LogicException $exception) {
+            return false;
+        }
+
+        return true;
+    }
 }

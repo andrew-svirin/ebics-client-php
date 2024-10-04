@@ -6,7 +6,7 @@ use AndrewSvirin\Ebics\Models\Keyring;
 use LogicException;
 
 /**
- * EBICS Keyring representation manage one key ring stored in the file.
+ * EBICS Keyring representation manage one keyring stored in the file.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
@@ -25,13 +25,13 @@ final class FileKeyringManager extends KeyringManager
             && ($content = file_get_contents($resource))
             && is_string($content)
         ) {
-            $result = $this->keyringFactory->createKeyringFromData(json_decode($content, true));
+            $keyring = $this->keyringFactory->createKeyringFromData(json_decode($content, true));
         } else {
-            $result = new Keyring($defaultVersion);
+            $keyring = new Keyring($defaultVersion);
         }
-        $result->setPassword($passphrase);
+        $keyring->setPassword($passphrase);
 
-        return $result;
+        return $keyring;
     }
 
     /**
