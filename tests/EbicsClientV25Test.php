@@ -93,11 +93,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      */
     public function testH3K(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
     {
-        if (false === isset($codes['H3K'])) {
-            $this->markTestSkipped(sprintf('No H3K test for bank credential %d', $credentialsId));
-        }
-
-        $client = $this->setupClientV3($credentialsId, $x509Generator, $codes['H3K']['fake']);
+        $client = $this->setupClientV25($credentialsId, $x509Generator, $codes['H3K']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $userExists = $client->getKeyring()->getUserSignatureA();

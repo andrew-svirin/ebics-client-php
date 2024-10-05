@@ -9,6 +9,7 @@
 * Changed pdf generator to FPDF.
 * Add methods `XEK` order type for EBICS 3.0
 * Add method to check keyring.
+* Add method to change keyring password.
 
 ## 2.1
 

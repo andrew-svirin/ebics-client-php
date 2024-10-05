@@ -47,7 +47,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         return $this->setupClient(Keyring::VERSION_25, $credentialsId, $x509Generator, $fake);
     }
 
-    protected function setupClientV3(
+    protected function setupClientV30(
         int $credentialsId,
         X509GeneratorInterface $x509Generator = null,
         bool $fake = false
