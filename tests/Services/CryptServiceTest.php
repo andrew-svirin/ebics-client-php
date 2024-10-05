@@ -49,4 +49,46 @@ class CryptServiceTest extends AbstractEbicsTestCase
 
         $this->assertFalse($cryptService->checkKeyring($keyring));
     }
+
+    /**
+     * @group crypt-service-change-password
+     */
+    public function testChangePasswordV25()
+    {
+        $credentialsId = 2;
+        $client = $this->setupClientV25($credentialsId);
+        $cryptService = new CryptService();
+
+        $keyring = $client->getKeyring();
+
+        $cryptService->changeKeyringPassword($keyring, 'some_new_password');
+
+        $hpb = $client->HPB();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @group crypt-service-change-password
+     */
+    public function testChangePasswordV30()
+    {
+        $credentialsId = 6;
+        $client = $this->setupClientV30($credentialsId);
+        $cryptService = new CryptService();
+
+        $keyring = $client->getKeyring();
+
+        $cryptService->changeKeyringPassword($keyring, 'some_new_password');
+
+        $hpb = $client->HPB();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+    }
 }

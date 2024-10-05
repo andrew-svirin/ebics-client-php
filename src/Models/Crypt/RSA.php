@@ -1459,4 +1459,75 @@ final class RSA implements RSAInterface
 
         return $result === "\0";
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function changePassword($oldPrivatekey, $oldPassword, $newPassword)
+    {
+        if (!defined('CRYPT_RSA_EXPONENT')) {
+            // http://en.wikipedia.org/wiki/65537_%28number%29
+            define('CRYPT_RSA_EXPONENT', 65537);
+        }
+        // per <http://cseweb.ucsd.edu/~hovav/dist/survey.pdf#page=5>, this number ought not result
+        // in primes smaller than 256 bits. as a consequence if the key you're trying to create is
+        // 1024 bits and you've set CRYPT_RSA_SMALLEST_PRIME to 384 bits then you're going to get a
+        // 384 bit prime and a 640 bit prime (384 + 1024 % 384). at least if CRYPT_RSA_MODE is set to
+        // self::MODE_INTERNAL. if CRYPT_RSA_MODE is set to self::MODE_OPENSSL then CRYPT_RSA_SMALLEST_PRIME
+        // is ignored (ie. multi-prime RSA support is more intended as a way to speed up RSA key
+        // generation when there's a chance neither gmp nor OpenSSL are installed)
+        if (!defined('CRYPT_RSA_SMALLEST_PRIME')) {
+            define('CRYPT_RSA_SMALLEST_PRIME', 4096);
+        }
+
+        $rsa = openssl_pkey_get_private($oldPrivatekey, $oldPassword);
+
+        if ($rsa === false) {
+            throw new LogicException('Openssl pkey loading error.');
+        }
+
+        if (openssl_pkey_export($rsa, $privatekey, null) === false) {
+            throw new LogicException('Openssl pkey get details error.');
+        }
+
+        if (!($publickey = openssl_pkey_get_details($rsa))) {
+            throw new LogicException('Openssl pkey get details error.');
+        }
+
+        $publickey = $publickey['key'];
+
+        $this->setPassword($newPassword);
+
+        $parsedKey = $this->parseKey($privatekey, self::PRIVATE_FORMAT_PKCS1);
+        if (!is_array($parsedKey)) {
+            throw new LogicException('Parse key error.');
+        }
+        $privatekey = $this->convertPrivateKey(
+            $parsedKey['modulus'],
+            $parsedKey['publicExponent'],
+            $parsedKey['privateExponent'],
+            $parsedKey['primes'],
+            $parsedKey['exponents'],
+            $parsedKey['coefficients']
+        );
+
+        $parsedKey = $this->parseKey($publickey, self::PUBLIC_FORMAT_PKCS1);
+        if (!is_array($parsedKey)) {
+            throw new LogicException('Parse key error.');
+        }
+        $publickey = $this->convertPublicKey(
+            $parsedKey['modulus'],
+            $parsedKey['publicExponent']
+        );
+
+        // clear the buffer of error strings stemming from a minimalistic openssl.cnf
+        while (openssl_error_string() !== false) {
+        }
+
+        return [
+            'privatekey' => $privatekey,
+            'publickey' => $publickey,
+            'partialkey' => false,
+        ];
+    }
 }

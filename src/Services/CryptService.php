@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\Keyring;
+use AndrewSvirin\Ebics\Models\Signature;
 use LogicException;
 use RuntimeException;
 
@@ -499,5 +500,41 @@ final class CryptService
         }
 
         return true;
+    }
+
+    /**
+     * Change password for keyring.
+     *
+     * @param Keyring $keyring
+     * @param string $newPassword
+     *
+     * @return void
+     */
+    public function changeKeyringPassword(Keyring $keyring, string $newPassword): void
+    {
+        $pk = $this->rsaFactory->create();
+
+        $keys = $pk->changePassword(
+            $keyring->getUserSignatureA()->getPrivateKey(),
+            $keyring->getPassword(),
+            $newPassword
+        );
+        $keyring->setUserSignatureA(new Signature(Signature::TYPE_A, $keys['publickey'], $keys['privatekey']));
+
+        $keys = $pk->changePassword(
+            $keyring->getUserSignatureX()->getPrivateKey(),
+            $keyring->getPassword(),
+            $newPassword
+        );
+        $keyring->setUserSignatureX(new Signature(Signature::TYPE_X, $keys['publickey'], $keys['privatekey']));
+
+        $keys = $pk->changePassword(
+            $keyring->getUserSignatureE()->getPrivateKey(),
+            $keyring->getPassword(),
+            $newPassword
+        );
+        $keyring->setUserSignatureE(new Signature(Signature::TYPE_E, $keys['publickey'], $keys['privatekey']));
+
+        $keyring->setPassword($newPassword);
     }
 }

@@ -237,4 +237,15 @@ interface RSAInterface
      * @return bool
      */
     public function emsaPssVerify($m, $em, $emBits = null);
+
+    /**
+     * Change password for private key.
+     *
+     * @param string $privateKey
+     * @param string $oldPassword
+     * @param string $newPassword
+     *
+     * @return array New pair of keys.
+     */
+    public function changePassword($privateKey, $oldPassword, $newPassword);
 }
