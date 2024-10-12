@@ -10,9 +10,11 @@ use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Tests\Factories\X509\CreditSuisseX509Generator;
 use AndrewSvirin\Ebics\Tests\Factories\X509\ZKBX509Generator;
 use DateTime;
+use ReflectionClass;
 
 /**
  * Class EbicsClientTest.
@@ -24,6 +26,42 @@ use DateTime;
  */
 class EbicsClientV30Test extends AbstractEbicsTestCase
 {
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group check-keyring
+     */
+    public function testCheckKeyring(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV30($credentialsId, $x509Generator);
+
+        $this->assertTrue($client->checkKeyring());
+
+        $keyring = $client->getKeyring();
+        $keyring->setPassword('incorrect_password');
+
+        $this->assertFalse($client->checkKeyring());
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group change-keyring-password
+     */
+    public function testChangeKeyringPassword(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV30($credentialsId, $x509Generator);
+
+        $client->changeKeyringPassword('some_new_password');
+
+        $hpb = $client->HPB();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+    }
+
     /**
      * @dataProvider serversDataProvider
      *

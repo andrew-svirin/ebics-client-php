@@ -8,7 +8,6 @@ use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\Signature;
 use LogicException;
 use RuntimeException;
 
@@ -485,56 +484,41 @@ final class CryptService
     }
 
     /**
-     * Check keyring is valid.
+     * Check private key is valid.
      *
-     * @param Keyring $keyring
+     * @param string $privateKey
+     * @param string $password
      *
      * @return bool
      */
-    public function checkKeyring(Keyring $keyring): bool
+    public function checkPrivateKey(string $privateKey, string $password): bool
     {
         try {
-            $this->rsaFactory->createPrivate($keyring->getUserSignatureX()->getPrivateKey(), $keyring->getPassword());
+            $this->rsaFactory->createPrivate($privateKey, $password);
+
+            return true;
         } catch (LogicException $exception) {
             return false;
         }
-
-        return true;
     }
 
     /**
-     * Change password for keyring.
+     * Change password for private key.
      *
-     * @param Keyring $keyring
+     * @param string $privateKey
+     * @param string $oldPassword
      * @param string $newPassword
      *
-     * @return void
+     * @return array
      */
-    public function changeKeyringPassword(Keyring $keyring, string $newPassword): void
+    public function changePrivateKeyPassword(string $privateKey, string $oldPassword, string $newPassword): array
     {
         $pk = $this->rsaFactory->create();
 
-        $keys = $pk->changePassword(
-            $keyring->getUserSignatureA()->getPrivateKey(),
-            $keyring->getPassword(),
+        return $pk->changePassword(
+            $privateKey,
+            $oldPassword,
             $newPassword
         );
-        $keyring->setUserSignatureA(new Signature(Signature::TYPE_A, $keys['publickey'], $keys['privatekey']));
-
-        $keys = $pk->changePassword(
-            $keyring->getUserSignatureX()->getPrivateKey(),
-            $keyring->getPassword(),
-            $newPassword
-        );
-        $keyring->setUserSignatureX(new Signature(Signature::TYPE_X, $keys['publickey'], $keys['privatekey']));
-
-        $keys = $pk->changePassword(
-            $keyring->getUserSignatureE()->getPrivateKey(),
-            $keyring->getPassword(),
-            $newPassword
-        );
-        $keyring->setUserSignatureE(new Signature(Signature::TYPE_E, $keys['publickey'], $keys['privatekey']));
-
-        $keyring->setPassword($newPassword);
     }
 }

@@ -82,14 +82,14 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
         $publicKey = $x509->getPublicKey();
 
-        $certificate = $this->certificateFactory->createCertificateXFromDetails(
+        $signature = $this->signatureFactory->createSignatureXFromDetails(
             $publicKey->getModulus(),
             $publicKey->getExponent()
         );
 
-        $certificate->setCertificateContent($certificateContent ?? null);
+        $signature->setCertificateContent($certificateContent ?? null);
 
-        return $certificate;
+        return $signature;
     }
 
     public function retrieveEncryptionSignature(Document $document): SignatureInterface
@@ -114,13 +114,13 @@ final class OrderDataHandlerV3 extends OrderDataHandler
 
         $publicKey = $x509->getPublicKey();
 
-        $certificate = $this->certificateFactory->createCertificateEFromDetails(
+        $signature = $this->signatureFactory->createSignatureEFromDetails(
             $publicKey->getModulus(),
             $publicKey->getExponent()
         );
 
-        $certificate->setCertificateContent($certificateContent ?? null);
+        $signature->setCertificateContent($certificateContent ?? null);
 
-        return $certificate;
+        return $signature;
     }
 }

@@ -320,6 +320,7 @@ interface EbicsClientInterface
 
     /**
      * Download account information as PDF-file.
+     *
      * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
@@ -540,13 +541,6 @@ interface EbicsClientInterface
     public function HVT(HVTContext $hvtContext, DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
-     * Set certificate X509 Generator for French bank.
-     *
-     * @param X509GeneratorInterface|null $x509Generator
-     */
-    public function setX509Generator(X509GeneratorInterface $x509Generator = null): void;
-
-    /**
      * Set http client to subset later in the project.
      *
      * @param HttpClientInterface $httpClient
@@ -559,4 +553,20 @@ interface EbicsClientInterface
      * @return ResponseHandler
      */
     public function getResponseHandler(): ResponseHandler;
+
+    /**
+     * Check keyring is valid.
+     *
+     * @return bool
+     */
+    public function checkKeyring(): bool;
+
+    /**
+     * Change password for keyring.
+     *
+     * @param string $newPassword
+     *
+     * @return void
+     */
+    public function changeKeyringPassword(string $newPassword): void;
 }

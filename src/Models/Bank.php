@@ -21,13 +21,6 @@ final class Bank
     private string $url;
 
     /**
-     * Uses certificate.
-     *
-     * @var bool
-     */
-    private bool $isCertified = false;
-
-    /**
      * The Server Name of the bank.
      */
     private ?string $serverName = null;
@@ -62,22 +55,6 @@ final class Bank
     public function getUrl(): string
     {
         return $this->url;
-    }
-
-    /**
-     * @param bool $isCertified
-     */
-    public function setIsCertified(bool $isCertified): void
-    {
-        $this->isCertified = $isCertified;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCertified(): bool
-    {
-        return $this->isCertified;
     }
 
     /**

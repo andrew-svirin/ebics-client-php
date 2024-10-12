@@ -64,13 +64,15 @@ abstract class AbstractEbicsTestCase extends TestCase
         $credentials = $this->credentialsDataProvider($credentialsId);
 
         $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
-        $bank->setIsCertified($credentials['hostIsCertified']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
         $keyring = $this->loadKeyring($credentialsId, $version);
 
         $ebicsClient = new EbicsClient($bank, $user, $keyring);
-        $ebicsClient->setX509Generator($x509Generator);
+
+        if (null !== $x509Generator) {
+            $keyring->setCertificateGenerator($x509Generator);
+        }
 
         if (true === $fake) {
             $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));

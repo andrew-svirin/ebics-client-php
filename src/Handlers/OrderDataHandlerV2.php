@@ -113,7 +113,7 @@ abstract class OrderDataHandlerV2 extends OrderDataHandler
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
-        $certificate = $this->certificateFactory->createCertificateXFromDetails(
+        $signature = $this->signatureFactory->createSignatureXFromDetails(
             $this->bigIntegerFactory->create($modulusValueDe, 256),
             $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
@@ -122,10 +122,10 @@ abstract class OrderDataHandlerV2 extends OrderDataHandler
         if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
-            $certificate->setCertificateContent($x509CertificateValueDe);
+            $signature->setCertificateContent($x509CertificateValueDe);
         }
 
-        return $certificate;
+        return $signature;
     }
 
     public function retrieveEncryptionSignature(Document $document): SignatureInterface
@@ -140,7 +140,7 @@ abstract class OrderDataHandlerV2 extends OrderDataHandler
         $exponentValue = DOMHelper::safeItemValue($exponent);
         $exponentValueDe = base64_decode($exponentValue);
 
-        $certificate = $this->certificateFactory->createCertificateEFromDetails(
+        $signature = $this->signatureFactory->createSignatureEFromDetails(
             $this->bigIntegerFactory->create($modulusValueDe, 256),
             $this->bigIntegerFactory->create($exponentValueDe, 256)
         );
@@ -149,9 +149,9 @@ abstract class OrderDataHandlerV2 extends OrderDataHandler
         if ($x509Certificate instanceof DOMNodeList && 0 !== $x509Certificate->length) {
             $x509CertificateValue = DOMHelper::safeItemValue($x509Certificate);
             $x509CertificateValueDe = base64_decode($x509CertificateValue);
-            $certificate->setCertificateContent($x509CertificateValueDe);
+            $signature->setCertificateContent($x509CertificateValueDe);
         }
 
-        return $certificate;
+        return $signature;
     }
 }

@@ -145,7 +145,7 @@ final class SignatureFactory
      *
      * @return SignatureInterface
      */
-    public function createCertificateEFromDetails(
+    public function createSignatureEFromDetails(
         BigIntegerInterface $exponent,
         BigIntegerInterface $modulus
     ): SignatureInterface {
@@ -158,7 +158,7 @@ final class SignatureFactory
      *
      * @return SignatureInterface
      */
-    public function createCertificateXFromDetails(
+    public function createSignatureXFromDetails(
         BigIntegerInterface $exponent,
         BigIntegerInterface $modulus
     ): SignatureInterface {

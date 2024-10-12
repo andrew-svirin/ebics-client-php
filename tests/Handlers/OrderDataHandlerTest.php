@@ -34,7 +34,7 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         parent::setUp();
         $client = $this->setupClientV25(3);
         $this->setupKeys($client->getKeyring());
-        $this->orderDataHandler = new OrderDataHandlerV25($client->getBank(), $client->getUser(), $client->getKeyring());
+        $this->orderDataHandler = new OrderDataHandlerV25($client->getUser(), $client->getKeyring());
     }
 
     /**
@@ -54,13 +54,5 @@ class OrderDataHandlerTest extends AbstractEbicsTestCase
         $orderDataXPath = $this->prepareS001XPath($orderDataXML);
         $iniDatetime = $orderDataXPath->query("//S001:SignaturePubKeyInfo/S001:PubKeyValue/S001:TimeStamp")->item(0)->nodeValue;
         self::assertNotEmpty($iniDatetime);
-
-        // TODO: Extract public key.
-//      $ini2XML = clone $iniXML;
-//      $this->orderDataHandler->handleINI(
-//         $ini2XML,
-//         $this->keyring->getUserCertificateA(),
-//         DateTime::createFromFormat('Y-m-d\TH:i:s\Z', $iniDatetime)
-//      );
     }
 }

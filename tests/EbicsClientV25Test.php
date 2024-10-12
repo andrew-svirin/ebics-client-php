@@ -27,6 +27,42 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group check-keyring
+     */
+    public function testCheckKeyring(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV25($credentialsId, $x509Generator);
+
+        $this->assertTrue($client->checkKeyring());
+
+        $keyring = $client->getKeyring();
+        $keyring->setPassword('incorrect_password');
+
+        $this->assertFalse($client->checkKeyring());
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group change-keyring-password
+     */
+    public function testChangeKeyringPassword(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    {
+        $client = $this->setupClientV25($credentialsId, $x509Generator);
+
+        $client->changeKeyringPassword('some_new_password');
+
+        $hpb = $client->HPB();
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group HEV
      *
      * @param int $credentialsId
