@@ -41,7 +41,7 @@ final class RequestFactoryV3 extends RequestFactory
     {
         $this->authSignatureHandler = new AuthSignatureHandlerV3($keyring);
         $this->userSignatureHandler = new UserSignatureHandlerV3($user, $keyring);
-        $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyring);
+        $this->orderDataHandler = new OrderDataHandlerV3($user, $keyring);
         $this->digestResolver = new DigestResolverV3();
         parent::__construct($bank, $user, $keyring);
     }

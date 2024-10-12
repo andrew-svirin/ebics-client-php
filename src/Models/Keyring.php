@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Models;
 
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
 
 /**
@@ -32,6 +33,13 @@ final class Keyring
     private ?SignatureInterface $bankSignatureX = null;
     private ?SignatureInterface $bankSignatureE = null;
     private ?string $password = null;
+
+    /**
+     * Certificate generator.
+     *
+     * @var X509GeneratorInterface|null
+     */
+    private ?X509GeneratorInterface $x509Generator = null;
 
     /**
      * The Protocol Version.
@@ -130,6 +138,30 @@ final class Keyring
         }
 
         return $this->password;
+    }
+
+    /**
+     * @param X509GeneratorInterface $x509Generator
+     */
+    public function setCertificateGenerator(X509GeneratorInterface $x509Generator): void
+    {
+        $this->x509Generator = $x509Generator;
+    }
+
+    /**
+     * @return X509GeneratorInterface|null
+     */
+    public function getCertificateGenerator(): ?X509GeneratorInterface
+    {
+        return $this->x509Generator;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isCertified(): bool
+    {
+        return null !== $this->x509Generator;
     }
 
     public function setBankSignatureX(SignatureInterface $bankSignatureX = null): void

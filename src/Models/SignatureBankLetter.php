@@ -22,9 +22,8 @@ final class SignatureBankLetter
     private string $modulus;
     private string $keyHash;
     private int $modulusSize;
-    private ?string $certificateContent;
+    private ?string $certificateContent = null;
     private ?DateTime $certificateCreatedAt;
-    private bool $isCertified = false;
 
     public function __construct(
         string $type,
@@ -123,18 +122,10 @@ final class SignatureBankLetter
     }
 
     /**
-     * @param bool $isCertified
-     */
-    public function setIsCertified(bool $isCertified): void
-    {
-        $this->isCertified = $isCertified;
-    }
-
-    /**
      * @return bool
      */
     public function isCertified(): bool
     {
-        return $this->isCertified;
+        return null !== $this->certificateContent;
     }
 }

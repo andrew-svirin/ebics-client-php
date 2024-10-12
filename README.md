@@ -38,14 +38,19 @@ use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\EbicsClient;
+use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 $keyringRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
-// Use __IS_CERTIFIED__ true for EBICS 3.0 and/or French banks, otherwise use false.
 $keyringManager = new FileKeyringManager();
 $keyring = $keyringManager->loadKeyring($keyringRealPath, __PASSWORD__, __EBICS_VERSION__);
 $bank = new Bank(__HOST_ID__, __HOST_URL__);
-$bank->setIsCertified(__IS_CERTIFIED__);
+// Use __IS_CERTIFIED__ true for EBICS 3.0 and/or French banks, otherwise use false.
+if(__IS_CERTIFIED__) {
+    $certificateGenerator = (new BankX509Generator());
+    $certificateGenerator->setCertificateOptionsByBank($bank);
+    $keyring->setCertificateGenerator($certificateGenerator);
+}
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyring);
 ```
@@ -53,12 +58,10 @@ $client = new EbicsClient($bank, $user, $keyring);
 ### Note for French Bank and for Ebics 3.0
 
 If you are dealing with a French bank or with Ebics 3.0, you will need to create a X509 self-signed certificate. 
-You can achieve this by creating a class which extends the `AbstractX509Generator` and use `__IS_CERTIFIED__ = true`
+You can achieve this by creating a class which extends the `AbstractX509Generator`
 
 ```php
 <?php
-
-namespace App\Factories\X509;
 
 use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
 
@@ -86,7 +89,7 @@ class MyCompanyX509Generator extends AbstractX509Generator
     }
 }
 
-$client->setX509Generator(new MyCompanyX509Generator);
+$keyring->setCertificateGenerator(new MyCompanyX509Generator);
 ```
 
 ## Global process and interaction with Bank Department

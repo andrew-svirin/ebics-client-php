@@ -9,7 +9,6 @@ use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
 use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\CustomerH3K;
 use AndrewSvirin\Ebics\Models\CustomerHIA;
 use AndrewSvirin\Ebics\Models\CustomerINI;
@@ -34,21 +33,19 @@ abstract class OrderDataHandler
 {
     use H00XTrait;
 
-    private Bank $bank;
     private User $user;
     private Keyring $keyring;
     protected CryptService $cryptService;
-    protected SignatureFactory $certificateFactory;
+    protected SignatureFactory $signatureFactory;
     private CertificateX509Factory $certificateX509Factory;
     protected BigIntegerFactory $bigIntegerFactory;
 
-    public function __construct(Bank $bank, User $user, Keyring $keyring)
+    public function __construct(User $user, Keyring $keyring)
     {
-        $this->bank = $bank;
         $this->user = $user;
         $this->keyring = $keyring;
         $this->cryptService = new CryptService();
-        $this->certificateFactory = new SignatureFactory();
+        $this->signatureFactory = new SignatureFactory();
         $this->certificateX509Factory = new CertificateX509Factory();
         $this->bigIntegerFactory = new BigIntegerFactory();
     }
@@ -82,7 +79,7 @@ abstract class OrderDataHandler
         $xmlSignaturePubKeyInfo = $xml->createElement('SignaturePubKeyInfo');
         $xmlSignaturePubKeyOrderData->appendChild($xmlSignaturePubKeyInfo);
 
-        if ($this->bank->isCertified()) {
+        if ($this->keyring->isCertified()) {
             $this->handleX509Data($xmlSignaturePubKeyInfo, $xml, $certificateA);
         }
 
@@ -147,7 +144,7 @@ abstract class OrderDataHandler
         $xmlAuthenticationPubKeyInfo = $xml->createElement('AuthenticationPubKeyInfo');
         $xmlHIARequestOrderData->appendChild($xmlAuthenticationPubKeyInfo);
 
-        if ($this->bank->isCertified()) {
+        if ($this->keyring->isCertified()) {
             $this->handleX509Data($xmlAuthenticationPubKeyInfo, $xml, $certificateX);
         }
 
@@ -162,7 +159,7 @@ abstract class OrderDataHandler
         $xmlEncryptionPubKeyInfo = $xml->createElement('EncryptionPubKeyInfo');
         $xmlHIARequestOrderData->appendChild($xmlEncryptionPubKeyInfo);
 
-        if ($this->bank->isCertified()) {
+        if ($this->keyring->isCertified()) {
             $this->handleX509Data($xmlEncryptionPubKeyInfo, $xml, $certificateE);
         }
 

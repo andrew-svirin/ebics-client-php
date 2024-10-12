@@ -64,7 +64,6 @@ final class BankLetterService
             $certificateX509 = $this->certificateX509Factory->createFromContent($content);
             $startDate = $certificateX509->getValidityStartDate();
 
-            $signatureBankLetter->setIsCertified(true);
             $signatureBankLetter->setCertificateContent($content);
             $signatureBankLetter->setCertificateCreatedAt($startDate);
         }

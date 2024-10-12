@@ -29,7 +29,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     {
         $this->authSignatureHandler = new AuthSignatureHandlerV24($keyring);
         $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyring);
-        $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyring);
+        $this->orderDataHandler = new OrderDataHandlerV24($user, $keyring);
         $this->digestResolver = new DigestResolverV2();
         parent::__construct($bank, $user, $keyring);
     }

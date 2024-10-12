@@ -48,7 +48,7 @@ final class EbicsBankLetter
      */
     public function prepareBankLetter(Bank $bank, User $user, Keyring $keyring): BankLetter
     {
-        if ($bank->isCertified()) {
+        if ($keyring->isCertified()) {
             if (Keyring::VERSION_25 === $keyring->getVersion()) {
                 $digestResolver = new DigestResolverV2();
             } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {

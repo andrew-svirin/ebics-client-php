@@ -1,5 +1,7 @@
 ## 2.2
-* Change signature for KeyringManagerInterface. Moved version from Bank to Keyring.
+
+* Change signature for KeyringManagerInterface. Attributes `IsCertified`, `Version` moved from Bank to Keyring.
+* Change signature for EbicsInterface. Attributes `X509Generator`, moved from EbicsClient to Keyring `certificateGenerator`.
 * Remove UTF-8 encoding for content.
 * Support EBICS TS mode.
 * Add 'xml_files' parser for order data.

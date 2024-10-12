@@ -12,7 +12,6 @@ use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
@@ -74,7 +73,6 @@ final class EbicsClient implements EbicsClientInterface
     private DocumentFactory $documentFactory;
     private OrderResultFactory $orderResultFactory;
     private SignatureFactory $signatureFactory;
-    private ?X509GeneratorInterface $x509Generator;
     private HttpClientInterface $httpClient;
     private TransactionFactory $transactionFactory;
     private SegmentFactory $segmentFactory;
@@ -94,15 +92,15 @@ final class EbicsClient implements EbicsClientInterface
 
         if (Keyring::VERSION_24 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV24($bank, $user, $keyring);
-            $this->orderDataHandler = new OrderDataHandlerV24($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV24($user, $keyring);
             $this->responseHandler = new ResponseHandlerV24();
         } elseif (Keyring::VERSION_25 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV25($bank, $user, $keyring);
-            $this->orderDataHandler = new OrderDataHandlerV25($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV25($user, $keyring);
             $this->responseHandler = new ResponseHandlerV25();
         } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV3($bank, $user, $keyring);
-            $this->orderDataHandler = new OrderDataHandlerV3($bank, $user, $keyring);
+            $this->orderDataHandler = new OrderDataHandlerV3($user, $keyring);
             $this->responseHandler = new ResponseHandlerV3();
         } else {
             throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
@@ -1458,14 +1456,6 @@ final class EbicsClient implements EbicsClientInterface
     /**
      * @inheritDoc
      */
-    public function setX509Generator(X509GeneratorInterface $x509Generator = null): void
-    {
-        $this->x509Generator = $x509Generator;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function setHttpClient(HttpClientInterface $httpClient): void
     {
         $this->httpClient = $httpClient;
@@ -1497,7 +1487,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         if (!$signature || $createNew) {
-            $newSignature = $this->createUserSignature($type);
+            $newSignature = $this->generateUserSignature($type);
         }
 
         return $newSignature ?? $signature;
@@ -1511,28 +1501,28 @@ final class EbicsClient implements EbicsClientInterface
      * @return SignatureInterface
      * @throws EbicsException
      */
-    private function createUserSignature(string $type): SignatureInterface
+    private function generateUserSignature(string $type): SignatureInterface
     {
         switch ($type) {
             case SignatureInterface::TYPE_A:
                 $signature = $this->signatureFactory->createSignatureAFromKeys(
                     $this->cryptService->generateKeys($this->keyring->getPassword()),
                     $this->keyring->getPassword(),
-                    $this->bank->isCertified() ? $this->x509Generator : null
+                    $this->keyring->getCertificateGenerator()
                 );
                 break;
             case SignatureInterface::TYPE_E:
                 $signature = $this->signatureFactory->createSignatureEFromKeys(
                     $this->cryptService->generateKeys($this->keyring->getPassword()),
                     $this->keyring->getPassword(),
-                    $this->bank->isCertified() ? $this->x509Generator : null
+                    $this->keyring->getCertificateGenerator()
                 );
                 break;
             case SignatureInterface::TYPE_X:
                 $signature = $this->signatureFactory->createSignatureXFromKeys(
                     $this->cryptService->generateKeys($this->keyring->getPassword()),
                     $this->keyring->getPassword(),
-                    $this->bank->isCertified() ? $this->x509Generator : null
+                    $this->keyring->getCertificateGenerator()
                 );
                 break;
             default:
@@ -1542,8 +1532,72 @@ final class EbicsClient implements EbicsClientInterface
         return $signature;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getResponseHandler(): ResponseHandler
     {
         return $this->responseHandler;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function checkKeyring(): bool
+    {
+        return $this->cryptService->checkPrivateKey(
+            $this->keyring->getUserSignatureX()->getPrivateKey(),
+            $this->keyring->getPassword()
+        );
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function changeKeyringPassword(string $newPassword): void
+    {
+        $keys = $this->cryptService->changePrivateKeyPassword(
+            $this->keyring->getUserSignatureA()->getPrivateKey(),
+            $this->keyring->getPassword(),
+            $newPassword
+        );
+
+        $signature = $this->signatureFactory->createSignatureAFromKeys(
+            $keys,
+            $newPassword,
+            $this->keyring->getCertificateGenerator()
+        );
+
+        $this->keyring->setUserSignatureA($signature);
+
+        $keys = $this->cryptService->changePrivateKeyPassword(
+            $this->keyring->getUserSignatureX()->getPrivateKey(),
+            $this->keyring->getPassword(),
+            $newPassword
+        );
+
+        $signature = $this->signatureFactory->createSignatureXFromKeys(
+            $keys,
+            $newPassword,
+            $this->keyring->getCertificateGenerator()
+        );
+
+        $this->keyring->setUserSignatureX($signature);
+
+        $keys = $this->cryptService->changePrivateKeyPassword(
+            $this->keyring->getUserSignatureE()->getPrivateKey(),
+            $this->keyring->getPassword(),
+            $newPassword
+        );
+
+        $signature = $this->signatureFactory->createSignatureEFromKeys(
+            $keys,
+            $newPassword,
+            $this->keyring->getCertificateGenerator()
+        );
+
+        $this->keyring->setUserSignatureE($signature);
+
+        $this->keyring->setPassword($newPassword);
     }
 }
