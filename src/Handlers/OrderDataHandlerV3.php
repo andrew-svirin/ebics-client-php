@@ -73,12 +73,13 @@ final class OrderDataHandlerV3 extends OrderDataHandler
             throw new RuntimeException('Version 3.0 is not supported for not certified banks yet.');
         }
 
+        $certificateContent
+            = "-----BEGIN CERTIFICATE-----\n".
+            chunk_split($x509CertificateValue, 64).
+            "-----END CERTIFICATE-----\n";
+
         $x509 = new X509();
-        $cert = $x509->loadX509($x509CertificateValueDe);
-        $certificateContent = $x509->saveX509($cert);
-        if (false === $certificateContent) {
-            $certificateContent = null;
-        }
+        $x509->loadX509($x509CertificateValueDe);
 
         $publicKey = $x509->getPublicKey();
 
@@ -87,7 +88,7 @@ final class OrderDataHandlerV3 extends OrderDataHandler
             $publicKey->getExponent()
         );
 
-        $signature->setCertificateContent($certificateContent ?? null);
+        $signature->setCertificateContent($certificateContent);
 
         return $signature;
     }
@@ -105,12 +106,13 @@ final class OrderDataHandlerV3 extends OrderDataHandler
             throw new RuntimeException('Version 3.0 is not supported for not certified banks yet.');
         }
 
+        $certificateContent
+            = "-----BEGIN CERTIFICATE-----\n".
+            chunk_split($x509CertificateValue, 64).
+            "-----END CERTIFICATE-----\n";
+
         $x509 = new X509();
-        $cert = $x509->loadX509($x509CertificateValueDe);
-        $certificateContent = $x509->saveX509($cert);
-        if (false === $certificateContent) {
-            $certificateContent = null;
-        }
+        $x509->loadX509($x509CertificateValueDe);
 
         $publicKey = $x509->getPublicKey();
 
@@ -119,7 +121,7 @@ final class OrderDataHandlerV3 extends OrderDataHandler
             $publicKey->getExponent()
         );
 
-        $signature->setCertificateContent($certificateContent ?? null);
+        $signature->setCertificateContent($certificateContent);
 
         return $signature;
     }

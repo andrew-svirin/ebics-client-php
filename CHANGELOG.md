@@ -12,6 +12,7 @@
 * Add methods `XEK` order type for EBICS 3.0
 * Add method to check keyring.
 * Add method to change keyring password.
+* Changed logic for certificate storing into keyring.
 
 ## 2.1
 
