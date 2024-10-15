@@ -11,7 +11,8 @@ PHP library to communicate with a bank through EBICS protocol.
 Supported PHP versions - PHP 7.2 - PHP 8.3  
 Support Ebics server versions: 2.4 (partially), 2.5 (default), 3.0
 
-💥 Application can be used as Standalone Service in Docker Container and be interacted with REST API - https://www.youtube.com/watch?v=756lkDwKtO4
+💥 Application can be used as Standalone Service in Docker Container and be interacted with REST API - https://www.youtube.com/watch?v=wUztEHLksVM
+![ebics-server-standalone.gif](doc%2Febics-server-standalone.gif)
 
 ## License
 
