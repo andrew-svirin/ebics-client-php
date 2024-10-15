@@ -40,6 +40,7 @@ final class CustomerDirectDebitBuilder
      * least for 15 days. Used for rejecting duplicated transactions (max length: 35 characters)
      * @param string|null $paymentReference Overwrite default payment reference -
      * visible on creditors bank statement (max length: 35 characters)
+     * @param string $localInstrument Define whether the payment in question is Core or B2B: (CORE | B2B)
      * @return $this
      * @throws \DOMException
      */
@@ -53,7 +54,8 @@ final class CustomerDirectDebitBuilder
         DateTime $collectionDate = null,
         bool $batchBooking = true,
         string $msgId = null,
-        string $paymentReference = null
+        string $paymentReference = null,
+        string $localInstrument = 'CORE'
     ): CustomerDirectDebitBuilder {
         $this->instance = new CustomerDirectDebit();
         $now = new DateTime();
@@ -143,7 +145,7 @@ final class CustomerDirectDebitBuilder
         $xmlPmtTpInf->appendChild($xmlLclInstrm);
 
         $xmlCd = $this->instance->createElement('Cd');
-        $xmlCd->nodeValue = 'CORE';
+        $xmlCd->nodeValue = $localInstrument;
         $xmlLclInstrm->appendChild($xmlCd);
 
         $xmlSeqTp = $this->instance->createElement('SeqTp');
