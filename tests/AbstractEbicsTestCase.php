@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Tests;
 use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
@@ -15,6 +14,7 @@ use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
 use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -33,32 +33,28 @@ abstract class AbstractEbicsTestCase extends TestCase
 
     protected function setupClientV24(
         int $credentialsId,
-        X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Keyring::VERSION_24, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_24, $credentialsId, $fake);
     }
 
     protected function setupClientV25(
         int $credentialsId,
-        X509GeneratorInterface $x509Generator = null,
         $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Keyring::VERSION_25, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_25, $credentialsId, $fake);
     }
 
     protected function setupClientV30(
         int $credentialsId,
-        X509GeneratorInterface $x509Generator = null,
         bool $fake = false
     ): EbicsClientInterface {
-        return $this->setupClient(Keyring::VERSION_30, $credentialsId, $x509Generator, $fake);
+        return $this->setupClient(Keyring::VERSION_30, $credentialsId, $fake);
     }
 
     private function setupClient(
         string $version,
         int $credentialsId,
-        X509GeneratorInterface $x509Generator = null,
         bool $fake = false
     ): EbicsClientInterface {
         $credentials = $this->credentialsDataProvider($credentialsId);
@@ -70,7 +66,9 @@ abstract class AbstractEbicsTestCase extends TestCase
 
         $ebicsClient = new EbicsClient($bank, $user, $keyring);
 
-        if (null !== $x509Generator) {
+        if ($credentials['hostIsCertified']) {
+            $x509Generator = new BankX509Generator();
+            $x509Generator->setCertificateOptionsByBank($bank);
             $keyring->setCertificateGenerator($x509Generator);
         }
 

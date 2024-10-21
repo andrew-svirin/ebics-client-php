@@ -79,12 +79,6 @@ class MyCompanyX509Generator extends AbstractX509Generator
                     'id-at-commonName' => 'yourwebsite.tld',
                     ]
                 ],
-                'extensions' => [
-                    'id-ce-subjectAltName' => [
-                    'value' => [
-                        'dNSName' => '*.yourwebsite.tld',
-                    ]
-                ],
             ],
         ];
     }

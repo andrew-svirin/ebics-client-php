@@ -3,10 +3,8 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\Contexts\FULContext;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
-use AndrewSvirin\Ebics\Tests\Factories\X509\WeBankX509Generator;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
 
@@ -28,13 +26,12 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHEV(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHEV(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV24($credentialsId, $x509Generator, $codes['HEV']['fake']);
+        $client = $this->setupClientV24($credentialsId, $codes['HEV']['fake']);
         $hev = $client->HEV();
 
         $responseHandler = $client->getResponseHandler();
@@ -51,13 +48,12 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testINI(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testINI(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV24($credentialsId, $x509Generator, $codes['INI']['fake']);
+        $client = $this->setupClientV24($credentialsId, $codes['INI']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $userExists = $client->getKeyring()->getUserSignatureA();
@@ -83,13 +79,12 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHIA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHIA(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV24($credentialsId, $x509Generator, $codes['HIA']['fake']);
+        $client = $this->setupClientV24($credentialsId, $codes['HIA']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $bankExists = $client->getKeyring()->getUserSignatureX();
@@ -117,13 +112,12 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHPB(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHPB(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV24($credentialsId, $x509Generator, $codes['HPB']['fake']);
+        $client = $this->setupClientV24($credentialsId, $codes['HPB']['fake']);
 
         $this->assertExceptionCode($codes['HPB']['code']);
 
@@ -144,14 +138,13 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testFDL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testFDL(int $credentialsId, array $codes)
     {
         foreach ($codes['FDL'] as $fileFormat => $code) {
-            $client = $this->setupClientV24($credentialsId, $x509Generator, $code['fake']);
+            $client = $this->setupClientV24($credentialsId, $code['fake']);
 
             $this->assertExceptionCode($code['code']);
 
@@ -196,15 +189,14 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testFUL(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testFUL(int $credentialsId, array $codes)
     {
         $documentFactory = new DocumentFactory();
         foreach ($codes['FUL'] as $ebcdic => $code) {
-            $client = $this->setupClientV24($credentialsId, $x509Generator, $code['fake']);
+            $client = $this->setupClientV24($credentialsId, $code['fake']);
 
             $this->assertExceptionCode($code['code']);
 
@@ -277,7 +269,6 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                         ],
                     ],
                 ],
-                new WeBankX509Generator(),
             ],
         ];
     }

@@ -7,14 +7,9 @@ use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Tests\Factories\X509\CreditSuisseX509Generator;
-use AndrewSvirin\Ebics\Tests\Factories\X509\ZKBX509Generator;
 use DateTime;
-use ReflectionClass;
 
 /**
  * Class EbicsClientTest.
@@ -31,9 +26,9 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @group check-keyring
      */
-    public function testCheckKeyring(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testCheckKeyring(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator);
+        $client = $this->setupClientV30($credentialsId);
 
         $this->assertTrue($client->checkKeyring());
 
@@ -48,9 +43,9 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @group change-keyring-password
      */
-    public function testChangeKeyringPassword(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testChangeKeyringPassword(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator);
+        $client = $this->setupClientV30($credentialsId);
 
         $client->changeKeyringPassword('some_new_password');
 
@@ -71,13 +66,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHEV(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHEV(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HEV']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HEV']['fake']);
         $hev = $client->HEV();
 
         $responseHandler = $client->getResponseHandler();
@@ -95,13 +89,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testINI(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testINI(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['INI']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['INI']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $userExists = $client->getKeyring()->getUserSignatureA();
@@ -128,13 +121,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHIA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHIA(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HIA']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HIA']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $bankExists = $client->getKeyring()->getUserSignatureX();
@@ -161,17 +153,16 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testH3K(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testH3K(int $credentialsId, array $codes)
     {
         if (false === isset($codes['H3K'])) {
             $this->markTestSkipped(sprintf('No H3K test for bank credential %d', $credentialsId));
         }
 
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['H3K']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['H3K']['fake']);
 
         // Check that keyring is empty and or wait on success or wait on exception.
         $bankExists = $client->getKeyring()->getUserSignatureX();
@@ -200,13 +191,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHPB(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHPB(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HPB']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HPB']['fake']);
 
         $this->assertExceptionCode($codes['HPB']['code']);
 
@@ -228,13 +218,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHKD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHKD(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HKD']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HKD']['fake']);
 
         $this->assertExceptionCode($codes['HKD']['code']);
         $hkd = $client->HKD();
@@ -259,13 +248,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHPD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHPD(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HPD']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HPD']['fake']);
 
         $this->assertExceptionCode($codes['HPD']['code']);
         $hpd = $client->HPD();
@@ -290,13 +278,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHAA(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHAA(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HAA']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HAA']['fake']);
 
         $this->assertExceptionCode($codes['HAA']['code']);
         $haa = $client->HAA();
@@ -321,13 +308,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testBTD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testBTD(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['BTD']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['BTD']['fake']);
 
         $context = new BTDContext();
         $context->setServiceName('PSR');
@@ -359,13 +345,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testPTK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testPTK(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['PTK']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['PTK']['fake']);
 
         $this->assertExceptionCode($codes['PTK']['code']);
         $ptk = $client->PTK();
@@ -390,13 +375,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testZ54(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testZ54(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['Z54']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['Z54']['fake']);
 
         $this->assertExceptionCode($codes['Z54']['code']);
         $z54 = $client->Z54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
@@ -421,13 +405,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testZSR(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testZSR(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['ZSR']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['ZSR']['fake']);
 
         $this->assertExceptionCode($codes['ZSR']['code']);
         $zsr = $client->ZSR(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
@@ -452,13 +435,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testXEK(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testXEK(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['XEK']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['XEK']['fake']);
 
         $this->assertExceptionCode($codes['XEK']['code']);
         $xek = $client->XEK(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
@@ -483,13 +465,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testBTU(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testBTU(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['BTU']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['BTU']['fake']);
 
         $this->assertExceptionCode($codes['BTU']['code']);
 
@@ -527,13 +508,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testXE3(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testXE3(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['XE3']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['XE3']['fake']);
 
         $this->assertExceptionCode($codes['XE3']['code']);
 
@@ -562,13 +542,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testYCT(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testYCT(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['YCT']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['YCT']['fake']);
 
         $this->assertExceptionCode($codes['YCT']['code']);
 
@@ -597,13 +576,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHVU(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHVU(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HVU']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HVU']['fake']);
 
         $this->assertExceptionCode($codes['HVU']['code']);
         $hvu = $client->HVU();
@@ -628,13 +606,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHVZ(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHVZ(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HVZ']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HVZ']['fake']);
 
         $this->assertExceptionCode($codes['HVZ']['code']);
         $hvz = $client->HVZ();
@@ -659,13 +636,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHVE(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHVE(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HVE']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HVE']['fake']);
 
         $this->assertExceptionCode($codes['HVE']['code']);
 
@@ -701,13 +677,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHVD(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHVD(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HVD']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HVD']['fake']);
 
         $this->assertExceptionCode($codes['HVD']['code']);
 
@@ -743,13 +718,12 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-     * @param X509GeneratorInterface|null $x509Generator
      *
      * @covers
      */
-    public function testHVT(int $credentialsId, array $codes, X509GeneratorInterface $x509Generator = null)
+    public function testHVT(int $credentialsId, array $codes)
     {
-        $client = $this->setupClientV30($credentialsId, $x509Generator, $codes['HVT']['fake']);
+        $client = $this->setupClientV30($credentialsId, $codes['HVT']['fake']);
 
         $this->assertExceptionCode($codes['HVT']['code']);
 
@@ -809,7 +783,6 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],
-                new CreditSuisseX509Generator(),
             ],
             [
                 7, // Credentials Id.
@@ -835,7 +808,6 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],
-                new ZKBX509Generator(),
             ],
         ];
     }
