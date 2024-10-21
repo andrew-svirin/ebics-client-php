@@ -90,9 +90,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createVMK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -100,9 +98,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -128,10 +124,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -148,9 +143,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createSTA(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -158,9 +151,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -186,10 +177,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -206,9 +196,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createC52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -216,9 +204,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -244,10 +230,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -264,9 +249,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createC53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -274,9 +257,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -302,10 +283,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -322,9 +302,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createC54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -332,9 +310,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -360,10 +336,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -380,9 +355,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createZ52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -390,9 +363,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -418,10 +389,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -438,9 +408,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createZ53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -448,9 +416,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -476,10 +442,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -496,9 +461,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createZ54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -506,9 +469,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -534,10 +495,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -551,9 +511,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createZSR(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.5');
     }
@@ -561,9 +519,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createXEK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.5');
     }

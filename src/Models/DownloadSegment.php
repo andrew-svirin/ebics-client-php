@@ -87,7 +87,8 @@ final class DownloadSegment extends Segment
         if ($this->isLastSegmentNumber()) {
             throw new \RuntimeException('There is a last segment');
         }
-        return $this->segmentNumber++;
+
+        return $this->segmentNumber + 1;
     }
 
     public function isLastNextSegmentNumber(): bool
@@ -95,6 +96,9 @@ final class DownloadSegment extends Segment
         if ($this->isLastSegmentNumber()) {
             throw new \RuntimeException('There is a last segment');
         }
-        return $this->segmentNumber++ >= $this->numSegments;
+
+        $nextSegment = $this->segmentNumber + 1;
+
+        return $nextSegment >= $this->numSegments;
     }
 }

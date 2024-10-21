@@ -245,12 +245,12 @@ abstract class ResponseHandler
         $numSegments = $this->retrieveH00XNumSegments($response);
         $segmentNumber = $this->retrieveH00XSegmentNumber($response);
         $orderDataEncrypted = $this->retrieveH00XOrderData($response);
-        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
-            $keyring,
-            $orderDataEncrypted,
-            $transactionKey
-        );
-        $orderData = $this->zipService->uncompress($orderDataCompressed);
+//        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
+//            $keyring,
+//            $orderDataEncrypted,
+//            $transactionKey
+//        );
+//        $orderData = $this->zipService->uncompress($orderDataCompressed);
 
         $segment = $this->segmentFactory->createDownloadSegment();
         $segment->setResponse($response);
@@ -259,7 +259,7 @@ abstract class ResponseHandler
         $segment->setTransactionKey($transactionKey);
         $segment->setNumSegments((int)$numSegments);
         $segment->setSegmentNumber((int)$segmentNumber);
-        $segment->setOrderData($orderData);
+        $segment->setOrderData($orderDataEncrypted);
 
         return $segment;
     }

@@ -15,6 +15,7 @@ use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
+use AndrewSvirin\Ebics\Services\FakerHttpClient;
 use AndrewSvirin\Ebics\Services\FileKeyringManager;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;

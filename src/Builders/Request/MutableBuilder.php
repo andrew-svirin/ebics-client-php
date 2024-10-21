@@ -51,9 +51,7 @@ final class MutableBuilder
     {
         if (null !== $segmentNumber) {
             $xmlSegmentNumber = $this->dom->createElement('SegmentNumber');
-            if ($isLastSegment) {
-                $xmlSegmentNumber->setAttribute('lastSegment', 'true');
-            }
+            $xmlSegmentNumber->setAttribute('lastSegment', $isLastSegment ? 'true' : 'false');
             $xmlSegmentNumber->nodeValue = (string)$segmentNumber;
             $this->instance->appendChild($xmlSegmentNumber);
         }

@@ -339,18 +339,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHPD(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHPD(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -376,10 +371,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -393,18 +387,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHKD(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHKD(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -430,10 +419,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -450,9 +438,7 @@ abstract class RequestFactory
     public function createPTK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -460,9 +446,7 @@ abstract class RequestFactory
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -488,10 +472,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -505,18 +488,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHTD(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHTD(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -542,10 +520,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -564,9 +541,7 @@ abstract class RequestFactory
         string $fileFormat,
         string $countryCode,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
@@ -576,9 +551,7 @@ abstract class RequestFactory
             ->setFileFormat($fileFormat)
             ->setCountryCode($countryCode)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setEndDateTime($endDateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -609,10 +582,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -701,18 +673,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHAA(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHAA(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -738,10 +705,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -756,9 +722,7 @@ abstract class RequestFactory
         DateTimeInterface $dateTime,
         BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createBTU(
@@ -805,7 +769,7 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createTransferTransfer(
+    public function createTransferUpload(
         string $transactionId,
         string $transactionKey,
         string $orderData,
@@ -846,84 +810,100 @@ abstract class RequestFactory
         return $request;
     }
 
+    /**
+     * @throws EbicsException
+     */
+    public function createTransferDownload(
+        string $transactionId,
+        int $segmentNumber,
+        bool $isLastSegment = null
+    ): Request {
+        $context = (new RequestContext())
+            ->setBank($this->bank)
+            ->setTransactionId($transactionId)
+            ->setSegmentNumber($segmentNumber)
+            ->setIsLastSegment($isLastSegment);
+
+        $request = $this
+            ->createRequestBuilderInstance()
+            ->addContainerSecured(function (XmlBuilder $builder) use ($context) {
+                $builder->addHeader(function (HeaderBuilder $builder) use ($context) {
+                    $builder->addStatic(function (StaticBuilder $builder) use ($context) {
+                        $builder
+                            ->addHostId($context->getBank()->getHostId())
+                            ->addTransactionId($context->getTransactionId());
+                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                        $builder
+                            ->addTransactionPhase(MutableBuilder::PHASE_TRANSFER)
+                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                    });
+                })->addBody();
+            })
+            ->popInstance();
+
+        $this->authSignatureHandler->handle($request);
+
+        return $request;
+    }
+
     abstract public function createVMK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createSTA(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createC52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createC53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createC54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createZ52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createZ53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createZ54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createZSR(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createXEK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request;
 
     abstract public function createCCT(
@@ -967,18 +947,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHVU(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHVU(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -1004,10 +979,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -1021,18 +995,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHVZ(
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHVZ(DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment);
+            ->setDateTime($dateTime);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -1058,10 +1027,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -1141,19 +1109,13 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createHVD(
-        HVDContext $hvdContext,
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHVD(HVDContext $hvdContext, DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment)
             ->setHVDContext($hvdContext);
 
         $request = $this
@@ -1180,10 +1142,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })
@@ -1194,19 +1155,13 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createHVT(
-        HVTContext $hvtContext,
-        DateTimeInterface $dateTime,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
-    ): Request {
+    public function createHVT(HVTContext $hvtContext, DateTimeInterface $dateTime): Request
+    {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
             ->setDateTime($dateTime)
-            ->setSegmentNumber($segmentNumber)
-            ->setIsLastSegment($isLastSegment)
             ->setHVTContext($hvtContext);
 
         $request = $this
@@ -1233,10 +1188,9 @@ abstract class RequestFactory
                                 $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0200);
-                    })->addMutable(function (MutableBuilder $builder) use ($context) {
+                    })->addMutable(function (MutableBuilder $builder) {
                         $builder
-                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION)
-                            ->addSegmentNumber($context->getSegmentNumber(), $context->getIsLastSegment());
+                            ->addTransactionPhase(MutableBuilder::PHASE_INITIALIZATION);
                     });
                 })->addBody();
             })

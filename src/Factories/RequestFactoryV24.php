@@ -71,9 +71,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createVMK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -81,9 +79,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createSTA(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -91,9 +87,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createC52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -101,9 +95,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createC53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -111,9 +103,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createC54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -121,9 +111,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createZ52(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -131,9 +119,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createZ53(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -141,9 +127,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createZ54(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -151,9 +135,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createZSR(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
@@ -161,9 +143,7 @@ final class RequestFactoryV24 extends RequestFactoryV2
     public function createXEK(
         DateTimeInterface $dateTime,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }

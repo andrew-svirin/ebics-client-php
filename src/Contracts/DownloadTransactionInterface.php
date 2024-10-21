@@ -17,4 +17,6 @@ interface DownloadTransactionInterface extends TransactionInterface
     public function getReceipt(): Response;
 
     public function getNumSegments(): int;
+
+    public function getOrderData(): string;
 }

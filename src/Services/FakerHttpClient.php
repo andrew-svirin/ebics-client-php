@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace AndrewSvirin\Ebics\Services;
 
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
@@ -8,16 +8,13 @@ use AndrewSvirin\Ebics\Models\Http\Response;
 use LogicException;
 
 /**
- * Class EbicsClientTest.
+ * Class FakerHttpClient.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
- *
- * @group ebics-client
  */
-class FakerHttpClient implements HttpClientInterface
+final class FakerHttpClient implements HttpClientInterface
 {
-
     /**
      * @var string
      */
@@ -33,14 +30,29 @@ class FakerHttpClient implements HttpClientInterface
         Request $request
     ): Response {
         $requestContent = $request->getContent();
-        if (preg_match('/<OrderType>(?<order_type>.*)<\/OrderType>/', $requestContent, $matches) && !empty($matches)) {
+
+        $orderTypeMatches = [];
+        $orderTypeMatch = preg_match('/<OrderType>(?<order_type>.*)<\/OrderType>/', $requestContent, $orderTypeMatches);
+
+        if ($orderTypeMatch) {
+            $fileFormatMatches = [];
             preg_match('/<FileFormat.*>(?<file_format>.*)<\/FileFormat>/', $requestContent, $fileFormatMatches);
-            return $this->fixtureOrderType($matches['order_type'], [
-                'file_format' => $fileFormatMatches['file_format'] ?? null,
-            ]);
-        } elseif (preg_match('/<TransactionPhase>(?<transaction_phase>.*)<\/TransactionPhase>/', $requestContent,
-                $matches) || empty($matches)) {
-            return $this->fixtureTransactionPhase($matches['transaction_phase']);
+
+            return $this->fixtureOrderType(
+                $orderTypeMatches['order_type'],
+                ['file_format' => $fileFormatMatches['file_format'] ?? null]
+            );
+        }
+
+        $transactionPhaseMatches = [];
+        $transactionPhaseMatch = preg_match(
+            '/<TransactionPhase>(?<transaction_phase>.*)<\/TransactionPhase>/',
+            $requestContent,
+            $transactionPhaseMatches
+        );
+
+        if ($transactionPhaseMatch) {
+            return $this->fixtureTransactionPhase($transactionPhaseMatches['transaction_phase']);
         } else {
             return new Response();
         }
@@ -63,60 +75,43 @@ class FakerHttpClient implements HttpClientInterface
                 $fileName = sprintf('fdl.%s.xml', $options['file_format']);
                 break;
             case 'C53':
-                $fileName = 'c53.xml';
-                break;
             case 'STA':
-                $fileName = 'sta.xml';
-                break;
             case 'CCT':
-                $fileName = 'cct.xml';
-                break;
             case 'CDD':
-                $fileName = 'cdd.xml';
-                break;
             case 'CDB':
-                $fileName = 'cdb.xml';
+                $fileName = strtolower($orderType).'.xml';
                 break;
             default:
                 throw new LogicException(sprintf('Faked order type `%s` not supported.', $orderType));
         }
 
-        $fixturePath = $this->fixturesDir . '/' . $fileName;
-
-        if (!is_file($fixturePath)) {
-            throw new LogicException('Fixtures file does not exists.');
-        }
-
-        $response = new Response();
-
-        $responseContent = file_get_contents($fixturePath);
-
-        $response->loadXML($responseContent);
-
-        return $response;
+        return $this->readFixture($fileName);
     }
 
     /**
      * Fake transaction phase responses.
      *
-     * @param $transactionPhase
+     * @param string $transactionPhase
      *
      * @return Response
      */
-    private function fixtureTransactionPhase($transactionPhase): Response
+    private function fixtureTransactionPhase(string $transactionPhase): Response
     {
         switch ($transactionPhase) {
             case 'Receipt':
-                $fileName = 'receipt.xml';
-                break;
             case 'Transfer':
-                $fileName = 'transfer.xml';
+                $fileName = strtolower($transactionPhase).'.xml';
                 break;
             default:
                 throw new LogicException(sprintf('Faked transaction phase `%s` not supported.', $transactionPhase));
         }
 
-        $fixturePath = $this->fixturesDir . '/' . $fileName;
+        return $this->readFixture($fileName);
+    }
+
+    private function readFixture(string $fileName): Response
+    {
+        $fixturePath = $this->fixturesDir.'/'.$fileName;
 
         if (!is_file($fixturePath)) {
             throw new LogicException('Fixtures file does not exists.');
@@ -125,6 +120,10 @@ class FakerHttpClient implements HttpClientInterface
         $response = new Response();
 
         $responseContent = file_get_contents($fixturePath);
+
+        if (!is_string($responseContent)) {
+            throw new LogicException('Response content is not valid.');
+        }
 
         $response->loadXML($responseContent);
 

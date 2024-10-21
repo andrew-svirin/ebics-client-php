@@ -21,9 +21,7 @@ abstract class RequestFactoryV2 extends RequestFactory
         DateTimeInterface $dateTime,
         BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null,
-        int $segmentNumber = null,
-        bool $isLastSegment = null
+        DateTimeInterface $endDateTime = null
     ): Request {
         throw new LogicException('Method for EBICS 3.0');
     }

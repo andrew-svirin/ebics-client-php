@@ -18,10 +18,15 @@ final class DownloadTransaction extends Transaction implements DownloadTransacti
      */
     private array $segments = [];
     private Response $receipt;
+    private string $orderData;
 
     public function getId(): ?string
     {
         $lastSegment = $this->getLastSegment();
+
+        if (empty($lastSegment)) {
+            return null;
+        }
 
         return $lastSegment->getTransactionId();
     }
@@ -72,13 +77,13 @@ final class DownloadTransaction extends Transaction implements DownloadTransacti
         return $this->receipt;
     }
 
+    public function setOrderData(string $orderData): string
+    {
+        return $this->orderData = $orderData;
+    }
+
     public function getOrderData(): string
     {
-        $orderData = '';
-        foreach ($this->segments as $segment) {
-            $orderData .= $segment->getOrderData();
-        }
-
-        return $orderData;
+        return $this->orderData;
     }
 }

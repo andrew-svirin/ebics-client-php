@@ -286,14 +286,12 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $btfContext, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $btfContext, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createBTD(
                     $dateTime,
                     $btfContext,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -336,12 +334,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHPD(
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($dateTime) {
+                return $this->requestFactory->createHPD($dateTime);
             }
         );
 
@@ -359,12 +353,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHKD(
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($dateTime) {
+                return $this->requestFactory->createHKD($dateTime);
             }
         );
 
@@ -382,12 +372,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHTD(
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($dateTime) {
+                return $this->requestFactory->createHTD($dateTime);
             }
         );
 
@@ -408,13 +394,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createPTK(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -433,12 +417,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHAA(
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($dateTime) {
+                return $this->requestFactory->createHAA($dateTime);
             }
         );
 
@@ -459,13 +439,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createVMK(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -487,13 +465,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createSTA(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -517,13 +493,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createC52(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -547,13 +521,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createC53(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -577,13 +549,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createC54(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -607,13 +577,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createZ52(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -637,13 +605,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createZ53(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -667,13 +633,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createZ54(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -695,13 +659,11 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createZSR(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
@@ -723,18 +685,16 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime, $startDateTime, $endDateTime) {
+            function () use ($dateTime, $startDateTime, $endDateTime) {
                 return $this->requestFactory->createXEK(
                     $dateTime,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             }
         );
 
-        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_ZIP_FILES);
+        return $this->createDownloadOrderResult($transaction, self::FILE_PARSER_FORMAT_TEXT);
     }
 
     /**
@@ -755,10 +715,7 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function (
-                $segmentNumber,
-                $isLastSegment
-            ) use (
+            function () use (
                 $dateTime,
                 $fileFormat,
                 $countryCode,
@@ -770,9 +727,7 @@ final class EbicsClient implements EbicsClientInterface
                     $fileFormat,
                     $countryCode,
                     $startDateTime,
-                    $endDateTime,
-                    $segmentNumber,
-                    $isLastSegment
+                    $endDateTime
                 );
             },
             $storeClosure
@@ -1022,8 +977,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHVU($dateTime, $segmentNumber, $isLastSegment);
+            function () use ($dateTime) {
+                return $this->requestFactory->createHVU($dateTime);
             }
         );
 
@@ -1042,12 +997,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($dateTime) {
-                return $this->requestFactory->createHVZ(
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($dateTime) {
+                return $this->requestFactory->createHVZ($dateTime);
             }
         );
 
@@ -1092,13 +1043,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($hvdContext, $dateTime) {
-                return $this->requestFactory->createHVD(
-                    $hvdContext,
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($hvdContext, $dateTime) {
+                return $this->requestFactory->createHVD($hvdContext, $dateTime);
             }
         );
 
@@ -1117,13 +1063,8 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $transaction = $this->downloadTransaction(
-            function ($segmentNumber, $isLastSegment) use ($hvtContext, $dateTime) {
-                return $this->requestFactory->createHVT(
-                    $hvtContext,
-                    $dateTime,
-                    $segmentNumber,
-                    $isLastSegment
-                );
+            function () use ($hvtContext, $dateTime) {
+                return $this->requestFactory->createHVT($hvtContext, $dateTime);
             }
         );
 
@@ -1155,7 +1096,7 @@ final class EbicsClient implements EbicsClientInterface
     private function transferTransfer(UploadTransaction $uploadTransaction): void
     {
         foreach ($uploadTransaction->getSegments() as $segment) {
-            $request = $this->requestFactory->createTransferTransfer(
+            $request = $this->requestFactory->createTransferUpload(
                 $segment->getTransactionId(),
                 $segment->getTransactionKey(),
                 $segment->getOrderData(),
@@ -1262,17 +1203,26 @@ final class EbicsClient implements EbicsClientInterface
 
         $segment = $this->retrieveDownloadSegment($request);
         $transaction->addSegment($segment);
-        while (!$transaction->getLastSegment()->isLastSegmentNumber()) {
-            $request = call_user_func_array(
-                $requestClosure,
-                [
-                    $transaction->getLastSegment()->getNextSegmentNumber(),
-                    $transaction->getLastSegment()->isLastNextSegmentNumber(),
-                ]
+
+        $lastSegment = $transaction->getLastSegment();
+
+        while (!$lastSegment->isLastSegmentNumber()) {
+            $nextSegmentNumber = $lastSegment->getNextSegmentNumber();
+            $isLastNextSegmentNumber = $lastSegment->isLastNextSegmentNumber();
+
+            $request = $this->requestFactory->createTransferDownload(
+                $lastSegment->getTransactionId(),
+                $nextSegmentNumber,
+                $isLastNextSegmentNumber
             );
 
             $segment = $this->retrieveDownloadSegment($request);
             $transaction->addSegment($segment);
+
+            $segment->setNumSegments($lastSegment->getNumSegments());
+            $segment->setTransactionKey($lastSegment->getTransactionKey());
+
+            $lastSegment = $segment;
         }
 
         if (null !== $storeClosure) {
@@ -1282,6 +1232,20 @@ final class EbicsClient implements EbicsClientInterface
         }
 
         $this->transferReceipt($transaction, $acknowledged);
+
+        $orderDataEncrypted = '';
+        foreach ($transaction->getSegments() as $segment) {
+            $orderDataEncrypted .= $segment->getOrderData();
+        }
+
+        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
+            $this->keyring,
+            $orderDataEncrypted,
+            $lastSegment->getTransactionKey()
+        );
+        $orderData = $this->zipService->uncompress($orderDataCompressed);
+
+        $transaction->setOrderData($orderData);
 
         return $transaction;
     }
