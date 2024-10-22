@@ -369,6 +369,36 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group C53
+     * @group V3
+     * @group C53-V3
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     *
+     * @covers
+     */
+    public function testC53(int $credentialsId, array $codes)
+    {
+        $client = $this->setupClientV30($credentialsId, $codes['C53']['fake']);
+
+        $this->assertExceptionCode($codes['C53']['code']);
+        $c53 = $client->C53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+
+        $responseHandler = $client->getResponseHandler();
+        $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getLastSegment()->getResponse());
+        $this->assertResponseOk($code, $reportText);
+
+        $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getReceipt());
+        $reportText = $responseHandler->retrieveH00XReportText($c53->getTransaction()->getReceipt());
+
+        $this->assertResponseDone($code, $reportText);
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group Z54
      * @group V3
      * @group Z54-V3
@@ -774,6 +804,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
+                    'C53' => ['code' => '090003', 'fake' => false],
                     'Z54' => ['code' => '091005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],
@@ -799,6 +830,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
+                    'C53' => ['code' => '090003', 'fake' => false],
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],

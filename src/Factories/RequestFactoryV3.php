@@ -231,7 +231,13 @@ final class RequestFactoryV3 extends RequestFactory
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null
     ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btfContext = new BTDContext();
+        $btfContext->setServiceName('EOP');
+        $btfContext->setScope('DE');
+        $btfContext->setMsgName('camt.053');
+        $btfContext->setContainerType('ZIP');
+
+        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime);
     }
 
     public function createC54(
