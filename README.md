@@ -7,18 +7,24 @@
 
 <img src="https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png" width="300">
 
-PHP library to communicate with a bank through EBICS protocol.  
+PHP library to communicate with a bank through <a href="https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard" target="_blank">EBICS</a> protocol.  
+PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/  
 Supported PHP versions - PHP 7.2 - PHP 8.3  
-Support Ebics server versions: 2.4 (partially), 2.5 (default), 3.0
+Support EBICS server versions: 2.4 (partially), 2.5 (default), 3.0  
 
-💥 Application can be used as Standalone Service in Docker Container and be interacted with REST API - https://www.youtube.com/watch?v=wUztEHLksVM
+# 💥 EBICS REST API Server Standalone (V1.0.7)
+
+The application can be deployed as a standalone service on a server or within a Docker container and accessed via a REST API  
+EBICS REST API - https://sites.google.com/view/ebics-rest-api-server  
+Overview -  https://www.youtube.com/watch?v=wUztEHLksVM 
+
 ![ebics-server-standalone.gif](doc%2Febics-server-standalone.gif)
 
 ## License
 
 andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
-## Development and integration Ebics for your project
+## Development and integration EBICS for your project
 
 👉👍 Contact Andrew Svirin https://www.linkedin.com/in/andriy-svirin-0138a177/
 
@@ -54,37 +60,6 @@ if(__IS_CERTIFIED__) {
 }
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyring);
-```
-
-### Note for French Bank and for Ebics 3.0
-
-If you are dealing with a French bank or with Ebics 3.0, you will need to create a X509 self-signed certificate. 
-You can achieve this by creating a class which extends the `AbstractX509Generator`
-
-```php
-<?php
-
-use AndrewSvirin\Ebics\Models\X509\AbstractX509Generator;
-
-class MyCompanyX509Generator extends AbstractX509Generator
-{
-    protected function getCertificateOptions() : array {
-        return [
-             'subject' => [
-                'DN' => [
-                    'id-at-countryName' => 'FR',
-                    'id-at-stateOrProvinceName' => 'State',
-                    'id-at-localityName' => 'City',
-                    'id-at-organizationName' => 'Your company',
-                    'id-at-commonName' => 'yourwebsite.tld',
-                    ]
-                ],
-            ],
-        ];
-    }
-}
-
-$keyring->setCertificateGenerator(new MyCompanyX509Generator);
 ```
 
 ## Global process and interaction with Bank Department
@@ -205,7 +180,7 @@ try {
 | HVT         | Download detailed information about an order from VEU processing for which the user is authorized as a signatory. |
 
 If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://github.com/andrew-svirin/cfonb-php)  
-If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)
+If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)  
 
 ## Backlog
  - Format validators for all available ISO 20022 formats:
@@ -213,4 +188,7 @@ If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andr
    - download: PAIN.002, CAMT.052, CAMT.053, CAMT.054, MT199, MT900, MT910, MT940, MT942, CFONB240,CFONB245, CFONB120
  - Improve FakerHttpClient
  - Support import 3SKey certificates
- - Support change password for Keyring
+ - Country's Bank specific order types
+ - Apply restrictions by allowed versions (HEV) for Bank
+ - Apply restrictions by allowed Order types (HTD) for Account
+ - Refactor by abstraction Download and Upload Order types

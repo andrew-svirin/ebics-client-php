@@ -25,14 +25,16 @@ final class FakerHttpClient implements HttpClientInterface
         $this->fixturesDir = $fixturesDir;
     }
 
-    public function post(
-        string $url,
-        Request $request
-    ): Response {
+    public function post(string $url, Request $request): Response
+    {
         $requestContent = $request->getContent();
 
         $orderTypeMatches = [];
-        $orderTypeMatch = preg_match('/<OrderType>(?<order_type>.*)<\/OrderType>/', $requestContent, $orderTypeMatches);
+        $orderTypeMatch = preg_match(
+            '/(<OrderType>|<AdminOrderType>)(?<order_type>.*)(<\/AdminOrderType>|<\/OrderType>)/',
+            $requestContent,
+            $orderTypeMatches
+        );
 
         if ($orderTypeMatch) {
             $fileFormatMatches = [];
@@ -53,9 +55,18 @@ final class FakerHttpClient implements HttpClientInterface
 
         if ($transactionPhaseMatch) {
             return $this->fixtureTransactionPhase($transactionPhaseMatches['transaction_phase']);
-        } else {
-            return new Response();
         }
+
+        $hevRequestMatch = preg_match(
+            '/<ebicsHEVRequest .*>/',
+            $requestContent
+        );
+
+        if ($hevRequestMatch) {
+            return $this->readFixture('hev.xml');
+        }
+
+        return new Response();
     }
 
     /**
@@ -74,6 +85,10 @@ final class FakerHttpClient implements HttpClientInterface
             case 'FDL':
                 $fileName = sprintf('fdl.%s.xml', $options['file_format']);
                 break;
+            case 'INI':
+            case 'HIA':
+            case 'HPB':
+            case 'SPR':
             case 'C53':
             case 'STA':
             case 'CCT':
