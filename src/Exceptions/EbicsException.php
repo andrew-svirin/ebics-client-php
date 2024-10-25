@@ -4,6 +4,6 @@ namespace AndrewSvirin\Ebics\Exceptions;
 
 use Exception;
 
-class EbicsException extends Exception
+abstract class EbicsException extends Exception
 {
 }

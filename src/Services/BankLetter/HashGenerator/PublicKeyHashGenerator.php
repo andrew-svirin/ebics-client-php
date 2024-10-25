@@ -14,13 +14,9 @@ use AndrewSvirin\Ebics\Services\CryptService;
  *
  * @internal
  */
-class PublicKeyHashGenerator implements HashGeneratorInterface
+final class PublicKeyHashGenerator implements HashGeneratorInterface
 {
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
+    private CryptService $cryptService;
 
     public function __construct()
     {
@@ -39,9 +35,7 @@ class PublicKeyHashGenerator implements HashGeneratorInterface
 
         $key = $this->cryptService->calculateKey($e, $m);
 
-        $hash = $this->cryptService->calculateKeyHash($key);
-
-        return $hash;
+        return $this->cryptService->hash($key, 'sha256', false);
     }
 
     /**

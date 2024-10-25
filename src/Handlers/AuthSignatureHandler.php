@@ -4,13 +4,12 @@ namespace AndrewSvirin\Ebics\Handlers;
 
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\KeyRing;
+use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Services\CryptService;
+use AndrewSvirin\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
-use DOMXpath;
-use RuntimeException;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.
@@ -20,24 +19,17 @@ use RuntimeException;
  *
  * @internal
  */
-class AuthSignatureHandler
+abstract class AuthSignatureHandler
 {
     use C14NTrait;
-    use XPathTrait;
+    use H00XTrait;
 
-    /**
-     * @var KeyRing
-     */
-    private $keyRing;
+    private Keyring $keyring;
+    private CryptService $cryptService;
 
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    public function __construct(KeyRing $keyRing)
+    public function __construct(Keyring $keyring)
     {
-        $this->keyRing = $keyRing;
+        $this->keyring = $keyring;
         $this->cryptService = new CryptService();
     }
 
@@ -65,12 +57,9 @@ class AuthSignatureHandler
 
         // Find Header element to insert after.
         if (null === $xmlRequestHeader) {
-            $xpath = new DOMXpath($request);
+            $xpath = $this->prepareXPath($request);
             $headerList = $xpath->query('//header');
-            if (false === $headerList) {
-                throw new RuntimeException('Header element not found.');
-            }
-            $xmlRequestHeader = $headerList->item(0);
+            $xmlRequestHeader = DOMHelper::safeItem($headerList);
         }
 
         $this->insertAfter($xmlAuthSignature, $xmlRequestHeader);
@@ -120,31 +109,35 @@ class AuthSignatureHandler
         // Add ds:DigestValue to ds:Reference.
         $xmlDigestValue = $request->createElement('ds:DigestValue');
         $canonicalizedHeader = $this->calculateC14N(
-            $this->prepareH004XPath($request),
+            $this->prepareH00XXPath($request),
             $signaturePath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedHeaderHash = $this->cryptService->calculateHash($canonicalizedHeader, $digestMethodAlgorithm);
-        $xmlDigestValue->nodeValue = base64_encode($canonicalizedHeaderHash);
+        $canonicalizedHeaderHash = $this->cryptService->hash($canonicalizedHeader, $digestMethodAlgorithm);
+        $digestValueNodeValue = base64_encode($canonicalizedHeaderHash);
+
+        $xmlDigestValue->nodeValue = $digestValueNodeValue;
         $xmlReference->appendChild($xmlDigestValue);
 
         // Add ds:SignatureValue to AuthSignature.
         $xmlSignatureValue = $request->createElement('ds:SignatureValue');
         $canonicalizedSignedInfo = $this->calculateC14N(
-            $this->prepareH004XPath($request),
+            $this->prepareH00XXPath($request),
             $canonicalizationPath,
             $canonicalizationMethodAlgorithm
         );
-        $canonicalizedSignedInfoHash = $this->cryptService->calculateHash(
+        $canonicalizedSignedInfoHash = $this->cryptService->hash(
             $canonicalizedSignedInfo,
             $signatureMethodAlgorithm
         );
-        $canonicalizedSignedInfoHashSigned = $this->cryptService->cryptSignatureValue(
-            $this->keyRing,
+        $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encrypt(
+            $this->keyring->getUserSignatureX()->getPrivateKey(),
+            $this->keyring->getPassword(),
             $canonicalizedSignedInfoHash
         );
-        $canonicalizedSignedInfoHashSignedEn = base64_encode($canonicalizedSignedInfoHashSigned);
-        $xmlSignatureValue->nodeValue = $canonicalizedSignedInfoHashSignedEn;
+        $signatureValueNodeValue = base64_encode($canonicalizedSignedInfoHashEncrypted);
+
+        $xmlSignatureValue->nodeValue = $signatureValueNodeValue;
         $xmlAuthSignature->appendChild($xmlSignatureValue);
     }
 }

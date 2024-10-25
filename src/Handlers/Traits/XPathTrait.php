@@ -5,7 +5,6 @@ namespace AndrewSvirin\Ebics\Handlers\Traits;
 use DOMDocument;
 use DOMNode;
 use DOMXPath;
-use Exception;
 
 /**
  * Class XPathTrait manage XPath building.
@@ -16,19 +15,15 @@ use Exception;
 trait XPathTrait
 {
     /**
-     * Setup H004 XPath for DOM XML.
+     * Setup XPath for DOM XML.
      *
      * @param DOMDocument $xml
      *
      * @return DOMXPath
      */
-    private function prepareH004XPath(DOMDocument $xml): DOMXPath
+    protected function prepareXPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
-        $xpath->registerNamespace('H004', 'urn:org:ebics:H004');
-        $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
-
-        return $xpath;
+        return new DOMXpath($xml);
     }
 
     /**
@@ -38,9 +33,9 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareH000XPath(DOMDocument $xml): DOMXPath
+    protected function prepareH000XPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
+        $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('H000', 'http://www.ebics.org/H000');
 
         return $xpath;
@@ -53,9 +48,9 @@ trait XPathTrait
      *
      * @return DOMXPath
      */
-    private function prepareS001XPath(DOMDocument $xml): DOMXPath
+    protected function prepareS001XPath(DOMDocument $xml): DOMXPath
     {
-        $xpath = new DomXpath($xml);
+        $xpath = $this->prepareXPath($xml);
         $xpath->registerNamespace('S001', 'http://www.ebics.org/S001');
 
         return $xpath;
@@ -67,11 +62,12 @@ trait XPathTrait
      * @param DOMNode $newNode
      * @param DOMNode $afterNode
      */
-    private function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
+    protected function insertAfter(DOMNode $newNode, DOMNode $afterNode): void
     {
-        try {
-            $afterNode->parentNode->insertBefore($newNode, $afterNode->nextSibling);
-        } catch (Exception $e) {
+        $nextSibling = $afterNode->nextSibling;
+        if ($newNode !== $nextSibling) {
+            $afterNode->parentNode->insertBefore($newNode, $nextSibling);
+        } else {
             $afterNode->parentNode->appendChild($newNode);
         }
     }

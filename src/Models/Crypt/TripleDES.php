@@ -10,23 +10,11 @@ use LogicException;
  *
  * Uses openssl.  Operates in the EDE3 mode (encrypt-decrypt-encrypt).
  */
-class TripleDES implements TripleDESInterface
+final class TripleDES implements TripleDESInterface
 {
-
-    /**
-     * @var string
-     */
-    private $method = 'DES-EDE3-CBC';
-
-    /**
-     * @var string
-     */
-    private $key;
-
-    /**
-     * @var string
-     */
-    private $iv;
+    private string $method = 'DES-EDE3-CBC';
+    private string $key;
+    private string $iv;
 
     public function setKey($key)
     {
@@ -38,30 +26,30 @@ class TripleDES implements TripleDESInterface
         $this->iv = $iv;
     }
 
-    public function decrypt($ciphertext)
+    public function decrypt($ciphertext): string
     {
         if (!($decrypted = openssl_decrypt(
             $ciphertext,
             $this->method,
             $this->key,
-            $options = OPENSSL_RAW_DATA,
+            OPENSSL_RAW_DATA,
             $this->iv
         ))) {
-            throw new LogicException('Can not decrypt.');
+            throw new LogicException('Decryption failed.');
         }
         return $decrypted;
     }
 
-    public function encrypt($plaintext)
+    public function encrypt($plaintext): string
     {
         if (!($encrypted = openssl_encrypt(
             $plaintext,
             $this->method,
             $this->key,
-            $options = OPENSSL_RAW_DATA,
+            OPENSSL_RAW_DATA,
             $this->iv
         ))) {
-            throw new LogicException('Can not encrypt.');
+            throw new LogicException('Encryption failed.');
         }
         return $encrypted;
     }

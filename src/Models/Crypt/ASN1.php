@@ -4,16 +4,16 @@ namespace AndrewSvirin\Ebics\Models\Crypt;
 
 use AndrewSvirin\Ebics\Contracts\Crypt\ASN1Interface;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use LogicException;
 
 /**
  * Pure-PHP ASN.1 Parser
  */
-class ASN1 implements ASN1Interface
+final class ASN1 implements ASN1Interface
 {
-
-    /**#@+
+    /**
      * Tag Classes
      *
      * @link http://www.itu.int/ITU-T/studygroups/com17/languages/X.690-0207.pdf#page=12
@@ -22,9 +22,8 @@ class ASN1 implements ASN1Interface
     const CLASS_APPLICATION = 1;
     const CLASS_CONTEXT_SPECIFIC = 2;
     const CLASS_PRIVATE = 3;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Tag Classes
      *
      * @link http://www.obj-sys.com/asn1tutorial/node124.html
@@ -44,8 +43,8 @@ class ASN1 implements ASN1Interface
     //const TYPE_RELATIVE_OID      = 13;
     const TYPE_SEQUENCE = 16; // SEQUENCE OF
     const TYPE_SET = 17; // SET OF
-    /**#@-*/
-    /**#@+
+
+    /**
      * More Tag Classes
      *
      * @access private
@@ -64,51 +63,43 @@ class ASN1 implements ASN1Interface
     const TYPE_UNIVERSAL_STRING = 28;
     //const TYPE_CHARACTER_STRING = 29;
     const TYPE_BMP_STRING = 30;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Tag Aliases
      *
      * These tags are kinda place holders for other tags.
      */
     const TYPE_CHOICE = -1;
     const TYPE_ANY = -2;
-    /**#@-*/
 
     /**
      * ASN.1 object identifier
      *
-     * @var array
      * @link http://en.wikipedia.org/wiki/Object_identifier
      */
-    protected $oids = [];
+    protected array $oids = [];
 
     /**
      * Default date format
      *
-     * @var string
      * @link http://php.net/class.datetime
      */
-    protected $format = 'D, d M Y H:i:s O';
+    protected string $format = 'D, d M Y H:i:s O';
 
     /**
      * Filters
      *
      * If the mapping type is self::TYPE_ANY what do we actually encode it as?
-     *
-     * @var array
      */
-    protected $filters;
+    protected array $filters;
 
     /**
      * Type mapping table for the ANY type.
      *
      * Unambiguous types get the direct mapping (int/real/bool).
      * Others are mapped as a choice, with an extra indexing level.
-     *
-     * @var array
      */
-    protected $ANYmap = [
+    protected array $ANYmap = [
         self::TYPE_BOOLEAN => true,
         self::TYPE_INTEGER => true,
         self::TYPE_BIT_STRING => 'bitString',
@@ -138,10 +129,8 @@ class ASN1 implements ASN1Interface
      *
      * Non-convertable types are absent from this table.
      * size == 0 indicates variable length encoding.
-     *
-     * @var array
      */
-    protected $stringTypeSize = [
+    protected array $stringTypeSize = [
         self::TYPE_UTF8_STRING => 0,
         self::TYPE_BMP_STRING => 2,
         self::TYPE_UNIVERSAL_STRING => 4,
@@ -151,17 +140,14 @@ class ASN1 implements ASN1Interface
         self::TYPE_VISIBLE_STRING => 1,
     ];
 
-    /**
-     * @var array
-     */
-    protected $location;
+    protected array $location;
 
     public function loadOIDs($oids)
     {
         $this->oids = $oids;
     }
 
-    public function decodeBER($encoded)
+    public function decodeBER($encoded): array
     {
         // encapsulate in an array for BC with the old decodeBER
         return [$this->decodeBERInternal($encoded)];
@@ -428,7 +414,7 @@ class ASN1 implements ASN1Interface
      *
      * @return string
      */
-    private function decodeOID(string $content)
+    private function decodeOID(string $content): string
     {
         static $eighty;
         if (!$eighty) {
@@ -464,6 +450,8 @@ class ASN1 implements ASN1Interface
             array_unshift($oid, $part1->subtract($eighty));
             array_unshift($oid, 2);
         }
+
+        $oid = array_map('strval', $oid);
 
         return implode('.', $oid);
     }
@@ -746,7 +734,8 @@ class ASN1 implements ASN1Interface
                 if (!is_object($decoded['content'])) {
                     $decoded['content'] = $this->decodeTime($decoded['content'], $decoded['type']);
                 }
-                return $decoded['content'] ? $decoded['content']->format($this->format) : false;
+                return $decoded['content'] && $decoded['content'] instanceof DateTimeInterface ?
+                    $decoded['content']->format($this->format) : false;
             case self::TYPE_BIT_STRING:
                 if (isset($mapping['mapping'])) {
                     $offset = ord($decoded['content'][0]);
@@ -760,8 +749,9 @@ class ASN1 implements ASN1Interface
                         ensure that different semantics are not associated with such values which differ
                         only in the number of trailing 0 bits."
                     */
-                    $bits = count($mapping['mapping']) == $size ? [] :
-                        array_fill(0, count($mapping['mapping']) - $size, false);
+                    $fillSize = count($mapping['mapping']) - $size;
+                    $bits = $fillSize <= 0 ? [] :
+                        array_fill(0, $fillSize, false);
                     for ($i = strlen($decoded['content']) - 1; $i > 0; $i--) {
                         $current = ord($decoded['content'][$i]);
                         for ($j = $offset; $j < 8; $j++) {
@@ -819,7 +809,7 @@ class ASN1 implements ASN1Interface
         $this->filters = $filters;
     }
 
-    public function encodeDER($source, $mapping, $special = [])
+    public function encodeDER($source, $mapping, $special = []): string
     {
         $this->location = [];
         if (!($encodedDer = $this->encodeDERInternal($source, $mapping, null, $special))) {
@@ -1156,7 +1146,7 @@ class ASN1 implements ASN1Interface
      *
      * @return string
      */
-    private function encodeLength(int $length)
+    private function encodeLength(int $length): string
     {
         if ($length <= 0x7F) {
             return chr($length);
@@ -1175,7 +1165,7 @@ class ASN1 implements ASN1Interface
      *
      * @return string
      */
-    private function encodeOID(string $source)
+    private function encodeOID(string $source): string
     {
         static $mask, $zero, $forty;
         if (!$mask) {
@@ -1245,7 +1235,6 @@ class ASN1 implements ASN1Interface
                     $c = ($c << 8) | ord($in[$i++]);
                 // no break
                 case $insize == 1:
-                    break;
                 case ($c & 0x80) == 0x00:
                     break;
                 case ($c & 0x40) == 0x00:
@@ -1315,12 +1304,12 @@ class ASN1 implements ASN1Interface
         return $out;
     }
 
-    public function getANYmap()
+    public function getANYmap(): array
     {
         return $this->ANYmap;
     }
 
-    public function getStringTypeSize()
+    public function getStringTypeSize(): array
     {
         return $this->stringTypeSize;
     }

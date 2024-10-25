@@ -6,19 +6,12 @@ use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\Http\Response;
 
-class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
+abstract class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
 {
-    /** @var string */
-    private $responseCode;
-
-    /** @var Request|null */
-    private $request;
-
-    /** @var Response|null */
-    private $response;
-
-    /** @var string|null */
-    private $meaning;
+    private string $responseCode;
+    private ?Request $request;
+    private ?Response $response;
+    private ?string $meaning;
 
     /**
      * EbicsResponseException constructor.

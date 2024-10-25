@@ -8,31 +8,13 @@ namespace AndrewSvirin\Ebics\Models;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BankLetter
+final class BankLetter
 {
-    /**
-     * @var Bank
-     */
-    private $bank;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterA;
-
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterE;
-    /**
-     * @var SignatureBankLetter
-     */
-    private $signatureBankLetterX;
+    private Bank $bank;
+    private User $user;
+    private SignatureBankLetter $signatureBankLetterA;
+    private SignatureBankLetter $signatureBankLetterE;
+    private SignatureBankLetter $signatureBankLetterX;
 
     public function __construct(
         Bank $bank,

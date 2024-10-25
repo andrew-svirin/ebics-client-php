@@ -2,8 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Models\Http;
 
-use AndrewSvirin\Ebics\Models\DOMDocument;
-use AndrewSvirin\Ebics\Models\Transaction;
+use AndrewSvirin\Ebics\Models\Data;
 
 /**
  * Response model represents Response model.
@@ -11,35 +10,6 @@ use AndrewSvirin\Ebics\Models\Transaction;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Response extends DOMDocument
+final class Response extends Data
 {
-    /**
-     * @var Transaction[]
-     */
-    private $transactions = [];
-
-    public function addTransaction(Transaction $transaction): void
-    {
-        $this->transactions[] = $transaction;
-    }
-
-    /**
-     * @return Transaction[]
-     */
-    public function getTransactions(): array
-    {
-        return $this->transactions;
-    }
-
-    /**
-     * @return Transaction|null
-     */
-    public function getLastTransaction(): ?Transaction
-    {
-        if (0 === count($this->transactions)) {
-            return null;
-        }
-
-        return end($this->transactions);
-    }
 }

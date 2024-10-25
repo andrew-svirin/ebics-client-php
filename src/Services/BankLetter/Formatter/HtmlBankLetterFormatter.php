@@ -2,16 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\BankLetter;
 use AndrewSvirin\Ebics\Models\SignatureBankLetter;
-use AndrewSvirin\Ebics\Models\User;
-use LogicException;
-use RuntimeException;
 
 /**
- * Bank letter PDF formatter.
+ * Bank letter HTML formatter.
  * View pattern.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
@@ -19,167 +14,151 @@ use RuntimeException;
  *
  * @internal
  */
-class HtmlBankLetterFormatter implements FormatterInterface
+final class HtmlBankLetterFormatter extends LetterFormatter
 {
+    /**
+     * @var string
+     */
+    private string $style = '';
 
-    public function format(BankLetter $bankLetter)
+    /**
+     * Set additional CSS style.
+     *
+     * @param string $style
+     *
+     * @return void
+     */
+    public function setStyle(string $style): void
     {
-        $translations = [
-            'init_letter' => 'Initialization letter',
-        ];
+        $this->style = $style;
+    }
 
-        $result = <<<EOF
-    <h2>{$translations['init_letter']} INI</h2>
-    <hr/>
-    {$this->formatSection(
-            $bankLetter->getBank(),
-            $bankLetter->getUser(),
-            $bankLetter->getSignatureBankLetterA()
-        )}
-    <h2>{$translations['init_letter']} HIA</h2>
-    <hr/>
-    {$this->formatSection(
-            $bankLetter->getBank(),
-            $bankLetter->getUser(),
-            $bankLetter->getSignatureBankLetterE()
-        )}
-    <br/><br/><br/>
-    {$this->formatSection(
-            $bankLetter->getBank(),
-            $bankLetter->getUser(),
-            $bankLetter->getSignatureBankLetterX()
-        )}
+    /**
+     * @inheritDoc
+     */
+    public function format(BankLetter $bankLetter): string
+    {
+        return <<<EOF
+<html>
+<head>
+<style>
+    h1, h2, h3, h4 {
+        padding: .25rem .5rem;
+        color: #fff;
+    }
+    h1 {
+        background-color: #000;
+    }
+    h2 {
+        break-before: page;
+        background-color: #333;
+    }
+    h3 {
+        background-color: #666;
+    }
+    h4 {
+        background-color: #999;
+    }
+
+    .section {
+        break-after: page;
+    }
+
+    pre {
+        break-inside: avoid;
+        padding: 0 .5rem;
+    }
+
+    table {
+        break-inside: avoid;
+    }
+    table th, table td {
+        padding: .15rem .5rem;
+        text-align: left;
+    }
+    {$this->style}
+</style>
+<title>{$this->translations['init_letter']}</title>
+</head>
+<body>
+    <h1>{$this->translations['init_letter']}</h1>
+    <table>
+    <tbody>
+        <tr>
+            <th>{$this->translations['server_name']}</th>
+            <td>{$this->getServerName($bankLetter)}</td>
+        </tr>
+        <tr>
+            <th>{$this->translations['host_id']}</th>
+            <td>{$bankLetter->getBank()->getHostId()}</td>
+        </tr>
+        <tr>
+            <th>{$this->translations['partner_id']}</th>
+            <td>{$bankLetter->getUser()->getPartnerId()}</td>
+        </tr>
+        <tr>
+            <th>{$this->translations['user_id']}</th>
+            <td>{$bankLetter->getUser()->getUserId()}</td>
+        </tr>
+    </tbody>
+    </table>
+    <h2>{$this->translations['init_letter']} INI</h2>
+    {$this->formatSection($bankLetter->getSignatureBankLetterA())}
+    <h2>{$this->translations['init_letter']} HIA</h2>
+    {$this->formatSection($bankLetter->getSignatureBankLetterE())}
+    {$this->formatSection($bankLetter->getSignatureBankLetterX())}
+</body>
+</html>
 EOF;
-
-        return $result;
     }
 
     /**
      * Format section for one certificate.
      *
-     * @param Bank $bank
-     * @param User $user
      * @param SignatureBankLetter $signatureBankLetter
      *
      * @return string
      */
-    private function formatSection(Bank $bank, User $user, SignatureBankLetter $signatureBankLetter): string
+    private function formatSection(SignatureBankLetter $signatureBankLetter): string
     {
-        if ($signatureBankLetter->isCertified()) {
-            $certificateSection = $this->formatSectionFromCertificate($signatureBankLetter);
-        } else {
-            $certificateSection = $this->formatSectionFromModulusExponent($signatureBankLetter);
-        }
-
-        $translations = [
-            'parameters' => 'Parameters',
-            'server_name' => 'Server Name',
-            'host_id' => 'Host ID',
-            'partner_id' => 'Partner ID',
-            'user_id' => 'User ID',
-            'version' => 'Version',
-            'date' => 'Date',
-            'auth_certificate' => 'Authentication Certificate',
-            'certificate' => 'Certificate',
-            'hash' => 'Hash',
-            'es_signature' => 'ES signature',
-            'encryption_signature' => 'Encryption signature',
-            'authentication_signature' => 'Authentication signature',
-        ];
-
-        switch ($signatureBankLetter->getType()) {
-            case SignatureBankLetter::TYPE_A:
-                $signatureName = $translations['es_signature'];
-                break;
-            case SignatureBankLetter::TYPE_E:
-                $signatureName = $translations['encryption_signature'];
-                break;
-            case SignatureBankLetter::TYPE_X:
-                $signatureName = $translations['authentication_signature'];
-                break;
-            default:
-                throw new LogicException('Signature type unpredictable.');
-        }
-
-        if (($certificateCreatedAt = $signatureBankLetter->getCertificateCreatedAt())) {
-            $createdAt = $certificateCreatedAt->format('d/m/y H:i:s');
-        } else {
-            $createdAt = null;
-        }
-
-        $result = <<<EOF
-    <h3 style="color: #FFFFFF; background-color: #333333">{$translations['parameters']}</h3>
+        return <<<EOF
+<div class="section">
+    <h3>{$this->getSignatureName($signatureBankLetter)}</h3>
+    <h4>{$this->translations['parameters']}</h4>
     <table>
+    <tbody>
         <tr>
-            <td><b>{$translations['server_name']}</b></td>
-            <td>{$bank->getServerName()}</td>
-        </tr>
-        <tr>
-            <td><b>{$translations['host_id']}</b></td>
-            <td>{$bank->getHostId()}</td>
-        </tr>
-        <tr>
-            <td><b>{$translations['partner_id']}</b></td>
-            <td>{$user->getPartnerId()}</td>
-        </tr>
-        <tr>
-            <td><b>{$translations['user_id']}</b></td>
-            <td>{$user->getUserId()}</td>
-        </tr>
-        <tr>
-            <td><b>{$translations['version']}</b></td>
+            <th>{$this->translations['version']}</th>
             <td>{$signatureBankLetter->getVersion()}</td>
         </tr>
         <tr>
-            <td><b>{$translations['date']}</b></td>
-            <td>{$createdAt}</td>
+            <th>{$this->translations['date']}</th>
+            <td>{$this->getCertificateCreatedAt($signatureBankLetter)}</td>
         </tr>
+    </tbody>
     </table>
-    <br/>
-    <h3 style="color: #FFFFFF; background-color: #333333">{$signatureName}</h3>
-    {$certificateSection}
-    <br/><br/>
-    <b>{$translations['hash']} (SHA-256)</b>
-    <br/>
-    <code>{$this->formatBytes($signatureBankLetter->getKeyHash())}</code>
+    {$this->formatSectionFromCertificate($signatureBankLetter)}
+    <h4>{$this->translations['hash']} (SHA-256)</h4>
+    <pre>{$this->formatBytes($signatureBankLetter->getKeyHash())}</pre>
+</div>
 EOF;
-
-        return $result;
     }
 
     private function formatSectionFromCertificate(SignatureBankLetter $certificateBankLetter): string
     {
-        $translations = [
-            'certificate' => 'Certificate',
-        ];
-
-        $result = <<<EOF
-    <b>{$translations['certificate']}</b>
-    <br/>
-    {$this->formatCertificateContent($certificateBankLetter->getCertificateContent())}
+        if ($certificateBankLetter->isCertified()) {
+            return <<<EOF
+    <h4>{$this->translations['certificate']}</h4>
+    <pre>{$this->formatCertificateContent($certificateBankLetter->getCertificateContent())}</pre>
 EOF;
+        }
 
-        return $result;
-    }
-
-    private function formatSectionFromModulusExponent(SignatureBankLetter $certificateBankLetter): string
-    {
-        $translations = [
-            'exponent' => 'Exponent',
-            'modulus' => 'Modulus',
-        ];
-
-        $result = <<<EOF
-    <b>{$translations['exponent']}</b>
-    <br/>
-    <code>{$this->formatBytes($certificateBankLetter->getExponent())}</code>
-    <br/>
-    <b>{$translations['modulus']} ({$certificateBankLetter->getModulusSize()} bits)</b>
-    <br/>
-    <code>{$this->formatBytes($certificateBankLetter->getModulus())}</code>
+        return <<<EOF
+    <h4>{$this->translations['exponent']}</h4>
+    <pre>{$this->formatBytes($certificateBankLetter->getExponent())}</pre>
+    <h4>{$this->translations['modulus']} ({$certificateBankLetter->getModulusSize()} bits)</h4>
+    <pre>{$this->formatBytes($certificateBankLetter->getModulus())}</pre>
 EOF;
-
-        return $result;
     }
 
     /**
@@ -191,29 +170,17 @@ EOF;
      */
     private function formatBytes(string $bytes): string
     {
-        $result = '';
-        $newLineNum = 48;
-        $newLineChar = "\n";
+        $bytes = str_replace(' ', '', $bytes);
+        $bytes = strtoupper($bytes);
+        $bytes = str_split($bytes, 32);
+        $bytes = array_map(
+            function ($bytes) {
+                return implode(' ', str_split($bytes, 2));
+            },
+            $bytes
+        );
 
-        // Add fictive space.
-        $bytes = ' ' . $bytes;
-        $length = strlen($bytes);
-
-        // Prepare result from bytes. Replace every n-character by new line.
-        for ($i = 0; $i < $length; $i++) {
-            $isNewLine = (0 === $i % $newLineNum);
-            if ($isNewLine) {
-                if (' ' !== $bytes[$i]) {
-                    throw new RuntimeException('Character must be a space.');
-                }
-                $result[$i] = $newLineChar;
-            } else {
-                $result[$i] = $bytes[$i];
-            }
-        }
-
-        // Convert to upper case and trim leading fictive space.
-        return strtoupper(trim($result));
+        return implode("\n", $bytes);
     }
 
     /**
@@ -221,14 +188,8 @@ EOF;
      *
      * @return string
      */
-    private function formatCertificateContent(string $certificateContent): string
+    protected function formatCertificateContent(string $certificateContent): string
     {
-        $result = trim(str_replace(
-            ['-----BEGIN CERTIFICATE-----', '-----END CERTIFICATE-----', "\n", "\r"],
-            '',
-            $certificateContent
-        ));
-
-        return $result;
+        return chunk_split(parent::formatCertificateContent($certificateContent), 64);
     }
 }

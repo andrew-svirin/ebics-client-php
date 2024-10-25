@@ -8,21 +8,17 @@ namespace AndrewSvirin\Ebics\Models;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class User
+final class User
 {
     /**
      * The assigned PartnerID (Kunden-ID).
-     *
-     * @var string
      */
-    private $partnerId;
+    private string $partnerId;
 
     /**
      * The assigned UserID (Teilnehmer-ID).
-     *
-     * @var string
      */
-    private $userId;
+    private string $userId;
 
     /**
      * Constructor.

@@ -24,23 +24,21 @@ use LogicException;
  * the default value is used.  Problem is, if the parameter is there and it just so happens
  * to have the default value there are two ways that that parameter can be encoded.  It can
  * be encoded explicitly or left out all together.  This would effect the signature value
- * and thus may invalidate the the certificate all together unless the certificate is re-signed.
+ * and thus may invalidate the certificate all together unless the certificate is re-signed.
  */
 class X509 implements X509Interface
 {
-
-    /**#@+*/
     /**
      * Save as DER
      */
     const FORMAT_DER = 1;
+
     /**
      * Auto-detect the format
      *
      * Used only by the load*() functions
      */
     const FORMAT_AUTO_DETECT = 3;
-    /**#@-*/
 
     /**
      * Attribute value disposition.
@@ -50,7 +48,6 @@ class X509 implements X509Interface
     const ATTR_APPEND = -2; // Add a value.
     const ATTR_REPLACE = -3; // Clear first, then add a value.
 
-    /**#@+*/
     /**
      * Return internal array representation
      */
@@ -63,169 +60,92 @@ class X509 implements X509Interface
      * Return canonical ASN.1 RDNs string
      */
     const DN_CANON = 4;
-    /**#@-*/
 
-    /**#@+
+    /**
      * ASN.1 syntax for various extensions
      */
-    /**
-     * @var array
-     */
-    protected $DirectoryString;
+    protected array $DirectoryString;
 
-    /**
-     * @var array
-     */
-    protected $PKCS9String;
-
-    /**
-     * @var array
-     */
-    protected $AttributeValue;
-
-    /**
-     * @var array
-     */
-    protected $Extensions;
-
-    /**
-     * @var array
-     */
-    protected $KeyUsage;
-
-    /**
-     * @var array
-     */
-    protected $ExtKeyUsageSyntax;
-
-    /**
-     * @var array
-     */
-    protected $BasicConstraints;
-
-    /**
-     * @var array
-     */
-    protected $KeyIdentifier;
-
-    /**
-     * @var array
-     */
-    protected $AuthorityKeyIdentifier;
-
-    /**
-     * @var array
-     */
-    protected $CertificatePolicies;
-
-    /**
-     * @var array
-     */
-    protected $SubjectAltName;
-
-    /**
-     * @var array
-     */
-    protected $Name;
-
-    /**
-     * @var array
-     */
-    protected $RelativeDistinguishedName;
-
-    /**
-     * @var array
-     */
-    protected $InvalidityDate;
+    protected array $PKCS9String;
+    protected array $AttributeValue;
+    protected array $Extensions;
+    protected array $KeyUsage;
+    protected array $ExtKeyUsageSyntax;
+    protected array $BasicConstraints;
+    protected array $KeyIdentifier;
+    protected array $CRLDistributionPoints;
+    protected array $AuthorityKeyIdentifier;
+    protected array $AuthorityInfoAccessSyntax;
+    protected array $CertificatePolicies;
+    protected array $SubjectAltName;
+    protected array $Name;
+    protected array $RelativeDistinguishedName;
+    protected array $InvalidityDate;
 
     /**
      * ASN.1 syntax for X.509 certificates
-     *
-     * @var array
      */
-    protected $Certificate;
+    protected array $Certificate;
 
     /**
      * Public key
-     *
-     * @var RSAInterface|null
      */
-    protected $publicKey;
+    protected ?RSAInterface $publicKey = null;
 
     /**
      * Private key
-     *
-     * @var RSAInterface|null
      */
-    protected $privateKey;
+    protected ?RSAInterface $privateKey = null;
 
     /**
      * The currently loaded certificate
-     *
-     * @var array|null
      */
-    protected $currentCert;
+    protected ?array $currentCert = null;
 
     /**
      * Certificate Start Date
-     *
-     * @var string
      */
-    protected $startDate;
+    protected string $startDate;
 
     /**
      * Certificate End Date
-     *
-     * @var string
      */
-    protected $endDate;
+    protected string $endDate;
 
     /**
      * Serial Number
-     *
-     * @var string
      */
-    protected $serialNumber;
+    protected string $serialNumber;
 
-    /**
-     * @var array
-     */
-    protected $domains;
+    protected array $domains;
 
     /**
      * The signature subject
      *
      * There's no guarantee X509 is going to re-encode an X.509 cert in the same way it was originally
      * encoded so we take save the portion of the original cert that the signature would have made for.
-     *
-     * @var string
      */
-    protected $signatureSubject;
+    protected ?string $signatureSubject;
 
     /**
      * Distinguished Name
-     *
-     * @var array|null
      */
-    protected $dn;
+    protected ?array $dn;
 
     /**
      * Object identifiers for X.509 certificates
      *
-     * @var array
      * @link http://en.wikipedia.org/wiki/Object_identifier
      */
-    protected $oids;
+    protected array $oids;
 
     /**
      * Key Identifier
      *
      * See {@link http://tools.ietf.org/html/rfc5280#section-4.2.1.1 RFC5280#section-4.2.1.1} and
      * {@link http://tools.ietf.org/html/rfc5280#section-4.2.1.2 RFC5280#section-4.2.1.2}.
-     *
-     * @var string
      */
-    protected $currentKeyIdentifier;
+    protected ?string $currentKeyIdentifier;
 
     /**
      * Default Constructor.
@@ -714,6 +634,65 @@ class X509 implements X509Interface
             'children' => $GeneralName
         ];
 
+        $ReasonFlags = [
+            'type' => ASN1::TYPE_BIT_STRING,
+            'mapping' => [
+                'unused',
+                'keyCompromise',
+                'cACompromise',
+                'affiliationChanged',
+                'superseded',
+                'cessationOfOperation',
+                'certificateHold',
+                'privilegeWithdrawn',
+                'aACompromise'
+            ]
+        ];
+
+        $DistributionPointName = [
+            'type' => ASN1::TYPE_CHOICE,
+            'children' => [
+                'fullName' => [
+                        'constant' => 0,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $GeneralNames,
+                'nameRelativeToCRLIssuer' => [
+                        'constant' => 1,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $this->RelativeDistinguishedName
+            ]
+        ];
+
+        $DistributionPoint = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'children' => [
+                'distributionPoint' => [
+                        'constant' => 0,
+                        'optional' => true,
+                        'explicit' => true
+                    ] + $DistributionPointName,
+                'reasons' => [
+                        'constant' => 1,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $ReasonFlags,
+                'cRLIssuer' => [
+                        'constant' => 2,
+                        'optional' => true,
+                        'implicit' => true
+                    ] + $GeneralNames
+            ]
+        ];
+
+        $this->CRLDistributionPoints = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 1,
+            'max' => -1,
+            'children' => $DistributionPoint
+        ];
+
         $this->AuthorityKeyIdentifier = [
             'type' => ASN1::TYPE_SEQUENCE,
             'children' => [
@@ -759,6 +738,21 @@ class X509 implements X509Interface
                     'children' => $PolicyQualifierInfo
                 ]
             ]
+        ];
+
+        $AccessDescription = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'children' => [
+                'accessMethod' => ['type' => ASN1::TYPE_OBJECT_IDENTIFIER],
+                'accessLocation' => $GeneralName,
+            ],
+        ];
+
+        $this->AuthorityInfoAccessSyntax = [
+            'type' => ASN1::TYPE_SEQUENCE,
+            'min' => 1,
+            'max' => -1,
+            'children' => $AccessDescription,
         ];
 
         $this->CertificatePolicies = [
@@ -1049,7 +1043,7 @@ class X509 implements X509Interface
      *
      * @return bool
      */
-    private function removeExtension(string $id, string $path = null)
+    private function removeExtension(string $id, string $path = null): bool
     {
         $extensions = &$this->extensions($this->currentCert, $path);
 
@@ -1148,7 +1142,40 @@ class X509 implements X509Interface
 
     public function getPublicKey(): ?RSAInterface
     {
-        return $this->publicKey;
+        if (isset($this->publicKey)) {
+            return $this->publicKey;
+        }
+
+        if (isset($this->currentCert) && is_array($this->currentCert)) {
+            $paths = [
+                'tbsCertificate/subjectPublicKeyInfo',
+                'certificationRequestInfo/subjectPKInfo',
+                'publicKeyAndChallenge/spki'
+            ];
+            foreach ($paths as $path) {
+                $keyinfo = $this->subArray($this->currentCert, $path);
+                if (!empty($keyinfo)) {
+                    break;
+                }
+            }
+        }
+        if (empty($keyinfo)) {
+            return null;
+        }
+
+        $key = $keyinfo['subjectPublicKey'];
+
+        switch ($keyinfo['algorithm']['algorithm']) {
+            case 'rsaEncryption':
+                $publicKey = new RSA();
+                $publicKey->loadKey($key);
+                $publicKey->setPublicKey($key);
+                break;
+            default:
+                throw new LogicException('Incorrect algorithm');
+        }
+
+        return $publicKey;
     }
 
     public function setPrivateKey($key)
@@ -1161,7 +1188,7 @@ class X509 implements X509Interface
         return $this->privateKey;
     }
 
-    public function setDN($dn, $type = 'utf8String')
+    public function setDN($dn, $type = 'utf8String'): bool
     {
         $this->dn = null;
 
@@ -1222,7 +1249,7 @@ class X509 implements X509Interface
         }
     }
 
-    public function computeKeyIdentifier($key = null)
+    public function computeKeyIdentifier($key = null): string
     {
         if (is_null($key)) {
             $key = $this;
@@ -1268,11 +1295,12 @@ class X509 implements X509Interface
      *
      * @return array
      */
-    private function signByKey(RSAInterface $key, string $signatureAlgorithm)
+    private function signByKey(RSAInterface $key, string $signatureAlgorithm): array
     {
         switch ($signatureAlgorithm) {
             case 'sha256WithRSAEncryption':
                 $key->setHash(preg_replace('#WithRSAEncryption$#', '', $signatureAlgorithm));
+                $key->setSignatureMode(RSA::SIGNATURE_PKCS1);
 
                 $this->currentCert['signature'] = base64_encode("\0" . $key->sign($this->signatureSubject));
                 return $this->currentCert;
@@ -1293,7 +1321,7 @@ class X509 implements X509Interface
      *
      * @return array
      */
-    private function timeField(string $date)
+    private function timeField(string $date): array
     {
         $dateObj = new DateTime($date, new DateTimeZone('GMT'));
         $year = $dateObj->format('Y'); // the same way ASN1.php parses this
@@ -1309,6 +1337,7 @@ class X509 implements X509Interface
         if (empty($csr)) {
             $csr = $this->currentCert;
         }
+        $csr === null && $csr = [];
 
         $attributes = $this->subArray($csr, 'certificationRequestInfo/attributes');
 
@@ -1316,7 +1345,7 @@ class X509 implements X509Interface
             return false;
         }
 
-        foreach ($attributes as $key => $attribute) {
+        foreach ($attributes as $attribute) {
             if ($attribute['type'] == $id) {
                 $n = count($attribute['value']);
                 switch (true) {
@@ -1346,7 +1375,7 @@ class X509 implements X509Interface
      *
      * @return array|false
      */
-    private function &subArray(&$root, string $path, bool $create = false)
+    private function &subArray(array &$root, string $path, bool $create = false)
     {
         $false = false;
 
@@ -1380,7 +1409,7 @@ class X509 implements X509Interface
      *
      * @return string
      */
-    private function extractBER(string $str)
+    private function extractBER(string $str): string
     {
         /* X.509 certs are assumed to be base64 encoded but sometimes they'll have additional things in them
          * above and beyond the ceritificate.
@@ -1414,7 +1443,7 @@ class X509 implements X509Interface
      *
      * @return boolean
      */
-    private function isSubArrayValid($root, string $path)
+    private function isSubArrayValid(array $root, string $path): bool
     {
         if (!is_array($root)) {
             return false;
@@ -1445,7 +1474,7 @@ class X509 implements X509Interface
      *
      * @return void
      */
-    private function mapInExtensions(&$root, string $path, ASN1Interface $asn1)
+    private function mapInExtensions(array &$root, string $path, ASN1Interface $asn1)
     {
         $extensions = &$this->subArrayUnchecked($root, $path);
 
@@ -1481,7 +1510,7 @@ class X509 implements X509Interface
      *
      * @return string
      */
-    private function reformatKey(string $algorithm, string $key)
+    private function reformatKey(string $algorithm, string $key): string
     {
         switch ($algorithm) {
             case 'rsaEncryption':
@@ -1499,7 +1528,7 @@ class X509 implements X509Interface
         }
     }
 
-    public function setExtension($id, $value, $critical = false, $replace = true, string $path = null)
+    public function setExtension($id, $value, $critical = false, $replace = true, string $path = null): bool
     {
         $extensions = &$this->extensions($this->currentCert, $path, true);
 
@@ -1533,7 +1562,7 @@ class X509 implements X509Interface
      *
      * @return array|false
      */
-    private function &extensions(&$root, string $path = null, bool $create = false)
+    private function &extensions(?array &$root, string $path = null, bool $create = false)
     {
         if (!isset($root)) {
             $root = $this->currentCert;
@@ -1568,7 +1597,7 @@ class X509 implements X509Interface
      *
      * @return void
      */
-    private function mapOutExtensions(&$root, string $path, ASN1Interface $asn1)
+    private function mapOutExtensions(array &$root, string $path, ASN1Interface $asn1)
     {
         $extensions = &$this->subArray($root, $path);
 
@@ -1580,20 +1609,34 @@ class X509 implements X509Interface
 
                 switch ($id) {
                     case 'id-ce-certificatePolicies':
-                        throw new LogicException('id-ce-certificatePolicies not handled.');
+                        for ($j = 0; $j < count($value); $j++) {
+                            if (!isset($value[$j]['policyQualifiers'])) {
+                                continue;
+                            }
+                            for ($k = 0; $k < count($value[$j]['policyQualifiers']); $k++) {
+                                $subid = $value[$j]['policyQualifiers'][$k]['policyQualifierId'];
+                                $map = $this->getMapping($subid);
+                                if ($map !== false) {
+                                    if (isset($value['authorityCertSerialNumber'])) {
+                                        throw new LogicException('id-ce-certificatePolicies not handled.');
+                                    }
+                                }
+                            }
+                        }
+                        break;
                     case 'id-ce-authorityKeyIdentifier': // use 00 as the serial number instead of an empty string
                         if (isset($value['authorityCertSerialNumber'])) {
-                            if ($value['authorityCertSerialNumber']->toBytes() == '') {
-                                throw new LogicException('authorityCertSerialNumber can not be empty.');
-                            }
+                            throw new LogicException('authorityCertSerialNumber can not be empty.');
                         }
                 }
 
                 /* [extnValue] contains the DER encoding of an ASN.1 value
                    corresponding to the extension type identified by extnID */
                 $map = $this->getMapping($id);
-                if (false === $map) {
-                    throw new LogicException($id . ' is not a currently supported extension');
+                if (is_bool($map)) {
+                    if (!$map) {
+                        throw new LogicException($id . ' is not a currently supported extension');
+                    }
                 } else {
                     $temp = $asn1->encodeDER($value, $map, ['iPAddress' => [$this, '_encodeIP']]);
                     $value = base64_encode($temp);
@@ -1607,7 +1650,7 @@ class X509 implements X509Interface
      *
      * @param string $extnId
      *
-     * @return array|false
+     * @return array|bool
      */
     private function getMapping(string $extnId)
     {
@@ -1628,6 +1671,13 @@ class X509 implements X509Interface
                 return $this->SubjectAltName;
             case 'id-ce-invalidityDate':
                 return $this->InvalidityDate;
+            case 'id-ce-cRLDistributionPoints':
+                return $this->CRLDistributionPoints;
+            case 'id-pe-authorityInfoAccess':
+                return $this->AuthorityInfoAccessSyntax;
+            // "Certificate Transparency"
+            case '1.3.6.1.4.1.11129.2.4.2':
+                return true;
         }
 
         return false;
@@ -1649,7 +1699,7 @@ class X509 implements X509Interface
      *
      * @return array|false
      */
-    private function &subArrayUnchecked(&$root, string $path, bool $create = false)
+    private function &subArrayUnchecked(array &$root, string $path, bool $create = false)
     {
         $false = false;
 
@@ -1677,7 +1727,7 @@ class X509 implements X509Interface
      *
      * @return bool
      */
-    private function setDNProp(string $propName, $propValue, string $type = 'utf8String')
+    private function setDNProp(string $propName, $propValue, string $type = 'utf8String'): bool
     {
         if (empty($this->dn)) {
             $this->dn = ['rdnSequence' => []];
@@ -1707,7 +1757,7 @@ class X509 implements X509Interface
      *
      * @param string $propName
      *
-     * @return mixed
+     * @return string|false
      */
     private function translateDNProp(string $propName)
     {
@@ -1720,6 +1770,10 @@ class X509 implements X509Interface
             case 'organizationname':
             case 'o':
                 return 'id-at-organizationName';
+            case 'id-at-organizationalunitname':
+            case 'organizationalunitname':
+            case 'ou':
+                return 'id-at-organizationalUnitName';
             case 'id-at-commonname':
             case 'commonname':
             case 'cn':
@@ -1758,9 +1812,9 @@ class X509 implements X509Interface
             return false;
         }
 
-        foreach ($extensions as $key => $value) {
-            if ($value['extnId'] == $id) {
-                return $value['extnValue'];
+        foreach ($extensions as $extension) {
+            if ($extension['extnId'] == $id) {
+                return $extension['extnValue'];
             }
         }
 
@@ -1820,7 +1874,7 @@ class X509 implements X509Interface
      * @param array|null $dn optional
      * @param bool $withType optional
      *
-     * @return mixed
+     * @return array|false
      */
     private function getDNProp(string $propName, array $dn = null, bool $withType = false)
     {
@@ -1880,7 +1934,7 @@ class X509 implements X509Interface
      *
      * @return array
      */
-    private function dnsName(string $domain)
+    private function dnsName(string $domain): array
     {
         return ['dNSName' => $domain];
     }

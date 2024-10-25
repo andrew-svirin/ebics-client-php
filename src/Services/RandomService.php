@@ -2,6 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Services;
 
+use DateTime;
+use LogicException;
+
 /**
  * Random function.
  *
@@ -10,13 +13,12 @@ namespace AndrewSvirin\Ebics\Services;
  *
  * @internal
  */
-class RandomService
+final class RandomService
 {
-
     /**
-     * Generate random string form HEX characters in upper register.
+     * Generate random string from HEX characters in upper register.
      *
-     * @param int $length
+     * @param int $length Amount of characters.
      *
      * @return string
      */
@@ -44,13 +46,29 @@ class RandomService
     }
 
     /**
+     * Generate random bytes.
+     *
+     * @param int $length
+     *
+     * @return string
+     */
+    public function bytes(int $length): string
+    {
+        if ($length < 1) {
+            throw new LogicException('Minimal length is 1');
+        }
+        return random_bytes($length);
+    }
+
+    /**
      * Generate random characters where first character not 0.
+     *
      * @param string $characters
      * @param int $length
      *
      * @return string
      */
-    private function random(string $characters, int $length)
+    private function random(string $characters, int $length): string
     {
         $charactersLength = strlen($characters);
 
@@ -65,5 +83,20 @@ class RandomService
         }
 
         return $random;
+    }
+
+    /**
+     * Generate unique id with current date time prefix.
+     *
+     * @param string|null $prefix
+     *
+     * @return string
+     */
+    public function uniqueIdWithDate(string $prefix = null): string
+    {
+        $now = new DateTime();
+
+        $uniqid = $prefix . uniqid($now->format('YmdHisv'));
+        return substr($uniqid, 0, 35);
     }
 }

@@ -3,9 +3,6 @@
 namespace AndrewSvirin\Ebics\Tests;
 
 use AndrewSvirin\Ebics\EbicsBankLetter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
 
 /**
  * Class EbicsBankLetterTest.
@@ -17,7 +14,6 @@ use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
  */
 class EbicsBankLetterTest extends AbstractEbicsTestCase
 {
-
     /**
      * Prepare bank letter in txt format.
      *
@@ -29,18 +25,18 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterTxt(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
-        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, new TxtBankLetterFormatter());
+        $txt = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createTxtBankLetterFormatter());
 
-        $this->assertIsString($txt);
+        self::assertIsString($txt);
     }
 
     /**
@@ -54,18 +50,18 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterHtml(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
-        $html = $ebicsBankLetter->formatBankLetter($bankLetter, new HtmlBankLetterFormatter());
+        $html = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createHtmlBankLetterFormatter());
 
-        $this->assertIsString($html);
+        self::assertIsString($html);
     }
 
     /**
@@ -79,18 +75,18 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
      */
     public function testPrepareBankLetterPdf(int $credentialsId)
     {
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
             $client->getBank(),
             $client->getUser(),
-            $client->getKeyRing()
+            $client->getKeyring()
         );
 
-        $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, new PdfBankLetterFormatter());
+        $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createPdfBankLetterFormatter());
 
-        $this->assertIsString($pdf);
+        self::assertIsString($pdf);
     }
 
     /**

@@ -11,9 +11,8 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin, Guillaume Sainthillier
  */
-class CertificateX509Factory
+final class CertificateX509Factory
 {
-
     /**
      * @param string $content
      *

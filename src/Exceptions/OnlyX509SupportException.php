@@ -8,7 +8,7 @@ namespace AndrewSvirin\Ebics\Exceptions;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Guillaume Sainthillier
  */
-class OnlyX509SupportException extends EbicsResponseException
+final class OnlyX509SupportException extends EbicsResponseException
 {
     public function __construct(?string $responseMessage = null)
     {

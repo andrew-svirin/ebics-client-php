@@ -10,7 +10,7 @@ namespace AndrewSvirin\Ebics\Services\X509;
  *
  * @internal
  */
-class X509ExtensionOptionsNormalizer
+final class X509ExtensionOptionsNormalizer
 {
     /**
      * @param mixed|string|array $options = [

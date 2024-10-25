@@ -10,4 +10,5 @@ namespace AndrewSvirin\Ebics\Contracts;
  */
 interface TransactionInterface
 {
+    public function getKey(): string;
 }

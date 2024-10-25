@@ -11,9 +11,8 @@ use AndrewSvirin\Ebics\Models\Crypt\AES;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class AESFactory
+final class AESFactory
 {
-
     /**
      * @return AESInterface
      */

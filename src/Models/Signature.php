@@ -10,28 +10,17 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Signature implements SignatureInterface
+final class Signature implements SignatureInterface
 {
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $publicKey;
+    private string $type;
+    private string $publicKey;
 
     /**
      * Private key null for represent bank signature.
-     * @var string|null
      */
-    private $privateKey;
+    private ?string $privateKey;
 
-    /**
-     * @var string|null
-     */
-    private $certificateContent;
+    private ?string $certificateContent;
 
     /**
      * @param string $type
@@ -66,7 +55,7 @@ class Signature implements SignatureInterface
      */
     public function getPrivateKey(): ?string
     {
-        return $this->privateKey;
+        return $this->privateKey ?? null;
     }
 
     /**
@@ -82,6 +71,6 @@ class Signature implements SignatureInterface
      */
     public function getCertificateContent(): ?string
     {
-        return $this->certificateContent;
+        return $this->certificateContent ?? null;
     }
 }

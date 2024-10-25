@@ -11,7 +11,7 @@ namespace AndrewSvirin\Ebics\Exceptions;
 abstract class EbicsErrorCodeMapping
 {
     /**
-     * @var string[]
+     * @var class-string<EbicsResponseException>[]
      */
     public static $mapping = [
         '011000' => DownloadPostprocessDoneException::class,
@@ -80,4 +80,13 @@ abstract class EbicsErrorCodeMapping
         '091305' => InvalidSignerStateException::class,
         '091306' => DuplicateSignatureException::class,
     ];
+
+    /**
+     * @param string $errorCode
+     * @return class-string<EbicsResponseException>|null
+     */
+    public static function resolveClass(string $errorCode): ?string
+    {
+        return self::$mapping[$errorCode] ?? null;
+    }
 }

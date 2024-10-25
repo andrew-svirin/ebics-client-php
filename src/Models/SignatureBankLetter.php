@@ -10,57 +10,20 @@ use DateTime;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class SignatureBankLetter
+final class SignatureBankLetter
 {
-
     const TYPE_A = 'A';
     const TYPE_X = 'X';
     const TYPE_E = 'E';
 
-    /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * @var string
-     */
-    private $exponent;
-
-    /**
-     * @var string
-     */
-    private $modulus;
-
-    /**
-     * @var string
-     */
-    private $keyHash;
-
-    /**
-     * @var int
-     */
-    private $modulusSize;
-
-    /**
-     * @var string|null
-     */
-    private $certificateContent;
-
-    /**
-     * @var DateTime|null
-     */
-    private $certificateCreatedAt;
-
-    /**
-     * @var bool
-     */
-    private $isCertified;
+    private string $type;
+    private string $version;
+    private string $exponent;
+    private string $modulus;
+    private string $keyHash;
+    private int $modulusSize;
+    private ?string $certificateContent = null;
+    private ?DateTime $certificateCreatedAt;
 
     public function __construct(
         string $type,
@@ -139,7 +102,7 @@ class SignatureBankLetter
      */
     public function getCertificateContent(): ?string
     {
-        return $this->certificateContent;
+        return $this->certificateContent ?? null;
     }
 
     /**
@@ -155,15 +118,7 @@ class SignatureBankLetter
      */
     public function getCertificateCreatedAt(): ?DateTime
     {
-        return $this->certificateCreatedAt;
-    }
-
-    /**
-     * @param bool $isCertified
-     */
-    public function setIsCertified(bool $isCertified): void
-    {
-        $this->isCertified = $isCertified;
+        return $this->certificateCreatedAt ?? null;
     }
 
     /**
@@ -171,6 +126,6 @@ class SignatureBankLetter
      */
     public function isCertified(): bool
     {
-        return (bool)$this->isCertified;
+        return null !== $this->certificateContent;
     }
 }
