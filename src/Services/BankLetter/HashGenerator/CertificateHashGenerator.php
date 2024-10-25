@@ -4,7 +4,7 @@ namespace AndrewSvirin\Ebics\Services\BankLetter\HashGenerator;
 
 use AndrewSvirin\Ebics\Contracts\BankLetter\HashGeneratorInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Services\CryptService;
+use AndrewSvirin\Ebics\Services\DigestResolver;
 
 /**
  * Generate hash for certificate.
@@ -13,17 +13,13 @@ use AndrewSvirin\Ebics\Services\CryptService;
  *
  * @internal
  */
-class CertificateHashGenerator implements HashGeneratorInterface
+final class CertificateHashGenerator implements HashGeneratorInterface
 {
+    private DigestResolver $digestResolver;
 
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    public function __construct()
+    public function __construct(DigestResolver $digestResolver)
     {
-        $this->cryptService = new CryptService();
+        $this->digestResolver = $digestResolver;
     }
 
     /**
@@ -31,8 +27,8 @@ class CertificateHashGenerator implements HashGeneratorInterface
      */
     public function generate(SignatureInterface $signature): string
     {
-        $key = $signature->getCertificateContent();
+        $digest = $this->digestResolver->digest($signature);
 
-        return $this->cryptService->calculateKeyHash($key);
+        return bin2hex($digest);
     }
 }

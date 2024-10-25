@@ -11,9 +11,8 @@ use AndrewSvirin\Ebics\Models\Crypt\BigInteger;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class BigIntegerFactory
+final class BigIntegerFactory
 {
-
     /**
      * @param int|string $x base-10 number or base-$base number if $base set.
      * @param int $base

@@ -17,18 +17,18 @@ class CryptServiceTest extends AbstractEbicsTestCase
 {
 
     /**
-     * @group crypt-services-generate-keys
+     * @group crypt-service-generate-keys
      */
     public function testGenerateKeys()
     {
         $credentialsId = 2;
-        $client = $this->setupClient($credentialsId);
+        $client = $this->setupClientV25($credentialsId);
         $cryptService = new CryptService();
 
-        $keys = $cryptService->generateKeys($client->getKeyRing());
+        $keys = $cryptService->generateKeys($client->getKeyring()->getPassword());
 
-        $this->assertArrayHasKey('privatekey', $keys);
-        $this->assertArrayHasKey('publickey', $keys);
-        $this->assertArrayHasKey('partialkey', $keys);
+        self::assertArrayHasKey('privatekey', $keys);
+        self::assertArrayHasKey('publickey', $keys);
+        self::assertArrayHasKey('partialkey', $keys);
     }
 }

@@ -8,33 +8,22 @@ namespace AndrewSvirin\Ebics\Models;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  */
-class Bank
+final class Bank
 {
     /**
      * The HostID of the bank.
-     *
-     * @var string
      */
-    private $hostId;
+    private string $hostId;
 
     /**
      * The URL of the EBICS server.
-     *
-     * @var string
      */
-    private $url;
-
-    /**
-     * @var bool|null
-     */
-    private $isCertified;
+    private string $url;
 
     /**
      * The Server Name of the bank.
-     *
-     * @var string|null
      */
-    private $serverName;
+    private ?string $serverName = null;
 
     /**
      * Constructor.
@@ -53,7 +42,7 @@ class Bank
      *
      * @return string
      */
-    public function getHostId()
+    public function getHostId(): string
     {
         return $this->hostId;
     }
@@ -63,25 +52,9 @@ class Bank
      *
      * @return string
      */
-    public function getUrl()
+    public function getUrl(): string
     {
         return $this->url;
-    }
-
-    /**
-     * @param bool $isCertified
-     */
-    public function setIsCertified(bool $isCertified): void
-    {
-        $this->isCertified = $isCertified;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isCertified(): bool
-    {
-        return (bool)$this->isCertified;
     }
 
     /**

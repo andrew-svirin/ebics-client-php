@@ -3,6 +3,8 @@
 namespace AndrewSvirin\Ebics\Tests\Factories\X509;
 
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
+use AndrewSvirin\Ebics\Models\Bank;
+use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
 use DateTime;
 
@@ -18,15 +20,16 @@ class X509GeneratorTest extends AbstractEbicsTestCase
 {
 
     /**
-     * @group generate-webank-certificate-content
+     * @group generate-bank-certificate-content
      */
-    public function testGenerateWeBankCertificateContent()
+    public function testGenerateBankCertificateContent()
     {
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
 
-        //Certificate generated the 22/03/2020 (1 year validity)
-        $generator = new WeBankX509Generator();
+        // Certificate generated for the 22/03/2020 (1 year validity)
+        $generator = new BankX509Generator();
+        $generator->setCertificateOptionsByBank(new Bank('H123456', 'https://test.bank.dom'));
         $generator->setX509StartDate(new DateTime('2020-03-21'));
         $generator->setX509EndDate(new DateTime('2021-03-22'));
         $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
@@ -37,39 +40,11 @@ class X509GeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123', $generator);
 
-        $this->assertEquals($signature->getPrivateKey(), $privateKey);
-        $this->assertEquals($signature->getPublicKey(), $publicKey);
+        self::assertEquals($signature->getPrivateKey(), $privateKey);
+        self::assertEquals($signature->getPublicKey(), $publicKey);
         $this->assertCertificateEquals(
             $signature->getCertificateContent(),
-            $this->getCertificateContent('webank-self-signed.csr')
-        );
-    }
-
-    /**
-     * @group generate-silarhi-certificate-content
-     */
-    public function testGenerateSilarhiCertificateContent()
-    {
-        $privateKey = $this->getPrivateKey();
-        $publicKey = $this->getPublicKey();
-
-        //Certificate generated with https://certificatetools.com/ the 22/03/2020 (1 year validity)
-        $generator = new SilarhiX509Generator();
-        $generator->setX509StartDate(new DateTime('2020-03-22'));
-        $generator->setX509EndDate(new DateTime('2021-03-22'));
-        $generator->setSerialNumber('37376365613564393736653364353135633333333932376336366134393663336133663135323432');
-
-        $certificateFactory = new SignatureFactory();
-        $certificate = $certificateFactory->createSignatureAFromKeys([
-            'publickey' => $publicKey,
-            'privatekey' => $privateKey,
-        ], 'test123', $generator);
-
-        $this->assertEquals($certificate->getPrivateKey(), $privateKey);
-        $this->assertEquals($certificate->getPublicKey(), $publicKey);
-        $this->assertCertificateEquals(
-            $certificate->getCertificateContent(),
-            $this->getCertificateContent('silarhi-self-signed.csr')
+            $this->getCertificateContent()
         );
     }
 
@@ -82,16 +57,16 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $generatedInfos = openssl_x509_parse($generatedContent);
         $certificateInfos = openssl_x509_parse($fileContent);
 
-        $this->assertEquals($generatedInfos['subject'], $certificateInfos['subject']);
-        $this->assertEquals($generatedInfos['issuer'], $certificateInfos['issuer']);
-        $this->assertEquals(
+        self::assertEquals($generatedInfos['subject'], $certificateInfos['subject']);
+        self::assertEquals($generatedInfos['issuer'], $certificateInfos['issuer']);
+        self::assertEquals(
             DateTime::createFromFormat(
                 'U',
                 $generatedInfos['validFrom_time_t']
             )->format('d/m/Y'),
             DateTime::createFromFormat('U', $certificateInfos['validFrom_time_t'])->format('d/m/Y')
         );
-        $this->assertEquals(
+        self::assertEquals(
             DateTime::createFromFormat(
                 'U',
                 $generatedInfos['validTo_time_t']
@@ -100,17 +75,30 @@ class X509GeneratorTest extends AbstractEbicsTestCase
                 'U',
                 $certificateInfos['validTo_time_t']
             )->format('d/m/Y'));
-        $this->assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
+        self::assertEquals($generatedInfos['extensions'], $certificateInfos['extensions']);
     }
 
     /**
-     * @param string $name
-     *
-     * @return false|string
+     * @return string
      */
-    private function getCertificateContent(string $name)
+    private function getCertificateContent()
     {
-        return file_get_contents($this->data . '/certificates/' . $name);
+        return '-----BEGIN CERTIFICATE-----
+MIICcDCCAdmgAwIBAgJLNTM5NDUzNTEwODUyMTU1MTk0MDY1MjMzOTA4NDEzMzQy
+Nzg5MTU2NTQyMzk1OTU2NjcwMjU0NDc2MTU0OTY4NTk3NTgzMDU1OTQwMA0GCSqG
+SIb3DQEBCwUAMBwxCzAJBgNVBAYMAkRFMQ0wCwYDVQQDDARCYW5rMB4XDTIwMDMy
+MTAwMDAwMFoXDTIxMDMyMjAwMDAwMFowIjELMAkGA1UEBgwCREUxEzARBgNVBAMM
+CiouYmFuay5kb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAIzB7E84N4lz
+CyS7IiMipDakOQjqTgcRWel8Y51zjH2MXRwVifil3An0x3PoaqCgcuNYfYPWsofW
+MSw4VP2Sz5DIdG0ob+r2XIKvO4GjpxhNdTwyCL1RIz5nvQng1VIUo5s4LP/d4mvP
+h8N73nkMQyqFz5WSZeXI452IrLs+LZtvAgMBAAGjcjBwMB0GA1UdDgQWBBREAqUl
+0PKgjXu8AEk9bu5fsVn5NzAJBgNVHRMEAjAAMBMGA1UdJQQMMAoGCCsGAQUFBwME
+MA4GA1UdDwEB/wQEAwIGQDAfBgNVHSMEGDAWgBREAqUl0PKgjXu8AEk9bu5fsVn5
+NzANBgkqhkiG9w0BAQsFAAOBgQB+0u9QxJ0JXvmaAwnxtq6rTi1plTK1MnJLQ8CC
+Aj7GhA8cowBCq80OPg6cLPFYYQhNWPvAMNrHbc/spG9JJgOI0W3fucWzxcQwX1dz
+awjOZoyk/xxJRiatm6kpDvk0ekRoXRkeHB8HAlkdyJe8/5i8fJ6AnCbNZYRl8Lhj
+DAgpwQ==
+-----END CERTIFICATE-----';
     }
 
     /**
@@ -118,7 +106,22 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPrivateKey()
     {
-        return file_get_contents($this->data . '/private_key.rsa');
+        return '-----BEGIN RSA PRIVATE KEY-----
+MIICXAIBAAKBgQCMwexPODeJcwskuyIjIqQ2pDkI6k4HEVnpfGOdc4x9jF0cFYn4
+pdwJ9Mdz6GqgoHLjWH2D1rKH1jEsOFT9ks+QyHRtKG/q9lyCrzuBo6cYTXU8Mgi9
+USM+Z70J4NVSFKObOCz/3eJrz4fDe955DEMqhc+VkmXlyOOdiKy7Pi2bbwIDAQAB
+AoGAMeWMn4iOJ2tgx+SOdWYSUExm64Ijpt2/wcUWivorE1Zuq0X3Yu1o0x6ylaQO
+KGK4V19HHzU8lGqZg9N0TW99pI6Sp7IcOCakIm4RnyahAWzbKJzZ0XSAs1FHE/Gl
+yRvDg+V1+Nx7i52jCbSbHSCB/EmoOlTaV+TJjtq8yFsNagECQQDKAUW5w4y9/w+K
+ppWlyhBvV8zS1GztHQ8yJEcsTiHcUkyA3SF5KPATWw3c/lWN4uYw4XDTopdqWJNu
+W+fwWdMNAkEAsmGhYqQlEI9r49Tz1anQAFtCUzBHEJtBWOuRa0C5BLJH6tyU2IK9
+C1odvBbzlgLb1CzdjHal0/LYViHkrBa5awJBAL1uqAZmXUunLtnlEhzg+ryPZ6Km
+VmedgqyQ3LWtp49HFjsaI9PNEiX0k3GUiIKAL0HTh8zPgpLV8ZviUAVTFtkCQHXU
+G6BmwLzxn9i839vw8Z5qqaL9rtN/Wmj8IfBwrkY15V90GTXzFiCbhCysFHawqLi8
+chPIg70/Gju646vwzsUCQGucnbDIXjnQK8nkzAiv/2+AluuCaP/DpBducbUhVWZZ
+cTPigqsjIjo409hi01WNXMgZO3c6V7iAaaXtAmRmzVM=
+-----END RSA PRIVATE KEY-----
+';
     }
 
     /**
@@ -126,6 +129,12 @@ class X509GeneratorTest extends AbstractEbicsTestCase
      */
     private function getPublicKey()
     {
-        return file_get_contents($this->data . '/public_key.rsa');
+        return '-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCMwexPODeJcwskuyIjIqQ2pDkI
+6k4HEVnpfGOdc4x9jF0cFYn4pdwJ9Mdz6GqgoHLjWH2D1rKH1jEsOFT9ks+QyHRt
+KG/q9lyCrzuBo6cYTXU8Mgi9USM+Z70J4NVSFKObOCz/3eJrz4fDe955DEMqhc+V
+kmXlyOOdiKy7Pi2bbwIDAQAB
+-----END PUBLIC KEY-----
+';
     }
 }

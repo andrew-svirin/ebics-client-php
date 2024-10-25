@@ -16,23 +16,11 @@ use AndrewSvirin\Ebics\Models\SignatureBankLetter;
  *
  * @internal
  */
-class BankLetterService
+final class BankLetterService
 {
-
-    /**
-     * @var CryptService
-     */
-    private $cryptService;
-
-    /**
-     * @var SignatureBankLetterFactory
-     */
-    private $signatureBankLetterFactory;
-
-    /**
-     * @var CertificateX509Factory
-     */
-    private $certificateX509Factory;
+    private CryptService $cryptService;
+    private SignatureBankLetterFactory $signatureBankLetterFactory;
+    private CertificateX509Factory $certificateX509Factory;
 
     public function __construct()
     {
@@ -76,7 +64,6 @@ class BankLetterService
             $certificateX509 = $this->certificateX509Factory->createFromContent($content);
             $startDate = $certificateX509->getValidityStartDate();
 
-            $signatureBankLetter->setIsCertified(true);
             $signatureBankLetter->setCertificateContent($content);
             $signatureBankLetter->setCertificateCreatedAt($startDate);
         }
@@ -92,7 +79,7 @@ class BankLetterService
     private function formatKeyHashForBankLetter(string $hash): string
     {
         // Split hash by 2 bytes in array and join by space character.
-        $hash = join(' ', str_split($hash, 2));
+        $hash = implode(' ', str_split($hash, 2));
 
         return $hash;
     }

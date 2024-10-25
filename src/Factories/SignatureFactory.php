@@ -2,9 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
+use AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface;
 use AndrewSvirin\Ebics\Contracts\SignatureInterface;
 use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
 use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
 use AndrewSvirin\Ebics\Models\Crypt\RSA;
 use AndrewSvirin\Ebics\Models\Signature;
@@ -17,23 +17,13 @@ use RuntimeException;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin, Guillaume Sainthillier
  */
-class SignatureFactory
+final class SignatureFactory
 {
-
-    /**
-     * @var RSAFactory
-     */
-    private $rsaFactory;
-
-    /**
-     * @var BigIntegerFactory
-     */
-    private $bigIntegerFactory;
+    private RSAFactory $rsaFactory;
 
     public function __construct()
     {
         $this->rsaFactory = new RSAFactory();
-        $this->bigIntegerFactory = new BigIntegerFactory();
     }
 
     /**
@@ -46,13 +36,13 @@ class SignatureFactory
     public function create(string $type, string $publicKey, string $privateKey = null): SignatureInterface
     {
         switch ($type) {
-            case Signature::TYPE_A:
+            case SignatureInterface::TYPE_A:
                 $signature = $this->createSignatureA($publicKey, $privateKey);
                 break;
-            case Signature::TYPE_E:
+            case SignatureInterface::TYPE_E:
                 $signature = $this->createSignatureE($publicKey, $privateKey);
                 break;
-            case Signature::TYPE_X:
+            case SignatureInterface::TYPE_X:
                 $signature = $this->createSignatureX($publicKey, $privateKey);
                 break;
             default:
@@ -70,7 +60,7 @@ class SignatureFactory
      */
     public function createSignatureA(string $publicKey, string $privateKey): SignatureInterface
     {
-        return new Signature(Signature::TYPE_A, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_A, $publicKey, $privateKey);
     }
 
     /**
@@ -81,7 +71,7 @@ class SignatureFactory
      */
     public function createSignatureE(string $publicKey, string $privateKey = null): SignatureInterface
     {
-        return new Signature(Signature::TYPE_E, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_E, $publicKey, $privateKey);
     }
 
     /**
@@ -92,7 +82,7 @@ class SignatureFactory
      */
     public function createSignatureX(string $publicKey, string $privateKey = null): SignatureInterface
     {
-        return new Signature(Signature::TYPE_X, $publicKey, $privateKey);
+        return new Signature(SignatureInterface::TYPE_X, $publicKey, $privateKey);
     }
 
     /**
@@ -110,7 +100,7 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_A, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_A, $x509Generator);
     }
 
     /**
@@ -128,7 +118,7 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_E, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_E, $x509Generator);
     }
 
     /**
@@ -146,29 +136,33 @@ class SignatureFactory
         string $password,
         X509GeneratorInterface $x509Generator = null
     ): SignatureInterface {
-        return $this->createSignatureFromKeys($keys, $password, Signature::TYPE_X, $x509Generator);
+        return $this->createSignatureFromKeys($keys, $password, SignatureInterface::TYPE_X, $x509Generator);
     }
 
     /**
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
-    public function createCertificateEFromDetails(string $exponent, string $modulus): SignatureInterface
-    {
-        return $this->createCertificateFromDetails(Signature::TYPE_E, $exponent, $modulus);
+    public function createSignatureEFromDetails(
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
+    ): SignatureInterface {
+        return $this->createCertificateFromDetails(SignatureInterface::TYPE_E, $exponent, $modulus);
     }
 
     /**
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
-    public function createCertificateXFromDetails(string $exponent, string $modulus): SignatureInterface
-    {
-        return $this->createCertificateFromDetails(Signature::TYPE_X, $exponent, $modulus);
+    public function createSignatureXFromDetails(
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
+    ): SignatureInterface {
+        return $this->createCertificateFromDetails(SignatureInterface::TYPE_X, $exponent, $modulus);
     }
 
     /**
@@ -215,23 +209,19 @@ class SignatureFactory
         string $type,
         X509GeneratorInterface $x509Generator
     ): string {
-        $privateKey = $this->rsaFactory->create();
-        $privateKey->setPassword($password);
-        $privateKey->loadKey($keys['privatekey']);
+        $rsaPrivateKey = $this->rsaFactory->createPrivate($keys['privatekey'], $password);
 
-        $publicKey = $this->rsaFactory->create();
-        $publicKey->loadKey($keys['publickey']);
-        $publicKey->setPublicKey();
+        $rsaPublicKey = $this->rsaFactory->createPublic($keys['publickey']);
 
         switch ($type) {
-            case Signature::TYPE_A:
-                $x509 = $x509Generator->generateAX509($privateKey, $publicKey);
+            case SignatureInterface::TYPE_A:
+                $x509 = $x509Generator->generateAX509($rsaPrivateKey, $rsaPublicKey);
                 break;
-            case Signature::TYPE_E:
-                $x509 = $x509Generator->generateEX509($privateKey, $publicKey);
+            case SignatureInterface::TYPE_E:
+                $x509 = $x509Generator->generateEX509($rsaPrivateKey, $rsaPublicKey);
                 break;
-            case Signature::TYPE_X:
-                $x509 = $x509Generator->generateXX509($privateKey, $publicKey);
+            case SignatureInterface::TYPE_X:
+                $x509 = $x509Generator->generateXX509($rsaPrivateKey, $rsaPublicKey);
                 break;
             default:
                 throw new RuntimeException('Unpredictable type.');
@@ -246,24 +236,23 @@ class SignatureFactory
 
     /**
      * @param string $type
-     * @param string $exponent
-     * @param string $modulus
+     * @param BigIntegerInterface $exponent
+     * @param BigIntegerInterface $modulus
      *
      * @return SignatureInterface
      */
     private function createCertificateFromDetails(
         string $type,
-        string $exponent,
-        string $modulus
+        BigIntegerInterface $exponent,
+        BigIntegerInterface $modulus
     ): SignatureInterface {
-        $rsa = $this->rsaFactory->create();
-        $rsa->loadKey([
-            'n' => $this->bigIntegerFactory->create($modulus, 256),
-            'e' => $this->bigIntegerFactory->create($exponent, 256),
-        ]);
+        $details = [
+            'modulus' => $modulus,
+            'exponent' => $exponent,
+        ];
+        $rsa = $this->rsaFactory->createPublic($details);
         $publicKey = $rsa->getPublicKey(RSA::PUBLIC_FORMAT_PKCS1);
-        $privateKey = $rsa->getPrivateKey(RSA::PUBLIC_FORMAT_PKCS1);
 
-        return new Signature($type, $publicKey, $privateKey);
+        return new Signature($type, $publicKey, null);
     }
 }

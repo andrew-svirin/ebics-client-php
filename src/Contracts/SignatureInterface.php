@@ -37,5 +37,5 @@ interface SignatureInterface
     /**
      * @return string|null
      */
-    public function getCertificateContent();
+    public function getCertificateContent(): ?string;
 }
