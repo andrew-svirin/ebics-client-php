@@ -1251,7 +1251,6 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
     private function retrieveDownloadSegment(Request $request): DownloadSegment
@@ -1260,7 +1259,7 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->checkH00XReturnCode($request, $response);
 
-        return $this->responseHandler->extractDownloadSegment($response, $this->keyring);
+        return $this->responseHandler->extractDownloadSegment($response);
     }
 
     /**

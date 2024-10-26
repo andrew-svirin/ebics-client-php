@@ -1,6 +1,6 @@
 ## 2.3
 
-* Add `SPR` order type
+* Extended OrderData handler.
 
 ## 2.2
 

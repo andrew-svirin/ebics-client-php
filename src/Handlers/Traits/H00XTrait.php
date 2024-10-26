@@ -3,6 +3,7 @@
 namespace AndrewSvirin\Ebics\Handlers\Traits;
 
 use DOMDocument;
+use DOMNodeList;
 use DOMXPath;
 
 /**
@@ -33,5 +34,23 @@ trait H00XTrait
         $xpath->registerNamespace('ds', 'http://www.w3.org/2000/09/xmldsig#');
 
         return $xpath;
+    }
+
+    /**
+     * Perform query for H00X namespace.
+     *
+     * @param DOMDocument $xml
+     * @param string $path
+     *
+     * @return DOMNodeList|false
+     */
+    public function queryH00XXpath(DOMDocument $xml, string $path)
+    {
+        $h00x = $this->getH00XVersion();
+        $xpath = $this->prepareH00XXPath($xml);
+
+        $expression = preg_replace('#/([^/])#', '/'.$h00x.':$1', $path);
+
+        return $xpath->query($expression);
     }
 }

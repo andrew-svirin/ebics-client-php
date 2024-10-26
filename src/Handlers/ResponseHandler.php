@@ -46,11 +46,7 @@ abstract class ResponseHandler
      */
     public function retrieveH00XReturnCode(DOMDocument $xml): string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:mutable/$h00x:ReturnCode");
-
-        return DOMHelper::safeItemValue($value);
+        return DOMHelper::safeItemValue($this->queryH00XXpath($xml, '//header/mutable/ReturnCode'));
     }
 
     /**
@@ -62,11 +58,7 @@ abstract class ResponseHandler
      */
     public function retrieveH00XBodyReturnCode(DOMDocument $xml): string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $returnCode = $xpath->query("//$h00x:body/$h00x:ReturnCode");
-
-        return DOMHelper::safeItemValue($returnCode);
+        return DOMHelper::safeItemValue($this->queryH00XXpath($xml, '//body/ReturnCode'));
     }
 
     /**
@@ -78,38 +70,22 @@ abstract class ResponseHandler
      */
     public function retrieveH00XReportText(DOMDocument $xml): string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $reportText = $xpath->query("//$h00x:header/$h00x:mutable/$h00x:ReportText");
-
-        return DOMHelper::safeItemValue($reportText);
+        return DOMHelper::safeItemValue($this->queryH00XXpath($xml, '//header/mutable/ReportText'));
     }
 
     public function retrieveH00XTransactionId(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:static/$h00x:TransactionID");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//header/static/TransactionID'));
     }
 
     public function retrieveH00XTransactionPhase(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:mutable/$h00x:TransactionPhase");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//header/mutable/TransactionPhase'));
     }
 
     public function retrieveH00XNumSegments(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:static/$h00x:NumSegments");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//header/static/NumSegments'));
     }
 
     public function retrieveH00XRequestOrderId(DOMDocument $xml): string
@@ -122,38 +98,24 @@ abstract class ResponseHandler
 
     public function retrieveH00XResponseOrderId(DOMDocument $xml): string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:mutable/$h00x:OrderID");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//header/mutable/OrderID'));
     }
 
     public function retrieveH00XSegmentNumber(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:header/$h00x:mutable/$h00x:SegmentNumber");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//header/mutable/SegmentNumber'));
     }
 
     public function retrieveH00XTransactionKey(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:body/$h00x:DataTransfer/$h00x:DataEncryptionInfo/$h00x:TransactionKey");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull(
+            $this->queryH00XXpath($xml, '//body/DataTransfer/DataEncryptionInfo/TransactionKey')
+        );
     }
 
     public function retrieveH00XOrderData(DOMDocument $xml): ?string
     {
-        $h00x = $this->getH00XVersion();
-        $xpath = $this->prepareH00XXPath($xml);
-        $value = $xpath->query("//$h00x:body/$h00x:DataTransfer/$h00x:OrderData");
-
-        return DOMHelper::safeItemValueOrNull($value);
+        return DOMHelper::safeItemValueOrNull($this->queryH00XXpath($xml, '//body/DataTransfer/OrderData'));
     }
 
     /**
@@ -233,10 +195,8 @@ abstract class ResponseHandler
 
     /**
      * Extract DownloadSegment from the DOM XML.
-     *
-     * @throws EbicsException
      */
-    public function extractDownloadSegment(Response $response, Keyring $keyring): DownloadSegment
+    public function extractDownloadSegment(Response $response): DownloadSegment
     {
         $transactionId = $this->retrieveH00XTransactionId($response);
         $transactionPhase = $this->retrieveH00XTransactionPhase($response);
@@ -245,13 +205,6 @@ abstract class ResponseHandler
         $numSegments = $this->retrieveH00XNumSegments($response);
         $segmentNumber = $this->retrieveH00XSegmentNumber($response);
         $orderDataEncrypted = $this->retrieveH00XOrderData($response);
-//        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
-//            $keyring,
-//            $orderDataEncrypted,
-//            $transactionKey
-//        );
-//        $orderData = $this->zipService->uncompress($orderDataCompressed);
-
         $segment = $this->segmentFactory->createDownloadSegment();
         $segment->setResponse($response);
         $segment->setTransactionId($transactionId);
