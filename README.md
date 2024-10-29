@@ -12,10 +12,13 @@ PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/
 Supported PHP versions - PHP 7.2 - PHP 8.3  
 Support EBICS server versions: 2.4 (partially), 2.5 (default), 3.0  
 
-# 💥 EBICS API Client for webserver (V1.0.7)
+# 💥 EBICS API Client for webserver (V1.0.8)
+
+<img src="./doc/ebics_api_client.png" align="left" width="210" style="padding-right:20px">
 
 EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and accessed via a REST API  
 EBICS API Client - https://sites.google.com/view/ebics-api-client
+<br clear="left"/>
 
 ## License
 

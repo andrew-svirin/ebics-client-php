@@ -87,13 +87,31 @@ final class FakerHttpClient implements HttpClientInterface
                 break;
             case 'INI':
             case 'HIA':
+            case 'H3K':
             case 'HPB':
             case 'SPR':
-            case 'C53':
+            case 'HPD':
+            case 'HKD':
+            case 'HTD':
+            case 'PTK':
+            case 'HAA':
+            case 'VMK':
             case 'STA':
+            case 'C52':
+            case 'C53':
+            case 'C54':
+            case 'Z52':
+            case 'Z53':
+            case 'Z54':
+            case 'ZSR':
+            case 'XEK':
             case 'CCT':
             case 'CDD':
             case 'CDB':
+            case 'CIP':
+            case 'XE2':
+            case 'XE3':
+            case 'YCT':
                 $fileName = strtolower($orderType).'.xml';
                 break;
             default:
