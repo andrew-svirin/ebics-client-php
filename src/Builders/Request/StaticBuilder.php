@@ -112,30 +112,26 @@ abstract class StaticBuilder
 
     public function addBankPubKeyDigests(
         string $versionX,
-        string $certificateXDigest,
+        string $signXDigest,
         string $versionE,
-        string $certificateEDigest,
+        string $signEDigest,
         string $algorithm = 'sha256'
     ): StaticBuilder {
         $xmlBankPubKeyDigests = $this->dom->createElement('BankPubKeyDigests');
         $this->instance->appendChild($xmlBankPubKeyDigests);
 
-        $authenticationNodeValue = base64_encode($certificateXDigest);
-
-        $encryptionNodeValue = base64_encode($certificateEDigest);
-
         // Add Authentication to BankPubKeyDigests.
         $xmlAuthentication = $this->dom->createElement('Authentication');
         $xmlAuthentication->setAttribute('Version', $versionX);
         $xmlAuthentication->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $xmlAuthentication->nodeValue = $authenticationNodeValue;
+        $xmlAuthentication->nodeValue = base64_encode($signXDigest);
         $xmlBankPubKeyDigests->appendChild($xmlAuthentication);
 
         // Add Encryption to BankPubKeyDigests.
         $xmlEncryption = $this->dom->createElement('Encryption');
         $xmlEncryption->setAttribute('Version', $versionE);
         $xmlEncryption->setAttribute('Algorithm', sprintf('http://www.w3.org/2001/04/xmlenc#%s', $algorithm));
-        $xmlEncryption->nodeValue = $encryptionNodeValue;
+        $xmlEncryption->nodeValue = base64_encode($signEDigest);
         $xmlBankPubKeyDigests->appendChild($xmlEncryption);
 
         return $this;

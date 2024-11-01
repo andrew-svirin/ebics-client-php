@@ -5,8 +5,6 @@ namespace AndrewSvirin\Ebics\Tests\Services\BankLetter;
 use AndrewSvirin\Ebics\Factories\SignatureFactory;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
-use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
-use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
 use AndrewSvirin\Ebics\Services\DigestResolverV2;
 use AndrewSvirin\Ebics\Services\DigestResolverV3;
 use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
@@ -22,7 +20,6 @@ use DateTime;
  */
 class HashGeneratorTest extends AbstractEbicsTestCase
 {
-
     /**
      * @group hash-generator-certificate-v2
      * @covers
@@ -30,7 +27,6 @@ class HashGeneratorTest extends AbstractEbicsTestCase
     public function testGenerateCertificateHashV2()
     {
         $digestResolver = new DigestResolverV2();
-        $hashGenerator = new CertificateHashGenerator($digestResolver);
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
@@ -49,9 +45,9 @@ class HashGeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123', $x509Generator);
 
-        $hash = $hashGenerator->generate($signature);
+        $hash = $digestResolver->confirmDigest($signature);
 
-        self::assertEquals('e1955c3873327e1791aca42e350cea48196f7934648d48b60228eaf5d10ee0c4', $hash);
+        self::assertEquals('9d652779181bc388791d021cdd76999e9f0cc38b888296c8c4efcb2d4bdee55f', $hash);
     }
 
     /**
@@ -61,7 +57,6 @@ class HashGeneratorTest extends AbstractEbicsTestCase
     public function testGenerateCertificateHashV3()
     {
         $digestResolver = new DigestResolverV3();
-        $hashGenerator = new CertificateHashGenerator($digestResolver);
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
@@ -80,7 +75,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123', $x509Generator);
 
-        $hash = $hashGenerator->generate($signature);
+        $hash = $digestResolver->confirmDigest($signature);
 
         self::assertEquals('9d652779181bc388791d021cdd76999e9f0cc38b888296c8c4efcb2d4bdee55f', $hash);
     }
@@ -91,7 +86,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
      */
     public function testGeneratePublicKeyHash()
     {
-        $hashGenerator = new PublicKeyHashGenerator();
+        $digestResolver = new DigestResolverV2();
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
@@ -103,7 +98,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
             'privatekey' => $privateKey,
         ], 'test123');
 
-        $hash = $hashGenerator->generate($signature);
+        $hash = $digestResolver->confirmDigest($signature);
 
         self::assertEquals('e1955c3873327e1791aca42e350cea48196f7934648d48b60228eaf5d10ee0c4', $hash);
     }

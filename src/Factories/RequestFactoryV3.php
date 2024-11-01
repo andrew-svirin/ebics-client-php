@@ -103,9 +103,9 @@ final class RequestFactoryV3 extends RequestFactory
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -169,9 +169,9 @@ final class RequestFactoryV3 extends RequestFactory
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());

@@ -69,5 +69,9 @@ jobs:
           php-version: '7.4'
       - name: Composer Install
         run: composer install --no-scripts --no-progress --ansi
+      - name: Prepare data
+        run: unzip -P ${{ secrets.PWD }} ./tests/_data.zip -d .
       - name: Run phpunit
+        env:
+            PASSWORD: ${{ secrets.PWD }}
         run: composer code-test

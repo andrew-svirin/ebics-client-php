@@ -12,12 +12,19 @@ use AndrewSvirin\Ebics\Contracts\SignatureInterface;
  */
 final class DigestResolverV3 extends DigestResolver
 {
-    public function digest(SignatureInterface $signature, string $algorithm = 'sha256'): string
+    public function signDigest(SignatureInterface $signature, string $algorithm = 'sha256'): string
     {
         return $this->cryptService->calculateCertificateFingerprint(
             $signature->getCertificateContent(),
-            $algorithm,
-            true
+            $algorithm
         );
+    }
+
+    public function confirmDigest(SignatureInterface $signature, string $algorithm = 'sha256'): string
+    {
+        return bin2hex($this->cryptService->calculateCertificateFingerprint(
+            $signature->getCertificateContent(),
+            $algorithm
+        ));
     }
 }

@@ -19,5 +19,23 @@ abstract class DigestResolver
         $this->cryptService = new CryptService();
     }
 
-    abstract public function digest(SignatureInterface $signature, string $algorithm = 'sha256'): string;
+    /**
+     * Digest for signing orders.
+     *
+     * @param SignatureInterface $signature
+     * @param string $algorithm
+     *
+     * @return string
+     */
+    abstract public function signDigest(SignatureInterface $signature, string $algorithm = 'sha256'): string;
+
+    /**
+     * Digest for confirmation letter.
+     *
+     * @param SignatureInterface $signature
+     * @param string $algorithm
+     *
+     * @return string
+     */
+    abstract public function confirmDigest(SignatureInterface $signature, string $algorithm = 'sha256'): string;
 }

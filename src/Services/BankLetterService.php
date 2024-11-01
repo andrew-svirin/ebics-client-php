@@ -32,22 +32,21 @@ final class BankLetterService
     /**
      * @param SignatureInterface $signature
      * @param string $version
-     *
-     * @param HashGeneratorInterface $hashGenerator
+     * @param DigestResolver $digestResolver
      *
      * @return SignatureBankLetter
      */
     public function formatSignatureForBankLetter(
         SignatureInterface $signature,
         string $version,
-        HashGeneratorInterface $hashGenerator
+        DigestResolver $digestResolver
     ): SignatureBankLetter {
         $publicKeyDetails = $this->cryptService->getPublicKeyDetails($signature->getPublicKey());
 
         $exponentFormatted = $this->formatBytesForBank($publicKeyDetails['e']);
         $modulusFormatted = $this->formatBytesForBank($publicKeyDetails['m']);
 
-        $keyHash = $hashGenerator->generate($signature);
+        $keyHash = $digestResolver->confirmDigest($signature);
         $keyHashFormatted = $this->formatKeyHashForBankLetter($keyHash);
 
         $modulusSize = strlen($publicKeyDetails['m']) * 8; // 8 bits in byte.

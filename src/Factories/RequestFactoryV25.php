@@ -119,9 +119,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -172,9 +172,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -225,9 +225,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -278,9 +278,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -331,9 +331,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -384,9 +384,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -437,9 +437,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -490,9 +490,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000);
                     })->addMutable(function (MutableBuilder $builder) {
@@ -561,9 +561,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -626,9 +626,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -691,9 +691,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -756,9 +756,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -821,9 +821,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());
@@ -886,9 +886,9 @@ final class RequestFactoryV25 extends RequestFactoryV2
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureX()),
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureX()),
                                 $context->getKeyring()->getBankSignatureEVersion(),
-                                $this->digestResolver->digest($context->getKeyring()->getBankSignatureE())
+                                $this->digestResolver->signDigest($context->getKeyring()->getBankSignatureE())
                             )
                             ->addSecurityMedium(StaticBuilder::SECURITY_MEDIUM_0000)
                             ->addNumSegments($context->getNumSegments());

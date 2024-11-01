@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\EbicsBankLetter;
 
 /**
@@ -17,15 +18,14 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
     /**
      * Prepare bank letter in txt format.
      *
-     * @dataProvider serversDataProvider
+     * @dataProvider clientsDataProvider
      *
      * @group prepare-bank-letter-txt
      *
-     * @param int $credentialsId
+     * @param EbicsClientInterface $client
      */
-    public function testPrepareBankLetterTxt(int $credentialsId)
+    public function testPrepareBankLetterTxt(EbicsClientInterface $client)
     {
-        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
@@ -42,15 +42,14 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
     /**
      * Prepare bank letter in html format.
      *
-     * @dataProvider serversDataProvider
+     * @dataProvider clientsDataProvider
      *
      * @group prepare-bank-letter-html
      *
-     * @param int $credentialsId
+     * @param EbicsClientInterface $client
      */
-    public function testPrepareBankLetterHtml(int $credentialsId)
+    public function testPrepareBankLetterHtml(EbicsClientInterface $client)
     {
-        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
@@ -67,15 +66,14 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
     /**
      * Prepare bank letter in pdf format.
      *
-     * @dataProvider serversDataProvider
+     * @dataProvider clientsDataProvider
      *
      * @group prepare-bank-letter-pdf
      *
-     * @param int $credentialsId
+     * @param EbicsClientInterface $client
      */
-    public function testPrepareBankLetterPdf(int $credentialsId)
+    public function testPrepareBankLetterPdf(EbicsClientInterface $client)
     {
-        $client = $this->setupClientV25($credentialsId);
         $ebicsBankLetter = new EbicsBankLetter();
 
         $bankLetter = $ebicsBankLetter->prepareBankLetter(
@@ -90,19 +88,25 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
     }
 
     /**
-     * Provider for servers.
+     * Provider for clients.
      */
-    public function serversDataProvider()
+    public function clientsDataProvider()
     {
         return [
-//            [
-//                1, // Credentials Id.
-//            ],
             [
-                2, // Credentials Id.
+                $this->setupClientV24(2),
             ],
             [
-                3, // Credentials Id.
+                $this->setupClientV24(3),
+            ],
+            [
+                $this->setupClientV25(2),
+            ],
+            [
+                $this->setupClientV25(3),
+            ],
+            [
+                $this->setupClientV30(2),
             ],
         ];
     }

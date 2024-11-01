@@ -11,8 +11,6 @@ use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
 use AndrewSvirin\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
 use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\CertificateHashGenerator;
-use AndrewSvirin\Ebics\Services\BankLetter\HashGenerator\PublicKeyHashGenerator;
 use AndrewSvirin\Ebics\Services\BankLetterService;
 use AndrewSvirin\Ebics\Services\DigestResolverV2;
 use AndrewSvirin\Ebics\Services\DigestResolverV3;
@@ -48,40 +46,33 @@ final class EbicsBankLetter
      */
     public function prepareBankLetter(Bank $bank, User $user, Keyring $keyring): BankLetter
     {
-        if ($keyring->isCertified()) {
-            if (Keyring::VERSION_25 === $keyring->getVersion()) {
-                $digestResolver = new DigestResolverV2();
-            } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
-                $digestResolver = new DigestResolverV3();
-            } else {
-                throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
-            }
-            $hashGenerator = new CertificateHashGenerator($digestResolver);
+        if (Keyring::VERSION_25 === $keyring->getVersion() || Keyring::VERSION_24 === $keyring->getVersion()) {
+            $digestResolver = new DigestResolverV2();
+        } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
+            $digestResolver = new DigestResolverV3();
         } else {
-            $hashGenerator = new PublicKeyHashGenerator();
+            throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
         }
 
-        $bankLetter = $this->bankLetterFactory->create(
+        return $this->bankLetterFactory->create(
             $bank,
             $user,
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyring->getUserSignatureA(),
                 $keyring->getUserSignatureAVersion(),
-                $hashGenerator
+                $digestResolver
             ),
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyring->getUserSignatureE(),
                 $keyring->getUserSignatureEVersion(),
-                $hashGenerator
+                $digestResolver
             ),
             $this->bankLetterService->formatSignatureForBankLetter(
                 $keyring->getUserSignatureX(),
                 $keyring->getUserSignatureXVersion(),
-                $hashGenerator
+                $digestResolver
             )
         );
-
-        return $bankLetter;
     }
 
     /**

@@ -67,9 +67,8 @@ final class CryptService
 
         $rsa = $this->rsaFactory->createPrivate($signatureE->getPrivateKey(), $keyring->getPassword());
         $transactionKeyDecrypted = $rsa->decrypt($transactionKey);
-        $orderDataCompressed = $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted);
 
-        return $orderDataCompressed;
+        return $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted);
     }
 
     /**
@@ -87,9 +86,8 @@ final class CryptService
         $aes->setKey($key);
         // Force openssl_options.
         $aes->setOpenSSLOptions(OPENSSL_ZERO_PADDING);
-        $decrypted = $aes->decrypt($encrypted);
 
-        return $decrypted;
+        return $aes->decrypt($encrypted);
     }
 
     /**
@@ -376,18 +374,18 @@ final class CryptService
     /**
      * Make certificate fingerprint.
      *
-     * @param string $key
+     * @param string $certContent
      * @param string $algorithm
      * @param bool $rawOutput
      *
      * @return string
      */
     public function calculateCertificateFingerprint(
-        string $key,
+        string $certContent,
         string $algorithm = 'sha256',
-        bool $rawOutput = false
+        bool $rawOutput = true
     ): string {
-        $fingerprint = openssl_x509_fingerprint($key, $algorithm, $rawOutput);
+        $fingerprint = openssl_x509_fingerprint($certContent, $algorithm, $rawOutput);
         if (false === $fingerprint) {
             throw new RuntimeException('Can not calculate fingerprint for certificate.');
         }
@@ -403,9 +401,7 @@ final class CryptService
      */
     public function generateNonce(): string
     {
-        $nonce = $this->randomService->hex(32);
-
-        return $nonce;
+        return $this->randomService->hex(32);
     }
 
     /**
@@ -415,9 +411,7 @@ final class CryptService
      */
     public function generateTransactionKey(): string
     {
-        $transactionKey = $this->randomService->bytes(16);
-
-        return $transactionKey;
+        return $this->randomService->bytes(16);
     }
 
     /**

@@ -22,3 +22,9 @@ check:
 	cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php ./vendor/bin/phpcs
 	cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php ./vendor/bin/phpstan
 	cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php ./vendor/bin/phpunit
+
+credentials-pack:
+	cd docker && docker-compose -p ebics-client-php exec php-cli-ebics-client-php zip -P $(pwd) -r ./tests/_data.zip ./tests/_data/
+
+credentials-unpack:
+	unzip -P $(pwd) ./tests/_data.zip -d .
