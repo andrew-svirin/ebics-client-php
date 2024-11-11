@@ -64,17 +64,12 @@ abstract class OrderDataHandlerV2 extends OrderDataHandler
 
     /**
      * Add PubKeyValue to PublicKeyInfo XML Node.
-     *
-     * @param DOMNode $xmlPublicKeyInfo
-     * @param DOMDocument $xml
-     * @param SignatureInterface $certificate
-     * @param DateTimeInterface $dateTime
      */
     private function handlePubKeyValue(
         DOMNode $xmlPublicKeyInfo,
         DOMDocument $xml,
         SignatureInterface $certificate,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): void {
         $publicKeyDetails = $this->cryptService->getPublicKeyDetails($certificate->getPublicKey());
 

@@ -47,7 +47,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
 
         $hash = $digestResolver->confirmDigest($signature);
 
-        self::assertEquals('9d652779181bc388791d021cdd76999e9f0cc38b888296c8c4efcb2d4bdee55f', $hash);
+        self::assertEquals('d6267bf288495631f9e2731f48e1d7f243b86448089f8adbb769288dda485c04', $hash);
     }
 
     /**
@@ -77,7 +77,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
 
         $hash = $digestResolver->confirmDigest($signature);
 
-        self::assertEquals('9d652779181bc388791d021cdd76999e9f0cc38b888296c8c4efcb2d4bdee55f', $hash);
+        self::assertEquals('d6267bf288495631f9e2731f48e1d7f243b86448089f8adbb769288dda485c04', $hash);
     }
 
     /**

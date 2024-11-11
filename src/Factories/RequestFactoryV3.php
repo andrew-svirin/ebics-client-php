@@ -26,6 +26,7 @@ use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
 use AndrewSvirin\Ebics\Services\DigestResolverV3;
+use DateTime;
 use DateTimeInterface;
 use LogicException;
 
@@ -57,7 +58,7 @@ final class RequestFactoryV3 extends RequestFactory
     protected function addOrderType(
         OrderDetailsBuilder $orderDetailsBuilder,
         string $orderType,
-        bool $withES = true
+        bool $withES = false
     ): OrderDetailsBuilder {
         return $orderDetailsBuilder->addAdminOrderType($orderType);
     }
@@ -66,19 +67,19 @@ final class RequestFactoryV3 extends RequestFactory
      * @throws EbicsException
      */
     public function createBTD(
-        DateTimeInterface $dateTime,
         BTDContext $btdContext,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
             ->setBTDContext($btdContext)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime);
+            ->setEndDateTime($endDateTime)
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -122,9 +123,9 @@ final class RequestFactoryV3 extends RequestFactory
     }
 
     public function createBTU(
+        UploadTransaction $transaction,
         BTUContext $btuContext,
-        DateTimeInterface $dateTime,
-        UploadTransaction $transaction
+        ?DateTimeInterface $dateTime
     ): Request {
         $signatureData = new UserSignature();
 
@@ -142,7 +143,7 @@ final class RequestFactoryV3 extends RequestFactory
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
+            ->setDateTime($dateTime ?? new DateTime())
             ->setBTUContext($btuContext)
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
@@ -203,63 +204,70 @@ final class RequestFactoryV3 extends RequestFactory
     }
 
     public function createVMK(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
     public function createSTA(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
     public function createC52(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
     public function createC53(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
-        $btfContext = new BTDContext();
-        $btfContext->setServiceName('EOP');
-        $btfContext->setScope('DE');
-        $btfContext->setMsgName('camt.053');
-        $btfContext->setContainerType('ZIP');
+        $btdContext = new BTDContext();
+        $btdContext->setServiceName('EOP');
+        $btdContext->setScope('DE');
+        $btdContext->setMsgName('camt.053');
+        $btdContext->setContainerType('ZIP');
 
-        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime);
+        return $this->createBTD($btdContext, $startDateTime, $endDateTime, $dateTime);
     }
 
     public function createC54(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
     public function createZ52(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
     public function createZ53(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
@@ -268,100 +276,101 @@ final class RequestFactoryV3 extends RequestFactory
      * @throws EbicsException
      */
     public function createZ54(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
-        $btfContext = new BTDContext();
-        $btfContext->setServiceName('REP');
-        $btfContext->setScope('CH');
-        $btfContext->setMsgName('camt.054');
-        $btfContext->setMsgNameVersion('04');
-        $btfContext->setContainerType('ZIP');
-        $btfContext->setServiceOption('XQRR');
+        $btdContext = new BTDContext();
+        $btdContext->setServiceName('REP');
+        $btdContext->setScope('CH');
+        $btdContext->setMsgName('camt.054');
+        $btdContext->setMsgNameVersion('04');
+        $btdContext->setContainerType('ZIP');
+        $btdContext->setServiceOption('XQRR');
 
-        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime);
+        return $this->createBTD($btdContext, $startDateTime, $endDateTime, $dateTime);
     }
 
     /**
      * @throws EbicsException
      */
     public function createZSR(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request {
-        $btfContext = new BTDContext();
-        $btfContext->setServiceName('PSR');
-        $btfContext->setScope('BIL');
-        $btfContext->setMsgName('pain.002');
-        $btfContext->setContainerType('ZIP');
+        $btdContext = new BTDContext();
+        $btdContext->setServiceName('PSR');
+        $btdContext->setScope('BIL');
+        $btdContext->setMsgName('pain.002');
+        $btdContext->setContainerType('ZIP');
 
-        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime);
+        return $this->createBTD($btdContext, $startDateTime, $endDateTime, $dateTime);
     }
 
     /**
      * @throws EbicsException
      */
     public function createXEK(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request {
-        $btfContext = new BTDContext();
-        $btfContext->setServiceName('EOP');
-        $btfContext->setScope('AT');
-        $btfContext->setMsgName('pdf');
-        $btfContext->setContainerType('ZIP');
+        $btdContext = new BTDContext();
+        $btdContext->setServiceName('EOP');
+        $btdContext->setScope('AT');
+        $btdContext->setMsgName('pdf');
+        $btdContext->setContainerType('ZIP');
 
-        return $this->createBTD($dateTime, $btfContext, $startDateTime, $endDateTime);
+        return $this->createBTD($btdContext, $startDateTime, $endDateTime, $dateTime);
     }
 
-    public function createCCT(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createCCT(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createCDD(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createCDD(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createCDB(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createCDB(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createCIP(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createCIP(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createXE2(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createXE2(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 3.0');
     }
 
-    public function createXE3(DateTimeInterface $dateTime, UploadTransaction $transaction, bool $withES): Request
+    public function createXE3(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
     {
-        $btfContext = new BTUContext();
-        $btfContext->setServiceName('SDD');
-        $btfContext->setScope('CH');
-        $btfContext->setMsgName('pain.008');
-        $btfContext->setMsgNameVersion('02');
-        $btfContext->setFileName('xe3.pain008.xml');
+        $btuContext = new BTUContext();
+        $btuContext->setServiceName('SDD');
+        $btuContext->setScope('CH');
+        $btuContext->setMsgName('pain.008');
+        $btuContext->setMsgNameVersion('02');
+        $btuContext->setFileName('xe3.pain008.xml');
 
-        return $this->createBTU($btfContext, $dateTime, $transaction);
+        return $this->createBTU($transaction, $btuContext, $dateTime);
     }
 
-    public function createYCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createYCT(UploadTransaction $transaction, ?DateTimeInterface $dateTime): Request
     {
-        $btfContext = new BTUContext();
-        $btfContext->setServiceName('MCT');
-        $btfContext->setScope('BIL');
-        $btfContext->setMsgName('pain.001');
-        $btfContext->setFileName('yct.pain001.xml');
+        $btuContext = new BTUContext();
+        $btuContext->setServiceName('MCT');
+        $btuContext->setScope('BIL');
+        $btuContext->setMsgName('pain.001');
+        $btuContext->setFileName('yct.pain001.xml');
 
-        return $this->createBTU($btfContext, $dateTime, $transaction);
+        return $this->createBTU($transaction, $btuContext, $dateTime);
     }
 }

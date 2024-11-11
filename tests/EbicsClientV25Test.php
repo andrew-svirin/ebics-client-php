@@ -2,11 +2,11 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Contexts\FDLContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
-use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use DateTime;
@@ -141,6 +141,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
             $this->assertResponseOk($code, $reportText);
         }
     }
+
     /**
      * @dataProvider serversDataProvider
      *
@@ -149,7 +150,6 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      *
      * @param int $credentialsId
      * @param array $codes
-
      *
      * @covers
      */
@@ -385,7 +385,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['VMK']['fake']);
 
         $this->assertExceptionCode($codes['VMK']['code']);
-        $vmk = $client->VMK(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $vmk = $client->VMK(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($vmk->getTransaction()->getLastSegment()->getResponse());
@@ -413,7 +413,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['STA']['fake']);
 
         $this->assertExceptionCode($codes['STA']['code']);
-        $sta = $client->STA(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $sta = $client->STA(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($sta->getTransaction()->getLastSegment()->getResponse());
@@ -441,7 +441,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['C52']['fake']);
 
         $this->assertExceptionCode($codes['C52']['code']);
-        $c52 = $client->C52(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $c52 = $client->C52(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c52->getTransaction()->getLastSegment()->getResponse());
@@ -469,7 +469,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['C53']['fake']);
 
         $this->assertExceptionCode($codes['C53']['code']);
-        $c53 = $client->C53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $c53 = $client->C53(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
@@ -497,7 +497,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['C54']['fake']);
 
         $this->assertExceptionCode($codes['C54']['code']);
-        $c54 = $client->C54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $c54 = $client->C54(new DateTime('2020-03-21'), new DateTime('2020-04-21'), true);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getLastSegment()->getResponse());
@@ -525,7 +525,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['Z52']['fake']);
 
         $this->assertExceptionCode($codes['Z52']['code']);
-        $z52 = $client->Z52(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $z52 = $client->Z52(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z52->getTransaction()->getLastSegment()->getResponse());
@@ -553,7 +553,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['Z53']['fake']);
 
         $this->assertExceptionCode($codes['Z53']['code']);
-        $z53 = $client->Z53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $z53 = $client->Z53(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z53->getTransaction()->getLastSegment()->getResponse());
@@ -581,7 +581,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['Z54']['fake']);
 
         $this->assertExceptionCode($codes['Z54']['code']);
-        $z54 = $client->Z54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $z54 = $client->Z54(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
@@ -611,11 +611,13 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
             $this->assertExceptionCode($code['code']);
 
+            $context = (new FDLContext())
+                ->setFileFormat($fileFormat)
+                ->setParameter('TEST', 'TRUE')
+                ->setCountryCode('FR');
+
             $fdl = $client->FDL(
-                $fileFormat,
-                EbicsClient::FILE_PARSER_FORMAT_TEXT,
-                EbicsClient::COUNTRY_CODE_FR,
-                null,
+                $context,
                 new DateTime('2020-03-21'),
                 new DateTime('2020-04-21')
             );
@@ -658,19 +660,19 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     public function testFUL(int $credentialsId, array $codes)
     {
         $documentFactory = new DocumentFactory();
-        foreach ($codes['FUL'] as $ebcdic => $code) {
+        foreach ($codes['FUL'] as $fileFormat => $code) {
             $client = $this->setupClientV25($credentialsId, $code['fake']);
 
             $this->assertExceptionCode($code['code']);
 
-            $context = new FULContext();
-            $context->setParameter('ebcdic', $ebcdic);
+            $context = (new FULContext())
+                ->setFileFormat($fileFormat)
+                ->setParameter('TEST', 'TRUE')
+                ->setCountryCode('FR');
 
             $ful = $client->FUL(
-                $code['file_format'],
-                $documentFactory->create($code['document']),
                 $context,
-                new DateTime()
+                $documentFactory->create($code['document'])
             );
 
             $responseHandler = $client->getResponseHandler();
@@ -703,9 +705,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CCT']['code']);
 
-        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.03');
+        $orderData = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.03');
 
-        $cct = $client->CCT($customerCreditTransfer);
+        $cct = $client->CCT($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cct->getTransaction()->getLastSegment()->getResponse());
@@ -736,7 +738,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
-        $cip = $client->CIP($customerDirectDebit, null, false);
+        $cip = $client->CIP($customerDirectDebit, false);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
@@ -767,9 +769,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['XE2']['code']);
 
-        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
+        $orderData = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
 
-        $xe2 = $client->XE2($customerCreditTransfer);
+        $xe2 = $client->XE2($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($xe2->getTransaction()->getLastSegment()->getResponse());
@@ -800,9 +802,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['XE3']['code']);
 
-        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
+        $orderData = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.02');
 
-        $xe3 = $client->XE3($customerCreditTransfer);
+        $xe3 = $client->XE3($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getLastSegment()->getResponse());
@@ -831,9 +833,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CDD']['code']);
 
-        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
+        $orderData = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
-        $cdd = $client->CDD($customerDirectDebit);
+        $cdd = $client->CDD($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cdd->getTransaction()->getLastSegment()->getResponse());
@@ -862,9 +864,9 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['CDB']['code']);
 
-        $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
+        $orderData = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
-        $cdb = $client->CDB($customerDirectDebit);
+        $cdb = $client->CDB($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cdb->getTransaction()->getLastSegment()->getResponse());
@@ -1085,14 +1087,12 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.03.sct' => [
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1135,11 +1135,10 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                         'camt.xxx.cfonb240.act' => ['code' => '090005', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.03.sct' => [
                             'code' => null,
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1179,14 +1178,12 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.03.sct' => [
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],
@@ -1226,14 +1223,12 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.03.sct' => [
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => '090003', 'fake' => false],
@@ -1273,14 +1268,12 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
                     'C54' => ['code' => '090003', 'fake' => false],
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.03.sct' => [
                             'code' => '091112',
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
                         ],
                     ],
                     'CCT' => ['code' => null, 'fake' => false],

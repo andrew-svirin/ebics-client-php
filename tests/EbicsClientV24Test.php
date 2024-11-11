@@ -2,6 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
+use AndrewSvirin\Ebics\Contexts\FDLContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
@@ -148,11 +149,13 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
 
             $this->assertExceptionCode($code['code']);
 
+            $context = (new FDLContext())
+                ->setFileFormat($fileFormat)
+                ->setParameter('TEST', 'TRUE')
+                ->setCountryCode('FR');
+
             $fdl = $client->FDL(
-                $fileFormat,
-                'text',
-                'FR',
-                null,
+                $context,
                 new DateTime('2020-03-21'),
                 new DateTime('2020-04-21')
             );
@@ -195,19 +198,19 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
     public function testFUL(int $credentialsId, array $codes)
     {
         $documentFactory = new DocumentFactory();
-        foreach ($codes['FUL'] as $ebcdic => $code) {
+        foreach ($codes['FUL'] as $fileFormat => $code) {
             $client = $this->setupClientV24($credentialsId, $code['fake']);
 
             $this->assertExceptionCode($code['code']);
 
-            $context = new FULContext();
-            $context->setParameter('ebcdic', $ebcdic);
+            $context = (new FULContext())
+                ->setFileFormat($fileFormat)
+                ->setParameter('TEST', 'TRUE')
+                ->setCountryCode('FR');
 
             $ful = $client->FUL(
-                $code['file_format'],
-                $documentFactory->create($code['document']),
                 $context,
-                new DateTime()
+                $documentFactory->create($code['document'])
             );
 
             $responseHandler = $client->getResponseHandler();
@@ -229,27 +232,6 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
     {
         return [
             [
-                8, // Credentials Id.
-                [
-                    'HEV' => ['code' => null, 'fake' => false],
-                    'INI' => ['code' => null, 'fake' => false],
-                    'HIA' => ['code' => null, 'fake' => false],
-                    'HPB' => ['code' => null, 'fake' => false],
-                    'FDL' => [
-                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                        'camt.xxx.cfonb240.act' => ['code' => '091112', 'fake' => false],
-                    ],
-                    'FUL' => [
-                        'CCT' => [
-                            'code' => '091112',
-                            'fake' => false,
-                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
-                        ],
-                    ],
-                ],
-            ],
-            [
                 9, // Credentials Id.
                 [
                     'HEV' => ['code' => null, 'fake' => false],
@@ -259,13 +241,18 @@ class EbicsClientV24Test extends AbstractEbicsTestCase
                     'FDL' => [
                         'camt.xxx.cfonb120.stm' => ['code' => '090005', 'fake' => false],
                         'camt.xxx.cfonb240.act' => ['code' => '090005', 'fake' => false],
+                        'camt.xxx.estmt.eop' => ['code' => '090005', 'fake' => false],
                     ],
                     'FUL' => [
-                        'CCT' => [
+                        'pain.001.001.02.sct' => [
                             'code' => null,
                             'fake' => false,
                             'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                            'file_format' => 'pain.001.001.03.sct',
+                        ],
+                        'pain.008.001.02.sdd' => [
+                            'code' => null,
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
                         ],
                     ],
                 ],

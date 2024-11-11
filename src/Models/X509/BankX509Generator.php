@@ -57,8 +57,10 @@ final class BankX509Generator extends AbstractX509Generator
                 return EbicsClientInterface::COUNTRY_CODE_FR;
             case 'ch':
                 return EbicsClientInterface::COUNTRY_CODE_CH;
-            default:
+            case 'de':
                 return EbicsClientInterface::COUNTRY_CODE_DE;
+            default:
+                return EbicsClientInterface::COUNTRY_CODE_EU;
         }
     }
 

@@ -2,6 +2,13 @@
 <ruleset name="PSR2">
     <description>The PSR2 coding standard.</description>
     <rule ref="PSR2"/>
+
+    <!-- Exclude methods that match specific patterns from camel caps rule -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>src/EbicsClient.php</exclude-pattern>
+        <exclude-pattern>src/Contracts/EbicsClientInterface.php</exclude-pattern>
+    </rule>
+
     <file>src</file>
 
     <!-- Exclude files that do not contain PHP, Javascript or CSS code. -->

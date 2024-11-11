@@ -323,7 +323,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $context->setContainerType('ZIP');
 
         $this->assertExceptionCode($codes['BTD']['code']);
-        $btd = $client->BTD($context, null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $btd = $client->BTD($context, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($btd->getTransaction()->getLastSegment()->getResponse());
@@ -383,7 +383,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $client = $this->setupClientV30($credentialsId, $codes['C53']['fake']);
 
         $this->assertExceptionCode($codes['C53']['code']);
-        $c53 = $client->C53(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $c53 = $client->C53(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c53->getTransaction()->getLastSegment()->getResponse());
@@ -413,7 +413,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $client = $this->setupClientV30($credentialsId, $codes['Z54']['fake']);
 
         $this->assertExceptionCode($codes['Z54']['code']);
-        $z54 = $client->Z54(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $z54 = $client->Z54(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($z54->getTransaction()->getLastSegment()->getResponse());
@@ -443,7 +443,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $client = $this->setupClientV30($credentialsId, $codes['ZSR']['fake']);
 
         $this->assertExceptionCode($codes['ZSR']['code']);
-        $zsr = $client->ZSR(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $zsr = $client->ZSR(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($zsr->getTransaction()->getLastSegment()->getResponse());
@@ -473,7 +473,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $client = $this->setupClientV30($credentialsId, $codes['XEK']['fake']);
 
         $this->assertExceptionCode($codes['XEK']['code']);
-        $xek = $client->XEK(null, new DateTime('2020-03-21'), new DateTime('2020-04-21'));
+        $xek = $client->XEK(new DateTime('2020-03-21'), new DateTime('2020-04-21'));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($xek->getTransaction()->getLastSegment()->getResponse());
@@ -504,7 +504,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
 
         $this->assertExceptionCode($codes['BTU']['code']);
 
-        $customerCreditTransfer = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.09');
+        $orderData = $this->buildCustomerCreditTransfer('urn:iso:std:iso:20022:tech:xsd:pain.001.001.09');
 
         // XE2
         $context = new BTUContext();
@@ -513,10 +513,8 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $context->setMsgName('pain.001');
         $context->setMsgNameVersion('09');
         $context->setFileName('xe2.pain001.xml');
-        $context->setFileData($customerCreditTransfer->getContent());
-        $context->setFileDocument($customerCreditTransfer);
 
-        $btu = $client->BTU($context);
+        $btu = $client->BTU($context, $orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($btu->getTransaction()->getLastSegment()->getResponse());
@@ -548,9 +546,9 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['XE3']['code']);
 
         $documentFactory = new DocumentFactory();
-        $context = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
+        $orderData = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
 
-        $xe3 = $client->XE3($context);
+        $xe3 = $client->XE3($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($xe3->getTransaction()->getLastSegment()->getResponse());
@@ -582,9 +580,9 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['YCT']['code']);
 
         $documentFactory = new DocumentFactory();
-        $context = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
+        $orderData = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
 
-        $yct = $client->YCT($context);
+        $yct = $client->YCT($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($yct->getTransaction()->getLastSegment()->getResponse());
@@ -797,7 +795,6 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'H3K' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
-                    'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
                     'HVE' => ['code' => '090003', 'fake' => false],
@@ -808,6 +805,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'Z54' => ['code' => '091005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],
+                    'BTD' => ['code' => '090005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],
@@ -823,7 +821,6 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HIA' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
-                    'BTD' => ['code' => '090005', 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],
                     'HVZ' => ['code' => '090003', 'fake' => false],
                     'HVE' => ['code' => '090003', 'fake' => false],
@@ -834,6 +831,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'Z54' => ['code' => '090005', 'fake' => false],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],
+                    'BTD' => ['code' => '090005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false],
                     'YCT' => ['code' => '091005', 'fake' => false],

@@ -22,9 +22,9 @@ final class RequestContext
     private DateTimeInterface $dateTime;
     private ?DateTimeInterface $startDateTime;
     private ?DateTimeInterface $endDateTime;
-    private ?bool $withES;
-    private string $fileFormat;
-    private string $countryCode;
+    private bool $withES;
+    private FDLContext $fdlContext;
+    private FULContext $fulContext;
     private string $receiptCode;
     private ?int $segmentNumber;
     private ?bool $isLastSegment;
@@ -40,7 +40,6 @@ final class RequestContext
     private HVEContext $hveContext;
     private HVDContext $hvdContext;
     private HVTContext $hvtContext;
-    private FULContext $fulContext;
 
     public function setBank(Bank $bank): RequestContext
     {
@@ -121,34 +120,35 @@ final class RequestContext
         return $this;
     }
 
-    public function getWithES(): ?bool
+    public function getWithES(): bool
     {
         return $this->withES;
     }
 
-    public function setFileFormat(string $fileFormat): RequestContext
+    public function setFdlContext(FDLContext $fdlContext): RequestContext
     {
-        $this->fileFormat = $fileFormat;
+        $this->fdlContext = $fdlContext;
 
         return $this;
     }
 
-    public function getFileFormat(): string
+    public function getFdlContext(): FDLContext
     {
-        return $this->fileFormat;
+        return $this->fdlContext;
     }
 
-    public function setCountryCode(string $countryCode): RequestContext
+    public function setFulContext(FULContext $fdlContext): RequestContext
     {
-        $this->countryCode = $countryCode;
+        $this->fulContext = $fdlContext;
 
         return $this;
     }
 
-    public function getCountryCode(): string
+    public function getFulContext(): FULContext
     {
-        return $this->countryCode;
+        return $this->fulContext;
     }
+
 
     public function setReceiptCode(string $receiptCode): RequestContext
     {
@@ -292,18 +292,6 @@ final class RequestContext
     public function getHVTContext(): HVTContext
     {
         return $this->hvtContext;
-    }
-
-    public function setFULContext(FULContext $fulContext): RequestContext
-    {
-        $this->fulContext = $fulContext;
-
-        return $this;
-    }
-
-    public function getFULContext(): FULContext
-    {
-        return $this->fulContext;
     }
 
     public function setBTUContext(BTUContext $btuContext): RequestContext

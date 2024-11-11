@@ -4,6 +4,7 @@ namespace AndrewSvirin\Ebics\Builders\Request;
 
 use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FDLContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
@@ -78,10 +79,9 @@ abstract class OrderDetailsBuilder
     }
 
     public function addFDLOrderParams(
-        string $fileFormat,
-        string $countryCode,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        FDLContext $fdlContext,
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime
     ): OrderDetailsBuilder {
         // Add FDLOrderParams to OrderDetails.
         $xmlFDLOrderParams = $this->dom->createElement('FDLOrderParams');
@@ -93,28 +93,42 @@ abstract class OrderDetailsBuilder
             $xmlFDLOrderParams->appendChild($xmlDateRange);
         }
 
+        $this->addParameters($xmlFDLOrderParams, $fdlContext->getParameters());
+
         // Add FileFormat to FDLOrderParams.
         $xmlFileFormat = $this->dom->createElement('FileFormat');
-        $xmlFileFormat->nodeValue = $fileFormat;
+        $xmlFileFormat->nodeValue = $fdlContext->getFileFormat();
         $xmlFDLOrderParams->appendChild($xmlFileFormat);
 
-        $xmlFileFormat->setAttribute('CountryCode', $countryCode);
+        $xmlFileFormat->setAttribute('CountryCode', $fdlContext->getCountryCode());
 
         return $this;
     }
 
-    public function addFULOrderParams(
-        string $fileFormat,
-        FULContext $fulContext
-    ): OrderDetailsBuilder {
+    public function addFULOrderParams(FULContext $fulContext): OrderDetailsBuilder
+    {
         // Add FULOrderParams to OrderDetails.
         $xmlFULOrderParams = $this->dom->createElement('FULOrderParams');
         $this->instance->appendChild($xmlFULOrderParams);
 
-        foreach ($fulContext->getParameters() as $name => $value) {
+        $this->addParameters($xmlFULOrderParams, $fulContext->getParameters());
+
+        // Add FileFormat to FULOrderParams.
+        $xmlFileFormat = $this->dom->createElement('FileFormat');
+        $xmlFileFormat->nodeValue = $fulContext->getFileFormat();
+        $xmlFULOrderParams->appendChild($xmlFileFormat);
+
+        $xmlFileFormat->setAttribute('CountryCode', $fulContext->getCountryCode());
+
+        return $this;
+    }
+
+    private function addParameters(DOMElement $orderParams, array $parameters): void
+    {
+        foreach ($parameters as $name => $value) {
             // Add Parameter to FULOrderParams.
             $xmlParameter = $this->dom->createElement('Parameter');
-            $xmlFULOrderParams->appendChild($xmlParameter);
+            $orderParams->appendChild($xmlParameter);
 
             // Add Name to Parameter.
             $xmlName = $this->dom->createElement('Name');
@@ -128,13 +142,6 @@ abstract class OrderDetailsBuilder
 
             $xmlValue->setAttribute('Type', 'string');
         }
-
-        // Add FileFormat to FULOrderParams.
-        $xmlFileFormat = $this->dom->createElement('FileFormat');
-        $xmlFileFormat->nodeValue = $fileFormat;
-        $xmlFULOrderParams->appendChild($xmlFileFormat);
-
-        return $this;
     }
 
     public function getInstance(): DOMElement

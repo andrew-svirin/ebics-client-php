@@ -1,6 +1,11 @@
 ## 2.3
 
+* Add `withES` param for downloading order types. Default `withES=false`.
 * Extended OrderData handler.
+* Add CountryCode for FUL.
+* Add Parameters for FDL.
+* Add ParserFormat for BTD.
+* Client methods signatures refactoring.
 
 ## 2.2
 

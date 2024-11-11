@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
-
 /**
  * Class BTUContext context container for BTU orders - requires EBICS 3.0
  *
@@ -12,33 +10,7 @@ use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
  */
 final class BTUContext extends BTFContext
 {
-    private string $fileData;
     private string $fileName;
-    private OrderDataInterface $orderData;
-
-    public function setFileData(string $fileData): BTUContext
-    {
-        $this->fileData = $fileData;
-
-        return $this;
-    }
-
-    public function getFileData(): string
-    {
-        return $this->fileData;
-    }
-
-    public function setFileDocument(OrderDataInterface $orderData): BTUContext
-    {
-        $this->orderData = $orderData;
-
-        return $this;
-    }
-
-    public function getFileDocument(): OrderDataInterface
-    {
-        return $this->orderData;
-    }
 
     public function setFileName(string $fileName): BTUContext
     {

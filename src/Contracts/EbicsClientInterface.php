@@ -4,15 +4,19 @@ namespace AndrewSvirin\Ebics\Contracts;
 
 use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FDLContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
+use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\DownloadOrderResult;
 use AndrewSvirin\Ebics\Models\Http\Response;
 use AndrewSvirin\Ebics\Models\InitializationOrderResult;
+use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadOrderResult;
+use AndrewSvirin\Ebics\Models\User;
 use DateTimeInterface;
 
 /**
@@ -28,6 +32,7 @@ interface EbicsClientInterface
     public const FILE_PARSER_FORMAT_XML_FILES = 'xml_files';
     public const FILE_PARSER_FORMAT_ZIP_FILES = 'zip_files';
 
+    public const COUNTRY_CODE_EU = 'EU';
     public const COUNTRY_CODE_DE = 'DE';
     public const COUNTRY_CODE_FR = 'FR';
     public const COUNTRY_CODE_CH = 'CH';
@@ -49,41 +54,42 @@ interface EbicsClientInterface
      * Send to the bank public signature of signature A00X.
      * Prepare A00X signature for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime current date
+     * @param DateTimeInterface|null $dateTime Current date
+     * @param bool $createSignature Create new signature.
      *
      * @return Response
      */
-    public function INI(DateTimeInterface $dateTime = null): Response;
+    public function INI(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
 
     /**
      * Make HIA request.
      * Send to the bank public signatures of authentication (X002) and encryption (E002).
      * Prepare E002 and X002 user signatures for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime current date
+     * @param DateTimeInterface|null $dateTime Current date
+     * @param bool $createSignature Create new signature.
      *
      * @return Response
      */
-    public function HIA(DateTimeInterface $dateTime = null): Response;
+    public function HIA(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
 
     /**
      * Make H3K request.
      * Send to the bank public signatures of signature (A00X), authentication (X002) and encryption (E002).
      * Prepare A00X, E002 and X002 user signatures for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime current date
+     * @param DateTimeInterface|null $dateTime Current date
+     * @param bool $createSignature Create new signature.
      *
      * @return Response
      */
-    // @codingStandardsIgnoreStart
-    public function H3K(DateTimeInterface $dateTime = null): Response;
-    // @codingStandardsIgnoreEnd
+    public function H3K(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
 
     /**
      * Download the Bank public signatures authentication (X002) and encryption (E002).
      * Prepare E002 and X002 bank signatures for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime current date
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return InitializationOrderResult
      */
@@ -92,38 +98,16 @@ interface EbicsClientInterface
     /**
      * Suspend activated Keyring.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return UploadOrderResult
      */
     public function SPR(DateTimeInterface $dateTime = null): UploadOrderResult;
 
     /**
-     * Download request files of any BTF structure.
-     *
-     * @param BTDContext $btfContext
-     * @param DateTimeInterface|null $dateTime
-     * @param DateTimeInterface|null $startDateTime
-     * @param DateTimeInterface|null $endDateTime
-     *
-     * @return DownloadOrderResult
-     */
-    public function BTD(
-        BTDContext $btfContext,
-        DateTimeInterface $dateTime = null,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
-    ): DownloadOrderResult;
-
-    /**
-     * Upload the files to the bank.
-     */
-    public function BTU(BTUContext $btuContext, DateTimeInterface $dateTime = null): UploadOrderResult;
-
-    /**
      * Download the bank server parameters.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
@@ -132,7 +116,7 @@ interface EbicsClientInterface
     /**
      * Download customer's customer and subscriber information.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
@@ -141,248 +125,273 @@ interface EbicsClientInterface
     /**
      * Download subscriber's customer and subscriber information.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function HTD(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
-     * Download transaction status.
-     *
-     * @param DateTimeInterface|null $dateTime
-     * @param DateTimeInterface|null $startDateTime
-     * @param DateTimeInterface|null $endDateTime
-     *
-     * @return DownloadOrderResult
-     */
-    public function PTK(
-        DateTimeInterface $dateTime = null,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
-    ): DownloadOrderResult;
-
-    /**
      * Download Bank available order types.
      *
-     * @param DateTimeInterface|null $dateTime current date
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function HAA(DateTimeInterface $dateTime = null): DownloadOrderResult;
 
     /**
-     * Download the interim transaction report in SWIFT format (MT942).
-     * OrderType:BTD, Service Name:STM, Scope:BIL, Container:, MsgName:mt942
+     * Download transaction status.
      *
-     * @param DateTimeInterface|null $dateTime current date
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
+     *
+     * @return DownloadOrderResult
+     */
+    public function PTK(
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
+    ): DownloadOrderResult;
+
+    /**
+     * Download the interim transaction report in SWIFT format (MT942).
+     *
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function VMK(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
 
     /**
      * Download the bank account statement.
-     * OrderType:BTD, Service Name:EOP, Scope:BIL, Container:, MsgName:mt940
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function STA(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
 
     /**
-     * Download the bank account report in Camt.052 format.
-     * OrderType:BTD, Service Name:STM, Scope:BIL, Container:ZIP, MsgName:camt.052
+     * Download the bank account report in camt.052 format.
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function C52(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
-     * Download the bank account statement in Camt.053 format.
-     * OrderType:BTD, Service Name:EOP, Scope:BIL, Container:ZIP, MsgName:camt.053
+     * Download the bank account statement in camt.053 format.
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function C53(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
-     * Download Debit Credit Notification (DTI).
-     * OrderType:BTD, Service Name:STM, Scope:BIL, Container:ZIP, MsgName:camt.054
+     * Download Debit Credit Notification (DTI) in camt.053 format.
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function C54(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
-     * Download the bank account report in Camt.052 format (i.e Switzerland financial services).
-     * OrderType:BTD, Service Name:STM, Scope:CH, Container:ZIP, MsgName:camt.052,Version:04
+     * Download the bank account report in camt.052 format (i.e Switzerland financial services).
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function Z52(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
-     * Download the bank account statement in Camt.053 format (i.e Switzerland financial services).
-     * OrderType:BTD, Service Name:EOP, Scope:CH, Container:ZIP, MsgName:camt.053,Version:04
+     * Download the bank account statement in camt.053 format (i.e Switzerland financial services).
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function Z53(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
-     * Download the bank account statement in Camt.054 format (i.e available in Switzerland).
-     * OrderType:BTD, Service Name:REP, Scope:CH, Container:ZIP, MsgName:camt.054,Version:04
+     * Download the bank account statement in camt.054 format (i.e available in Switzerland).
      *
-     * @param DateTimeInterface|null $dateTime
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
-    // @codingStandardsIgnoreStart
     public function Z54(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
-    // @codingStandardsIgnoreEnd
 
     /**
      * Download Order/Payment Status report.
-     * OrderType:BTD, Service Name:PSR, Scope:BIL, Container:ZIP, MsgName:pain.002
      *
-     * @param DateTimeInterface|null $dateTime
-     * @param DateTimeInterface|null $startDateTime
-     * @param DateTimeInterface|null $endDateTime
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function ZSR(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
 
     /**
      * Download account information as PDF-file.
      *
-     * @param DateTimeInterface|null $dateTime
-     * @param DateTimeInterface|null $startDateTime
-     * @param DateTimeInterface|null $endDateTime
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param DateTimeInterface|null $dateTime Current date
      *
      * @return DownloadOrderResult
      */
     public function XEK(
-        DateTimeInterface $dateTime = null,
         DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        DateTimeInterface $endDateTime = null,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
+
+    /**
+     * Download request files of any BTF structure.
+     *
+     * @param BTDContext $btdContext
+     * @param DateTimeInterface|null $startDateTime the start date of requested transactions
+     * @param DateTimeInterface|null $endDateTime the end date of requested transactions
+     * @param DateTimeInterface|null $dateTime Current date
+     *
+     * @return DownloadOrderResult
+     */
+    public function BTD(
+        BTDContext $btdContext,
+        DateTimeInterface $startDateTime = null,
+        DateTimeInterface $endDateTime = null,
+        DateTimeInterface $dateTime = null
+    ): DownloadOrderResult;
+
+    /**
+     * Upload the files to the bank of any BTF structure.
+     *
+     * @param BTUContext $btuContext
+     * @param OrderDataInterface $orderData
+     * @param DateTimeInterface|null $dateTime
+     *
+     * @return UploadOrderResult
+     */
+    public function BTU(
+        BTUContext $btuContext,
+        OrderDataInterface $orderData,
+        DateTimeInterface $dateTime = null
+    ): UploadOrderResult;
 
     /**
      * Download subscriber's customer and subscriber information.
      *
-     * @param string $fileFormat Format of response. ex 'pain.001.001.03.sct'
-     * @param string $parserFormat How to handle response.
-     * @param string $countryCode Country code (ISO 3166-1 alpha-2) (max 2 char)
-     * @param DateTimeInterface|null $dateTime
+     * @param FDLContext $fdlContext
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
-     * @param callable|null $storeClosure Custom closure to handle download acknowledge.
+     * @param bool $withES OrderData contains both order data and Electronic Signature
+     * @param callable|null $ackClosure Custom closure to handle download acknowledge.
+     * @param DateTimeInterface|null $dateTime
      *
      * @return DownloadOrderResult
      */
     public function FDL(
-        string $fileFormat,
-        string $parserFormat = self::FILE_PARSER_FORMAT_TEXT,
-        string $countryCode = self::COUNTRY_CODE_DE,
-        DateTimeInterface $dateTime = null,
+        FDLContext $fdlContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        $storeClosure = null
+        bool $withES = false,
+        $ackClosure = null,
+        DateTimeInterface $dateTime = null
     ): DownloadOrderResult;
 
     /**
      * Standard order type for submitting the files to the bank. Using this order type ensures a
      * transparent transfer of files of any format.
      *
-     * @param string $fileFormat Format of request ex 'pain.001.001.03.sct'
-     * @param OrderDataInterface $orderData File to be uploaded.
-     * @param FULContext $fulContext Order attributes.
+     * @param FULContext $fulContext
+     * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function FUL(
-        string $fileFormat,
-        OrderDataInterface $orderData,
         FULContext $fulContext,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        OrderDataInterface $orderData,
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -393,15 +402,15 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SCT, Scope:DE, Container:, MsgName:pain.001
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function CCT(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -411,15 +420,15 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:SDD,Service Option:COR Container:, MsgName:pain.008
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function CDD(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -429,30 +438,30 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:SDD,Service Option:COR Container:, MsgName:pain.008
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function CDB(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
      * Upload initiation of the instant credit transfer per SEPA.
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function CIP(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -462,15 +471,15 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:MCT, Scope:CH,Service Option:COR Container:, MsgName:pain.001,Version: 03
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function XE2(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -479,15 +488,15 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:CH,Service Option:COR Container:, MsgName:pain.008,Version: 02
      *
      * @param OrderDataInterface $orderData
+     * @param bool $withES OrderData contains both order data and Electronic Signature
      * @param DateTimeInterface|null $dateTime
-     * @param bool $withES EBICS T or TS mode when false. (the file contains both order data and signature(s))
      *
      * @return UploadOrderResult
      */
     public function XE3(
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null,
-        bool $withES = true
+        bool $withES = false,
+        DateTimeInterface $dateTime = null
     ): UploadOrderResult;
 
     /**
@@ -548,6 +557,27 @@ interface EbicsClientInterface
      * @return DownloadOrderResult
      */
     public function HVT(HVTContext $hvtContext, DateTimeInterface $dateTime = null): DownloadOrderResult;
+
+    /**
+     * Get Keyring.
+     *
+     * @return Keyring
+     */
+    public function getKeyring(): Keyring;
+
+    /**
+     * Get Bank.
+     *
+     * @return Bank
+     */
+    public function getBank(): Bank;
+
+    /**
+     * Get User.
+     *
+     * @return User
+     */
+    public function getUser(): User;
 
     /**
      * Set http client to subset later in the project.

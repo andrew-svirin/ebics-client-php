@@ -18,18 +18,18 @@ use LogicException;
 abstract class RequestFactoryV2 extends RequestFactory
 {
     public function createBTD(
-        DateTimeInterface $dateTime,
         BTDContext $btdContext,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method for EBICS 3.0');
     }
 
     public function createBTU(
+        UploadTransaction $transaction,
         BTUContext $btuContext,
-        DateTimeInterface $dateTime,
-        UploadTransaction $transaction
+        ?DateTimeInterface $dateTime
     ): Request {
         throw new LogicException('Method for EBICS 3.0');
     }

@@ -37,7 +37,7 @@ final class OrderDataHandlerV3 extends OrderDataHandler
         DOMElement $xmlSignaturePubKeyInfo,
         CustomerINI $xml,
         SignatureInterface $certificateA,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): void {
         // Is not need for V3.
     }
@@ -46,7 +46,7 @@ final class OrderDataHandlerV3 extends OrderDataHandler
         DOMElement $xmlAuthenticationPubKeyInfo,
         CustomerHIA $xml,
         SignatureInterface $certificateX,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): void {
         // Is not need for V3.
     }
@@ -55,7 +55,7 @@ final class OrderDataHandlerV3 extends OrderDataHandler
         DOMElement $xmlEncryptionPubKeyInfo,
         CustomerHIA $xml,
         SignatureInterface $certificateE,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): void {
         // Is not need for V3.
     }

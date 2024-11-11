@@ -14,6 +14,7 @@ use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Contexts\BTDContext;
 use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\FDLContext;
 use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
@@ -35,6 +36,7 @@ use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\DigestResolver;
+use DateTime;
 use DateTimeInterface;
 
 /**
@@ -76,7 +78,7 @@ abstract class RequestFactory
     abstract protected function addOrderType(
         OrderDetailsBuilder $orderDetailsBuilder,
         string $orderType,
-        bool $withES = true
+        bool $withES = false
     ): OrderDetailsBuilder;
 
     public function createHEV(): Request
@@ -94,8 +96,12 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createINI(SignatureInterface $certificateA, DateTimeInterface $dateTime): Request
+    public function createINI(SignatureInterface $certificateA, ?DateTimeInterface $dateTime): Request
     {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
         $orderData = new CustomerINI();
         $this->orderDataHandler->handleINI(
             $orderData,
@@ -138,8 +144,12 @@ abstract class RequestFactory
     public function createHIA(
         SignatureInterface $certificateE,
         SignatureInterface $certificateX,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): Request {
+        if (null === $dateTime) {
+            $dateTime = new DateTime();
+        }
+
         $orderData = new CustomerHIA();
         $this->orderDataHandler->handleHIA(
             $orderData,
@@ -184,7 +194,7 @@ abstract class RequestFactory
         SignatureInterface $certificateA,
         SignatureInterface $certificateE,
         SignatureInterface $certificateX,
-        DateTimeInterface $dateTime
+        ?DateTimeInterface $dateTime
     ): Request {
         $orderData = new CustomerH3K();
         $this->orderDataHandler->handleH3K(
@@ -204,7 +214,7 @@ abstract class RequestFactory
             ->setKeyring($this->keyring)
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setDateTime($dateTime)
+            ->setDateTime($dateTime ?? new DateTime())
             ->setOrderData($orderData->getContent())
             ->setSignatureData($signatureData);
 
@@ -236,17 +246,14 @@ abstract class RequestFactory
     }
 
     /**
-     * @param DateTimeInterface $dateTime
-     *
-     * @return Request
      * @throws EbicsException
      */
-    public function createHPB(DateTimeInterface $dateTime): Request
+    public function createHPB(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -274,7 +281,7 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createSPR(DateTimeInterface $dateTime, UploadTransaction $transaction): Request
+    public function createSPR(UploadTransaction $transaction, ?DateTimeInterface $dateTime): Request
     {
         $signatureData = new UserSignature();
         $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
@@ -283,7 +290,7 @@ abstract class RequestFactory
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
+            ->setDateTime($dateTime ?? new DateTime())
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
             ->setSignatureData($signatureData);
@@ -339,13 +346,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHPD(DateTimeInterface $dateTime): Request
+    public function createHPD(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -387,13 +394,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHKD(DateTimeInterface $dateTime): Request
+    public function createHKD(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -436,17 +443,19 @@ abstract class RequestFactory
      * @throws EbicsException
      */
     public function createPTK(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime);
+            ->setEndDateTime($endDateTime)
+            ->setWithES($withES)
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -488,13 +497,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHTD(DateTimeInterface $dateTime): Request
+    public function createHTD(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -537,21 +546,21 @@ abstract class RequestFactory
      * @throws EbicsException
      */
     public function createFDL(
-        DateTimeInterface $dateTime,
-        string $fileFormat,
-        string $countryCode,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        FDLContext $fdlContext,
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setFileFormat($fileFormat)
-            ->setCountryCode($countryCode)
+            ->setFdlContext($fdlContext)
             ->setStartDateTime($startDateTime)
-            ->setEndDateTime($endDateTime);
+            ->setEndDateTime($endDateTime)
+            ->setWithES($withES)
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -567,10 +576,9 @@ abstract class RequestFactory
                             ->addProduct('Ebics client PHP', 'de')
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
                                 $this
-                                    ->addOrderType($orderDetailsBuilder, 'FDL')
+                                    ->addOrderType($orderDetailsBuilder, 'FDL', $context->getWithES())
                                     ->addFDLOrderParams(
-                                        $context->getFileFormat(),
-                                        $context->getCountryCode(),
+                                        $context->getFdlContext(),
                                         $context->getStartDateTime(),
                                         $context->getEndDateTime()
                                     );
@@ -599,11 +607,10 @@ abstract class RequestFactory
      * @throws EbicsException
      */
     public function createFUL(
-        DateTimeInterface $dateTime,
-        string $fileFormat,
-        FULContext $fulContext,
         UploadTransaction $transaction,
-        bool $withES
+        FULContext $fulContext,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request {
         $signatureData = new UserSignature();
         $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
@@ -612,13 +619,12 @@ abstract class RequestFactory
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setFileFormat($fileFormat)
-            ->setFULContext($fulContext)
+            ->setFulContext($fulContext)
+            ->setWithES($withES)
+            ->setDateTime($dateTime ?? new DateTime())
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
-            ->setSignatureData($signatureData)
-            ->setWithES($withES);
+            ->setSignatureData($signatureData);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -635,10 +641,7 @@ abstract class RequestFactory
                             ->addOrderDetails(function (OrderDetailsBuilder $orderDetailsBuilder) use ($context) {
                                 $this
                                     ->addOrderType($orderDetailsBuilder, 'FUL', $context->getWithES())
-                                    ->addFULOrderParams(
-                                        $context->getFileFormat(),
-                                        $context->getFULContext()
-                                    );
+                                    ->addFULOrderParams($context->getFulContext());
                             })
                             ->addBankPubKeyDigests(
                                 $context->getKeyring()->getBankSignatureXVersion(),
@@ -673,13 +676,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHAA(DateTimeInterface $dateTime): Request
+    public function createHAA(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -719,16 +722,16 @@ abstract class RequestFactory
     }
 
     abstract public function createBTD(
-        DateTimeInterface $dateTime,
         BTDContext $btdContext,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createBTU(
+        UploadTransaction $transaction,
         BTUContext $btuContext,
-        DateTimeInterface $dateTime,
-        UploadTransaction $transaction
+        ?DateTimeInterface $dateTime
     ): Request;
 
     /**
@@ -847,113 +850,121 @@ abstract class RequestFactory
     }
 
     abstract public function createVMK(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createSTA(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createC52(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createC53(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createC54(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createZ52(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createZ53(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createZ54(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createZSR(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createXEK(
-        DateTimeInterface $dateTime,
-        DateTimeInterface $startDateTime = null,
-        DateTimeInterface $endDateTime = null
+        ?DateTimeInterface $startDateTime,
+        ?DateTimeInterface $endDateTime,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createCCT(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createCDD(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createCDB(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createCIP(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createXE2(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
     abstract public function createXE3(
-        DateTimeInterface $dateTime,
         UploadTransaction $transaction,
-        bool $withES
+        bool $withES,
+        ?DateTimeInterface $dateTime
     ): Request;
 
-    abstract public function createYCT(DateTimeInterface $dateTime, UploadTransaction $transaction): Request;
+    abstract public function createYCT(UploadTransaction $transaction, ?DateTimeInterface $dateTime): Request;
 
     /**
      * @throws EbicsException
      */
-    public function createHVU(DateTimeInterface $dateTime): Request
+    public function createHVU(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -995,13 +1006,13 @@ abstract class RequestFactory
     /**
      * @throws EbicsException
      */
-    public function createHVZ(DateTimeInterface $dateTime): Request
+    public function createHVZ(?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime);
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -1044,9 +1055,9 @@ abstract class RequestFactory
      * @throws EbicsException
      */
     public function createHVE(
+        UploadTransaction $transaction,
         HVEContext $hveContext,
-        DateTimeInterface $dateTime,
-        UploadTransaction $transaction
+        ?DateTimeInterface $dateTime
     ): Request {
         $signatureData = new UserSignature();
         $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
@@ -1055,11 +1066,11 @@ abstract class RequestFactory
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
+            ->setHVEContext($hveContext)
+            ->setDateTime($dateTime ?? new DateTime())
             ->setTransactionKey($transaction->getKey())
             ->setNumSegments($transaction->getNumSegments())
-            ->setSignatureData($signatureData)
-            ->setHVEContext($hveContext);
+            ->setSignatureData($signatureData);
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -1109,14 +1120,14 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createHVD(HVDContext $hvdContext, DateTimeInterface $dateTime): Request
+    public function createHVD(HVDContext $hvdContext, ?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setHVDContext($hvdContext);
+            ->setHVDContext($hvdContext)
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()
@@ -1155,14 +1166,14 @@ abstract class RequestFactory
         return $request;
     }
 
-    public function createHVT(HVTContext $hvtContext, DateTimeInterface $dateTime): Request
+    public function createHVT(HVTContext $hvtContext, ?DateTimeInterface $dateTime): Request
     {
         $context = (new RequestContext())
             ->setBank($this->bank)
             ->setUser($this->user)
             ->setKeyring($this->keyring)
-            ->setDateTime($dateTime)
-            ->setHVTContext($hvtContext);
+            ->setHVTContext($hvtContext)
+            ->setDateTime($dateTime ?? new DateTime());
 
         $request = $this
             ->createRequestBuilderInstance()

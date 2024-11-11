@@ -146,10 +146,10 @@ try {
 | HPD         | Download the bank server parameters.                                                                              |
 | HKD         | Download customer's customer and subscriber information.                                                          |
 | HTD         | Download subscriber's customer and subscriber information.                                                        |
+| HAA         | Download Bank available order types.                                                                              |
 | PTK         | Download transaction status.                                                                                      |
 | FDL         | Download the files from the bank.                                                                                 |
 | FUL         | Upload the files to the bank.                                                                                     |
-| HAA         | Download Bank available order types.                                                                              |
 | VMK         | Download the interim transaction report in SWIFT format (MT942).                                                  |
 | STA         | Download the bank account statement.                                                                              |
 | C52         | Download the bank account report in Camt.052 format.                                                              |

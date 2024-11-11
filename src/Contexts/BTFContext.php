@@ -15,7 +15,7 @@ abstract class BTFContext extends ServiceContext
     private ?string $msgNameVersion = null;
     private ?string $msgNameFormat = null;
 
-    public function setContainerFlag(string $containerFlag): BTFContext
+    public function setContainerFlag(string $containerFlag): self
     {
         $this->containerFlag = $containerFlag;
 
@@ -27,7 +27,7 @@ abstract class BTFContext extends ServiceContext
         return $this->containerFlag;
     }
 
-    public function setMsgNameVariant(string $msgNameVariant): BTFContext
+    public function setMsgNameVariant(string $msgNameVariant): self
     {
         $this->msgNameVariant = $msgNameVariant;
 
@@ -39,7 +39,7 @@ abstract class BTFContext extends ServiceContext
         return $this->msgNameVariant;
     }
 
-    public function setMsgNameVersion(string $msgNameVersion): BTFContext
+    public function setMsgNameVersion(string $msgNameVersion): self
     {
         $this->msgNameVersion = $msgNameVersion;
 
@@ -51,7 +51,7 @@ abstract class BTFContext extends ServiceContext
         return $this->msgNameVersion;
     }
 
-    public function setMsgNameFormat(string $msgNameFormat): BTFContext
+    public function setMsgNameFormat(string $msgNameFormat): self
     {
         $this->msgNameFormat = $msgNameFormat;
 
