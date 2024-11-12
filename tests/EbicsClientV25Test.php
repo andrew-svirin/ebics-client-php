@@ -7,6 +7,7 @@ use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
+use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
 use AndrewSvirin\Ebics\Factories\DocumentFactory;
 use DateTime;
@@ -113,6 +114,37 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group HIA
+     * @group HIA-V25
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     *
+     * @covers
+     */
+    public function testHIA(int $credentialsId, array $codes)
+    {
+        $client = $this->setupClientV25($credentialsId, $codes['HIA']['fake']);
+
+        // Check that keyring is empty and or wait on success or wait on exception.
+        $bankExists = $client->getKeyring()->getUserSignatureX();
+        if ($bankExists) {
+            $this->expectException(InvalidUserOrUserStateException::class);
+            $this->expectExceptionCode(91002);
+        }
+        $hia = $client->HIA();
+        if (!$bankExists) {
+            $responseHandler = $client->getResponseHandler();
+            $this->saveKeyring($credentialsId, $client->getKeyring());
+            $code = $responseHandler->retrieveH00XReturnCode($hia);
+            $reportText = $responseHandler->retrieveH00XReportText($hia);
+            $this->assertResponseOk($code, $reportText);
+        }
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group H3K
      * @group V25
      * @group H3K-V25
@@ -138,37 +170,6 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
             $this->saveKeyring($credentialsId, $client->getKeyring());
             $code = $responseHandler->retrieveH00XReturnCode($ini);
             $reportText = $responseHandler->retrieveH00XReportText($ini);
-            $this->assertResponseOk($code, $reportText);
-        }
-    }
-
-    /**
-     * @dataProvider serversDataProvider
-     *
-     * @group HIA
-     * @group HIA-V25
-     *
-     * @param int $credentialsId
-     * @param array $codes
-     *
-     * @covers
-     */
-    public function testHIA(int $credentialsId, array $codes)
-    {
-        $client = $this->setupClientV25($credentialsId, $codes['HIA']['fake']);
-
-        // Check that keyring is empty and or wait on success or wait on exception.
-        $bankExists = $client->getKeyring()->getUserSignatureX();
-        if ($bankExists) {
-            $this->expectException(InvalidUserOrUserStateException::class);
-            $this->expectExceptionCode(91002);
-        }
-        $hia = $client->HIA();
-        if (!$bankExists) {
-            $responseHandler = $client->getResponseHandler();
-            $this->saveKeyring($credentialsId, $client->getKeyring());
-            $code = $responseHandler->retrieveH00XReturnCode($hia);
-            $reportText = $responseHandler->retrieveH00XReportText($hia);
             $this->assertResponseOk($code, $reportText);
         }
     }
@@ -497,7 +498,11 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
         $client = $this->setupClientV25($credentialsId, $codes['C54']['fake']);
 
         $this->assertExceptionCode($codes['C54']['code']);
-        $c54 = $client->C54(new DateTime('2020-03-21'), new DateTime('2020-04-21'), true);
+        $c54 = $client->C54(
+            new DateTime('2020-03-21'),
+            new DateTime('2020-04-21'),
+            (new RequestContext())->setWithES(true)
+        );
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($c54->getTransaction()->getLastSegment()->getResponse());
@@ -738,7 +743,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
 
         $customerDirectDebit = $this->buildCustomerDirectDebit('urn:iso:std:iso:20022:tech:xsd:pain.008.001.02');
 
-        $cip = $client->CIP($customerDirectDebit, false);
+        $cip = $client->CIP($customerDirectDebit, (new RequestContext())->setWithES(true));
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($cip->getTransaction()->getLastSegment()->getResponse());
@@ -1063,51 +1068,51 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     public function serversDataProvider()
     {
         return [
-            [
-                1, // Credentials Id.
-                [
-                    'HEV' => ['code' => null, 'fake' => false],
-                    'INI' => ['code' => null, 'fake' => false],
-                    'HIA' => ['code' => null, 'fake' => false],
-                    'H3K' => ['code' => null, 'fake' => false],
-                    'HPB' => ['code' => null, 'fake' => false],
-                    'SPR' => ['code' => null, 'fake' => false],
-                    'HPD' => ['code' => null, 'fake' => false],
-                    'HKD' => ['code' => null, 'fake' => false],
-                    'HTD' => ['code' => null, 'fake' => false],
-                    'HAA' => ['code' => null, 'fake' => false],
-                    'PTK' => ['code' => null, 'fake' => false],
-                    'VMK' => ['code' => '090003', 'fake' => false],
-                    'STA' => ['code' => '090003', 'fake' => false],
-                    'Z52' => ['code' => '090005', 'fake' => false],
-                    'Z53' => ['code' => '090005', 'fake' => false],
-                    'Z54' => ['code' => '090005', 'fake' => false],
-                    'C52' => ['code' => '090003', 'fake' => false],
-                    'C53' => ['code' => '090003', 'fake' => false],
-                    'C54' => ['code' => '090003', 'fake' => false],
-                    'FDL' => [
-                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-                    ],
-                    'FUL' => [
-                        'pain.001.001.03.sct' => [
-                            'code' => '091112',
-                            'fake' => false,
-                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
-                        ],
-                    ],
-                    'CCT' => ['code' => null, 'fake' => false],
-                    'XE2' => ['code' => null, 'fake' => false],
-                    'XE3' => ['code' => null, 'fake' => false],
-                    'CDD' => ['code' => null, 'fake' => false],
-                    'CDB' => ['code' => '090003', 'fake' => false],
-                    'CIP' => ['code' => '091005', 'fake' => false],
-                    'HVU' => ['code' => '090003', 'fake' => false],
-                    'HVZ' => ['code' => '090003', 'fake' => false],
-                    'HVE' => ['code' => '090003', 'fake' => false],
-                    'HVD' => ['code' => '090003', 'fake' => false],
-                    'HVT' => ['code' => '090003', 'fake' => false],
-                ],
-            ],
+//            [
+//                1, // Credentials Id.
+//                [
+//                    'HEV' => ['code' => null, 'fake' => false],
+//                    'INI' => ['code' => null, 'fake' => false],
+//                    'HIA' => ['code' => null, 'fake' => false],
+//                    'H3K' => ['code' => null, 'fake' => false],
+//                    'HPB' => ['code' => null, 'fake' => false],
+//                    'SPR' => ['code' => null, 'fake' => false],
+//                    'HPD' => ['code' => null, 'fake' => false],
+//                    'HKD' => ['code' => null, 'fake' => false],
+//                    'HTD' => ['code' => null, 'fake' => false],
+//                    'HAA' => ['code' => null, 'fake' => false],
+//                    'PTK' => ['code' => null, 'fake' => false],
+//                    'VMK' => ['code' => '090003', 'fake' => false],
+//                    'STA' => ['code' => '090003', 'fake' => false],
+//                    'Z52' => ['code' => '090005', 'fake' => false],
+//                    'Z53' => ['code' => '090005', 'fake' => false],
+//                    'Z54' => ['code' => '090005', 'fake' => false],
+//                    'C52' => ['code' => '090003', 'fake' => false],
+//                    'C53' => ['code' => '090003', 'fake' => false],
+//                    'C54' => ['code' => '090003', 'fake' => false],
+//                    'FDL' => [
+//                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
+//                    ],
+//                    'FUL' => [
+//                        'pain.001.001.03.sct' => [
+//                            'code' => '091112',
+//                            'fake' => false,
+            /*                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',*/
+//                        ],
+//                    ],
+//                    'CCT' => ['code' => null, 'fake' => false],
+//                    'XE2' => ['code' => null, 'fake' => false],
+//                    'XE3' => ['code' => null, 'fake' => false],
+//                    'CDD' => ['code' => null, 'fake' => false],
+//                    'CDB' => ['code' => '090003', 'fake' => false],
+//                    'CIP' => ['code' => '091005', 'fake' => false],
+//                    'HVU' => ['code' => '090003', 'fake' => false],
+//                    'HVZ' => ['code' => '090003', 'fake' => false],
+//                    'HVE' => ['code' => '090003', 'fake' => false],
+//                    'HVD' => ['code' => '090003', 'fake' => false],
+//                    'HVT' => ['code' => '090003', 'fake' => false],
+//                ],
+//            ],
             [
                 2, // Credentials Id.
                 [

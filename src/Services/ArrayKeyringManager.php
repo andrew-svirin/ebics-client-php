@@ -24,7 +24,7 @@ final class ArrayKeyringManager extends KeyringManager
         if (!empty($resource)) {
             $keyring = $this->keyringFactory->createKeyringFromData($resource);
         } else {
-            $keyring = new Keyring($defaultVersion);
+            $keyring = $this->createKeyring($defaultVersion);
         }
         $keyring->setPassword($passphrase);
 

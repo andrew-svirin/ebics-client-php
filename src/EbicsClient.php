@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
+use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
 use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
@@ -124,15 +125,16 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function createUserSignatures(): void
+    public function createUserSignatures(string $aVersion = SignatureInterface::A_VERSION6): void
     {
-        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, true);
+        $signatureA = $this->createUserSignature(SignatureInterface::TYPE_A);
+        $this->keyring->setUserSignatureAVersion($aVersion);
         $this->keyring->setUserSignatureA($signatureA);
 
-        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, true);
+        $signatureE = $this->createUserSignature(SignatureInterface::TYPE_E);
         $this->keyring->setUserSignatureE($signatureE);
 
-        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, true);
+        $signatureX = $this->createUserSignature(SignatureInterface::TYPE_X);
         $this->keyring->setUserSignatureX($signatureX);
     }
 
@@ -142,7 +144,8 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function HEV(): Response
     {
-        $request = $this->requestFactory->createHEV();
+        $context = new RequestContext();
+        $request = $this->requestFactory->createHEV($context);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH000ReturnCode($request, $response);
@@ -154,11 +157,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function INI(DateTimeInterface $dateTime = null, bool $createSignature = false): Response
+    public function INI(RequestContext $context = null): Response
     {
-        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, $createSignature);
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A);
 
-        $request = $this->requestFactory->createINI($signatureA, $dateTime);
+        $request = $this->requestFactory->createINI($signatureA, $context);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
@@ -171,12 +177,15 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function HIA(DateTimeInterface $dateTime = null, bool $createSignature = false): Response
+    public function HIA(RequestContext $context = null): Response
     {
-        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, $createSignature);
-        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, $createSignature);
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E);
+        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X);
 
-        $request = $this->requestFactory->createHIA($signatureE, $signatureX, $dateTime);
+        $request = $this->requestFactory->createHIA($signatureE, $signatureX, $context);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
@@ -190,13 +199,16 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function H3K(DateTimeInterface $dateTime = null, bool $createSignature = false): Response
+    public function H3K(RequestContext $context = null): Response
     {
-        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A, $createSignature);
-        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E, $createSignature);
-        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X, $createSignature);
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $signatureA = $this->getUserSignature(SignatureInterface::TYPE_A);
+        $signatureE = $this->getUserSignature(SignatureInterface::TYPE_E);
+        $signatureX = $this->getUserSignature(SignatureInterface::TYPE_X);
 
-        $request = $this->requestFactory->createH3K($signatureA, $signatureE, $signatureX, $dateTime);
+        $request = $this->requestFactory->createH3K($signatureA, $signatureE, $signatureX, $context);
         $response = $this->httpClient->post($this->bank->getUrl(), $request);
 
         $this->checkH00XReturnCode($request, $response);
@@ -211,11 +223,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPB(DateTimeInterface $dateTime = null): InitializationOrderResult
+    public function HPB(RequestContext $context = null): InitializationOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->initializeTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHPB($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHPB($context);
             }
         );
 
@@ -233,14 +248,19 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function SPR(DateTimeInterface $dateTime = null): UploadOrderResult
+    public function SPR(RequestContext $context = null): UploadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setOnlyES(true);
+
         $transaction = $this->uploadESTransaction(
-            function (UploadTransaction $transaction) use ($dateTime) {
+            function (UploadTransaction $transaction) use ($context) {
                 $transaction->setOrderData(' ');
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createSPR($transaction, $dateTime);
+                return $this->requestFactory->createSPR($transaction, $context);
             }
         );
 
@@ -251,11 +271,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HPD(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HPD(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHPD($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHPD($context);
             }
         );
 
@@ -266,11 +289,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HKD(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HKD(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHKD($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHKD($context);
             }
         );
 
@@ -281,11 +307,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HTD(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HTD(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHTD($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHTD($context);
             }
         );
 
@@ -296,11 +325,14 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws Exceptions\EbicsException
      */
-    public function HAA(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HAA(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHAA($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHAA($context);
             }
         );
 
@@ -314,17 +346,18 @@ final class EbicsClient implements EbicsClientInterface
     public function PTK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createPTK(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime,
-                );
+            function () use ($startDateTime, $endDateTime, $context) {
+                $context
+                    ->setStartDateTime($startDateTime)
+                    ->setEndDateTime($endDateTime);
+
+                return $this->requestFactory->createPTK($context);
             }
         );
 
@@ -338,17 +371,18 @@ final class EbicsClient implements EbicsClientInterface
     public function VMK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createVMK(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createVMK($context);
             }
         );
 
@@ -362,17 +396,18 @@ final class EbicsClient implements EbicsClientInterface
     public function STA(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createSTA(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime,
-                );
+            function () use ($context) {
+                return $this->requestFactory->createSTA($context);
             }
         );
 
@@ -386,17 +421,18 @@ final class EbicsClient implements EbicsClientInterface
     public function C52(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createC52(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createC52($context);
             }
         );
 
@@ -410,17 +446,18 @@ final class EbicsClient implements EbicsClientInterface
     public function C53(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createC53(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createC53($context);
             }
         );
 
@@ -434,17 +471,18 @@ final class EbicsClient implements EbicsClientInterface
     public function C54(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createC54(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createC54($context);
             }
         );
 
@@ -458,17 +496,18 @@ final class EbicsClient implements EbicsClientInterface
     public function Z52(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createZ52(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createZ52($context);
             }
         );
 
@@ -482,17 +521,18 @@ final class EbicsClient implements EbicsClientInterface
     public function Z53(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createZ53(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createZ53($context);
             }
         );
 
@@ -506,17 +546,18 @@ final class EbicsClient implements EbicsClientInterface
     public function Z54(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createZ54(
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createZ54($context);
             }
         );
 
@@ -530,15 +571,18 @@ final class EbicsClient implements EbicsClientInterface
     public function ZSR(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $dateTime) {
-                return $this->requestFactory->createZSR(
-                    $startDateTime,
-                    $endDateTime,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createZSR($context);
             }
         );
 
@@ -552,15 +596,18 @@ final class EbicsClient implements EbicsClientInterface
     public function XEK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($startDateTime, $endDateTime, $dateTime) {
-                return $this->requestFactory->createXEK(
-                    $startDateTime,
-                    $endDateTime,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createXEK($context);
             }
         );
 
@@ -575,16 +622,19 @@ final class EbicsClient implements EbicsClientInterface
         BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setBTDContext($btdContext)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($btdContext, $startDateTime, $endDateTime, $dateTime) {
-                return $this->requestFactory->createBTD(
-                    $btdContext,
-                    $startDateTime,
-                    $endDateTime,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createBTD($context);
             }
         );
 
@@ -598,18 +648,19 @@ final class EbicsClient implements EbicsClientInterface
     public function BTU(
         BTUContext $btuContext,
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setBTUContext($btuContext);
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($btuContext, $orderData, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createBTU(
-                    $transaction,
-                    $btuContext,
-                    $dateTime,
-                );
+                return $this->requestFactory->createBTU($transaction, $context);
             }
         );
 
@@ -624,21 +675,21 @@ final class EbicsClient implements EbicsClientInterface
         FDLContext $fdlContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        $ackClosure = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context
+            ->setFdlContext($fdlContext)
+            ->setStartDateTime($startDateTime)
+            ->setEndDateTime($endDateTime);
+
         $transaction = $this->downloadTransaction(
-            function () use ($fdlContext, $startDateTime, $endDateTime, $withES, $dateTime) {
-                return $this->requestFactory->createFDL(
-                    $fdlContext,
-                    $startDateTime,
-                    $endDateTime,
-                    $withES,
-                    $dateTime
-                );
+            function () use ($context) {
+                return $this->requestFactory->createFDL($context);
             },
-            $ackClosure
+            $context->getAckClosure()
         );
 
         return $this->createDownloadOrderResult($transaction, $fdlContext->getParserFormat());
@@ -651,20 +702,19 @@ final class EbicsClient implements EbicsClientInterface
     public function FUL(
         FULContext $fulContext,
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setFulContext($fulContext);
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($fulContext, $orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createFUL(
-                    $transaction,
-                    $fulContext,
-                    $withES,
-                    $dateTime
-                );
+                return $this->requestFactory->createFUL($transaction, $context);
             }
         );
 
@@ -678,15 +728,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function CCT(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createCCT($transaction, $withES, $dateTime);
+                return $this->requestFactory->createCCT($transaction, $context);
             }
         );
 
@@ -700,15 +753,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function CDD(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createCDD($transaction, $withES, $dateTime);
+                return $this->requestFactory->createCDD($transaction, $context);
             }
         );
 
@@ -722,15 +778,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function CDB(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createCDB($transaction, $withES, $dateTime);
+                return $this->requestFactory->createCDB($transaction, $context);
             }
         );
 
@@ -744,15 +803,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function CIP(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createCIP($transaction, $withES, $dateTime);
+                return $this->requestFactory->createCIP($transaction, $context);
             }
         );
 
@@ -766,15 +828,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function XE2(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createXE2($transaction, $withES, $dateTime);
+                return $this->requestFactory->createXE2($transaction, $context);
             }
         );
 
@@ -788,15 +853,18 @@ final class EbicsClient implements EbicsClientInterface
      */
     public function XE3(
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($orderData, $withES, $dateTime) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createXE3($transaction, $withES, $dateTime);
+                return $this->requestFactory->createXE3($transaction, $context);
             }
         );
 
@@ -808,14 +876,18 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    public function YCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult
+    public function YCT(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->uploadTransaction(
-            function (UploadTransaction $transaction) use ($dateTime, $orderData) {
+            function (UploadTransaction $transaction) use ($orderData, $context) {
                 $transaction->setOrderData($orderData->getContent());
                 $transaction->setDigest($this->cryptService->hash($transaction->getOrderData()));
 
-                return $this->requestFactory->createYCT($transaction, $dateTime);
+                return $this->requestFactory->createYCT($transaction, $context);
             }
         );
 
@@ -827,11 +899,15 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    public function HVU(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HVU(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHVU($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHVU($context);
             }
         );
 
@@ -843,11 +919,15 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    public function HVZ(DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HVZ(RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+
         $transaction = $this->downloadTransaction(
-            function () use ($dateTime) {
-                return $this->requestFactory->createHVZ($dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHVZ($context);
             }
         );
 
@@ -858,17 +938,18 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function HVE(HVEContext $hveContext, DateTimeInterface $dateTime = null): UploadOrderResult
+    public function HVE(HVEContext $hveContext, RequestContext $context = null): UploadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setHVEContext($hveContext);
+
         $transaction = $this->uploadESTransaction(
-            function (UploadTransaction $transaction) use ($hveContext, $dateTime) {
-                $transaction->setDigest($hveContext->getDigest());
+            function (UploadTransaction $transaction) use ($context) {
+                $transaction->setDigest($context->getHVEContext()->getDigest());
 
-                return $this->requestFactory->createHVE(
-                    $transaction,
-                    $hveContext,
-                    $dateTime
-                );
+                return $this->requestFactory->createHVE($transaction, $context);
             }
         );
 
@@ -880,11 +961,16 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    public function HVD(HVDContext $hvdContext, DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HVD(HVDContext $hvdContext, RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setHVDContext($hvdContext);
+
         $transaction = $this->downloadTransaction(
-            function () use ($hvdContext, $dateTime) {
-                return $this->requestFactory->createHVD($hvdContext, $dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHVD($context);
             }
         );
 
@@ -896,11 +982,16 @@ final class EbicsClient implements EbicsClientInterface
      * @throws Exceptions\EbicsResponseException
      * @throws EbicsException
      */
-    public function HVT(HVTContext $hvtContext, DateTimeInterface $dateTime = null): DownloadOrderResult
+    public function HVT(HVTContext $hvtContext, RequestContext $context = null): DownloadOrderResult
     {
+        if (null === $context) {
+            $context = new RequestContext();
+        }
+        $context->setHVTContext($hvtContext);
+
         $transaction = $this->downloadTransaction(
-            function () use ($hvtContext, $dateTime) {
-                return $this->requestFactory->createHVT($hvtContext, $dateTime);
+            function () use ($context) {
+                return $this->requestFactory->createHVT($context);
             }
         );
 
@@ -1289,12 +1380,10 @@ final class EbicsClient implements EbicsClientInterface
      * Get user signature.
      *
      * @param string $type One of allowed user signature type.
-     * @param bool $createNew Flag to generate new signature force.
      *
      * @return SignatureInterface
-     * @throws EbicsException
      */
-    private function getUserSignature(string $type, bool $createNew = false): SignatureInterface
+    private function getUserSignature(string $type): SignatureInterface
     {
         switch ($type) {
             case SignatureInterface::TYPE_A:
@@ -1310,11 +1399,7 @@ final class EbicsClient implements EbicsClientInterface
                 throw new LogicException(sprintf('Type "%s" not allowed', $type));
         }
 
-        if (!$signature || $createNew) {
-            $newSignature = $this->generateUserSignature($type);
-        }
-
-        return $newSignature ?? $signature;
+        return $signature;
     }
 
     /**
@@ -1325,7 +1410,7 @@ final class EbicsClient implements EbicsClientInterface
      * @return SignatureInterface
      * @throws EbicsException
      */
-    private function generateUserSignature(string $type): SignatureInterface
+    private function createUserSignature(string $type): SignatureInterface
     {
         switch ($type) {
             case SignatureInterface::TYPE_A:

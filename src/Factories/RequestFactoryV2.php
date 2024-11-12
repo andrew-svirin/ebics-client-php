@@ -2,11 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Contexts\BTDContext;
-use AndrewSvirin\Ebics\Contexts\BTUContext;
+use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Models\Http\Request;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
-use DateTimeInterface;
 use LogicException;
 
 /**
@@ -17,20 +15,13 @@ use LogicException;
  */
 abstract class RequestFactoryV2 extends RequestFactory
 {
-    public function createBTD(
-        BTDContext $btdContext,
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        ?DateTimeInterface $dateTime
-    ): Request {
+    public function createBTD(RequestContext $context): Request
+    {
         throw new LogicException('Method for EBICS 3.0');
     }
 
-    public function createBTU(
-        UploadTransaction $transaction,
-        BTUContext $btuContext,
-        ?DateTimeInterface $dateTime
-    ): Request {
+    public function createBTU(UploadTransaction $transaction, RequestContext $context): Request
+    {
         throw new LogicException('Method for EBICS 3.0');
     }
 }

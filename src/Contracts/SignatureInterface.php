@@ -10,6 +10,12 @@ namespace AndrewSvirin\Ebics\Contracts;
  */
 interface SignatureInterface
 {
+    const A_VERSION5 = 'A005';
+    const A_VERSION6 = 'A006';
+
+    const E_VERSION2 = 'E002';
+    const X_VERSION2 = 'X002';
+
     const TYPE_A = 'A';
     const TYPE_X = 'X';
     const TYPE_E = 'E';

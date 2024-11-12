@@ -63,7 +63,16 @@ abstract class AbstractEbicsTestCase extends TestCase
         $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
         $user = new User($credentials['partnerId'], $credentials['userId']);
-        $keyring = $this->loadKeyring($credentialsId, $version);
+
+        $keyringManager = new FileKeyringManager();
+
+        $keyringPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
+        if (is_file($keyringPath)) {
+            $keyring = $keyringManager->loadKeyring($keyringPath, $credentials['password'], $version);
+        } else {
+            $keyring = $keyringManager->createKeyring($version);
+            $keyring->setPassword($credentials['password']);
+        }
 
         $ebicsClient = new EbicsClient($bank, $user, $keyring);
 
@@ -73,6 +82,11 @@ abstract class AbstractEbicsTestCase extends TestCase
             $keyring->setCertificateGenerator($x509Generator);
         }
 
+        if (!is_file($keyringPath)) {
+            $ebicsClient->createUserSignatures($credentials['aVersion']);
+            $this->saveKeyring($credentialsId, $ebicsClient->getKeyring());
+        }
+
         if (true === $fake) {
             $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));
         }
@@ -80,13 +94,11 @@ abstract class AbstractEbicsTestCase extends TestCase
         return $ebicsClient;
     }
 
-    protected function loadKeyring(string $credentialsId, string $version): Keyring
+    protected function loadKeyring(string $keyringPath, string $password, string $version): Keyring
     {
-        $keyringRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
-        $password = 'test123';
         $keyringManager = new FileKeyringManager();
 
-        return $keyringManager->loadKeyring($keyringRealPath, $password, $version);
+        return $keyringManager->loadKeyring($keyringPath, $password, $version);
     }
 
     protected function saveKeyring(string $credentialsId, Keyring $keyring): void
@@ -181,6 +193,8 @@ abstract class AbstractEbicsTestCase extends TestCase
             'hostIsCertified' => (bool)$credentialsEnc['hostIsCertified'],
             'partnerId' => $credentialsEnc['partnerId'],
             'userId' => $credentialsEnc['userId'],
+            'aVersion' => $credentialsEnc['aVersion'],
+            'password' => $credentialsEnc['password'],
         ];
     }
 

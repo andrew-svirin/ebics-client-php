@@ -39,11 +39,12 @@ abstract class AuthSignatureHandler
      * Add Authenticate signature after Header section.
      *
      * @param DOMDocument $request
+     * @param bool $onlyES
      * @param DOMNode|null $xmlRequestHeader
      *
      * @throws EbicsException
      */
-    public function handle(DOMDocument $request, DOMNode $xmlRequestHeader = null): void
+    public function handle(DOMDocument $request, bool $onlyES, DOMNode $xmlRequestHeader = null): void
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";
@@ -133,7 +134,9 @@ abstract class AuthSignatureHandler
         $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encrypt(
             $this->keyring->getUserSignatureX()->getPrivateKey(),
             $this->keyring->getPassword(),
-            $canonicalizedSignedInfoHash
+            $this->keyring->getUserSignatureAVersion(),
+            $canonicalizedSignedInfoHash,
+            $onlyES
         );
         $signatureValueNodeValue = base64_encode($canonicalizedSignedInfoHashEncrypted);
 

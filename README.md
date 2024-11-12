@@ -10,13 +10,13 @@
 PHP library to communicate with a bank through <a href="https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard" target="_blank">EBICS</a> protocol.  
 PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/  
 Supported PHP versions - PHP 7.2 - PHP 8.3  
-Support EBICS server versions: 2.4 (partially), 2.5 (default), 3.0  
+Support EBICS server versions: 2.4, 2.5, 3.0  
 
-# 💥 EBICS API Client for webserver (V1.0.8)
+# 💥 EBICS API Client for web-server (V1.0.8)
 
 <img src="./doc/ebics_api_client.png" align="left" width="210" style="padding-right:20px">
 
-EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and accessed via a REST API  
+EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and accessed via a REST API, use UI to make orders, log orders activity, manage Connections and access to them.  
 EBICS API Client - https://sites.google.com/view/ebics-api-client
 <br clear="left"/>
 
@@ -44,9 +44,14 @@ use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
-$keyringRealPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
+$keyringPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 $keyringManager = new FileKeyringManager();
-$keyring = $keyringManager->loadKeyring($keyringRealPath, __PASSWORD__, __EBICS_VERSION__);
+if (is_file($keyringPath)) {
+    $keyring = $keyringManager->loadKeyring($keyringPath, __PASSWORD__, __EBICS_VERSION__);
+} else {
+    $keyring = $keyringManager->createKeyring($version);
+    $keyring->setPassword(__PASSWORD__);
+}
 $bank = new Bank(__HOST_ID__, __HOST_URL__);
 // Use __IS_CERTIFIED__ true for EBICS 3.0 and/or French banks, otherwise use false.
 if(__IS_CERTIFIED__) {
@@ -56,11 +61,15 @@ if(__IS_CERTIFIED__) {
 }
 $user = new User(__PARTNER_ID__, __USER_ID__);
 $client = new EbicsClient($bank, $user, $keyring);
+if (!is_file($keyringPath)) {
+    $client->createUserSignatures();
+    $keyringManager->saveKeyring($client->getKeyring(), $keyringPath);
+}
 ```
 
 ## Global process and interaction with Bank Department
 
-### 1. Create and store your 3 keys
+### 1. Create and store your 3 keys and send initialization request.
 
 ```php
 <?php
@@ -178,13 +187,47 @@ try {
 If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://github.com/andrew-svirin/cfonb-php)  
 If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)  
 
+## Keyring schema
+```json
+{
+    "VERSION": "VERSION_24|VERSION_25|VERSION_30",
+    "USER": {
+        "A": {
+            "VERSION": "A005|A006",
+            "CERTIFICATE": "null|string",
+            "PUBLIC_KEY": "string",
+            "PRIVATE_KEY": "string"
+        },
+        "E": {
+            "CERTIFICATE": "null|string",
+            "PUBLIC_KEY": "string",
+            "PRIVATE_KEY": "string"
+        },
+        "X": {
+            "CERTIFICATE": "null|string",
+            "PUBLIC_KEY": "string",
+            "PRIVATE_KEY": "string"
+        }
+    },
+    "BANK": {
+        "E": {
+            "CERTIFICATE": "null|string",
+            "PUBLIC_KEY": "null|string",
+            "PRIVATE_KEY": null
+        },
+        "X": {
+            "CERTIFICATE": null,
+            "PUBLIC_KEY": "null|string",
+            "PRIVATE_KEY": null
+        }
+    }
+}
+```
+
 ## Backlog
  - Format validators for all available ISO 20022 formats:
    - upload: PAIN.001, PAIN.008, MT101, TA875, CFONB320, CFONB160 with different versions.
    - download: PAIN.002, CAMT.052, CAMT.053, CAMT.054, MT199, MT900, MT910, MT940, MT942, CFONB240,CFONB245, CFONB120
- - Improve FakerHttpClient
  - Support import 3SKey certificates
  - Country's Bank specific order types
- - Apply restrictions by allowed versions (HEV) for Bank
- - Apply restrictions by allowed Order types (HTD) for Account
  - Refactor by abstraction Download and Upload Order types

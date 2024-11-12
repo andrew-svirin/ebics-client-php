@@ -42,9 +42,14 @@ final class Keyring
     private ?X509GeneratorInterface $x509Generator = null;
 
     /**
-     * The Protocol Version.
+     * The EBICS Version.
      */
     private string $version;
+
+    /**
+     * User Signature A Version.
+     */
+    private string $userSignatureAVersion;
 
     public function __construct(string $version)
     {
@@ -73,11 +78,21 @@ final class Keyring
     }
 
     /**
+     * @param string $version
+     *
+     * @return void
+     */
+    public function setUserSignatureAVersion(string $version): void
+    {
+        $this->userSignatureAVersion = $version;
+    }
+
+    /**
      * @return string
      */
     public function getUserSignatureAVersion(): string
     {
-        return 'A005';
+        return $this->userSignatureAVersion;
     }
 
     public function setUserSignatureX(SignatureInterface $signature = null): void
@@ -98,7 +113,7 @@ final class Keyring
      */
     public function getUserSignatureXVersion(): string
     {
-        return 'X002';
+        return SignatureInterface::X_VERSION2;
     }
 
     public function setUserSignatureE(SignatureInterface $signature = null): void
@@ -119,7 +134,7 @@ final class Keyring
      */
     public function getUserSignatureEVersion(): string
     {
-        return 'E002';
+        return SignatureInterface::E_VERSION2;
     }
 
     public function setPassword(string $password): void
@@ -182,7 +197,7 @@ final class Keyring
      */
     public function getBankSignatureXVersion(): string
     {
-        return 'X002';
+        return SignatureInterface::X_VERSION2;
     }
 
     public function setBankSignatureE(SignatureInterface $bankSignatureE = null): void
@@ -203,6 +218,6 @@ final class Keyring
      */
     public function getBankSignatureEVersion(): string
     {
-        return 'E002';
+        return SignatureInterface::E_VERSION2;
     }
 }

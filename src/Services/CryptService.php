@@ -37,7 +37,6 @@ final class CryptService
      *
      * @param string $text
      * @param string $algorithm
-     * @param bool $binary
      *
      * @return string
      */
@@ -114,16 +113,24 @@ final class CryptService
      *
      * @param string $privateKey
      * @param string $password
+     * @param string $version
      * @param string $data
+     * @param bool $onlyES
      *
      * @return string
      */
     public function encrypt(
         string $privateKey,
         string $password,
-        string $data
+        string $version,
+        string $data,
+        bool $onlyES
     ): string {
-        $digestToSignBin = $this->filter($data);
+        if ($version === SignatureInterface::A_VERSION6 && $onlyES) {
+            $digestToSignBin = $data;
+        } else {
+            $digestToSignBin = $this->filter($data);
+        }
 
         $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
 
@@ -133,16 +140,16 @@ final class CryptService
     public function sign(
         string $privateKey,
         string $password,
-        string $type,
+        string $version,
         string $data
     ): string {
-        switch ($type) {
-            case 'A005':
+        switch ($version) {
+            case SignatureInterface::A_VERSION5:
                 $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
                 $rsa->setHash('sha256');
                 $sign = $rsa->emsaPkcs1V15Encode($data);
                 break;
-            case 'A006':
+            case SignatureInterface::A_VERSION6:
                 $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
                 $rsa->setHash('sha256');
                 $rsa->setMGFHash('sha256');
@@ -152,7 +159,7 @@ final class CryptService
                 }
                 break;
             default:
-                throw new LogicException(sprintf('Algorithm type %s not supported', $type));
+                throw new LogicException(sprintf('Algorithm type for Version %s not supported', $version));
         }
 
         return $sign;
@@ -333,14 +340,12 @@ final class CryptService
      *
      * @param SignatureInterface $signature
      * @param string $algorithm
-     * @param bool $rawOutput
      *
      * @return string
      */
     public function calculateDigest(
         SignatureInterface $signature,
-        string $algorithm = 'sha256',
-        bool $rawOutput = true
+        string $algorithm = 'sha256'
     ): string {
         $rsa = $this->rsaFactory->createPublic($signature->getPublicKey());
 
@@ -349,7 +354,7 @@ final class CryptService
 
         $key = $this->calculateKey($exponent, $modulus);
 
-        return $this->hash($key, $algorithm, $rawOutput);
+        return $this->hash($key, $algorithm);
     }
 
     /**

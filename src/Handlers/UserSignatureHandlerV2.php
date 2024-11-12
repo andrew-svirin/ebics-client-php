@@ -14,7 +14,7 @@ use AndrewSvirin\Ebics\Models\UserSignature;
  */
 final class UserSignatureHandlerV2 extends UserSignatureHandler
 {
-    public function handle(UserSignature $xml, string $digest): void
+    public function handle(UserSignature $xml, string $digest, bool $onlyES): void
     {
         // Add UserSignatureData to root.
         $xmlUserSignatureData = $xml->createElementNS(
@@ -45,7 +45,9 @@ final class UserSignatureHandlerV2 extends UserSignatureHandler
         $canonicalizedUserSignatureDataHashSigned = $this->cryptService->encrypt(
             $this->keyring->getUserSignatureA()->getPrivateKey(),
             $this->keyring->getPassword(),
-            $digest
+            $this->keyring->getUserSignatureAVersion(),
+            $digest,
+            $onlyES
         );
         $signatureValueNodeValue = base64_encode($canonicalizedUserSignatureDataHashSigned);
 

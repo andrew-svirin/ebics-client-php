@@ -43,5 +43,5 @@ abstract class UserSignatureHandler
      *
      * @throws EbicsException
      */
-    abstract public function handle(UserSignature $xml, string $digest): void;
+    abstract public function handle(UserSignature $xml, string $digest, bool $onlyES): void;
 }

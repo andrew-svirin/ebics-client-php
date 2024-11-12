@@ -5,6 +5,7 @@ namespace AndrewSvirin\Ebics\Factories;
 use AndrewSvirin\Ebics\Builders\Request\OrderDetailsBuilder;
 use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV24;
+use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV24;
 use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV24;
 use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
@@ -14,7 +15,6 @@ use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Services\DigestResolverV2;
-use DateTimeInterface;
 use LogicException;
 
 /**
@@ -68,125 +68,87 @@ final class RequestFactoryV24 extends RequestFactoryV2
             ->addOrderAttribute($orderAttribute);
     }
 
-    public function createVMK(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createSTA(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createC52(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createC53(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createC54(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createZ52(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createZ53(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createZ54(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        bool $withES,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createZSR(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createXEK(
-        ?DateTimeInterface $startDateTime,
-        ?DateTimeInterface $endDateTime,
-        ?DateTimeInterface $dateTime
-    ): Request {
-        throw new LogicException('Method not implemented yet for EBICS 2.4');
-    }
-
-    public function createCCT(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createVMK(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createCDD(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createSTA(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createCDB(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createC52(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createCIP(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createC53(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createXE2(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createC54(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createXE3(UploadTransaction $transaction, bool $withES, ?DateTimeInterface $dateTime): Request
+    public function createZ52(RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }
 
-    public function createYCT(UploadTransaction $transaction, ?DateTimeInterface $dateTime): Request
+    public function createZ53(RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createZ54(RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createZSR(RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createXEK(RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createCCT(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createCDD(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createCDB(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createCIP(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createXE2(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createXE3(UploadTransaction $transaction, RequestContext $context): Request
+    {
+        throw new LogicException('Method not implemented yet for EBICS 2.4');
+    }
+
+    public function createYCT(UploadTransaction $transaction, RequestContext $context): Request
     {
         throw new LogicException('Method not implemented yet for EBICS 2.4');
     }

@@ -9,6 +9,7 @@ use AndrewSvirin\Ebics\Contexts\FULContext;
 use AndrewSvirin\Ebics\Contexts\HVDContext;
 use AndrewSvirin\Ebics\Contexts\HVEContext;
 use AndrewSvirin\Ebics\Contexts\HVTContext;
+use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Handlers\ResponseHandler;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\DownloadOrderResult;
@@ -40,7 +41,7 @@ interface EbicsClientInterface
     /**
      * Create user signatures A, E and X on first launch.
      */
-    public function createUserSignatures(): void;
+    public function createUserSignatures(string $aVersion): void;
 
     /**
      * Download supported protocol versions for the Bank.
@@ -51,110 +52,102 @@ interface EbicsClientInterface
 
     /**
      * Make INI request.
-     * Send to the bank public signature of signature A00X.
-     * Prepare A00X signature for Keyring.
+     * Send to the bank public signature of signature A005|A006.
      *
-     * @param DateTimeInterface|null $dateTime Current date
-     * @param bool $createSignature Create new signature.
+     * @param RequestContext|null $context
      *
      * @return Response
      */
-    public function INI(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
+    public function INI(RequestContext $context = null): Response;
 
     /**
      * Make HIA request.
      * Send to the bank public signatures of authentication (X002) and encryption (E002).
-     * Prepare E002 and X002 user signatures for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime Current date
-     * @param bool $createSignature Create new signature.
+     * @param RequestContext|null $context
      *
      * @return Response
      */
-    public function HIA(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
+    public function HIA(RequestContext $context = null): Response;
 
     /**
      * Make H3K request.
-     * Send to the bank public signatures of signature (A00X), authentication (X002) and encryption (E002).
-     * Prepare A00X, E002 and X002 user signatures for Keyring.
+     * Send to the bank public signatures of signature (A005|A006), authentication (X002) and encryption (E002).
      *
-     * @param DateTimeInterface|null $dateTime Current date
-     * @param bool $createSignature Create new signature.
+     * @param RequestContext|null $context
      *
      * @return Response
      */
-    public function H3K(DateTimeInterface $dateTime = null, bool $createSignature = false): Response;
+    public function H3K(RequestContext $context = null): Response;
 
     /**
      * Download the Bank public signatures authentication (X002) and encryption (E002).
      * Prepare E002 and X002 bank signatures for Keyring.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return InitializationOrderResult
      */
-    public function HPB(DateTimeInterface $dateTime = null): InitializationOrderResult;
+    public function HPB(RequestContext $context = null): InitializationOrderResult;
 
     /**
      * Suspend activated Keyring.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function SPR(DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function SPR(RequestContext $context = null): UploadOrderResult;
 
     /**
      * Download the bank server parameters.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HPD(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HPD(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download customer's customer and subscriber information.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HKD(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HKD(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download subscriber's customer and subscriber information.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HTD(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HTD(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download Bank available order types.
      *
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HAA(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HAA(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download transaction status.
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function PTK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -162,16 +155,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function VMK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -179,16 +170,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function STA(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -196,16 +185,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function C52(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -213,16 +200,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function C53(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -230,16 +215,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function C54(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -247,16 +230,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function Z52(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -264,16 +245,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function Z53(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -281,16 +260,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function Z54(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -298,14 +275,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function ZSR(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -313,14 +290,14 @@ interface EbicsClientInterface
      *
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
     public function XEK(
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -329,7 +306,7 @@ interface EbicsClientInterface
      * @param BTDContext $btdContext
      * @param DateTimeInterface|null $startDateTime the start date of requested transactions
      * @param DateTimeInterface|null $endDateTime the end date of requested transactions
-     * @param DateTimeInterface|null $dateTime Current date
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
@@ -337,7 +314,7 @@ interface EbicsClientInterface
         BTDContext $btdContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -345,14 +322,14 @@ interface EbicsClientInterface
      *
      * @param BTUContext $btuContext
      * @param OrderDataInterface $orderData
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
     public function BTU(
         BTUContext $btuContext,
         OrderDataInterface $orderData,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult;
 
     /**
@@ -361,9 +338,7 @@ interface EbicsClientInterface
      * @param FDLContext $fdlContext
      * @param DateTimeInterface|null $startDateTime
      * @param DateTimeInterface|null $endDateTime
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param callable|null $ackClosure Custom closure to handle download acknowledge.
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
@@ -371,9 +346,7 @@ interface EbicsClientInterface
         FDLContext $fdlContext,
         DateTimeInterface $startDateTime = null,
         DateTimeInterface $endDateTime = null,
-        bool $withES = false,
-        $ackClosure = null,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): DownloadOrderResult;
 
     /**
@@ -382,16 +355,14 @@ interface EbicsClientInterface
      *
      * @param FULContext $fulContext
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
     public function FUL(
         FULContext $fulContext,
         OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
+        RequestContext $context = null
     ): UploadOrderResult;
 
     /**
@@ -402,16 +373,11 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SCT, Scope:DE, Container:, MsgName:pain.001
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function CCT(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function CCT(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload initiation of the direct debit transaction.
@@ -420,16 +386,11 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:SDD,Service Option:COR Container:, MsgName:pain.008
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function CDD(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function CDD(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload initiation of the direct debit transaction for business.
@@ -438,31 +399,21 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:SDD,Service Option:COR Container:, MsgName:pain.008
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function CDB(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function CDB(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload initiation of the instant credit transfer per SEPA.
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function CIP(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function CIP(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload initiation credit transfer per Swiss Payments specification set by Six banking services.
@@ -471,16 +422,11 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:MCT, Scope:CH,Service Option:COR Container:, MsgName:pain.001,Version: 03
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function XE2(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function XE2(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload SEPA Direct Debit Initiation, CH definitions, CORE.
@@ -488,75 +434,70 @@ interface EbicsClientInterface
      * OrderType:BTU, Service Name:SDD, Scope:CH,Service Option:COR Container:, MsgName:pain.008,Version: 02
      *
      * @param OrderDataInterface $orderData
-     * @param bool $withES OrderData contains both order data and Electronic Signature
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function XE3(
-        OrderDataInterface $orderData,
-        bool $withES = false,
-        DateTimeInterface $dateTime = null
-    ): UploadOrderResult;
+    public function XE3(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Upload Credit transfer CGI (SEPA & non SEPA).
      * OrderType:BTU, Service Name:MCT, Scope:BIL, Container:, MsgName:pain.001
      *
      * @param OrderDataInterface $orderData
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function YCT(OrderDataInterface $orderData, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function YCT(OrderDataInterface $orderData, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Download List the orders for which the user is authorized as a signatory.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HVU(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HVU(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download VEU overview with additional information.
      *
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HVZ(DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HVZ(RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Add a VEU signature for order.
      *
      * @param HVEContext $hveContext
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return UploadOrderResult
      */
-    public function HVE(HVEContext $hveContext, DateTimeInterface $dateTime = null): UploadOrderResult;
+    public function HVE(HVEContext $hveContext, RequestContext $context = null): UploadOrderResult;
 
     /**
      * Download the state of a VEU order.
      *
      * @param HVDContext $hvdContext
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HVD(HVDContext $hvdContext, DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HVD(HVDContext $hvdContext, RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Download detailed information about an order from VEU processing for which the user is authorized as a signatory.
      *
      * @param HVTContext $hvtContext
-     * @param DateTimeInterface|null $dateTime
+     * @param RequestContext|null $context
      *
      * @return DownloadOrderResult
      */
-    public function HVT(HVTContext $hvtContext, DateTimeInterface $dateTime = null): DownloadOrderResult;
+    public function HVT(HVTContext $hvtContext, RequestContext $context = null): DownloadOrderResult;
 
     /**
      * Get Keyring.

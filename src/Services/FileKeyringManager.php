@@ -27,7 +27,7 @@ final class FileKeyringManager extends KeyringManager
         ) {
             $keyring = $this->keyringFactory->createKeyringFromData(json_decode($content, true));
         } else {
-            $keyring = new Keyring($defaultVersion);
+            $keyring = $this->createKeyring($defaultVersion);
         }
         $keyring->setPassword($passphrase);
 

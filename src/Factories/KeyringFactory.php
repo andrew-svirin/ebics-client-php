@@ -29,6 +29,9 @@ final class KeyringFactory
     {
         $keyring = new Keyring($data[Keyring::VERSION_PREFIX]);
 
+        $keyring->setUserSignatureAVersion(
+            $data[Keyring::USER_PREFIX][Keyring::SIGNATURE_PREFIX_A][Keyring::VERSION_PREFIX]
+        );
         $keyring->setUserSignatureA(
             $this->buildKeyringFromDataForTypeKeyring($data, Keyring::USER_PREFIX, Keyring::SIGNATURE_PREFIX_A)
         );
@@ -124,6 +127,7 @@ final class KeyringFactory
             Keyring::VERSION_PREFIX => $keyring->getVersion(),
             Keyring::USER_PREFIX => [
                 Keyring::SIGNATURE_PREFIX_A => [
+                    Keyring::VERSION_PREFIX => $keyring->getUserSignatureAVersion(),
                     Keyring::CERTIFICATE_PREFIX => isset($userSignatureAB64) ?
                         $this->encodeValue($userSignatureAB64) : null,
                     Keyring::PUBLIC_KEY_PREFIX => isset($userSignatureAPublicKey) ?

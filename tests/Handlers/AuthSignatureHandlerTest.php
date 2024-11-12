@@ -58,7 +58,7 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
         $authSignature2 = $hpb2XPath->query("//$h00x:AuthSignature")->item(0);
         $authSignature2->parentNode->removeChild($authSignature2);
 
-        $this->authSignatureHandler->handle($hpb2XML, $hpb2Header);
+        $this->authSignatureHandler->handle($hpb2XML, false, $hpb2Header);
 
         // Rewind. Because after remove and insert XML tree do not work correctly.
         $hpb2XML->loadXML($hpb2XML->saveXML());
@@ -97,7 +97,7 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
 
         $request2Request = $request2XPath->query("/$h00x:ebicsNoPubKeyDigestsRequest")->item(0);
         $request2RequestHeader = $request2XPath->query("//$h00x:header")->item(0);
-        $this->authSignatureHandler->handle($request2, $request2RequestHeader);
+        $this->authSignatureHandler->handle($request2, false, $request2RequestHeader);
         // Add removed body after AuthSignature.
         $request2Request->appendChild($body2);
 
@@ -108,9 +108,5 @@ class AuthSignatureHandlerTest extends AbstractEbicsTestCase
         $digestValue2 = $request2XPath->query("//$h00x:AuthSignature/ds:SignatureValue")->item(0)->nodeValue;
 
         self::assertEquals($digestValue, $digestValue2);
-
-//      $hostResponse = $this->client->post($request2);
-//      $hostResponseContent = $hostResponse->getContent();
-//      return;
     }
 }

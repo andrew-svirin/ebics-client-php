@@ -94,10 +94,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
     {
         return [
             [
-                $this->setupClientV24(2),
-            ],
-            [
-                $this->setupClientV24(3),
+                $this->setupClientV24(9),
             ],
             [
                 $this->setupClientV25(2),
@@ -106,7 +103,7 @@ class EbicsBankLetterTest extends AbstractEbicsTestCase
                 $this->setupClientV25(3),
             ],
             [
-                $this->setupClientV30(2),
+                $this->setupClientV30(6),
             ],
         ];
     }

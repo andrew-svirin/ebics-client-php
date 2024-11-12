@@ -6,6 +6,7 @@ use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\User;
+use DateTime;
 use DateTimeInterface;
 
 /**
@@ -16,13 +17,24 @@ use DateTimeInterface;
  */
 final class RequestContext
 {
+    /**
+     * Request have both ES and OrderData
+     */
+    private bool $withES;
+    private bool $onlyES;
+
+    /**
+     * @var callable|null $ackClosure Custom closure to handle download acknowledge.
+     */
+    private $ackClosure = null;
+
+    private string $orderType;
     private Bank $bank;
     private User $user;
     private Keyring $keyring;
     private DateTimeInterface $dateTime;
     private ?DateTimeInterface $startDateTime;
     private ?DateTimeInterface $endDateTime;
-    private bool $withES;
     private FDLContext $fdlContext;
     private FULContext $fulContext;
     private string $receiptCode;
@@ -40,6 +52,17 @@ final class RequestContext
     private HVEContext $hveContext;
     private HVDContext $hvdContext;
     private HVTContext $hvtContext;
+    private string $product;
+    private string $language;
+
+    public function __construct()
+    {
+        $this->dateTime = new DateTime();
+        $this->withES = false;
+        $this->onlyES = false;
+        $this->product = 'Ebics client PHP';
+        $this->language = 'de';
+    }
 
     public function setBank(Bank $bank): RequestContext
     {
@@ -328,5 +351,47 @@ final class RequestContext
     public function getSignatureVersion(): string
     {
         return $this->signatureVersion;
+    }
+
+    public function getAckClosure(): ?callable
+    {
+        return $this->ackClosure;
+    }
+
+    public function setAckClosure(?callable $ackClosure): void
+    {
+        $this->ackClosure = $ackClosure;
+    }
+
+    public function setOnlyES(bool $onlyES): void
+    {
+        $this->onlyES = $onlyES;
+    }
+
+    public function isOnlyES(): bool
+    {
+        return $this->onlyES;
+    }
+
+    public function getProduct(): string
+    {
+        return $this->product;
+    }
+
+    public function getLanguage(): string
+    {
+        return $this->language;
+    }
+
+    public function getOrderType(): string
+    {
+        return $this->orderType;
+    }
+
+    public function setOrderType(string $orderType): RequestContext
+    {
+        $this->orderType = $orderType;
+
+        return $this;
     }
 }

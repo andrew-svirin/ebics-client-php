@@ -1,5 +1,7 @@
 ## 2.3
 
+* Support switching A005/A006
+* Change signature for KeyringManagerInterface. Attributes `USER.A.Version` moved from Bank to Keyring.
 * Add `withES` param for downloading order types. Default `withES=false`.
 * Extended OrderData handler.
 * Add CountryCode for FUL.

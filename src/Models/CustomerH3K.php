@@ -8,7 +8,7 @@ namespace AndrewSvirin\Ebics\Models;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Ronan GIRON <https://github.com/ElGigi>
  */
-class CustomerH3K extends OrderData
+final class CustomerH3K extends OrderData
 {
 
 }
