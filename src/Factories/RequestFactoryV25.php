@@ -212,7 +212,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createCCT(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('CCT')
@@ -232,7 +232,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createCDD(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('CDD')
@@ -252,7 +252,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createCDB(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('CDB')
@@ -272,7 +272,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createCIP(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('CIP')
@@ -292,7 +292,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createXE2(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('XE2')
@@ -312,7 +312,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
     public function createXE3(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('XE3')
@@ -367,7 +367,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -423,7 +423,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }

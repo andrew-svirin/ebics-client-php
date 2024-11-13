@@ -2,7 +2,9 @@
 
 namespace AndrewSvirin\Ebics\Handlers;
 
+use AndrewSvirin\Ebics\Exceptions\AlgoEbicsException;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
+use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
 use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
 use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
 use AndrewSvirin\Ebics\Models\Keyring;
@@ -39,12 +41,11 @@ abstract class AuthSignatureHandler
      * Add Authenticate signature after Header section.
      *
      * @param DOMDocument $request
-     * @param bool $onlyES
      * @param DOMNode|null $xmlRequestHeader
      *
      * @throws EbicsException
      */
-    public function handle(DOMDocument $request, bool $onlyES, DOMNode $xmlRequestHeader = null): void
+    public function handle(DOMDocument $request, DOMNode $xmlRequestHeader = null): void
     {
         $canonicalizationPath = '//AuthSignature/*';
         $signaturePath = "//*[@authenticate='true']";
@@ -134,9 +135,8 @@ abstract class AuthSignatureHandler
         $canonicalizedSignedInfoHashEncrypted = $this->cryptService->encrypt(
             $this->keyring->getUserSignatureX()->getPrivateKey(),
             $this->keyring->getPassword(),
-            $this->keyring->getUserSignatureAVersion(),
-            $canonicalizedSignedInfoHash,
-            $onlyES
+            $this->keyring->getUserSignatureXVersion(),
+            $canonicalizedSignedInfoHash
         );
         $signatureValueNodeValue = base64_encode($canonicalizedSignedInfoHashEncrypted);
 

@@ -108,7 +108,7 @@ final class RequestFactoryV3 extends RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -117,7 +117,7 @@ final class RequestFactoryV3 extends RequestFactory
     {
         $signatureData = new UserSignature();
 
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $signatureVersion = $this->keyring->getUserSignatureAVersion();
         $dataDigest = $this->cryptService->sign(
@@ -185,7 +185,7 @@ final class RequestFactoryV3 extends RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }

@@ -115,7 +115,6 @@ final class CryptService
      * @param string $password
      * @param string $version
      * @param string $data
-     * @param bool $onlyES
      *
      * @return string
      */
@@ -123,18 +122,27 @@ final class CryptService
         string $privateKey,
         string $password,
         string $version,
-        string $data,
-        bool $onlyES
+        string $data
     ): string {
-        if ($version === SignatureInterface::A_VERSION6 && $onlyES) {
-            $digestToSignBin = $data;
-        } else {
-            $digestToSignBin = $this->filter($data);
+        switch ($version) {
+            case SignatureInterface::A_VERSION6:
+                $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
+                $rsa->setHash('sha256');
+                $rsa->setMGFHash('sha256');
+
+                $encrypt = $rsa->sign($data);
+                break;
+
+            case SignatureInterface::A_VERSION5:
+            default:
+                $digestToSignBin = $this->filter($data);
+
+                $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
+
+                $encrypt = $this->encryptByRsa($rsa, $digestToSignBin);
         }
 
-        $rsa = $this->rsaFactory->createPrivate($privateKey, $password);
-
-        return $this->encryptByRsa($rsa, $digestToSignBin);
+        return $encrypt;
     }
 
     public function sign(

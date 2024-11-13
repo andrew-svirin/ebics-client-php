@@ -19,7 +19,7 @@ use Silarhi\Cfonb\CfonbParser;
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin
  *
- * @group ebics-client
+ * @group V25
  */
 class EbicsClientV25Test extends AbstractEbicsTestCase
 {
@@ -487,6 +487,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group C54
+     * @group C54-V25
      *
      * @param int $credentialsId
      * @param array $codes
@@ -729,6 +730,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group CIP
+     * @group CIP-V25
      *
      * @param int $credentialsId
      * @param array $codes
@@ -1068,51 +1070,51 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
     public function serversDataProvider()
     {
         return [
-//            [
-//                1, // Credentials Id.
-//                [
-//                    'HEV' => ['code' => null, 'fake' => false],
-//                    'INI' => ['code' => null, 'fake' => false],
-//                    'HIA' => ['code' => null, 'fake' => false],
-//                    'H3K' => ['code' => null, 'fake' => false],
-//                    'HPB' => ['code' => null, 'fake' => false],
-//                    'SPR' => ['code' => null, 'fake' => false],
-//                    'HPD' => ['code' => null, 'fake' => false],
-//                    'HKD' => ['code' => null, 'fake' => false],
-//                    'HTD' => ['code' => null, 'fake' => false],
-//                    'HAA' => ['code' => null, 'fake' => false],
-//                    'PTK' => ['code' => null, 'fake' => false],
-//                    'VMK' => ['code' => '090003', 'fake' => false],
-//                    'STA' => ['code' => '090003', 'fake' => false],
-//                    'Z52' => ['code' => '090005', 'fake' => false],
-//                    'Z53' => ['code' => '090005', 'fake' => false],
-//                    'Z54' => ['code' => '090005', 'fake' => false],
-//                    'C52' => ['code' => '090003', 'fake' => false],
-//                    'C53' => ['code' => '090003', 'fake' => false],
-//                    'C54' => ['code' => '090003', 'fake' => false],
-//                    'FDL' => [
-//                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
-//                    ],
-//                    'FUL' => [
-//                        'pain.001.001.03.sct' => [
-//                            'code' => '091112',
-//                            'fake' => false,
-            /*                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',*/
-//                        ],
-//                    ],
-//                    'CCT' => ['code' => null, 'fake' => false],
-//                    'XE2' => ['code' => null, 'fake' => false],
-//                    'XE3' => ['code' => null, 'fake' => false],
-//                    'CDD' => ['code' => null, 'fake' => false],
-//                    'CDB' => ['code' => '090003', 'fake' => false],
-//                    'CIP' => ['code' => '091005', 'fake' => false],
-//                    'HVU' => ['code' => '090003', 'fake' => false],
-//                    'HVZ' => ['code' => '090003', 'fake' => false],
-//                    'HVE' => ['code' => '090003', 'fake' => false],
-//                    'HVD' => ['code' => '090003', 'fake' => false],
-//                    'HVT' => ['code' => '090003', 'fake' => false],
-//                ],
-//            ],
+            [
+                1, // Credentials Id.
+                [
+                    'HEV' => ['code' => null, 'fake' => false],
+                    'INI' => ['code' => null, 'fake' => false],
+                    'HIA' => ['code' => null, 'fake' => false],
+                    'H3K' => ['code' => null, 'fake' => false],
+                    'HPB' => ['code' => null, 'fake' => false],
+                    'SPR' => ['code' => null, 'fake' => false],
+                    'HPD' => ['code' => null, 'fake' => false],
+                    'HKD' => ['code' => null, 'fake' => false],
+                    'HTD' => ['code' => null, 'fake' => false],
+                    'HAA' => ['code' => null, 'fake' => false],
+                    'PTK' => ['code' => null, 'fake' => false],
+                    'VMK' => ['code' => '090003', 'fake' => false],
+                    'STA' => ['code' => '090003', 'fake' => false],
+                    'Z52' => ['code' => '090005', 'fake' => false],
+                    'Z53' => ['code' => '090005', 'fake' => false],
+                    'Z54' => ['code' => '090005', 'fake' => false],
+                    'C52' => ['code' => '090003', 'fake' => false],
+                    'C53' => ['code' => '090003', 'fake' => false],
+                    'C54' => ['code' => '090003', 'fake' => false],
+                    'FDL' => [
+                        'camt.xxx.cfonb120.stm' => ['code' => '091112', 'fake' => false],
+                    ],
+                    'FUL' => [
+                        'pain.001.001.03.sct' => [
+                            'code' => '091112',
+                            'fake' => false,
+                            'document' => '<?xml version="1.0" encoding="UTF-8"?><Root></Root>',
+                        ],
+                    ],
+                    'CCT' => ['code' => null, 'fake' => false],
+                    'XE2' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
+                    'CDD' => ['code' => null, 'fake' => false],
+                    'CDB' => ['code' => '090003', 'fake' => false],
+                    'CIP' => ['code' => '091005', 'fake' => false],
+                    'HVU' => ['code' => '090003', 'fake' => false],
+                    'HVZ' => ['code' => '090003', 'fake' => false],
+                    'HVE' => ['code' => '090003', 'fake' => false],
+                    'HVD' => ['code' => '090003', 'fake' => false],
+                    'HVT' => ['code' => '090003', 'fake' => false],
+                ],
+            ],
             [
                 2, // Credentials Id.
                 [

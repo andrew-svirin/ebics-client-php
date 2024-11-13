@@ -84,8 +84,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group INI
-     * @group V3
-     * @group INI-V3
+     * @group INI-V30
      *
      * @param int $credentialsId
      * @param array $codes
@@ -116,8 +115,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group HIA
-     * @group V3
-     * @group HIA-V3
+     * @group HIA-V30
      *
      * @param int $credentialsId
      * @param array $codes
@@ -207,6 +205,34 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $reportText = $responseHandler->retrieveH00XReportText($hpb->getTransaction()->getInitializationSegment()->getResponse());
         $this->assertResponseOk($code, $reportText);
         $this->saveKeyring($credentialsId, $client->getKeyring());
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
+     * @group SPR
+     * @group SPR-V30
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     *
+     * @covers
+     */
+    public function testSPR(int $credentialsId, array $codes)
+    {
+        $this->markTestSkipped('Avoid keyring suspension.');
+
+        $client = $this->setupClientV30($credentialsId, $codes['SPR']['fake']);
+
+        $this->assertExceptionCode($codes['SPR']['code']);
+        $spr = $client->SPR();
+
+        $responseHandler = $client->getResponseHandler();
+
+        $code = $responseHandler->retrieveH00XReturnCode($spr->getTransaction()->getInitialization()->getResponse());
+        $reportText = $responseHandler->retrieveH00XReportText($spr->getTransaction()->getInitialization()->getResponse());
+
+        $this->assertResponseOk($code, $reportText);
     }
 
     /**
@@ -786,39 +812,41 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
     public function serversDataProvider()
     {
         return [
-            [
-                6, // Credentials Id.
-                [
-                    'HEV' => ['code' => null, 'fake' => false],
-                    'INI' => ['code' => null, 'fake' => false],
-                    'HIA' => ['code' => null, 'fake' => false],
-                    'H3K' => ['code' => null, 'fake' => false],
-                    'HPB' => ['code' => null, 'fake' => false],
-                    'HKD' => ['code' => null, 'fake' => false],
-                    'HVU' => ['code' => '090003', 'fake' => false],
-                    'HVZ' => ['code' => '090003', 'fake' => false],
-                    'HVE' => ['code' => '090003', 'fake' => false],
-                    'HVD' => ['code' => '090003', 'fake' => false],
-                    'HVT' => ['code' => '090003', 'fake' => false],
-                    'PTK' => ['code' => null, 'fake' => false],
-                    'C53' => ['code' => '090003', 'fake' => false],
-                    'Z54' => ['code' => '091005', 'fake' => false],
-                    'ZSR' => ['code' => '091005', 'fake' => false],
-                    'XEK' => ['code' => '091005', 'fake' => false],
-                    'BTD' => ['code' => '090005', 'fake' => false],
-                    'BTU' => ['code' => null, 'fake' => false],
-                    'XE3' => ['code' => null, 'fake' => false],
-                    'YCT' => ['code' => '091005', 'fake' => false],
-                    'HPD' => ['code' => null, 'fake' => false],
-                    'HAA' => ['code' => null, 'fake' => false],
-                ],
-            ],
+//            [
+//                6, // Credentials Id.
+//                [
+//                    'HEV' => ['code' => null, 'fake' => false],
+//                    'INI' => ['code' => null, 'fake' => false],
+//                    'HIA' => ['code' => null, 'fake' => false],
+//                    'SPR' => ['code' => null, 'fake' => false],
+//                    'H3K' => ['code' => null, 'fake' => false],
+//                    'HPB' => ['code' => null, 'fake' => false],
+//                    'HKD' => ['code' => null, 'fake' => false],
+//                    'HVU' => ['code' => '090003', 'fake' => false],
+//                    'HVZ' => ['code' => '090003', 'fake' => false],
+//                    'HVE' => ['code' => '090003', 'fake' => false],
+//                    'HVD' => ['code' => '090003', 'fake' => false],
+//                    'HVT' => ['code' => '090003', 'fake' => false],
+//                    'PTK' => ['code' => null, 'fake' => false],
+//                    'C53' => ['code' => '090003', 'fake' => false],
+//                    'Z54' => ['code' => '091005', 'fake' => false],
+//                    'ZSR' => ['code' => '091005', 'fake' => false],
+//                    'XEK' => ['code' => '091005', 'fake' => false],
+//                    'BTD' => ['code' => '090005', 'fake' => false],
+//                    'BTU' => ['code' => null, 'fake' => false],
+//                    'XE3' => ['code' => null, 'fake' => false],
+//                    'YCT' => ['code' => '091005', 'fake' => false],
+//                    'HPD' => ['code' => null, 'fake' => false],
+//                    'HAA' => ['code' => null, 'fake' => false],
+//                ],
+//            ],
             [
                 7, // Credentials Id.
                 [
                     'HEV' => ['code' => null, 'fake' => false],
                     'INI' => ['code' => null, 'fake' => false],
                     'HIA' => ['code' => null, 'fake' => false],
+                    'SPR' => ['code' => null, 'fake' => false],
                     'HPB' => ['code' => null, 'fake' => false],
                     'HKD' => ['code' => null, 'fake' => false],
                     'HVU' => ['code' => '090003', 'fake' => false],

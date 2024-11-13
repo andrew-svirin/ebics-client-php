@@ -189,8 +189,7 @@ abstract class RequestFactory
         $signatureData = new UserSignature();
         $this->userSignatureHandler->handle(
             $signatureData,
-            $this->cryptService->hash($orderData->getContent()),
-            false
+            $this->cryptService->hash($orderData->getContent())
         );
 
         $context
@@ -259,7 +258,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -267,7 +266,7 @@ abstract class RequestFactory
     public function createSPR(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('SPR')
@@ -321,7 +320,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -419,7 +418,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -467,7 +466,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -523,7 +522,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -534,7 +533,7 @@ abstract class RequestFactory
     public function createFUL(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('FUL')
@@ -591,7 +590,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -630,7 +629,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -674,7 +673,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -710,7 +709,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -792,7 +791,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -840,7 +839,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -851,7 +850,7 @@ abstract class RequestFactory
     public function createHVE(UploadTransaction $transaction, RequestContext $context): Request
     {
         $signatureData = new UserSignature();
-        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest(), $context->isOnlyES());
+        $this->userSignatureHandler->handle($signatureData, $transaction->getDigest());
 
         $context
             ->setOrderType('HVE')
@@ -905,7 +904,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -950,7 +949,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
@@ -995,7 +994,7 @@ abstract class RequestFactory
             })
             ->popInstance();
 
-        $this->authSignatureHandler->handle($request, $context->isOnlyES());
+        $this->authSignatureHandler->handle($request);
 
         return $request;
     }
