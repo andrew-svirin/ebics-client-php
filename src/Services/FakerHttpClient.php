@@ -38,11 +38,28 @@ final class FakerHttpClient implements HttpClientInterface
 
         if ($orderTypeMatch) {
             $fileFormatMatches = [];
-            preg_match('/<FileFormat.*>(?<file_format>.*)<\/FileFormat>/', $requestContent, $fileFormatMatches);
+            preg_match(
+                '/<FileFormat.*>(?<file_format>.*)<\/FileFormat>/',
+                $requestContent,
+                $fileFormatMatches
+            );
+
+            $btfOrderParamsMatches = [];
+            preg_match(
+                '/<ServiceName.*>(?<service_name>.*)<\/ServiceName>.*?<MsgName.*>(?<msg_name>.*)<\/MsgName>/',
+                $requestContent,
+                $btfOrderParamsMatches
+            );
 
             return $this->fixtureOrderType(
                 $orderTypeMatches['order_type'],
-                ['file_format' => $fileFormatMatches['file_format'] ?? null]
+                [
+                    'file_format' => $fileFormatMatches['file_format'] ??
+                            (!empty($btfOrderParamsMatches) ?
+                                $btfOrderParamsMatches['service_name'].'.'.$btfOrderParamsMatches['msg_name']
+                                : null) ??
+                            null,
+                ]
             );
         }
 
@@ -82,8 +99,11 @@ final class FakerHttpClient implements HttpClientInterface
     private function fixtureOrderType(string $orderType, array $options = null): Response
     {
         switch ($orderType) {
+            case 'FUL':
             case 'FDL':
-                $fileName = sprintf('fdl.%s.xml', $options['file_format']);
+            case 'BTU':
+            case 'BTD':
+                $fileName = sprintf(strtolower($orderType).'.%s.xml', strtolower($options['file_format']));
                 break;
             case 'INI':
             case 'HIA':
@@ -147,7 +167,7 @@ final class FakerHttpClient implements HttpClientInterface
         $fixturePath = $this->fixturesDir.'/'.$fileName;
 
         if (!is_file($fixturePath)) {
-            throw new LogicException('Fixtures file does not exists.');
+            throw new LogicException(sprintf('Fixtures file %s does not exists.', $fileName));
         }
 
         $response = new Response();

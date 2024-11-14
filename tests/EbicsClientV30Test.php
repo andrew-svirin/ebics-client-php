@@ -812,34 +812,34 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
     public function serversDataProvider()
     {
         return [
-//            [
-//                6, // Credentials Id.
-//                [
-//                    'HEV' => ['code' => null, 'fake' => false],
-//                    'INI' => ['code' => null, 'fake' => false],
-//                    'HIA' => ['code' => null, 'fake' => false],
-//                    'SPR' => ['code' => null, 'fake' => false],
-//                    'H3K' => ['code' => null, 'fake' => false],
-//                    'HPB' => ['code' => null, 'fake' => false],
-//                    'HKD' => ['code' => null, 'fake' => false],
-//                    'HVU' => ['code' => '090003', 'fake' => false],
-//                    'HVZ' => ['code' => '090003', 'fake' => false],
-//                    'HVE' => ['code' => '090003', 'fake' => false],
-//                    'HVD' => ['code' => '090003', 'fake' => false],
-//                    'HVT' => ['code' => '090003', 'fake' => false],
-//                    'PTK' => ['code' => null, 'fake' => false],
-//                    'C53' => ['code' => '090003', 'fake' => false],
-//                    'Z54' => ['code' => '091005', 'fake' => false],
-//                    'ZSR' => ['code' => '091005', 'fake' => false],
-//                    'XEK' => ['code' => '091005', 'fake' => false],
-//                    'BTD' => ['code' => '090005', 'fake' => false],
-//                    'BTU' => ['code' => null, 'fake' => false],
-//                    'XE3' => ['code' => null, 'fake' => false],
-//                    'YCT' => ['code' => '091005', 'fake' => false],
-//                    'HPD' => ['code' => null, 'fake' => false],
-//                    'HAA' => ['code' => null, 'fake' => false],
-//                ],
-//            ],
+            [
+                6, // Credentials Id.
+                [
+                    'HEV' => ['code' => null, 'fake' => false],
+                    'INI' => ['code' => null, 'fake' => false],
+                    'HIA' => ['code' => null, 'fake' => false],
+                    'SPR' => ['code' => null, 'fake' => false],
+                    'H3K' => ['code' => null, 'fake' => false],
+                    'HPB' => ['code' => null, 'fake' => false],
+                    'HKD' => ['code' => null, 'fake' => false],
+                    'HVU' => ['code' => '090003', 'fake' => false],
+                    'HVZ' => ['code' => '090003', 'fake' => false],
+                    'HVE' => ['code' => '090003', 'fake' => false],
+                    'HVD' => ['code' => '090003', 'fake' => false],
+                    'HVT' => ['code' => '090003', 'fake' => false],
+                    'PTK' => ['code' => null, 'fake' => false],
+                    'C53' => ['code' => '090003', 'fake' => false],
+                    'Z54' => ['code' => '091005', 'fake' => false],
+                    'ZSR' => ['code' => '091005', 'fake' => false],
+                    'XEK' => ['code' => '091005', 'fake' => false],
+                    'BTD' => ['code' => '090005', 'fake' => false],
+                    'BTU' => ['code' => null, 'fake' => false],
+                    'XE3' => ['code' => null, 'fake' => false],
+                    'YCT' => ['code' => '091005', 'fake' => false],
+                    'HPD' => ['code' => null, 'fake' => false],
+                    'HAA' => ['code' => null, 'fake' => false],
+                ],
+            ],
             [
                 7, // Credentials Id.
                 [

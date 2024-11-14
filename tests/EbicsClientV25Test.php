@@ -319,6 +319,7 @@ class EbicsClientV25Test extends AbstractEbicsTestCase
      * @dataProvider serversDataProvider
      *
      * @group HPD
+     * @group HPD-V25
      *
      * @param int $credentialsId
      * @param array $codes

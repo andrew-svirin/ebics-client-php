@@ -10,7 +10,7 @@
 PHP library to communicate with a bank through <a href="https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard" target="_blank">EBICS</a> protocol.  
 PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/  
 Supported PHP versions - PHP 7.2 - PHP 8.3  
-Support EBICS server versions: 2.4, 2.5, 3.0  
+Support EBICS versions: 2.4, 2.5, 3.0; Encryption versions: E002, X002, A005, A006; Switching EBICS T/TS
 
 # 💥 EBICS API Client for web-server (V1.0.8)
 
@@ -44,12 +44,13 @@ use AndrewSvirin\Ebics\EbicsClient;
 use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
+// "__EBICS_VERSION__" should have value "VERSION_30" for EBICS 3.0
 $keyringPath = __PATH_TO_WORKSPACES_DIR__ . '/workspace/keyring.json';
 $keyringManager = new FileKeyringManager();
 if (is_file($keyringPath)) {
     $keyring = $keyringManager->loadKeyring($keyringPath, __PASSWORD__, __EBICS_VERSION__);
 } else {
-    $keyring = $keyringManager->createKeyring($version);
+    $keyring = $keyringManager->createKeyring(__EBICS_VERSION__);
     $keyring->setPassword(__PASSWORD__);
 }
 $bank = new Bank(__HOST_ID__, __HOST_URL__);
