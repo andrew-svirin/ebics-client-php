@@ -39,7 +39,7 @@ abstract class BTFContext extends ServiceContext
         return $this->msgNameVariant;
     }
 
-    public function setMsgNameVersion(string $msgNameVersion): self
+    public function setMsgNameVersion(?string $msgNameVersion): self
     {
         $this->msgNameVersion = $msgNameVersion;
 

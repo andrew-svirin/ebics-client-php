@@ -8,6 +8,7 @@ use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\User;
 use DateTime;
 use DateTimeInterface;
+use LogicException;
 
 /**
  * Class RequestContext context container for @see \AndrewSvirin\Ebics\Factories\RequestFactory
@@ -47,8 +48,8 @@ final class RequestContext
     private SignatureDataInterface $signatureData;
     private string $dataDigest;
     private string $signatureVersion;
-    private BTDContext $btdContext;
-    private BTUContext $btuContext;
+    private ?BTDContext $btdContext = null;
+    private ?BTUContext $btuContext = null;
     private HVEContext $hveContext;
     private HVDContext $hvdContext;
     private HVTContext $hvtContext;
@@ -276,8 +277,12 @@ final class RequestContext
         return $this;
     }
 
-    public function getBTDContext(): BTDContext
+    public function getBTDContext(): ?BTDContext
     {
+        if (null === $this->btdContext) {
+            throw new LogicException('BTDContext should be specified in Context');
+        }
+
         return $this->btdContext;
     }
 
@@ -324,8 +329,12 @@ final class RequestContext
         return $this;
     }
 
-    public function getBTUContext(): BTUContext
+    public function getBTUContext(): ?BTUContext
     {
+        if (null === $this->btuContext) {
+            throw new LogicException('BTUContext should be specified in Context');
+        }
+
         return $this->btuContext;
     }
 

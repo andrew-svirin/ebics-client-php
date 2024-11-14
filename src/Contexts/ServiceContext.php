@@ -39,7 +39,7 @@ abstract class ServiceContext
         return $this->msgName;
     }
 
-    public function setScope(string $scope): ServiceContext
+    public function setScope(?string $scope): ServiceContext
     {
         $this->scope = $scope;
 

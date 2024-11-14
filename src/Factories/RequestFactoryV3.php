@@ -12,8 +12,6 @@ use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV3;
-use AndrewSvirin\Ebics\Contexts\BTDContext;
-use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV3;
@@ -26,7 +24,6 @@ use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
 use AndrewSvirin\Ebics\Models\UserSignature;
 use AndrewSvirin\Ebics\Services\DigestResolverV3;
-use LogicException;
 
 /**
  * Ebics 3.0 RequestFactory.
@@ -192,45 +189,76 @@ final class RequestFactoryV3 extends RequestFactory
 
     public function createVMK(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('STM');
+        $btdContext->setMsgName('mt942');
+
+        return $this->createBTD($context);
     }
 
     public function createSTA(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('EOP');
+        $btdContext->setMsgName('mt940');
+
+        return $this->createBTD($context);
     }
 
     public function createC52(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('STM');
+        $btdContext->setMsgName('camt.052');
+
+        return $this->createBTD($context);
     }
 
     public function createC53(RequestContext $context): Request
     {
-        $btdContext = new BTDContext();
+        $btdContext = $context->getBTDContext();
+
         $btdContext->setServiceName('EOP');
-        $btdContext->setScope('DE');
         $btdContext->setMsgName('camt.053');
         $btdContext->setContainerType('ZIP');
-
-        $context->setBTDContext($btdContext);
 
         return $this->createBTD($context);
     }
 
     public function createC54(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('REP');
+        $btdContext->setMsgName('camt.054');
+        $btdContext->setContainerType('ZIP');
+
+        return $this->createBTD($context);
     }
 
     public function createZ52(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('STM');
+        $btdContext->setMsgName('camt.052');
+        $btdContext->setContainerType('ZIP');
+
+        return $this->createBTD($context);
     }
 
     public function createZ53(RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btdContext = $context->getBTDContext();
+
+        $btdContext->setServiceName('EOP');
+        $btdContext->setMsgName('camt.053');
+        $btdContext->setContainerType('ZIP');
+
+        return $this->createBTD($context);
     }
 
     /**
@@ -238,15 +266,12 @@ final class RequestFactoryV3 extends RequestFactory
      */
     public function createZ54(RequestContext $context): Request
     {
-        $btdContext = new BTDContext();
+        $btdContext = $context->getBTDContext();
+
         $btdContext->setServiceName('REP');
-        $btdContext->setScope('CH');
         $btdContext->setMsgName('camt.054');
-        $btdContext->setMsgNameVersion('04');
         $btdContext->setContainerType('ZIP');
         $btdContext->setServiceOption('XQRR');
-
-        $context->setBTDContext($btdContext);
 
         return $this->createBTD($context);
     }
@@ -256,7 +281,8 @@ final class RequestFactoryV3 extends RequestFactory
      */
     public function createZSR(RequestContext $context): Request
     {
-        $btdContext = new BTDContext();
+        $btdContext = $context->getBTDContext();
+
         $btdContext->setServiceName('PSR');
         $btdContext->setScope('BIL');
         $btdContext->setMsgName('pain.002');
@@ -272,9 +298,9 @@ final class RequestFactoryV3 extends RequestFactory
      */
     public function createXEK(RequestContext $context): Request
     {
-        $btdContext = new BTDContext();
+        $btdContext = $context->getBTDContext();
+
         $btdContext->setServiceName('EOP');
-        $btdContext->setScope('AT');
         $btdContext->setMsgName('pdf');
         $btdContext->setContainerType('ZIP');
 
@@ -285,52 +311,81 @@ final class RequestFactoryV3 extends RequestFactory
 
     public function createCCT(UploadTransaction $transaction, RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btuContext = $context->getBTUContext();
+
+        $btuContext->setServiceName('SCT');
+        $btuContext->setMsgName('pain.001');
+        $btuContext->setFileName('cct.pain.001.xxx.xml');
+
+        return $this->createBTU($transaction, $context);
     }
 
     public function createCDD(UploadTransaction $transaction, RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btuContext = $context->getBTUContext();
+
+        $btuContext->setServiceName('SDD');
+        $btuContext->setScope('GLB');
+        $btuContext->setMsgName('pain.008');
+        $btuContext->setServiceOption('COR');
+        $btuContext->setFileName('cdd.pain.008.xxx.xml');
+
+        return $this->createBTU($transaction, $context);
     }
 
     public function createCDB(UploadTransaction $transaction, RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btuContext = $context->getBTUContext();
+
+        $btuContext->setServiceName('SDD');
+        $btuContext->setMsgName('pain.008');
+        $btuContext->setServiceOption('B2B');
+        $btuContext->setFileName('cdb.pain.008.xxx.xml');
+
+        return $this->createBTU($transaction, $context);
     }
 
     public function createCIP(UploadTransaction $transaction, RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btuContext = $context->getBTUContext();
+
+        $btuContext->setServiceName('SCI');
+        $btuContext->setMsgName('pain.001');
+        $btuContext->setFileName('cip.pain.001.xxx.xml');
+
+        return $this->createBTU($transaction, $context);
     }
 
     public function createXE2(UploadTransaction $transaction, RequestContext $context): Request
     {
-        throw new LogicException('Method not implemented yet for EBICS 3.0');
+        $btuContext = $context->getBTUContext();
+
+        $btuContext->setServiceName('MCT');
+        $btuContext->setMsgName('pain.001');
+        $btuContext->setFileName('xe2.pain.001.xxx.xml');
+
+        return $this->createBTU($transaction, $context);
     }
 
     public function createXE3(UploadTransaction $transaction, RequestContext $context): Request
     {
-        $btuContext = new BTUContext();
-        $btuContext->setServiceName('SDD');
-        $btuContext->setScope('CH');
-        $btuContext->setMsgName('pain.008');
-        $btuContext->setMsgNameVersion('02');
-        $btuContext->setFileName('xe3.pain008.xml');
+        $btuContext = $context->getBTUContext();
 
-        $context->setBTUContext($btuContext);
+        $btuContext->setServiceName('SDD');
+        $btuContext->setMsgName('pain.008');
+        $btuContext->setFileName('xe3.pain.008.xxx.xml');
 
         return $this->createBTU($transaction, $context);
     }
 
     public function createYCT(UploadTransaction $transaction, RequestContext $context): Request
     {
-        $btuContext = new BTUContext();
+        $btuContext = $context->getBTUContext();
+
         $btuContext->setServiceName('MCT');
         $btuContext->setScope('BIL');
         $btuContext->setMsgName('pain.001');
-        $btuContext->setFileName('yct.pain001.xml');
-
-        $context->setBTUContext($btuContext);
+        $btuContext->setFileName('yct.pain.001.xxx.xml');
 
         return $this->createBTU($transaction, $context);
     }
