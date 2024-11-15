@@ -10,6 +10,12 @@ namespace AndrewSvirin\Ebics\Models;
  */
 final class Bank
 {
+    public const COUNTRY_CODE_EU = 'EU';
+    public const COUNTRY_CODE_AT = 'AT';
+    public const COUNTRY_CODE_DE = 'DE';
+    public const COUNTRY_CODE_FR = 'FR';
+    public const COUNTRY_CODE_CH = 'CH';
+
     /**
      * The HostID of the bank.
      */
@@ -19,6 +25,11 @@ final class Bank
      * The URL of the EBICS server.
      */
     private string $url;
+
+    /**
+     * The country code from supported list.
+     */
+    private ?string $countryCode = self::COUNTRY_CODE_EU;
 
     /**
      * The Server Name of the bank.
@@ -37,39 +48,33 @@ final class Bank
         $this->url = $url;
     }
 
-    /**
-     * Getter for {hostId}.
-     *
-     * @return string
-     */
     public function getHostId(): string
     {
         return $this->hostId;
     }
 
-    /**
-     * Getter for {url}.
-     *
-     * @return string
-     */
     public function getUrl(): string
     {
         return $this->url;
     }
 
-    /**
-     * @param string|null $serverName
-     */
     public function setServerName(?string $serverName): void
     {
         $this->serverName = $serverName;
     }
 
-    /**
-     * @return string|null
-     */
     public function getServerName(): ?string
     {
         return $this->serverName;
+    }
+
+    public function getCountryCode(): ?string
+    {
+        return $this->countryCode;
+    }
+
+    public function setCountryCode(?string $countryCode): void
+    {
+        $this->countryCode = $countryCode;
     }
 }

@@ -12,6 +12,8 @@ use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
 use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
 use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV3;
+use AndrewSvirin\Ebics\Contexts\BTDContext;
+use AndrewSvirin\Ebics\Contexts\BTUContext;
 use AndrewSvirin\Ebics\Contexts\RequestContext;
 use AndrewSvirin\Ebics\Exceptions\EbicsException;
 use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV3;
@@ -388,5 +390,29 @@ final class RequestFactoryV3 extends RequestFactory
         $btuContext->setFileName('yct.pain.001.xxx.xml');
 
         return $this->createBTU($transaction, $context);
+    }
+
+    public function prepareDownloadContext(RequestContext $requestContext = null): RequestContext
+    {
+        $requestContext = $this->prepareStandardContext($requestContext);
+        if (null === $requestContext->getBTDContext()) {
+            $btdContext = new BTDContext();
+            $btdContext->setScope($this->bank->getCountryCode());
+            $requestContext->setBTDContext($btdContext);
+        }
+
+        return $requestContext;
+    }
+
+    public function prepareUploadContext(RequestContext $requestContext = null): RequestContext
+    {
+        $requestContext = $this->prepareStandardContext($requestContext);
+        if (null === $requestContext->getBTUContext()) {
+            $btuContext = new BTUContext();
+            $btuContext->setScope($this->bank->getCountryCode());
+            $requestContext->setBTUContext($btuContext);
+        }
+
+        return $requestContext;
     }
 }

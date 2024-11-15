@@ -2,8 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-
 /**
  * Business transactions & formats.
  *
@@ -14,11 +12,7 @@ abstract class FFLContext
 {
     private string $fileFormat;
     private array $parameters = [];
-    /**
-     * Country code (ISO 3166-1 alpha-2) (max 2 char)
-     * @var string
-     */
-    private string $countryCode = EbicsClientInterface::COUNTRY_CODE_EU;
+    private string $countryCode;
 
     public function setFileFormat(string $fileFormat): self
     {

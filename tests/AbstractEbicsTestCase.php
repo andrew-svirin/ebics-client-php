@@ -62,6 +62,7 @@ abstract class AbstractEbicsTestCase extends TestCase
 
         $bank = new Bank($credentials['hostId'], $credentials['hostURL']);
         $bank->setServerName(sprintf('Server %d', $credentialsId));
+        $bank->setCountryCode($credentials['countryCode']);
         $user = new User($credentials['partnerId'], $credentials['userId']);
 
         $keyringManager = new FileKeyringManager();
@@ -190,6 +191,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         return [
             'hostId' => $credentialsEnc['hostId'],
             'hostURL' => $credentialsEnc['hostURL'],
+            'countryCode' => $credentialsEnc['countryCode'],
             'hostIsCertified' => (bool)$credentialsEnc['hostIsCertified'],
             'partnerId' => $credentialsEnc['partnerId'],
             'userId' => $credentialsEnc['userId'],

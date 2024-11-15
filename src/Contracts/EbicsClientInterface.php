@@ -33,11 +33,6 @@ interface EbicsClientInterface
     public const FILE_PARSER_FORMAT_XML_FILES = 'xml_files';
     public const FILE_PARSER_FORMAT_ZIP_FILES = 'zip_files';
 
-    public const COUNTRY_CODE_EU = 'EU';
-    public const COUNTRY_CODE_DE = 'DE';
-    public const COUNTRY_CODE_FR = 'FR';
-    public const COUNTRY_CODE_CH = 'CH';
-
     /**
      * Create user signatures A, E and X on first launch.
      */

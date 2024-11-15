@@ -412,11 +412,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['C52']['code']);
         $c52 = $client->C52(
             new DateTime('2020-03-21'),
-            new DateTime('2020-04-21'),
-            (new RequestContext())
-                ->setBTDContext((new BTDContext())
-                    ->setScope($codes['C52']['params']['s'])
-                    ->setMsgNameVersion($codes['C52']['params']['mnv']))
+            new DateTime('2020-04-21')
         );
 
         $responseHandler = $client->getResponseHandler();
@@ -449,11 +445,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['C53']['code']);
         $c53 = $client->C53(
             new DateTime('2020-03-21'),
-            new DateTime('2020-04-21'),
-            (new RequestContext())
-                ->setBTDContext((new BTDContext())
-                    ->setScope($codes['C53']['params']['s'])
-                    ->setMsgNameVersion($codes['C53']['params']['mnv']))
+            new DateTime('2020-04-21')
         );
 
         $responseHandler = $client->getResponseHandler();
@@ -486,11 +478,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['C54']['code']);
         $c54 = $client->C54(
             new DateTime('2020-03-21'),
-            new DateTime('2020-04-21'),
-            (new RequestContext())
-                ->setBTDContext((new BTDContext())
-                    ->setScope($codes['C54']['params']['s'])
-                    ->setMsgNameVersion($codes['C54']['params']['mnv']))
+            new DateTime('2020-04-21')
         );
 
         $responseHandler = $client->getResponseHandler();
@@ -560,9 +548,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['ZSR']['code']);
         $zsr = $client->ZSR(
             new DateTime('2020-03-21'),
-            new DateTime('2020-04-21'),
-            (new RequestContext())
-                ->setBTDContext((new BTDContext()))
+            new DateTime('2020-04-21')
         );
 
         $responseHandler = $client->getResponseHandler();
@@ -595,9 +581,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $this->assertExceptionCode($codes['XEK']['code']);
         $xek = $client->XEK(
             new DateTime('2020-03-21'),
-            new DateTime('2020-04-21'),
-            (new RequestContext())
-                ->setBTDContext((new BTDContext()))
+            new DateTime('2020-04-21')
         );
 
         $responseHandler = $client->getResponseHandler();
@@ -711,7 +695,7 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
         $documentFactory = new DocumentFactory();
         $orderData = $documentFactory->create(file_get_contents($this->fixtures.'/yct.pain001.xml'));
 
-        $yct = $client->YCT($orderData, (new RequestContext())->setBTUContext((new BTUContext())));
+        $yct = $client->YCT($orderData);
 
         $responseHandler = $client->getResponseHandler();
         $code = $responseHandler->retrieveH00XReturnCode($yct->getTransaction()->getLastSegment()->getResponse());
@@ -931,16 +915,16 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
-                    'C52' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
-                    'C53' => ['code' => '090005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
-                    'C54' => ['code' => '090005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
+                    'C52' => ['code' => '091005', 'fake' => false],
+                    'C53' => ['code' => '090005', 'fake' => false],
+                    'C54' => ['code' => '090005', 'fake' => false],
                     'Z54' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => '04', 's' => 'CH']],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],
                     'BTD' => ['code' => '090005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false, 'params' => ['mnv' => '02', 's' => 'CH']],
-                    'YCT' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
+                    'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],
@@ -960,16 +944,16 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
                     'HVD' => ['code' => '090003', 'fake' => false],
                     'HVT' => ['code' => '090003', 'fake' => false],
                     'PTK' => ['code' => null, 'fake' => false],
-                    'C52' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
-                    'C53' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
-                    'C54' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
+                    'C52' => ['code' => '091005', 'fake' => false],
+                    'C53' => ['code' => '091005', 'fake' => false],
+                    'C54' => ['code' => '091005', 'fake' => false],
                     'Z54' => ['code' => '090005', 'fake' => false, 'params' => ['mnv' => '04', 's' => 'CH']],
                     'ZSR' => ['code' => '091005', 'fake' => false],
                     'XEK' => ['code' => '091005', 'fake' => false],
                     'BTD' => ['code' => '090005', 'fake' => false],
                     'BTU' => ['code' => null, 'fake' => false],
                     'XE3' => ['code' => null, 'fake' => false, 'params' => ['mnv' => '02', 's' => 'CH']],
-                    'YCT' => ['code' => '091005', 'fake' => false, 'params' => ['mnv' => null, 's' => 'CH']],
+                    'YCT' => ['code' => '091005', 'fake' => false],
                     'HPD' => ['code' => null, 'fake' => false],
                     'HAA' => ['code' => null, 'fake' => false],
                 ],

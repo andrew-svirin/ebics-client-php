@@ -36,8 +36,8 @@ final class RequestContext
     private DateTimeInterface $dateTime;
     private ?DateTimeInterface $startDateTime;
     private ?DateTimeInterface $endDateTime;
-    private FDLContext $fdlContext;
-    private FULContext $fulContext;
+    private ?FDLContext $fdlContext = null;
+    private ?FULContext $fulContext = null;
     private string $receiptCode;
     private ?int $segmentNumber;
     private ?bool $isLastSegment;
@@ -156,7 +156,7 @@ final class RequestContext
         return $this;
     }
 
-    public function getFdlContext(): FDLContext
+    public function getFdlContext(): ?FDLContext
     {
         return $this->fdlContext;
     }
@@ -168,7 +168,7 @@ final class RequestContext
         return $this;
     }
 
-    public function getFulContext(): FULContext
+    public function getFulContext(): ?FULContext
     {
         return $this->fulContext;
     }
@@ -279,10 +279,6 @@ final class RequestContext
 
     public function getBTDContext(): ?BTDContext
     {
-        if (null === $this->btdContext) {
-            throw new LogicException('BTDContext should be specified in Context');
-        }
-
         return $this->btdContext;
     }
 
@@ -331,10 +327,6 @@ final class RequestContext
 
     public function getBTUContext(): ?BTUContext
     {
-        if (null === $this->btuContext) {
-            throw new LogicException('BTUContext should be specified in Context');
-        }
-
         return $this->btuContext;
     }
 

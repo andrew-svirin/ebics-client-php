@@ -998,4 +998,17 @@ abstract class RequestFactory
 
         return $request;
     }
+
+    public function prepareStandardContext(RequestContext $requestContext = null): RequestContext
+    {
+        if (null === $requestContext) {
+            $requestContext = new RequestContext();
+        }
+
+        return $requestContext;
+    }
+
+    abstract public function prepareDownloadContext(RequestContext $requestContext = null): RequestContext;
+
+    abstract public function prepareUploadContext(RequestContext $requestContext = null): RequestContext;
 }
