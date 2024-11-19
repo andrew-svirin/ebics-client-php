@@ -16,8 +16,15 @@ Support EBICS versions: 2.4, 2.5, 3.0; Encryption versions: E002, X002, A005, A0
 
 <img src="./doc/ebics_api_client.png" align="left" width="210" style="padding-right:20px">
 
-EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and accessed via a REST API, use UI to make orders, log orders activity, manage Connections and access to them.  
-EBICS API Client - https://sites.google.com/view/ebics-api-client
+EBICS API Client - https://sites.google.com/view/ebics-api-client  
+EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and provides:
+<br clear="left"/>
+- :100: Support for EBICS Integration
+- :white_check_mark: REST API to operate with orders, connections, keyrings, access logs
+- :white_check_mark: UI to execute orders directly from the App
+- :white_check_mark: Logging orders activity
+- :white_check_mark: Manage Connections and Monitor access logs
+- :ballot_box_with_check: Soon! Scheduled Jobs, Files secure storage and Searching with API
 <br clear="left"/>
 
 ## License
