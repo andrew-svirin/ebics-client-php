@@ -1237,13 +1237,11 @@ final class EbicsClient implements EbicsClientInterface
     }
 
     /**
-     * @return Document[]
+     * @return string[]
      */
     private function extractOrderDataZipFiles(string $orderData): array
     {
-        $files = $this->zipService->extractFilesFromString($orderData);
-
-        return $this->documentFactory->createMultiple($files);
+        return $this->zipService->extractFilesFromString($orderData);
     }
 
     /**

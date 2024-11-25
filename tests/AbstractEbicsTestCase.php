@@ -2,7 +2,7 @@
 
 namespace AndrewSvirin\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerSwissCreditTransferBuilder;
+use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
 use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\EbicsClient;
@@ -210,7 +210,7 @@ abstract class AbstractEbicsTestCase extends TestCase
      */
     protected function buildCustomerCreditTransfer(string $schema): CustomerCreditTransfer
     {
-        $builder = new CustomerSwissCreditTransferBuilder();
+        $builder = new CustomerCreditTransferBuilder();
         $customerCreditTransfer = $builder
             ->createInstance(
                 $schema,
@@ -223,7 +223,7 @@ abstract class AbstractEbicsTestCase extends TestCase
                 'DE09820000000083001503',
                 new StructuredPostalAddress('CH', 'Triesen', '9495'),
                 100.10,
-                'CHF',
+                'EUR',
                 'Test payment  1'
             )
             ->addSEPATransaction(
@@ -241,7 +241,7 @@ abstract class AbstractEbicsTestCase extends TestCase
                 'United Development Ltd',
                 new UnstructuredPostalAddress('GB', 'George Street', 'BA1 2FJ Bath'),
                 65.10,
-                'GBP',
+                'CHF',
                 'Test payment 3'
             )
             ->popInstance();

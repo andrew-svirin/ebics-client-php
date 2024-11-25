@@ -15,7 +15,7 @@ final class DownloadOrderResult extends OrderResult
     private DownloadTransaction $transaction;
 
     /**
-     * @param Document[] $dataFiles
+     * @param Document[]|string[] $dataFiles
      *
      * @return void
      */
@@ -25,7 +25,7 @@ final class DownloadOrderResult extends OrderResult
     }
 
     /**
-     * @return Document[]|null
+     * @return Document[]|string[]|null
      */
     public function getDataFiles(): ?array
     {
