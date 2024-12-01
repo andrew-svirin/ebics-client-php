@@ -12,7 +12,7 @@ PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/
 Supported PHP versions - PHP 7.2 - PHP 8.3  
 Support EBICS versions: 2.4, 2.5, 3.0; Encryption versions: E002, X002, A005, A006; Switching EBICS T/TS
 
-# 💥 EBICS API Client for web-server (V1.0.8)
+# 💥 EBICS API Client for web-server (V1.0.9)
 
 <img src="./doc/ebics_api_client.png" align="left" width="210" style="padding-right:20px">
 
@@ -20,11 +20,11 @@ EBICS API Client - https://sites.google.com/view/ebics-api-client
 EBICS Client can be deployed as a standalone service on a webserver or within a Docker container and provides:
 <br clear="left"/>
 - :100: Support for EBICS Integration
-- :white_check_mark: REST API to operate with orders, connections, keyrings, access logs
-- :white_check_mark: UI to execute orders directly from the App
-- :white_check_mark: Logging orders activity
+- :white_check_mark: RESTful API to operate with orders, connections, keyrings, access logs, fetched files
+- :white_check_mark: Extended Access Policy
+- :white_check_mark: Execute order transactions directly from the App
 - :white_check_mark: Manage Connections and Monitor access logs
-- :ballot_box_with_check: Soon! Scheduled Jobs, Files secure storage and Searching with API
+- :white_check_mark: Scheduler Jobs, Fetched files secure storage
 <br clear="left"/>
 
 ## License
