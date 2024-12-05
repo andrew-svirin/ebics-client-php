@@ -157,7 +157,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
             'extensions' => [
                 'id-ce-basicConstraints' => [
                     'value' => [
-                        'CA' => false,
+                        'cA' => false,
                     ],
                 ],
                 'id-ce-extKeyUsage' => [

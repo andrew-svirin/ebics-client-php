@@ -19,9 +19,11 @@ final class BankX509Generator extends AbstractX509Generator
      */
     public function setCertificateOptionsByBank(Bank $bank): void
     {
-        $countryName = $this->resolveCountryName($bank->getUrl());
-        $domainName = $this->resolveDomainName($bank->getUrl());
-        $establishmentName = $this->resolveEstablishmentName($bank->getUrl());
+        $url = $bank->getUrl();
+
+        $countryName = $this->resolveCountryName($url);
+        $domainName = $this->resolveDomainName($url);
+        $establishmentName = $this->resolveEstablishmentName($url);
         $this->certificateOptions = [
             'subject' => [
                 'DN' => [
@@ -59,6 +61,8 @@ final class BankX509Generator extends AbstractX509Generator
                 return Bank::COUNTRY_CODE_CH;
             case 'de':
                 return Bank::COUNTRY_CODE_DE;
+            case 'at':
+                return Bank::COUNTRY_CODE_AT;
             default:
                 return Bank::COUNTRY_CODE_EU;
         }
