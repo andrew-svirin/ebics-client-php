@@ -35,8 +35,11 @@ interface EbicsClientInterface
 
     /**
      * Create user signatures A, E and X on first launch.
+     * @param string $aVersion Version of Electronic Signature (A005|A006)
+     * @param array|null $aDetails Custom Certificate, private_key and
+     *  password details for Electronic Signature.
      */
-    public function createUserSignatures(string $aVersion): void;
+    public function createUserSignatures(string $aVersion, array $aDetails = null): void;
 
     /**
      * Download supported protocol versions for the Bank.

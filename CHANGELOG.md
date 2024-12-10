@@ -1,5 +1,6 @@
 ## 2.3
 
+* Support specify custom keyring details for Electronic Signature.
 * Support switching A005/A006
 * Change signature for KeyringManagerInterface. Attributes `USER.A.Version` moved from Bank to Keyring.
 * Add `withES` param for downloading order types. Default `withES=false`.

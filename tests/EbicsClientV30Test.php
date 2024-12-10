@@ -61,6 +61,43 @@ class EbicsClientV30Test extends AbstractEbicsTestCase
     /**
      * @dataProvider serversDataProvider
      *
+     * @group INI-CUSTOM
+     * @group INI-V30-CUSTOM
+     *
+     * @param int $credentialsId
+     * @param array $codes
+     *
+     * @covers
+     */
+    public function testINIWithCustomCrt(int $credentialsId, array $codes)
+    {
+        $client = $this->setupClientV30($credentialsId, $codes['INI']['fake']);
+
+        $client->createUserSignatures('A005', [
+            'privatekey' => file_get_contents($this->data.'/electronic_signature/user.key'),
+            'certificate' => file_get_contents($this->data.'/electronic_signature/user.crt'),
+            'password' => file_get_contents($this->data.'/electronic_signature/passphrase.txt'),
+        ]);
+
+        // Check that keyring is empty and or wait on success or wait on exception.
+        $userExists = $client->getKeyring()->getUserSignatureA();
+        if ($userExists) {
+            $this->expectException(InvalidUserOrUserStateException::class);
+            $this->expectExceptionCode(91002);
+        }
+        $ini = $client->INI();
+        if (!$userExists) {
+            $responseHandler = $client->getResponseHandler();
+            $this->saveKeyring($credentialsId, $client->getKeyring());
+            $code = $responseHandler->retrieveH00XReturnCode($ini);
+            $reportText = $responseHandler->retrieveH00XReportText($ini);
+            $this->assertResponseOk($code, $reportText);
+        }
+    }
+
+    /**
+     * @dataProvider serversDataProvider
+     *
      * @group HEV
      * @group V3
      * @group HEV-V3

@@ -2,7 +2,6 @@
 
 namespace AndrewSvirin\Ebics\Models\X509;
 
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
 use AndrewSvirin\Ebics\Models\Bank;
 use LogicException;
 

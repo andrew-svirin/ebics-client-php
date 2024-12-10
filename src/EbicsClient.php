@@ -50,6 +50,7 @@ use AndrewSvirin\Ebics\Models\Keyring;
 use AndrewSvirin\Ebics\Models\UploadOrderResult;
 use AndrewSvirin\Ebics\Models\UploadTransaction;
 use AndrewSvirin\Ebics\Models\User;
+use AndrewSvirin\Ebics\Models\X509\ContentX509Generator;
 use AndrewSvirin\Ebics\Services\CryptService;
 use AndrewSvirin\Ebics\Services\CurlHttpClient;
 use AndrewSvirin\Ebics\Services\XmlService;
@@ -125,9 +126,11 @@ final class EbicsClient implements EbicsClientInterface
      * @inheritDoc
      * @throws EbicsException
      */
-    public function createUserSignatures(string $aVersion = SignatureInterface::A_VERSION6): void
-    {
-        $signatureA = $this->createUserSignature(SignatureInterface::TYPE_A);
+    public function createUserSignatures(
+        string $aVersion = SignatureInterface::A_VERSION6,
+        array $aDetails = null
+    ): void {
+        $signatureA = $this->createUserSignature(SignatureInterface::TYPE_A, $aDetails);
         $this->keyring->setUserSignatureAVersion($aVersion);
         $this->keyring->setUserSignatureA($signatureA);
 
@@ -1310,14 +1313,27 @@ final class EbicsClient implements EbicsClientInterface
      * @return SignatureInterface
      * @throws EbicsException
      */
-    private function createUserSignature(string $type): SignatureInterface
+    private function createUserSignature(string $type, array $details = null): SignatureInterface
     {
         switch ($type) {
             case SignatureInterface::TYPE_A:
+                if (null === $details) {
+                    $keys = $this->cryptService->generateKeys($this->keyring->getPassword());
+                    $certificateGenerator = $this->keyring->getCertificateGenerator();
+                } else {
+                    $keys = $this->cryptService->changePrivateKeyPassword(
+                        $details['privatekey'],
+                        $details['password'],
+                        $this->keyring->getPassword()
+                    );
+                    $certificateGenerator = new ContentX509Generator();
+                    $certificateGenerator->setAContent($details['certificate']);
+                }
+
                 $signature = $this->signatureFactory->createSignatureAFromKeys(
-                    $this->cryptService->generateKeys($this->keyring->getPassword()),
+                    $keys,
                     $this->keyring->getPassword(),
-                    $this->keyring->getCertificateGenerator()
+                    $certificateGenerator
                 );
                 break;
             case SignatureInterface::TYPE_E:
