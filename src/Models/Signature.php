@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
 
 /**
  * Class Signature represents Signature model.

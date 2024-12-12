@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
 /**
  * KeymgmtKeylengthErrorSignatureException used for 091204 EBICS error

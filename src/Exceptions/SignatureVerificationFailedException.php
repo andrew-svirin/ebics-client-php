@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
 /**
  * SignatureVerificationFailedException used for 091301 EBICS error

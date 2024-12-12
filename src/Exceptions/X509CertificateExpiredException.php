@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
 /**
  * X509CertificateExpiredException used for 091208 EBICS error

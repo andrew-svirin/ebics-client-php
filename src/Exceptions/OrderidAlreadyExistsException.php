@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
 /**
  * OrderidAlreadyExistsException used for 091115 EBICS error

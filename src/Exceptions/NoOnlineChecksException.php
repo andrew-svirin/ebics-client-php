@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
 /**
  * NoOnlineChecksException used for 011301 EBICS error

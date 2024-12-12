@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\Crypt;
+namespace EbicsApi\Ebics\Models\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\HashInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\Crypt\BigIntegerInterface;
+use EbicsApi\Ebics\Contracts\Crypt\HashInterface;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
 use LogicException;
 
 /**

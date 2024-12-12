@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Factories\X509;
+namespace EbicsApi\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Legacy X509 certificate generator @see X509GeneratorInterface.

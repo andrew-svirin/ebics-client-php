@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\CertificateX509;
+use EbicsApi\Ebics\Models\CertificateX509;
 use RuntimeException;
 
 /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers\Traits;
+namespace EbicsApi\Ebics\Handlers\Traits;
 
-use AndrewSvirin\Ebics\Exceptions\AlgoEbicsException;
+use EbicsApi\Ebics\Exceptions\AlgoEbicsException;
 use DOMNode;
 use DOMNodeList;
 use DOMXPath;

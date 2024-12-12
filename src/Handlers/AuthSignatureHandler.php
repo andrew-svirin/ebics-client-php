@@ -1,15 +1,15 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\AlgoEbicsException;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
-use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\DOMHelper;
+use EbicsApi\Ebics\Exceptions\AlgoEbicsException;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Exceptions\PasswordEbicsException;
+use EbicsApi\Ebics\Handlers\Traits\C14NTrait;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Services\DOMHelper;
 use DOMDocument;
 use DOMNode;
 

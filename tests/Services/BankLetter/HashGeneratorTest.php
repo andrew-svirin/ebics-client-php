@@ -1,13 +1,13 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Services\BankLetter;
+namespace EbicsApi\Ebics\Tests\Services\BankLetter;
 
-use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
-use AndrewSvirin\Ebics\Services\DigestResolverV2;
-use AndrewSvirin\Ebics\Services\DigestResolverV3;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Factories\SignatureFactory;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\X509\BankX509Generator;
+use EbicsApi\Ebics\Services\DigestResolverV2;
+use EbicsApi\Ebics\Services\DigestResolverV3;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 use DateTime;
 
 /**

@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
+namespace EbicsApi\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Models\BankLetter;
-use AndrewSvirin\Ebics\Models\SignatureBankLetter;
+use EbicsApi\Ebics\Contracts\BankLetter\FormatterInterface;
+use EbicsApi\Ebics\Models\BankLetter;
+use EbicsApi\Ebics\Models\SignatureBankLetter;
 use LogicException;
 
 /**

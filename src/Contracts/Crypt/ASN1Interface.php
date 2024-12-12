@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\Crypt;
+namespace EbicsApi\Ebics\Contracts\Crypt;
 
-use AndrewSvirin\Ebics\Models\Crypt\ASN1;
+use EbicsApi\Ebics\Models\Crypt\ASN1;
 
 /**
  * Crypt ASN1 representation.

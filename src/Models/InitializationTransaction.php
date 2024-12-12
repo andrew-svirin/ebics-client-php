@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\InitializationTransactionInterface;
+use EbicsApi\Ebics\Contracts\InitializationTransactionInterface;
 
 /**
  * Download Transaction represent collection of segments.

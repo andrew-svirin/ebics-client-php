@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\Crypt;
+namespace EbicsApi\Ebics\Factories\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\AESInterface;
-use AndrewSvirin\Ebics\Models\Crypt\AES;
+use EbicsApi\Ebics\Contracts\Crypt\AESInterface;
+use EbicsApi\Ebics\Models\Crypt\AES;
 
 /**
  * Class AESFactory represents producers for the @see AES.

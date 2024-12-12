@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
 /**
  * Class HVDContext context container for HVD orders

@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsErrorCodeMapping;
-use AndrewSvirin\Ebics\Exceptions\IncorrectResponseEbicsException;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Exceptions\EbicsErrorCodeMapping;
+use EbicsApi\Ebics\Exceptions\IncorrectResponseEbicsException;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
 
 /**
  * Exception factory with an EBICS response code

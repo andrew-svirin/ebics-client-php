@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
 /**
  * Class CustomerDirectDebit represents CustomerDirectDebit model.

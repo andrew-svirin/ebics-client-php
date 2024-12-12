@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace EbicsApi\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\EbicsBankLetter;
+use EbicsApi\Ebics\Contracts\EbicsClientInterface;
+use EbicsApi\Ebics\EbicsBankLetter;
 
 /**
  * Class EbicsBankLetterTest.

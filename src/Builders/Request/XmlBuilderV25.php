@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H004Trait;
+use EbicsApi\Ebics\Handlers\Traits\H004Trait;
 use Closure;
 
 /**

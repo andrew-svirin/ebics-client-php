@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace EbicsApi\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Contexts\FDLContext;
-use AndrewSvirin\Ebics\Contexts\FULContext;
-use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
-use AndrewSvirin\Ebics\Factories\DocumentFactory;
+use EbicsApi\Ebics\Contexts\FDLContext;
+use EbicsApi\Ebics\Contexts\FULContext;
+use EbicsApi\Ebics\Exceptions\InvalidUserOrUserStateException;
+use EbicsApi\Ebics\Factories\DocumentFactory;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
 

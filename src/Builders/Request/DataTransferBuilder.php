@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
-use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\ZipService;
+use EbicsApi\Ebics\Contracts\SignatureDataInterface;
+use EbicsApi\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Services\ZipService;
 use Closure;
 use DOMDocument;
 use DOMElement;

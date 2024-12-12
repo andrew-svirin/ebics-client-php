@@ -1,20 +1,20 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Builders\Request\OrderDetailsBuilder;
-use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
-use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV24;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV24;
-use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV24;
-use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\UploadTransaction;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Services\DigestResolverV2;
+use EbicsApi\Ebics\Builders\Request\OrderDetailsBuilder;
+use EbicsApi\Ebics\Builders\Request\RequestBuilder;
+use EbicsApi\Ebics\Builders\Request\XmlBuilderV24;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Handlers\AuthSignatureHandlerV24;
+use EbicsApi\Ebics\Handlers\OrderDataHandlerV24;
+use EbicsApi\Ebics\Handlers\UserSignatureHandlerV2;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\UploadTransaction;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Services\DigestResolverV2;
 use LogicException;
 
 /**

@@ -1,17 +1,17 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\User;
+use EbicsApi\Ebics\Contracts\SignatureDataInterface;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\User;
 use DateTime;
 use DateTimeInterface;
 use LogicException;
 
 /**
- * Class RequestContext context container for @see \AndrewSvirin\Ebics\Factories\RequestFactory
+ * Class RequestContext context container for @see \EbicsApi\Ebics\Factories\RequestFactory
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin

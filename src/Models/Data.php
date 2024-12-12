@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\DataInterface;
+use EbicsApi\Ebics\Contracts\DataInterface;
 use DOMDocument;
 
 /**

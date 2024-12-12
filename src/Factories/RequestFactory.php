@@ -1,34 +1,34 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Builders\Request\BodyBuilder;
-use AndrewSvirin\Ebics\Builders\Request\DataEncryptionInfoBuilder;
-use AndrewSvirin\Ebics\Builders\Request\DataTransferBuilder;
-use AndrewSvirin\Ebics\Builders\Request\HeaderBuilder;
-use AndrewSvirin\Ebics\Builders\Request\MutableBuilder;
-use AndrewSvirin\Ebics\Builders\Request\OrderDetailsBuilder;
-use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
-use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
-use AndrewSvirin\Ebics\Builders\Request\TransferReceiptBuilder;
-use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
-use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
-use AndrewSvirin\Ebics\Handlers\UserSignatureHandler;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\CustomerH3K;
-use AndrewSvirin\Ebics\Models\CustomerHIA;
-use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\UploadTransaction;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Models\UserSignature;
-use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\DigestResolver;
+use EbicsApi\Ebics\Builders\Request\BodyBuilder;
+use EbicsApi\Ebics\Builders\Request\DataEncryptionInfoBuilder;
+use EbicsApi\Ebics\Builders\Request\DataTransferBuilder;
+use EbicsApi\Ebics\Builders\Request\HeaderBuilder;
+use EbicsApi\Ebics\Builders\Request\MutableBuilder;
+use EbicsApi\Ebics\Builders\Request\OrderDetailsBuilder;
+use EbicsApi\Ebics\Builders\Request\RequestBuilder;
+use EbicsApi\Ebics\Builders\Request\StaticBuilder;
+use EbicsApi\Ebics\Builders\Request\TransferReceiptBuilder;
+use EbicsApi\Ebics\Builders\Request\XmlBuilder;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Handlers\AuthSignatureHandler;
+use EbicsApi\Ebics\Handlers\OrderDataHandler;
+use EbicsApi\Ebics\Handlers\UserSignatureHandler;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\CustomerH3K;
+use EbicsApi\Ebics\Models\CustomerHIA;
+use EbicsApi\Ebics\Models\CustomerINI;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\UploadTransaction;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Models\UserSignature;
+use EbicsApi\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Services\DigestResolver;
 
 /**
  * Class RequestFactory represents producers for the @see Request.

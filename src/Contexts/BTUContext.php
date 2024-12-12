@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
 /**
  * Class BTUContext context container for BTU orders - requires EBICS 3.0

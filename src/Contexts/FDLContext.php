@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use EbicsApi\Ebics\Contracts\EbicsClientInterface;
 
 /**
  * Class Parameters context container for FUL/FDL orders

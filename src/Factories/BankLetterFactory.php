@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\BankLetter;
-use AndrewSvirin\Ebics\Models\SignatureBankLetter;
-use AndrewSvirin\Ebics\Models\User;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\BankLetter;
+use EbicsApi\Ebics\Models\SignatureBankLetter;
+use EbicsApi\Ebics\Models\User;
 
 /**
  * Class BankLetterFactory represents producers for the @see BankLetter.

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace EbicsApi\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Models\TransferSegment;
+use EbicsApi\Ebics\Models\TransferSegment;
 
 /**
  * EBICS TransactionInterface representation.

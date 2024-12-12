@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\UploadTransactionInterface;
+use EbicsApi\Ebics\Contracts\UploadTransactionInterface;
 
 /**
  * Upload Transaction represent collection of segments.

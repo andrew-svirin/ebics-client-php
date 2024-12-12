@@ -1,12 +1,12 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Contexts\FDLContext;
-use AndrewSvirin\Ebics\Contexts\FULContext;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\UploadTransaction;
+use EbicsApi\Ebics\Contexts\FDLContext;
+use EbicsApi\Ebics\Contexts\FULContext;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\UploadTransaction;
 use LogicException;
 
 /**

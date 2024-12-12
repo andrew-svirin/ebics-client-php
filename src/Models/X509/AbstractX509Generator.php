@@ -1,14 +1,14 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\X509;
+namespace EbicsApi\Ebics\Models\X509;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Exceptions\X509\X509GeneratorException;
-use AndrewSvirin\Ebics\Factories\Crypt\X509Factory;
-use AndrewSvirin\Ebics\Services\RandomService;
-use AndrewSvirin\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
+use EbicsApi\Ebics\Contracts\X509GeneratorInterface;
+use EbicsApi\Ebics\Exceptions\X509\X509GeneratorException;
+use EbicsApi\Ebics\Factories\Crypt\X509Factory;
+use EbicsApi\Ebics\Services\RandomService;
+use EbicsApi\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
 use DateTime;
 use DateTimeInterface;
 use RuntimeException;

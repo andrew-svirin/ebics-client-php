@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\SignatureBankLetter;
+use EbicsApi\Ebics\Models\SignatureBankLetter;
 
 /**
  * Class SignatureBankLetterFactory represents producers for the @see SignatureBankLetter.

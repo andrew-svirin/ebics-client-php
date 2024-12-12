@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\Document;
+use EbicsApi\Ebics\Models\Document;
 
 /**
  * Class DocumentFactory represents producers for the @see Document.

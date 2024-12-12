@@ -1,16 +1,16 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\CustomerCreditTransfer;
+namespace EbicsApi\Ebics\Builders\CustomerCreditTransfer;
 
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
-use AndrewSvirin\Ebics\Services\DOMHelper;
-use AndrewSvirin\Ebics\Services\RandomService;
+use EbicsApi\Ebics\Handlers\Traits\XPathTrait;
+use EbicsApi\Ebics\Models\CustomerCreditTransfer;
+use EbicsApi\Ebics\Services\DOMHelper;
+use EbicsApi\Ebics\Services\RandomService;
 use DateTime;
 
 /**
  * Class CustomerInstantCreditTransferBuilder builder for model
- * @see \AndrewSvirin\Ebics\Models\CustomerInstantCreditTransfer
+ * @see \EbicsApi\Ebics\Models\CustomerInstantCreditTransfer
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Linus Holtstiege

@@ -1,12 +1,12 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\DownloadSegment;
-use AndrewSvirin\Ebics\Models\InitializationSegment;
-use AndrewSvirin\Ebics\Models\Segment;
-use AndrewSvirin\Ebics\Models\TransferSegment;
-use AndrewSvirin\Ebics\Models\UploadSegment;
+use EbicsApi\Ebics\Models\DownloadSegment;
+use EbicsApi\Ebics\Models\InitializationSegment;
+use EbicsApi\Ebics\Models\Segment;
+use EbicsApi\Ebics\Models\TransferSegment;
+use EbicsApi\Ebics\Models\UploadSegment;
 
 /**
  * Class SegmentFactory represents producers for the @see Segment.

@@ -1,12 +1,12 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\HashGeneratorInterface;
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
-use AndrewSvirin\Ebics\Factories\SignatureBankLetterFactory;
-use AndrewSvirin\Ebics\Models\SignatureBankLetter;
+use EbicsApi\Ebics\Contracts\BankLetter\HashGeneratorInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Factories\CertificateX509Factory;
+use EbicsApi\Ebics\Factories\SignatureBankLetterFactory;
+use EbicsApi\Ebics\Models\SignatureBankLetter;
 
 /**
  * Bank letter helper functions.

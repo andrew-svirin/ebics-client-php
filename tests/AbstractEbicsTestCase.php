@@ -1,22 +1,22 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace EbicsApi\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
-use AndrewSvirin\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
-use AndrewSvirin\Ebics\EbicsClient;
-use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\CustomerCreditTransfer;
-use AndrewSvirin\Ebics\Models\CustomerDirectDebit;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\StructuredPostalAddress;
-use AndrewSvirin\Ebics\Models\UnstructuredPostalAddress;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
-use AndrewSvirin\Ebics\Services\FakerHttpClient;
-use AndrewSvirin\Ebics\Services\FileKeyringManager;
+use EbicsApi\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder;
+use EbicsApi\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
+use EbicsApi\Ebics\Contracts\EbicsClientInterface;
+use EbicsApi\Ebics\EbicsClient;
+use EbicsApi\Ebics\Factories\SignatureFactory;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\CustomerCreditTransfer;
+use EbicsApi\Ebics\Models\CustomerDirectDebit;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\StructuredPostalAddress;
+use EbicsApi\Ebics\Models\UnstructuredPostalAddress;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Models\X509\BankX509Generator;
+use EbicsApi\Ebics\Services\FakerHttpClient;
+use EbicsApi\Ebics\Services\FileKeyringManager;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\Crypt;
+namespace EbicsApi\Ebics\Models\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\ASN1Interface;
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
+use EbicsApi\Ebics\Contracts\Crypt\ASN1Interface;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
 use DateTime;
 use DateTimeZone;
 use LogicException;

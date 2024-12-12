@@ -1,13 +1,13 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\Crypt\AESFactory;
-use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
-use AndrewSvirin\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Factories\Crypt\AESFactory;
+use EbicsApi\Ebics\Factories\Crypt\RSAFactory;
+use EbicsApi\Ebics\Models\Keyring;
 use LogicException;
 use RuntimeException;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Models\Crypt\X509;
+use EbicsApi\Ebics\Models\Crypt\X509;
 use DateTime;
 
 /**

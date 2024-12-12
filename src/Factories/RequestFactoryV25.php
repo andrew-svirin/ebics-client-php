@@ -1,29 +1,29 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Builders\Request\BodyBuilder;
-use AndrewSvirin\Ebics\Builders\Request\DataEncryptionInfoBuilder;
-use AndrewSvirin\Ebics\Builders\Request\DataTransferBuilder;
-use AndrewSvirin\Ebics\Builders\Request\HeaderBuilder;
-use AndrewSvirin\Ebics\Builders\Request\MutableBuilder;
-use AndrewSvirin\Ebics\Builders\Request\OrderDetailsBuilder;
-use AndrewSvirin\Ebics\Builders\Request\RequestBuilder;
-use AndrewSvirin\Ebics\Builders\Request\StaticBuilder;
-use AndrewSvirin\Ebics\Builders\Request\XmlBuilder;
-use AndrewSvirin\Ebics\Builders\Request\XmlBuilderV25;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV25;
-use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV25;
-use AndrewSvirin\Ebics\Handlers\UserSignatureHandlerV2;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\UploadTransaction;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Models\UserSignature;
-use AndrewSvirin\Ebics\Services\DigestResolverV2;
+use EbicsApi\Ebics\Builders\Request\BodyBuilder;
+use EbicsApi\Ebics\Builders\Request\DataEncryptionInfoBuilder;
+use EbicsApi\Ebics\Builders\Request\DataTransferBuilder;
+use EbicsApi\Ebics\Builders\Request\HeaderBuilder;
+use EbicsApi\Ebics\Builders\Request\MutableBuilder;
+use EbicsApi\Ebics\Builders\Request\OrderDetailsBuilder;
+use EbicsApi\Ebics\Builders\Request\RequestBuilder;
+use EbicsApi\Ebics\Builders\Request\StaticBuilder;
+use EbicsApi\Ebics\Builders\Request\XmlBuilder;
+use EbicsApi\Ebics\Builders\Request\XmlBuilderV25;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Handlers\AuthSignatureHandlerV25;
+use EbicsApi\Ebics\Handlers\OrderDataHandlerV25;
+use EbicsApi\Ebics\Handlers\UserSignatureHandlerV2;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\UploadTransaction;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Models\UserSignature;
+use EbicsApi\Ebics\Services\DigestResolverV2;
 use LogicException;
 
 /**

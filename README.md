@@ -1,14 +1,14 @@
 # EBICS-CLIENT-PHP
 
-[![CI](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/ci.yml/badge.svg)](https://github.com/andrew-svirin/ebics-client-php/actions/workflows/ci.yml)
-[![Latest Stable Version](https://poser.pugx.org/andrew-svirin/ebics-client-php/v/stable)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
-[![Total Downloads](https://img.shields.io/packagist/dt/andrew-svirin/ebics-client-php.svg)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
-[![License](https://poser.pugx.org/andrew-svirin/ebics-client-php/license)](https://packagist.org/packages/andrew-svirin/ebics-client-php)
+[![CI](https://github.com/ebics-api/ebics-client-php/actions/workflows/ci.yml/badge.svg)](https://github.com/ebics-api/ebics-client-php/actions/workflows/ci.yml)
+[![Latest Stable Version](https://poser.pugx.org/ebics-api/ebics-client-php/v/stable)](https://packagist.org/packages/ebics-api/ebics-client-php)
+[![Total Downloads](https://img.shields.io/packagist/dt/ebics-api/ebics-client-php.svg)](https://packagist.org/packages/ebics-api/ebics-client-php)
+[![License](https://poser.pugx.org/ebics-api/ebics-client-php/license)](https://packagist.org/packages/ebics-api/ebics-client-php)
 
 <img src="https://www.ebics.org/typo3conf/ext/siz_ebicsorg_base/Resources/Public/Images/ebics-logo.png" width="300">
 
 PHP library to communicate with a bank through <a href="https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard" target="_blank">EBICS</a> protocol.  
-PHP EBICS Client - https://andrew-svirin.github.io/ebics-client-php/  
+PHP EBICS Client - https://ebics-api.github.io/ebics-client-php/  
 Supported PHP versions - PHP 7.2 - PHP 8.3  
 Support EBICS versions: 2.4, 2.5, 3.0; Encryption versions: E002, X002, A005, A006; Switching EBICS T/TS
 
@@ -29,12 +29,12 @@ EBICS Client can be deployed as a standalone service on a webserver or within a 
 
 ## License
 
-andrew-svirin/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
+ebics-api/ebics-client-php is licensed under the MIT License, see the LICENSE file for details
 
 ## Installation
 
 ```bash
-$ composer require andrew-svirin/ebics-client-php
+$ composer require ebics-api/ebics-client-php
 ```
 
 ## Initialize client
@@ -44,11 +44,11 @@ You will need to have this information from your Bank: `HostID`, `HostURL`, `Par
 ```php
 <?php
 
-use AndrewSvirin\Ebics\Services\FileKeyringManager;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\EbicsClient;
-use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
+use EbicsApi\Ebics\Services\FileKeyringManager;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\EbicsClient;
+use EbicsApi\Ebics\Models\X509\BankX509Generator;
 
 // Prepare `workspace` dir in the __PATH_TO_WORKSPACES_DIR__ manually.
 // "__EBICS_VERSION__" should have value "VERSION_30" for EBICS 3.0
@@ -82,14 +82,14 @@ if (!is_file($keyringPath)) {
 ```php
 <?php
 
-use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
+use EbicsApi\Ebics\Contracts\EbicsResponseExceptionInterface;
 
-/* @var \AndrewSvirin\Ebics\EbicsClient $client */
+/* @var \EbicsApi\Ebics\EbicsClient $client */
 
 try {
     $client->INI();
-    /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
-    /* @var \AndrewSvirin\Ebics\Models\Keyring $keyring */
+    /* @var \EbicsApi\Ebics\Services\FileKeyringManager $keyringManager */
+    /* @var \EbicsApi\Ebics\Models\Keyring $keyring */
     $keyringManager->saveKeyring($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
@@ -116,8 +116,8 @@ try {
 ### 2. Generate a EBICS letter
 
 ```php
-/* @var \AndrewSvirin\Ebics\EbicsClient $client */
-$ebicsBankLetter = new \AndrewSvirin\Ebics\EbicsBankLetter();
+/* @var \EbicsApi\Ebics\EbicsClient $client */
+$ebicsBankLetter = new \EbicsApi\Ebics\EbicsBankLetter();
 
 $bankLetter = $ebicsBankLetter->prepareBankLetter(
     $client->getBank(),
@@ -135,10 +135,10 @@ $pdf = $ebicsBankLetter->formatBankLetter($bankLetter, $ebicsBankLetter->createP
 ```php
 
 try {
-    /* @var \AndrewSvirin\Ebics\EbicsClient $client */
+    /* @var \EbicsApi\Ebics\EbicsClient $client */
     $client->HPB();
-    /* @var \AndrewSvirin\Ebics\Services\FileKeyringManager $keyringManager */
-    /* @var \AndrewSvirin\Ebics\Models\Keyring $keyring */
+    /* @var \EbicsApi\Ebics\Services\FileKeyringManager $keyringManager */
+    /* @var \EbicsApi\Ebics\Models\Keyring $keyring */
     $keyringManager->saveKeyring($keyring, $keyringRealPath);
 } catch (EbicsResponseExceptionInterface $exception) {
     echo sprintf(
@@ -192,8 +192,8 @@ try {
 | HVD         | Download the state of a VEU order.                                                                                |
 | HVT         | Download detailed information about an order from VEU processing for which the user is authorized as a signatory. |
 
-If you need to parse Cfonb 120, 240, 360 use [andrew-svirin/cfonb-php](https://github.com/andrew-svirin/cfonb-php)  
-If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andrew-svirin/mt942-php)  
+If you need to parse Cfonb 120, 240, 360 use [ebics-api/cfonb-php](https://github.com/ebics-api/cfonb-php)  
+If you need to parse MT942 use [ebics-api/mt942-php](https://github.com/ebics-api/mt942-php)  
 
 ## Keyring schema
 ```json
@@ -236,6 +236,5 @@ If you need to parse MT942 use [andrew-svirin/mt942-php](https://github.com/andr
  - Format validators for all available ISO 20022 formats:
    - upload: PAIN.001, PAIN.008, MT101, TA875, CFONB320, CFONB160 with different versions.
    - download: PAIN.002, CAMT.052, CAMT.053, CAMT.054, MT199, MT900, MT910, MT940, MT942, CFONB240,CFONB245, CFONB120
- - Support import 3SKey certificates
  - Country's Bank specific order types
  - Refactor by abstraction Download and Upload Order types

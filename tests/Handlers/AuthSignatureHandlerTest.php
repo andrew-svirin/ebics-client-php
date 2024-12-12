@@ -1,14 +1,14 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Handlers;
+namespace EbicsApi\Ebics\Tests\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Handlers\AuthSignatureHandler;
-use AndrewSvirin\Ebics\Handlers\AuthSignatureHandlerV25;
-use AndrewSvirin\Ebics\Handlers\Traits\H004Trait;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Handlers\AuthSignatureHandler;
+use EbicsApi\Ebics\Handlers\AuthSignatureHandlerV25;
+use EbicsApi\Ebics\Handlers\Traits\H004Trait;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class EbicsTest.

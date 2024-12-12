@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Contracts\HttpClientInterface;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
 use LogicException;
 
 /**

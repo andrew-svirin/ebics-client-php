@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\DocumentInterface;
+use EbicsApi\Ebics\Contracts\DocumentInterface;
 
 /**
  * Class Document represents Document model.

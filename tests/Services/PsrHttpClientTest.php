@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Services;
+namespace EbicsApi\Ebics\Tests\Services;
 
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Services\PsrHttpClient;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Services\PsrHttpClient;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;

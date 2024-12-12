@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\Keyring;
 use LogicException;
 
 /**

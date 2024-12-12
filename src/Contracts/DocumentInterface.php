@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace EbicsApi\Ebics\Contracts;
 
 /**
  * DocumentInterface class representation.

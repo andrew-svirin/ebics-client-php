@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
 /**
  * Class CustomerCreditTransfer represents CustomerCreditTransfer model.

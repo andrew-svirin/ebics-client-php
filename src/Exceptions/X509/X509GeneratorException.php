@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions\X509;
+namespace EbicsApi\Ebics\Exceptions\X509;
 
 use Exception;
 

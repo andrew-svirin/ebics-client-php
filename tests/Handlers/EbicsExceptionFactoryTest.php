@@ -1,13 +1,13 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Handlers;
+namespace EbicsApi\Ebics\Tests\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\BankPubkeyUpdateRequiredException;
-use AndrewSvirin\Ebics\Exceptions\EbicsResponseException;
-use AndrewSvirin\Ebics\Exceptions\IncorrectResponseEbicsException;
-use AndrewSvirin\Ebics\Exceptions\InternalErrorException;
-use AndrewSvirin\Ebics\Factories\EbicsExceptionFactory;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Exceptions\BankPubkeyUpdateRequiredException;
+use EbicsApi\Ebics\Exceptions\EbicsResponseException;
+use EbicsApi\Ebics\Exceptions\IncorrectResponseEbicsException;
+use EbicsApi\Ebics\Exceptions\InternalErrorException;
+use EbicsApi\Ebics\Factories\EbicsExceptionFactory;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class EbicsExceptionFactoryTest.

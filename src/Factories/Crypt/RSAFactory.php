@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\Crypt;
+namespace EbicsApi\Ebics\Factories\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Models\Crypt\RSA;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Models\Crypt\RSA;
 
 /**
  * Class RSAFactory represents producers for the @see RSA.

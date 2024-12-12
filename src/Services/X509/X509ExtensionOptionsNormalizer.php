@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\X509;
+namespace EbicsApi\Ebics\Services\X509;
 
 /**
  * X509 extensions options normalizer.
@@ -25,7 +25,7 @@ final class X509ExtensionOptionsNormalizer
      *  'replace' => '<string>',
      * ]
      *
-     * @see \AndrewSvirin\Ebics\Models\Crypt\X509::setExtension()
+     * @see \EbicsApi\Ebics\Models\Crypt\X509::setExtension()
      */
     public static function normalize($options): array
     {

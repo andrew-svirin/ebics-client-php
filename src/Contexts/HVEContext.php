@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
 /**
  * Class HVEContext context container for HVE orders

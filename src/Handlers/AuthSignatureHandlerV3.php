@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H005Trait;
+use EbicsApi\Ebics\Handlers\Traits\H005Trait;
 
 /**
  * Ebics 2.5 AuthSignatureHandler.

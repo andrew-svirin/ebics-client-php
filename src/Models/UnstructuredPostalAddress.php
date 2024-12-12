@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\PostalAddressInterface;
+use EbicsApi\Ebics\Contracts\PostalAddressInterface;
 use DOMElement;
 
 /**

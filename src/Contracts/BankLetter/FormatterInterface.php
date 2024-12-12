@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\BankLetter;
+namespace EbicsApi\Ebics\Contracts\BankLetter;
 
-use AndrewSvirin\Ebics\Models\BankLetter;
+use EbicsApi\Ebics\Models\BankLetter;
 
 /**
  * EBICS formatter for bank letter.

@@ -1,14 +1,14 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Handlers\Traits\C14NTrait;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Models\UserSignature;
-use AndrewSvirin\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Handlers\Traits\C14NTrait;
+use EbicsApi\Ebics\Handlers\Traits\XPathTrait;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Models\UserSignature;
+use EbicsApi\Ebics\Services\CryptService;
 
 /**
  * Class AuthSignatureHandler manage body DOM elements.

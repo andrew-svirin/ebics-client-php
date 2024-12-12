@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace EbicsApi\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
 
 /**
  * EBICS ResponseExceptionInterface representation.

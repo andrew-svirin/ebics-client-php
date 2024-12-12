@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\HttpClientInterface;
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Contracts\HttpClientInterface;
+use EbicsApi\Ebics\Models\Http\Response;
 use RuntimeException;
 
 /**

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\Crypt;
+namespace EbicsApi\Ebics\Contracts\Crypt;
 
-use AndrewSvirin\Ebics\Models\Crypt\X509;
+use EbicsApi\Ebics\Models\Crypt\X509;
 
 /**
  * Crypt X509 representation.

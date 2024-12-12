@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\Traits\H003Trait;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
-use AndrewSvirin\Ebics\Models\UploadSegment;
+use EbicsApi\Ebics\Handlers\Traits\H003Trait;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Models\UploadSegment;
 
 /**
  * Ebics 2.4 ResponseHandler.

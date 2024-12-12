@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\Crypt;
+namespace EbicsApi\Ebics\Contracts\Crypt;
 
-use AndrewSvirin\Ebics\Models\Crypt\RSA;
+use EbicsApi\Ebics\Models\Crypt\RSA;
 
 /**
  * Crypt RSA representation.

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\TransactionInterface;
+use EbicsApi\Ebics\Contracts\TransactionInterface;
 
 /**
  * Transaction Collection represent collection of segments.

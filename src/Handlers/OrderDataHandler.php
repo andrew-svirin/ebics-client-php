@@ -1,21 +1,21 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Exceptions\CertificateEbicsException;
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\CertificateX509Factory;
-use AndrewSvirin\Ebics\Factories\Crypt\BigIntegerFactory;
-use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\CustomerH3K;
-use AndrewSvirin\Ebics\Models\CustomerHIA;
-use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\Document;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Exceptions\CertificateEbicsException;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Factories\CertificateX509Factory;
+use EbicsApi\Ebics\Factories\Crypt\BigIntegerFactory;
+use EbicsApi\Ebics\Factories\SignatureFactory;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Models\CustomerH3K;
+use EbicsApi\Ebics\Models\CustomerHIA;
+use EbicsApi\Ebics\Models\CustomerINI;
+use EbicsApi\Ebics\Models\Document;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Services\CryptService;
 use DateTimeInterface;
 use DOMDocument;
 use DOMElement;

@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace EbicsApi\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
 
 /**
  * X509 Factory Interface representation.

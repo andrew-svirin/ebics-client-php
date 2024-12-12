@@ -1,15 +1,15 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Handlers;
+namespace EbicsApi\Ebics\Tests\Handlers;
 
-use AndrewSvirin\Ebics\Handlers\OrderDataHandler;
-use AndrewSvirin\Ebics\Handlers\OrderDataHandlerV25;
-use AndrewSvirin\Ebics\Handlers\Traits\H004Trait;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Handlers\OrderDataHandler;
+use EbicsApi\Ebics\Handlers\OrderDataHandlerV25;
+use EbicsApi\Ebics\Handlers\Traits\H004Trait;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Handlers\Traits\XPathTrait;
+use EbicsApi\Ebics\Models\CustomerINI;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class RequestFactoryTest.

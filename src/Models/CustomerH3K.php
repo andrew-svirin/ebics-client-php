@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
 /**
  * Class CustomerH3K represents CustomerH3K model.

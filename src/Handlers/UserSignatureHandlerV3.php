@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Models\UserSignature;
+use EbicsApi\Ebics\Models\UserSignature;
 
 /**
  * Ebics 3.0 Class AuthSignatureHandler manage body DOM elements.

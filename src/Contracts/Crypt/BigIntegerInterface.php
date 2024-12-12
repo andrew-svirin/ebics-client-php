@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\Crypt;
+namespace EbicsApi\Ebics\Contracts\Crypt;
 
 /**
  * Crypt BigInteger representation.

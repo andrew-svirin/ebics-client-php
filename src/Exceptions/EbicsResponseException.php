@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Exceptions;
+namespace EbicsApi\Ebics\Exceptions;
 
-use AndrewSvirin\Ebics\Contracts\EbicsResponseExceptionInterface;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Contracts\EbicsResponseExceptionInterface;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
 
 abstract class EbicsResponseException extends EbicsException implements EbicsResponseExceptionInterface
 {

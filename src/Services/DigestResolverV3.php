@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
 
 /**
  * Ebics 3.0 DigestResolver.

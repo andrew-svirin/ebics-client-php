@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\OrderDataInterface;
+use EbicsApi\Ebics\Contracts\OrderDataInterface;
 
 /**
  * Order result with extracted data.

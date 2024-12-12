@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Factories\X509;
+namespace EbicsApi\Ebics\Tests\Factories\X509;
 
-use AndrewSvirin\Ebics\Factories\SignatureFactory;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\X509\BankX509Generator;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Factories\SignatureFactory;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\X509\BankX509Generator;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 use DateTime;
 
 /**

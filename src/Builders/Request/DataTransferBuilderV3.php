@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
 /**
  * Ebics 3.0 Class DataTransferBuilder builder for request container.

@@ -1,13 +1,13 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface;
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Factories\Crypt\RSAFactory;
-use AndrewSvirin\Ebics\Models\Crypt\RSA;
-use AndrewSvirin\Ebics\Models\Signature;
+use EbicsApi\Ebics\Contracts\Crypt\BigIntegerInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Contracts\X509GeneratorInterface;
+use EbicsApi\Ebics\Factories\Crypt\RSAFactory;
+use EbicsApi\Ebics\Models\Crypt\RSA;
+use EbicsApi\Ebics\Models\Signature;
 use LogicException;
 use RuntimeException;
 

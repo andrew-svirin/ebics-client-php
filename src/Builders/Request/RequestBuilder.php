@@ -1,12 +1,12 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Request;
 use Closure;
 
 /**
- * Class RequestBuilder builder for model @see \AndrewSvirin\Ebics\Models\Http\Request
+ * Class RequestBuilder builder for model @see \EbicsApi\Ebics\Models\Http\Request
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin

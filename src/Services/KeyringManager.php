@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
-use AndrewSvirin\Ebics\Contracts\KeyringManagerInterface;
-use AndrewSvirin\Ebics\Factories\KeyringFactory;
-use AndrewSvirin\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Contracts\KeyringManagerInterface;
+use EbicsApi\Ebics\Factories\KeyringFactory;
+use EbicsApi\Ebics\Models\Keyring;
 
 /**
  * An EbicsKeyring instance can hold sets of private user keys and/or public

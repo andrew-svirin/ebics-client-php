@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\SignatureDataInterface;
+use EbicsApi\Ebics\Contracts\SignatureDataInterface;
 
 /**
  * Class SignatureData represents SignatureData model.

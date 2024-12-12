@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\Crypt;
+namespace EbicsApi\Ebics\Factories\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
-use AndrewSvirin\Ebics\Models\Crypt\X509;
+use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
+use EbicsApi\Ebics\Models\Crypt\X509;
 
 /**
  * Class X509Factory represents producers for the @see X509.

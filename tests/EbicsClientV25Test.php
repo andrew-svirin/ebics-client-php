@@ -1,15 +1,15 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace EbicsApi\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Contexts\FDLContext;
-use AndrewSvirin\Ebics\Contexts\FULContext;
-use AndrewSvirin\Ebics\Contexts\HVDContext;
-use AndrewSvirin\Ebics\Contexts\HVEContext;
-use AndrewSvirin\Ebics\Contexts\HVTContext;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
-use AndrewSvirin\Ebics\Factories\DocumentFactory;
+use EbicsApi\Ebics\Contexts\FDLContext;
+use EbicsApi\Ebics\Contexts\FULContext;
+use EbicsApi\Ebics\Contexts\HVDContext;
+use EbicsApi\Ebics\Contexts\HVEContext;
+use EbicsApi\Ebics\Contexts\HVTContext;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Exceptions\InvalidUserOrUserStateException;
+use EbicsApi\Ebics\Factories\DocumentFactory;
 use DateTime;
 use Silarhi\Cfonb\CfonbParser;
 

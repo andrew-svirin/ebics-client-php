@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services\BankLetter\Formatter;
+namespace EbicsApi\Ebics\Services\BankLetter\Formatter;
 
-use AndrewSvirin\Ebics\Models\BankLetter;
-use AndrewSvirin\Ebics\Models\Pdf;
-use AndrewSvirin\Ebics\Models\SignatureBankLetter;
+use EbicsApi\Ebics\Models\BankLetter;
+use EbicsApi\Ebics\Models\Pdf;
+use EbicsApi\Ebics\Models\SignatureBankLetter;
 
 /**
  * Bank letter PDF formatter.

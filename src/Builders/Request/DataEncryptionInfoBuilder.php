@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Exceptions\SignatureEbicsException;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Exceptions\SignatureEbicsException;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Services\CryptService;
 use DOMDocument;
 use DOMElement;
 

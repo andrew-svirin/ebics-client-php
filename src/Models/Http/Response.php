@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\Http;
+namespace EbicsApi\Ebics\Models\Http;
 
-use AndrewSvirin\Ebics\Models\Data;
+use EbicsApi\Ebics\Models\Data;
 
 /**
  * Response model represents Response model.

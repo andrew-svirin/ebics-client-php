@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\DownloadOrderResult;
-use AndrewSvirin\Ebics\Models\InitializationOrderResult;
-use AndrewSvirin\Ebics\Models\UploadOrderResult;
+use EbicsApi\Ebics\Models\DownloadOrderResult;
+use EbicsApi\Ebics\Models\InitializationOrderResult;
+use EbicsApi\Ebics\Models\UploadOrderResult;
 
 /**
  * Class SegmentFactory represents producers for the @see OrderResult.

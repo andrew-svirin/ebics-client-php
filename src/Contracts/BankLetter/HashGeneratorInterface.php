@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts\BankLetter;
+namespace EbicsApi\Ebics\Contracts\BankLetter;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
 
 /**
  * EBICS Generate hash for bank letter.

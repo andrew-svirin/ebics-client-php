@@ -1,14 +1,14 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\Crypt\X509;
-use AndrewSvirin\Ebics\Models\CustomerHIA;
-use AndrewSvirin\Ebics\Models\CustomerINI;
-use AndrewSvirin\Ebics\Models\Document;
-use AndrewSvirin\Ebics\Services\DOMHelper;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Models\Crypt\X509;
+use EbicsApi\Ebics\Models\CustomerHIA;
+use EbicsApi\Ebics\Models\CustomerINI;
+use EbicsApi\Ebics\Models\Document;
+use EbicsApi\Ebics\Services\DOMHelper;
 use DateTimeInterface;
 use DOMDocument;
 use DOMElement;

@@ -1,11 +1,11 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\X509;
+namespace EbicsApi\Ebics\Models\X509;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\RSAInterface;
-use AndrewSvirin\Ebics\Contracts\Crypt\X509Interface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Models\Crypt\X509;
+use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
+use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
+use EbicsApi\Ebics\Contracts\X509GeneratorInterface;
+use EbicsApi\Ebics\Models\Crypt\X509;
 
 /**
  * Generator simulation for already created certificates and loaded from content.

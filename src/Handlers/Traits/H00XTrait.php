@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers\Traits;
+namespace EbicsApi\Ebics\Handlers\Traits;
 
 use DOMDocument;
 use DOMNodeList;

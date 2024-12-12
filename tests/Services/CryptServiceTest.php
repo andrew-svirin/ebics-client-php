@@ -1,9 +1,9 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests\Services;
+namespace EbicsApi\Ebics\Tests\Services;
 
-use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Tests\AbstractEbicsTestCase;
+use EbicsApi\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
 
 /**
  * Class CryptServiceTest.

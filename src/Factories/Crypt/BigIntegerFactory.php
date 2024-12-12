@@ -1,12 +1,12 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories\Crypt;
+namespace EbicsApi\Ebics\Factories\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface;
-use AndrewSvirin\Ebics\Models\Crypt\BigInteger;
+use EbicsApi\Ebics\Contracts\Crypt\BigIntegerInterface;
+use EbicsApi\Ebics\Models\Crypt\BigInteger;
 
 /**
- * Class BigIntegerFactory represents producers for the @see \AndrewSvirin\Ebics\Contracts\Crypt\BigIntegerInterface.
+ * Class BigIntegerFactory represents producers for the @see \EbicsApi\Ebics\Contracts\Crypt\BigIntegerInterface.
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin

@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers\Traits;
+namespace EbicsApi\Ebics\Handlers\Traits;
 
 /**
  * Trait H003Trait settings.

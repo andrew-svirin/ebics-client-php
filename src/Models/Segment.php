@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Models\Http\Response;
 
 /**
  * Segment item.

@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Factories;
+namespace EbicsApi\Ebics\Factories;
 
-use AndrewSvirin\Ebics\Models\DownloadTransaction;
-use AndrewSvirin\Ebics\Models\InitializationTransaction;
-use AndrewSvirin\Ebics\Models\UploadTransaction;
+use EbicsApi\Ebics\Models\DownloadTransaction;
+use EbicsApi\Ebics\Models\InitializationTransaction;
+use EbicsApi\Ebics\Models\UploadTransaction;
 
 /**
  * Class TransactionFactory represents producers for the @see DownloadTransaction.

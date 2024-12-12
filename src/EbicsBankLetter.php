@@ -1,19 +1,19 @@
 <?php
 
-namespace AndrewSvirin\Ebics;
+namespace EbicsApi\Ebics;
 
-use AndrewSvirin\Ebics\Contracts\BankLetter\FormatterInterface;
-use AndrewSvirin\Ebics\Factories\BankLetterFactory;
-use AndrewSvirin\Ebics\Models\Bank;
-use AndrewSvirin\Ebics\Models\BankLetter;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\User;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
-use AndrewSvirin\Ebics\Services\BankLetterService;
-use AndrewSvirin\Ebics\Services\DigestResolverV2;
-use AndrewSvirin\Ebics\Services\DigestResolverV3;
+use EbicsApi\Ebics\Contracts\BankLetter\FormatterInterface;
+use EbicsApi\Ebics\Factories\BankLetterFactory;
+use EbicsApi\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\BankLetter;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\User;
+use EbicsApi\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
+use EbicsApi\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
+use EbicsApi\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
+use EbicsApi\Ebics\Services\BankLetterService;
+use EbicsApi\Ebics\Services\DigestResolverV2;
+use EbicsApi\Ebics\Services\DigestResolverV3;
 use LogicException;
 
 /**

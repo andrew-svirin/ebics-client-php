@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contexts;
+namespace EbicsApi\Ebics\Contexts;
 
-use AndrewSvirin\Ebics\Contracts\EbicsClientInterface;
+use EbicsApi\Ebics\Contracts\EbicsClientInterface;
 
 /**
  * Class BTFContext context container for BTD orders - requires EBICS 3.0

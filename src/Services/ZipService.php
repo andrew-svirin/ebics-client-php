@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Services;
+namespace EbicsApi\Ebics\Services;
 
 use RuntimeException;
 use ZipArchive;

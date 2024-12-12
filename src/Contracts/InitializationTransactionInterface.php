@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Contracts;
+namespace EbicsApi\Ebics\Contracts;
 
-use AndrewSvirin\Ebics\Models\InitializationSegment;
+use EbicsApi\Ebics\Models\InitializationSegment;
 
 /**
  * EBICS InitializationTransactionInterface representation.

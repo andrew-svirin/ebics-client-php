@@ -1,6 +1,6 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
 use Closure;
 use DOMDocument;

@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\Crypt;
+namespace EbicsApi\Ebics\Models\Crypt;
 
-use AndrewSvirin\Ebics\Contracts\Crypt\TripleDESInterface;
+use EbicsApi\Ebics\Contracts\Crypt\TripleDESInterface;
 use LogicException;
 
 /**

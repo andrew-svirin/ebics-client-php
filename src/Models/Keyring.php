@@ -1,10 +1,10 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models;
+namespace EbicsApi\Ebics\Models;
 
-use AndrewSvirin\Ebics\Contracts\SignatureInterface;
-use AndrewSvirin\Ebics\Contracts\X509GeneratorInterface;
-use AndrewSvirin\Ebics\Exceptions\PasswordEbicsException;
+use EbicsApi\Ebics\Contracts\SignatureInterface;
+use EbicsApi\Ebics\Contracts\X509GeneratorInterface;
+use EbicsApi\Ebics\Exceptions\PasswordEbicsException;
 
 /**
  * EBICS keyring representation.

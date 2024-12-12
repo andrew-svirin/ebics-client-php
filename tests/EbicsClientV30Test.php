@@ -1,15 +1,15 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Tests;
+namespace EbicsApi\Ebics\Tests;
 
-use AndrewSvirin\Ebics\Contexts\BTDContext;
-use AndrewSvirin\Ebics\Contexts\BTUContext;
-use AndrewSvirin\Ebics\Contexts\HVDContext;
-use AndrewSvirin\Ebics\Contexts\HVEContext;
-use AndrewSvirin\Ebics\Contexts\HVTContext;
-use AndrewSvirin\Ebics\Contexts\RequestContext;
-use AndrewSvirin\Ebics\Exceptions\InvalidUserOrUserStateException;
-use AndrewSvirin\Ebics\Factories\DocumentFactory;
+use EbicsApi\Ebics\Contexts\BTDContext;
+use EbicsApi\Ebics\Contexts\BTUContext;
+use EbicsApi\Ebics\Contexts\HVDContext;
+use EbicsApi\Ebics\Contexts\HVEContext;
+use EbicsApi\Ebics\Contexts\HVTContext;
+use EbicsApi\Ebics\Contexts\RequestContext;
+use EbicsApi\Ebics\Exceptions\InvalidUserOrUserStateException;
+use EbicsApi\Ebics\Factories\DocumentFactory;
 use DateTime;
 
 /**

@@ -1,15 +1,15 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\CustomerDirectDebit;
+namespace EbicsApi\Ebics\Builders\CustomerDirectDebit;
 
-use AndrewSvirin\Ebics\Handlers\Traits\XPathTrait;
-use AndrewSvirin\Ebics\Models\CustomerDirectDebit;
-use AndrewSvirin\Ebics\Services\DOMHelper;
-use AndrewSvirin\Ebics\Services\RandomService;
+use EbicsApi\Ebics\Handlers\Traits\XPathTrait;
+use EbicsApi\Ebics\Models\CustomerDirectDebit;
+use EbicsApi\Ebics\Services\DOMHelper;
+use EbicsApi\Ebics\Services\RandomService;
 use DateTime;
 
 /**
- * Class CustomerDirectDebitBuilder builder for model @see \AndrewSvirin\Ebics\Models\CustomerDirectDebit
+ * Class CustomerDirectDebitBuilder builder for model @see \EbicsApi\Ebics\Models\CustomerDirectDebit
  *
  * @license http://www.opensource.org/licenses/mit-license.html  MIT License
  * @author Andrew Svirin

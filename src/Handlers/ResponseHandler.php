@@ -1,19 +1,19 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Handlers;
+namespace EbicsApi\Ebics\Handlers;
 
-use AndrewSvirin\Ebics\Exceptions\EbicsException;
-use AndrewSvirin\Ebics\Factories\SegmentFactory;
-use AndrewSvirin\Ebics\Handlers\Traits\H00XTrait;
-use AndrewSvirin\Ebics\Models\DownloadSegment;
-use AndrewSvirin\Ebics\Models\Http\Request;
-use AndrewSvirin\Ebics\Models\Http\Response;
-use AndrewSvirin\Ebics\Models\InitializationSegment;
-use AndrewSvirin\Ebics\Models\Keyring;
-use AndrewSvirin\Ebics\Models\UploadSegment;
-use AndrewSvirin\Ebics\Services\CryptService;
-use AndrewSvirin\Ebics\Services\DOMHelper;
-use AndrewSvirin\Ebics\Services\ZipService;
+use EbicsApi\Ebics\Exceptions\EbicsException;
+use EbicsApi\Ebics\Factories\SegmentFactory;
+use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
+use EbicsApi\Ebics\Models\DownloadSegment;
+use EbicsApi\Ebics\Models\Http\Request;
+use EbicsApi\Ebics\Models\Http\Response;
+use EbicsApi\Ebics\Models\InitializationSegment;
+use EbicsApi\Ebics\Models\Keyring;
+use EbicsApi\Ebics\Models\UploadSegment;
+use EbicsApi\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Services\DOMHelper;
+use EbicsApi\Ebics\Services\ZipService;
 use DOMDocument;
 
 /**

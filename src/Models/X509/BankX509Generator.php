@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Models\X509;
+namespace EbicsApi\Ebics\Models\X509;
 
-use AndrewSvirin\Ebics\Models\Bank;
+use EbicsApi\Ebics\Models\Bank;
 use LogicException;
 
 /**

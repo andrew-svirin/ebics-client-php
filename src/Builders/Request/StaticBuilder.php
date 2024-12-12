@@ -1,8 +1,8 @@
 <?php
 
-namespace AndrewSvirin\Ebics\Builders\Request;
+namespace EbicsApi\Ebics\Builders\Request;
 
-use AndrewSvirin\Ebics\Services\CryptService;
+use EbicsApi\Ebics\Services\CryptService;
 use Closure;
 use DateTimeInterface;
 use DOMDocument;
