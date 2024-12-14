@@ -6,6 +6,7 @@ use EbicsApi\Ebics\Builders\CustomerCreditTransfer\CustomerCreditTransferBuilder
 use EbicsApi\Ebics\Builders\CustomerDirectDebit\CustomerDirectDebitBuilder;
 use EbicsApi\Ebics\Contracts\EbicsClientInterface;
 use EbicsApi\Ebics\EbicsClient;
+use EbicsApi\Ebics\Factories\KeyringFactory;
 use EbicsApi\Ebics\Factories\SignatureFactory;
 use EbicsApi\Ebics\Models\Bank;
 use EbicsApi\Ebics\Models\CustomerCreditTransfer;
@@ -65,7 +66,7 @@ abstract class AbstractEbicsTestCase extends TestCase
         $bank->setCountryCode($credentials['countryCode']);
         $user = new User($credentials['partnerId'], $credentials['userId']);
 
-        $keyringManager = new FileKeyringManager();
+        $keyringManager = new FileKeyringManager(new KeyringFactory);
 
         $keyringPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
         if (is_file($keyringPath)) {
@@ -75,7 +76,12 @@ abstract class AbstractEbicsTestCase extends TestCase
             $keyring->setPassword($credentials['password']);
         }
 
-        $ebicsClient = new EbicsClient($bank, $user, $keyring);
+        $options = [];
+        if (true === $fake) {
+            $options['http_client'] = new FakerHttpClient($this->fixtures);
+        }
+
+        $ebicsClient = new EbicsClient($bank, $user, $keyring, $options);
 
         if ($credentials['hostIsCertified']) {
             $x509Generator = new BankX509Generator();
@@ -88,16 +94,12 @@ abstract class AbstractEbicsTestCase extends TestCase
             $this->saveKeyring($credentialsId, $ebicsClient->getKeyring());
         }
 
-        if (true === $fake) {
-            $ebicsClient->setHttpClient(new FakerHttpClient($this->fixtures));
-        }
-
         return $ebicsClient;
     }
 
     protected function loadKeyring(string $keyringPath, string $password, string $version): Keyring
     {
-        $keyringManager = new FileKeyringManager();
+        $keyringManager = new FileKeyringManager(new KeyringFactory);
 
         return $keyringManager->loadKeyring($keyringPath, $password, $version);
     }
@@ -105,7 +107,7 @@ abstract class AbstractEbicsTestCase extends TestCase
     protected function saveKeyring(string $credentialsId, Keyring $keyring): void
     {
         $keyringRealPath = sprintf('%s/workspace/keyring_%d.json', $this->data, $credentialsId);
-        $keyringManager = new FileKeyringManager();
+        $keyringManager = new FileKeyringManager(new KeyringFactory);
         $keyringManager->saveKeyring($keyring, $keyringRealPath);
     }
 

@@ -2,6 +2,7 @@
 
 namespace EbicsApi\Ebics\Handlers;
 
+use DOMDocument;
 use EbicsApi\Ebics\Exceptions\EbicsException;
 use EbicsApi\Ebics\Factories\SegmentFactory;
 use EbicsApi\Ebics\Handlers\Traits\H00XTrait;
@@ -11,10 +12,10 @@ use EbicsApi\Ebics\Models\Http\Response;
 use EbicsApi\Ebics\Models\InitializationSegment;
 use EbicsApi\Ebics\Models\Keyring;
 use EbicsApi\Ebics\Models\UploadSegment;
+use EbicsApi\Ebics\Services\BufferFactory;
 use EbicsApi\Ebics\Services\CryptService;
 use EbicsApi\Ebics\Services\DOMHelper;
 use EbicsApi\Ebics\Services\ZipService;
-use DOMDocument;
 
 /**
  * Class ResponseHandler manage response DOM elements.
@@ -29,12 +30,18 @@ abstract class ResponseHandler
     protected SegmentFactory $segmentFactory;
     protected CryptService $cryptService;
     protected ZipService $zipService;
+    protected BufferFactory $bufferFactory;
 
-    public function __construct()
-    {
-        $this->segmentFactory = new SegmentFactory();
-        $this->cryptService = new CryptService();
-        $this->zipService = new ZipService();
+    public function __construct(
+        SegmentFactory $segmentFactory,
+        CryptService $cryptService,
+        ZipService $zipService,
+        BufferFactory $bufferFactory
+    ) {
+        $this->segmentFactory = $segmentFactory;
+        $this->cryptService = $cryptService;
+        $this->zipService = $zipService;
+        $this->bufferFactory = $bufferFactory;
     }
 
     /**
@@ -177,18 +184,27 @@ abstract class ResponseHandler
     {
         $transactionKeyEncoded = $this->retrieveH00XTransactionKey($response);
         $transactionKey = base64_decode($transactionKeyEncoded);
-        $orderDataEncrypted = $this->retrieveH00XOrderData($response);
-        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
+        $orderDataEncrypted = $this->bufferFactory->createFromContent(
+            base64_decode($this->retrieveH00XOrderData($response))
+        );
+        $orderDataCompressed = $this->bufferFactory->create();
+        $this->cryptService->decryptOrderDataCompressed(
             $keyring,
             $orderDataEncrypted,
+            $orderDataCompressed,
             $transactionKey
         );
-        $orderData = $this->zipService->uncompress($orderDataCompressed);
+        unset($orderDataEncrypted);
+
+        $orderData = $this->bufferFactory->create();
+        $this->zipService->uncompress($orderDataCompressed, $orderData);
+        unset($orderDataCompressed);
 
         $segment = $this->segmentFactory->createInitializationSegment();
         $segment->setResponse($response);
         $segment->setTransactionKey($transactionKey);
-        $segment->setOrderData($orderData);
+        $segment->setOrderData($orderData->readContent());
+        unset($orderData);
 
         return $segment;
     }

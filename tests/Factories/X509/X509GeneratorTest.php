@@ -2,11 +2,11 @@
 
 namespace EbicsApi\Ebics\Tests\Factories\X509;
 
+use DateTime;
 use EbicsApi\Ebics\Factories\SignatureFactory;
 use EbicsApi\Ebics\Models\Bank;
 use EbicsApi\Ebics\Models\X509\BankX509Generator;
 use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
-use DateTime;
 
 /**
  * Legacy X509 certificate generator @see X509GeneratorInterface.
@@ -28,17 +28,17 @@ class X509GeneratorTest extends AbstractEbicsTestCase
         $publicKey = $this->getPublicKey();
 
         // Certificate generated for the 22/03/2020 (1 year validity)
-        $generator = new BankX509Generator();
-        $generator->setCertificateOptionsByBank(new Bank('H123456', 'https://test.bank.dom'));
-        $generator->setX509StartDate(new DateTime('2020-03-21'));
-        $generator->setX509EndDate(new DateTime('2021-03-22'));
-        $generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
+        $x509Generator = new BankX509Generator();
+        $x509Generator->setCertificateOptionsByBank(new Bank('H123456', 'https://test.bank.dom'));
+        $x509Generator->setX509StartDate(new DateTime('2020-03-21'));
+        $x509Generator->setX509EndDate(new DateTime('2021-03-22'));
+        $x509Generator->setSerialNumber('539453510852155194065233908413342789156542395956670254476154968597583055940');
 
         $signatureFactory = new SignatureFactory();
         $signature = $signatureFactory->createSignatureAFromKeys([
             'publickey' => $publicKey,
             'privatekey' => $privateKey,
-        ], 'test123', $generator);
+        ], 'test123', $x509Generator);
 
         self::assertEquals($signature->getPrivateKey(), $privateKey);
         self::assertEquals($signature->getPublicKey(), $publicKey);

@@ -14,9 +14,9 @@ abstract class DigestResolver
 {
     protected CryptService $cryptService;
 
-    public function __construct()
+    public function __construct(CryptService $cryptService)
     {
-        $this->cryptService = new CryptService();
+        $this->cryptService = $cryptService;
     }
 
     /**

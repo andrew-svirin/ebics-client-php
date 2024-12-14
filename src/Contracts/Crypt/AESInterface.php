@@ -2,6 +2,8 @@
 
 namespace EbicsApi\Ebics\Contracts\Crypt;
 
+use EbicsApi\Ebics\Contracts\BufferInterface;
+
 /**
  * Crypt AES representation.
  *
@@ -66,6 +68,19 @@ interface AESInterface
      * @internal Could, but not must, extend by the child Crypt_* class
      */
     public function encrypt(string $plaintext);
+
+    /**
+     * Decrypts a message.
+     *
+     * If strlen($ciphertext) is not a multiple of the block size, null bytes will be added
+     * to the end of the string until it is.
+     *
+     * @param BufferInterface $ciphertext
+     * @param BufferInterface $plaintext
+     *
+     * @return void
+     */
+    public function decryptBuffer(BufferInterface $ciphertext, BufferInterface $plaintext);
 
     /**
      * Decrypts a message.

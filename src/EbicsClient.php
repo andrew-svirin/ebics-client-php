@@ -2,6 +2,7 @@
 
 namespace EbicsApi\Ebics;
 
+use DateTimeInterface;
 use EbicsApi\Ebics\Contexts\BTDContext;
 use EbicsApi\Ebics\Contexts\BTUContext;
 use EbicsApi\Ebics\Contexts\FDLContext;
@@ -51,11 +52,11 @@ use EbicsApi\Ebics\Models\UploadOrderResult;
 use EbicsApi\Ebics\Models\UploadTransaction;
 use EbicsApi\Ebics\Models\User;
 use EbicsApi\Ebics\Models\X509\ContentX509Generator;
+use EbicsApi\Ebics\Services\BufferFactory;
 use EbicsApi\Ebics\Services\CryptService;
 use EbicsApi\Ebics\Services\CurlHttpClient;
 use EbicsApi\Ebics\Services\XmlService;
 use EbicsApi\Ebics\Services\ZipService;
-use DateTimeInterface;
 use LogicException;
 
 /**
@@ -81,6 +82,7 @@ final class EbicsClient implements EbicsClientInterface
     private HttpClientInterface $httpClient;
     private TransactionFactory $transactionFactory;
     private SegmentFactory $segmentFactory;
+    private BufferFactory $bufferFactory;
 
     /**
      * Constructor.
@@ -88,38 +90,56 @@ final class EbicsClient implements EbicsClientInterface
      * @param Bank $bank
      * @param User $user
      * @param Keyring $keyring
+     * @param array $options
      */
-    public function __construct(Bank $bank, User $user, Keyring $keyring)
+    public function __construct(Bank $bank, User $user, Keyring $keyring, array $options = [])
     {
         $this->bank = $bank;
         $this->user = $user;
         $this->keyring = $keyring;
 
+        $this->segmentFactory = new SegmentFactory();
+        $this->cryptService = new CryptService();
+        $this->zipService = new ZipService();
+        $this->bufferFactory = new BufferFactory($options['buffer_filename'] ?? 'php://memory');
+
         if (Keyring::VERSION_24 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV24($bank, $user, $keyring);
             $this->orderDataHandler = new OrderDataHandlerV24($user, $keyring);
-            $this->responseHandler = new ResponseHandlerV24();
+            $this->responseHandler = new ResponseHandlerV24(
+                $this->segmentFactory,
+                $this->cryptService,
+                $this->zipService,
+                $this->bufferFactory
+            );
         } elseif (Keyring::VERSION_25 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV25($bank, $user, $keyring);
             $this->orderDataHandler = new OrderDataHandlerV25($user, $keyring);
-            $this->responseHandler = new ResponseHandlerV25();
+            $this->responseHandler = new ResponseHandlerV25(
+                $this->segmentFactory,
+                $this->cryptService,
+                $this->zipService,
+                $this->bufferFactory
+            );
         } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
             $this->requestFactory = new RequestFactoryV3($bank, $user, $keyring);
             $this->orderDataHandler = new OrderDataHandlerV3($user, $keyring);
-            $this->responseHandler = new ResponseHandlerV3();
+            $this->responseHandler = new ResponseHandlerV3(
+                $this->segmentFactory,
+                $this->cryptService,
+                $this->zipService,
+                $this->bufferFactory
+            );
         } else {
             throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
         }
 
-        $this->cryptService = new CryptService();
         $this->xmlService = new XmlService();
-        $this->zipService = new ZipService();
         $this->signatureFactory = new SignatureFactory();
         $this->documentFactory = new DocumentFactory();
         $this->orderResultFactory = new OrderResultFactory();
         $this->transactionFactory = new TransactionFactory();
-        $this->segmentFactory = new SegmentFactory();
-        $this->httpClient = new CurlHttpClient();
+        $this->httpClient = $options['http_client'] ?? new CurlHttpClient();
     }
 
     /**
@@ -1065,19 +1085,35 @@ final class EbicsClient implements EbicsClientInterface
 
         $this->transferReceipt($transaction, $acknowledged);
 
-        $orderDataEncrypted = '';
+        $orderDataEncoded = $this->bufferFactory->create();
         foreach ($transaction->getSegments() as $segment) {
-            $orderDataEncrypted .= $segment->getOrderData();
+            $orderDataEncoded->write($segment->getOrderData());
+            $segment->setOrderData('');
         }
+        $orderDataEncoded->rewind();
 
-        $orderDataCompressed = $this->cryptService->decryptOrderDataCompressed(
+        $orderDataDecoded = $this->bufferFactory->create();
+        while (!$orderDataEncoded->eof()) {
+            $orderDataDecoded->write(base64_decode($orderDataEncoded->read()));
+        }
+        $orderDataDecoded->rewind();
+        unset($orderDataEncoded);
+
+        $orderDataCompressed = $this->bufferFactory->create();
+        $this->cryptService->decryptOrderDataCompressed(
             $this->keyring,
-            $orderDataEncrypted,
+            $orderDataDecoded,
+            $orderDataCompressed,
             $lastSegment->getTransactionKey()
         );
-        $orderData = $this->zipService->uncompress($orderDataCompressed);
+        unset($orderDataDecoded);
 
-        $transaction->setOrderData($orderData);
+        $orderData = $this->bufferFactory->create();
+        $this->zipService->uncompress($orderDataCompressed, $orderData);
+        unset($orderDataCompressed);
+
+        $transaction->setOrderData($orderData->readContent());
+        unset($orderData);
 
         return $transaction;
     }
@@ -1269,14 +1305,6 @@ final class EbicsClient implements EbicsClientInterface
     public function getUser(): User
     {
         return $this->user;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setHttpClient(HttpClientInterface $httpClient): void
-    {
-        $this->httpClient = $httpClient;
     }
 
     /**

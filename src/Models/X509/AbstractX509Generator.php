@@ -2,6 +2,8 @@
 
 namespace EbicsApi\Ebics\Models\X509;
 
+use DateTime;
+use DateTimeInterface;
 use EbicsApi\Ebics\Contracts\Crypt\RSAInterface;
 use EbicsApi\Ebics\Contracts\Crypt\X509Interface;
 use EbicsApi\Ebics\Contracts\X509GeneratorInterface;
@@ -9,8 +11,6 @@ use EbicsApi\Ebics\Exceptions\X509\X509GeneratorException;
 use EbicsApi\Ebics\Factories\Crypt\X509Factory;
 use EbicsApi\Ebics\Services\RandomService;
 use EbicsApi\Ebics\Services\X509\X509ExtensionOptionsNormalizer;
-use DateTime;
-use DateTimeInterface;
 use RuntimeException;
 
 /**
@@ -43,6 +43,7 @@ abstract class AbstractX509Generator implements X509GeneratorInterface
 
     /**
      * @param array $certificateOptions
+     *
      * @deprecated 2.1 No longer used by internal code and not recommended. Extend getCertificateOptions() method.
      */
     public function setCertificateOptions(array $certificateOptions): void

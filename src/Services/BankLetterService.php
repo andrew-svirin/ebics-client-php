@@ -2,7 +2,6 @@
 
 namespace EbicsApi\Ebics\Services;
 
-use EbicsApi\Ebics\Contracts\BankLetter\HashGeneratorInterface;
 use EbicsApi\Ebics\Contracts\SignatureInterface;
 use EbicsApi\Ebics\Factories\CertificateX509Factory;
 use EbicsApi\Ebics\Factories\SignatureBankLetterFactory;
@@ -22,11 +21,14 @@ final class BankLetterService
     private SignatureBankLetterFactory $signatureBankLetterFactory;
     private CertificateX509Factory $certificateX509Factory;
 
-    public function __construct()
-    {
-        $this->cryptService = new CryptService();
-        $this->signatureBankLetterFactory = new SignatureBankLetterFactory();
-        $this->certificateX509Factory = new CertificateX509Factory();
+    public function __construct(
+        CryptService $cryptService,
+        SignatureBankLetterFactory $signatureBankLetterFactory,
+        CertificateX509Factory $certificateX509Factory
+    ) {
+        $this->cryptService = $cryptService;
+        $this->signatureBankLetterFactory = $signatureBankLetterFactory;
+        $this->certificateX509Factory = $certificateX509Factory;
     }
 
     /**

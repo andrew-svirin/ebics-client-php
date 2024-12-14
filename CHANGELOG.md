@@ -1,3 +1,7 @@
+## 2.4
+
+* Optimized memory usage.
+
 ## 2.3
 
 * Support specify custom keyring details for Electronic Signature.

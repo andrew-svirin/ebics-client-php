@@ -2,13 +2,14 @@
 
 namespace EbicsApi\Ebics\Tests\Services\BankLetter;
 
+use DateTime;
 use EbicsApi\Ebics\Factories\SignatureFactory;
 use EbicsApi\Ebics\Models\Bank;
 use EbicsApi\Ebics\Models\X509\BankX509Generator;
+use EbicsApi\Ebics\Services\CryptService;
 use EbicsApi\Ebics\Services\DigestResolverV2;
 use EbicsApi\Ebics\Services\DigestResolverV3;
 use EbicsApi\Ebics\Tests\AbstractEbicsTestCase;
-use DateTime;
 
 /**
  * Class HashGeneratorTest.
@@ -26,7 +27,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
      */
     public function testGenerateCertificateHashV2()
     {
-        $digestResolver = new DigestResolverV2();
+        $digestResolver = new DigestResolverV2(new CryptService());
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
@@ -56,7 +57,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
      */
     public function testGenerateCertificateHashV3()
     {
-        $digestResolver = new DigestResolverV3();
+        $digestResolver = new DigestResolverV3(new CryptService());
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();
@@ -86,7 +87,7 @@ class HashGeneratorTest extends AbstractEbicsTestCase
      */
     public function testGeneratePublicKeyHash()
     {
-        $digestResolver = new DigestResolverV2();
+        $digestResolver = new DigestResolverV2(new CryptService());
 
         $privateKey = $this->getPrivateKey();
         $publicKey = $this->getPublicKey();

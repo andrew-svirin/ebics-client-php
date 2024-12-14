@@ -19,9 +19,9 @@ abstract class KeyringManager implements KeyringManagerInterface
 {
     protected KeyringFactory $keyringFactory;
 
-    public function __construct()
+    public function __construct(KeyringFactory $keyringFactory)
     {
-        $this->keyringFactory = new KeyringFactory();
+        $this->keyringFactory = $keyringFactory;
     }
 
     public function createKeyring(string $version): Keyring

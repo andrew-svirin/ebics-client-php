@@ -519,13 +519,6 @@ interface EbicsClientInterface
     public function getUser(): User;
 
     /**
-     * Set http client to subset later in the project.
-     *
-     * @param HttpClientInterface $httpClient
-     */
-    public function setHttpClient(HttpClientInterface $httpClient): void;
-
-    /**
      * Get response handler for manual process response.
      *
      * @return ResponseHandler

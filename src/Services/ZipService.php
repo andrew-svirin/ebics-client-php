@@ -2,6 +2,7 @@
 
 namespace EbicsApi\Ebics\Services;
 
+use EbicsApi\Ebics\Models\Buffer;
 use RuntimeException;
 use ZipArchive;
 
@@ -17,6 +18,7 @@ final class ZipService
 {
     /**
      * Create temporary file to store zipped string.
+     *
      * @return string
      */
     private function createTmpFile(): string
@@ -24,6 +26,7 @@ final class ZipService
         if (!($path = tempnam(sys_get_temp_dir(), 'ebics-file'))) {
             throw new RuntimeException('Can not create temporary dir.');
         }
+
         return $path;
     }
 
@@ -62,21 +65,27 @@ final class ZipService
     /**
      * Uncompress from gz.
      *
-     * @param string $compressed
+     * @param Buffer $compressed
+     * @param Buffer $uncompressed
      *
-     * @return string
+     * @return void
      */
-    public function uncompress(string $compressed): string
+    public function uncompress(Buffer $compressed, Buffer $uncompressed): void
     {
-        if (!($uncompressed = gzuncompress($compressed))) {
-            throw new RuntimeException('Data can not be uncompressed.');
-        }
+        // Skip metadata.
+        $compressed->fseek(2);
 
-        return $uncompressed;
+        $compressed->filterAppend('zlib.inflate', STREAM_FILTER_READ);
+
+        while (!$compressed->eof()) {
+            $string = $compressed->read();
+            $uncompressed->write($string);
+        }
+        $uncompressed->rewind();
     }
 
     /**
-     * Compress to gz.
+     * Compress to gzlib.
      *
      * @param string $uncompressed
      *

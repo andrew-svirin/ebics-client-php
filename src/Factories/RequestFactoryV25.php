@@ -23,6 +23,7 @@ use EbicsApi\Ebics\Models\Keyring;
 use EbicsApi\Ebics\Models\UploadTransaction;
 use EbicsApi\Ebics\Models\User;
 use EbicsApi\Ebics\Models\UserSignature;
+use EbicsApi\Ebics\Services\CryptService;
 use EbicsApi\Ebics\Services\DigestResolverV2;
 use LogicException;
 
@@ -39,7 +40,7 @@ final class RequestFactoryV25 extends RequestFactoryV2
         $this->authSignatureHandler = new AuthSignatureHandlerV25($keyring);
         $this->userSignatureHandler = new UserSignatureHandlerV2($user, $keyring);
         $this->orderDataHandler = new OrderDataHandlerV25($user, $keyring);
-        $this->digestResolver = new DigestResolverV2();
+        $this->digestResolver = new DigestResolverV2(new CryptService());
         parent::__construct($bank, $user, $keyring);
     }
 

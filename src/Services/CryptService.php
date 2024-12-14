@@ -7,6 +7,7 @@ use EbicsApi\Ebics\Contracts\SignatureInterface;
 use EbicsApi\Ebics\Exceptions\EbicsException;
 use EbicsApi\Ebics\Factories\Crypt\AESFactory;
 use EbicsApi\Ebics\Factories\Crypt\RSAFactory;
+use EbicsApi\Ebics\Models\Buffer;
 use EbicsApi\Ebics\Models\Keyring;
 use LogicException;
 use RuntimeException;
@@ -49,17 +50,19 @@ final class CryptService
      * Decrypt encrypted OrderData.
      *
      * @param Keyring $keyring
-     * @param string $orderDataEncrypted
+     * @param Buffer $orderDataEncrypted
+     * @param Buffer $orderDataCompressed
      * @param string $transactionKey
      *
-     * @return string
+     * @return void
      * @throws EbicsException
      */
     public function decryptOrderDataCompressed(
         Keyring $keyring,
-        string $orderDataEncrypted,
+        Buffer $orderDataEncrypted,
+        Buffer $orderDataCompressed,
         string $transactionKey
-    ): string {
+    ): void {
         if (!($signatureE = $keyring->getUserSignatureE())) {
             throw new RuntimeException('Signature E is not set.');
         }
@@ -67,26 +70,27 @@ final class CryptService
         $rsa = $this->rsaFactory->createPrivate($signatureE->getPrivateKey(), $keyring->getPassword());
         $transactionKeyDecrypted = $rsa->decrypt($transactionKey);
 
-        return $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted);
+        $this->decryptByKey($transactionKeyDecrypted, $orderDataEncrypted, $orderDataCompressed);
     }
 
     /**
      * Algorithm AES-128-CBC.
      *
      * @param string $key
-     * @param string $encrypted
+     * @param Buffer $encrypted
+     * @param Buffer $plaintext
      *
-     * @return string
+     * @return void
      */
-    public function decryptByKey(string $key, string $encrypted): string
+    public function decryptByKey(string $key, Buffer $encrypted, Buffer $plaintext): void
     {
         $aes = $this->aesFactory->create();
         $aes->setKeyLength(128);
         $aes->setKey($key);
         // Force openssl_options.
-        $aes->setOpenSSLOptions(OPENSSL_ZERO_PADDING);
+        $aes->setOpenSSLOptions(OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING);
 
-        return $aes->decrypt($encrypted);
+        $aes->decryptBuffer($encrypted, $plaintext);
     }
 
     /**

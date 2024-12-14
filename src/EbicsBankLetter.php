@@ -4,6 +4,8 @@ namespace EbicsApi\Ebics;
 
 use EbicsApi\Ebics\Contracts\BankLetter\FormatterInterface;
 use EbicsApi\Ebics\Factories\BankLetterFactory;
+use EbicsApi\Ebics\Factories\CertificateX509Factory;
+use EbicsApi\Ebics\Factories\SignatureBankLetterFactory;
 use EbicsApi\Ebics\Models\Bank;
 use EbicsApi\Ebics\Models\BankLetter;
 use EbicsApi\Ebics\Models\Keyring;
@@ -12,6 +14,7 @@ use EbicsApi\Ebics\Services\BankLetter\Formatter\HtmlBankLetterFormatter;
 use EbicsApi\Ebics\Services\BankLetter\Formatter\PdfBankLetterFormatter;
 use EbicsApi\Ebics\Services\BankLetter\Formatter\TxtBankLetterFormatter;
 use EbicsApi\Ebics\Services\BankLetterService;
+use EbicsApi\Ebics\Services\CryptService;
 use EbicsApi\Ebics\Services\DigestResolverV2;
 use EbicsApi\Ebics\Services\DigestResolverV3;
 use LogicException;
@@ -27,10 +30,16 @@ final class EbicsBankLetter
 {
     private BankLetterService $bankLetterService;
     private BankLetterFactory $bankLetterFactory;
+    private CryptService $cryptService;
 
     public function __construct()
     {
-        $this->bankLetterService = new BankLetterService();
+        $this->cryptService = new CryptService();
+        $this->bankLetterService = new BankLetterService(
+            $this->cryptService,
+            new SignatureBankLetterFactory(),
+            new CertificateX509Factory()
+        );
         $this->bankLetterFactory = new BankLetterFactory();
     }
 
@@ -47,9 +56,9 @@ final class EbicsBankLetter
     public function prepareBankLetter(Bank $bank, User $user, Keyring $keyring): BankLetter
     {
         if (Keyring::VERSION_25 === $keyring->getVersion() || Keyring::VERSION_24 === $keyring->getVersion()) {
-            $digestResolver = new DigestResolverV2();
+            $digestResolver = new DigestResolverV2($this->cryptService);
         } elseif (Keyring::VERSION_30 === $keyring->getVersion()) {
-            $digestResolver = new DigestResolverV3();
+            $digestResolver = new DigestResolverV3($this->cryptService);
         } else {
             throw new LogicException(sprintf('Version "%s" is not implemented', $keyring->getVersion()));
         }

@@ -2,6 +2,7 @@
 
 namespace EbicsApi\Ebics\Models\Crypt;
 
+use EbicsApi\Ebics\Contracts\BufferInterface;
 use EbicsApi\Ebics\Contracts\Crypt\AESInterface;
 use LogicException;
 
@@ -177,13 +178,14 @@ final class AES implements AESInterface
             $this->changed = false;
         }
 
-        if (!($result = openssl_encrypt(
+        $result = openssl_encrypt(
             $plaintext,
             $this->cipherNameOpenssl,
             $this->key,
             $this->opensslOptions,
             $this->encryptIV
-        ))) {
+        );
+        if (!$result) {
             throw new LogicException('Encryption failed.');
         }
         if (!defined('OPENSSL_RAW_DATA')) {
@@ -226,6 +228,56 @@ final class AES implements AESInterface
         $padding = str_repeat(chr(0), $paddingSize - 1).chr($paddingSize);
 
         return $text.$padding;
+    }
+
+    public function decryptBuffer(BufferInterface $ciphertext, BufferInterface $plaintext): void
+    {
+        if ($this->paddable) {
+            // we pad with chr(0) since that's what mcrypt_generic does.  to quote from
+            // {@link http://www.php.net/function.mcrypt-generic}: "The data is padded with "\0"
+            // to make sure the length of the data is n * blocksize."
+
+            $length = ($this->block_size - $ciphertext->length() % $this->block_size) % $this->block_size;
+
+            $strpadRight = str_repeat(chr(0), $length);
+        }
+
+        if ($this->changed) {
+            $this->clearBuffers();
+            $this->changed = false;
+        }
+
+        while (!$ciphertext->eof()) {
+            $chunk = $ciphertext->read();
+
+            if ($ciphertext->length() === 0 && isset($strpadRight)) {
+                $chunk .= $strpadRight;
+            }
+
+            $plaintextChunk = openssl_decrypt(
+                $chunk,
+                $this->cipherNameOpenssl,
+                $this->key,
+                $this->opensslOptions,
+                $this->decryptIV
+            );
+
+            if (!$plaintextChunk) {
+                throw new LogicException('Encryption failed.');
+            }
+
+            if ($ciphertext->length() === 0 && $this->paddable) {
+                $plaintextChunk = $this->unpad($plaintextChunk);
+            }
+
+            $plaintext->write($plaintextChunk);
+
+            $this->decryptIV = substr($chunk, -16);
+        }
+
+        $this->clearBuffers();
+
+        $plaintext->rewind();
     }
 
     public function decrypt($ciphertext): string
@@ -339,8 +391,8 @@ final class AES implements AESInterface
                 if ($this->block_size != 16) {
                     return false;
                 }
-                $this->cipherNameOpensslEcb = 'aes-' . ($this->key_length << 3) . '-ecb';
-                $this->cipherNameOpenssl = 'aes-' . ($this->key_length << 3) . '-' . $this->opensslTranslateMode();
+                $this->cipherNameOpensslEcb = 'aes-'.($this->key_length << 3).'-ecb';
+                $this->cipherNameOpenssl = 'aes-'.($this->key_length << 3).'-'.$this->opensslTranslateMode();
                 break;
             default:
                 throw new LogicException('Unhandled engine.');
@@ -358,6 +410,7 @@ final class AES implements AESInterface
         if (in_array($this->cipherNameOpenssl, $methods)) {
             return true;
         }
+
         return false;
     }
 
